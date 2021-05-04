@@ -9,8 +9,12 @@ class Errors(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        if not ctx.command.has_error_handler():
-            await rift.handler(ctx, error)
+        if ctx.command.has_error_handler():
+            return
+        cog = ctx.cog
+        if cog and commands.Cog._get_overridden_method(cog.cog_command_error) is not None:
+            return
+        await rift.handler(ctx, error)
 
 
 def setup(bot):

@@ -13,12 +13,15 @@ class Database(commands.Cog):
 
     @commands.group(name="database", aliases=["archive", "db", "document", "documents"], invoke_without_command=True)
     async def database(self, ctx, *args):
+        if not args:
+            await ctx.reply(embed=rift.get_embed_author_member(ctx.author, "You didn't give any arguments!"))
+            return
         try:
             docs = await rift.search_documents(*args)
         except DocumentNotFoundError:
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"I couldn't find any documents matching your arguments `{'`, `'.join(args)}`"))
             return
-        embed = rift.get_document_embeds(ctx.author, docs)
+        embed = await rift.get_document_embeds(ctx.author, docs)
         if isinstance(embed, discord.Embed):
             await ctx.reply(embed=embed)
         else:
@@ -60,7 +63,6 @@ class Database(commands.Cog):
         if submission[2] is not None:
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"Submission #{sub_id} is not a pending submission."))
             return
-        # copied_url = await drive.copy_document(fileId=submission[1][submission[1].strip("/").remove("/edit").rfind("/")+1:submission[1].rfind("/")])
         await rift.edit_submission(sub_id=sub_id, status=status)
         if status:
             doc_id = await rift.add_document(name=name, url=submission[1])

@@ -25,6 +25,3 @@ class Confirm(Menu):
     async def confirm(self, ctx):
         await self.start(ctx, wait=True)
         return self.result
-
-    async def finalize(self, timed_out):
-        await self.message.clear_reactions()

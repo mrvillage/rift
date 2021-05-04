@@ -29,7 +29,7 @@ async def create_cache_servers(*, server_data):
     counter = 0
     for data in server_data:
         counter += 1
-        cache.documents[data[0]] = Server(data=data)
+        cache.servers[data[0]] = Server(data=data)
         if counter == 100:
             await asyncio.sleep(0)
             counter = 0

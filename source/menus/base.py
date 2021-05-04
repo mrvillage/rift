@@ -6,7 +6,10 @@ from ..ref import bot
 
 class Menu(menus.Menu):
     async def update(self, payload):
-        await bot.get_channel(payload.channel_id).get_partial_message(payload.message_id).remove_reaction(payload.emoji, payload.member)
+        try:
+            await bot.get_channel(payload.channel_id).get_partial_message(payload.message_id).remove_reaction(payload.emoji, payload.member)
+        except discord.Forbidden:
+            pass
         await super().update(payload)
 
     def reaction_check(self, payload):
@@ -19,7 +22,10 @@ class Menu(menus.Menu):
         return payload.emoji in self.buttons
 
     async def finalize(self, timed_out):
-        await self.message.clear_reactions()
+        try:
+            await self.message.clear_reactions()
+        except discord.Forbidden:
+            pass
 
 
 class EmbedPageSource(menus.ListPageSource):
@@ -32,7 +38,10 @@ class EmbedPageSource(menus.ListPageSource):
 
 class MenuPages(menus.MenuPages):
     async def update(self, payload):
-        await bot.get_channel(payload.channel_id).get_partial_message(payload.message_id).remove_reaction(payload.emoji, payload.member)
+        try:
+            await bot.get_channel(payload.channel_id).get_partial_message(payload.message_id).remove_reaction(payload.emoji, payload.member)
+        except discord.Forbidden:
+            pass
         await super().update(payload)
 
     async def send_initial_message(self, ctx, channel):

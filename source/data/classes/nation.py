@@ -61,6 +61,7 @@ class Nation(Base):
         self.alliance_id = self.data[7]
         self.alliance = self.data[8] if self.data[8] != "None" else None
         self.alliance_position = utils.get_alliance_position(self.data[9])
+        self.cities = self.data[10]
         self.offensive_wars = self.data[11]
         self.defensive_wars = self.data[12]
         self.score = self.data[13]
@@ -99,3 +100,13 @@ class Nation(Base):
                 return True
             else:
                 return SentError
+
+    def get_militarization(self):
+        militarization = {
+            "soldiers": self.soldiers/(self.cities*15000),
+            "tanks": self.tanks/(self.cities*1250),
+            "aircraft": self.aircraft/(self.cities*75),
+            "ships": self.ships/(self.cities*15),
+        }
+        militarization['total'] = sum(militarization.values())/4
+        return militarization

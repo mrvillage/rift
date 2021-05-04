@@ -4,7 +4,7 @@ from discord.ext import commands
 from ...data.query import get_mmr  # pylint: disable=relative-beyond-top-level
 
 
-class Experiments(commands.Cog):
+class Experiments(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot):
         self.bot = bot
 

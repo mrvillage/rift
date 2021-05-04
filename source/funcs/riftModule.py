@@ -107,13 +107,3 @@ def get_alliance_id(id):
         return "None"
     else:
         return id
-
-def get_nation_militarization(nation):
-    militarization = {
-        "soldiers": nation[19]/(nation[10]*15000),
-        "tanks": nation[20]/(nation[10]*1250),
-        "aircraft": nation[21]/(nation[10]*75),
-        "ships": nation[22]/(nation[10]*15)
-    }
-    militarization['total'] = sum(militarization.values())/4
-    return militarization

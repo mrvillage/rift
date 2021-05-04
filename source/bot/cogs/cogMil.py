@@ -3,9 +3,10 @@ import asyncio
 import json
 import time
 import aiohttp
+from io import BytesIO
 from discord.ext import commands, tasks
 from ... import funcs as rift  # pylint: disable=relative-beyond-top-level
-from io import BytesIO
+from ... import cache  # pylint: disable=relative-beyond-top-level
 
 
 class Military(commands.Cog):
@@ -116,34 +117,73 @@ class Military(commands.Cog):
         targets = await rift.get_targets_owner(self.bot.connection, ctx.author.id)
         await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"**Target ID | Nation ID | Nation Name**\n\n{f'{rift.NEWLINE}'.join([f'{target[0]} | {target[1]} | {(await rift.get_nation(self.bot.connection, target[1]))[1]}' for target in targets])}"))
 
-    @commands.group(name="militarization", aliases=["mil", "military"], case_insensitive=True)
+    @commands.group(name="militarization", aliases=["mil", "military"], case_insensitive=True, invoke_without_command=True)
     async def militarization(self, ctx, *, search=None):
         if search == None:
             nation_id = (await rift.get_link_user(self.bot.connection, ctx.author.id))[1]
-            alliance_id = (await rift.get_nation(self.bot.connection, nation_id))[7]
-            alliance = await rift.get_alliance(self.bot.connection, alliance_id)
+            alliance = cache.nations[nation_id].alliance
         else:
             try:
-                alliance_id = int(search)
-                alliance = await rift.get_alliance(self.bot.connection, alliance_id)
-            except:
+                user = (await commands.UserConverter().convert(ctx, search))
                 try:
-                    alliance = await rift.get_alliance_name(self.bot.connection, search)
-                    alliance_id = alliance[0]
-                except Exception:
+                    nation_id = (await rift.get_link_user(self.bot.connection, user.id))[1]
+                except IndexError:
+                    await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"No link found for user {user.mention}."))
+                    return
+                alliance = cache.nations[nation_id].alliance
+            except commands.BadArgument:
+                try:
+                    alliance_id = int(search)
+                    alliance = cache.alliances[alliance_id]
+                except ValueError:
+                    try:
+                        alliance = await rift.get_alliance_name(self.bot.connection, search)
+                        alliance = cache.alliances[alliance[0]]
+                    except IndexError:
+                        await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"Alliance `{search}` not found."))
+                        return
+                except KeyError:
                     await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"Alliance `{search}` not found."))
                     return
         async with ctx.typing():
-            async with aiohttp.request("GET", f"https://checkapi.bsnk.dev/getChart?allianceID={alliance_id}") as req:
+            async with aiohttp.request("GET", f"https://checkapi.bsnk.dev/getChart?allianceID={alliance.id}") as req:
                 byte = await req.read()
-        alliance_members = await rift.get_alliance_members(self.bot.connection, alliance_id)
-        alliance_members_militarization = [
-            rift.get_nation_militarization(nation) for nation in alliance_members]
+        militarization = alliance.get_militarization(vm=False)
         image = discord.File(
-            BytesIO(byte), f"militarization_{alliance_id}.png")
-        embed = rift.get_embed_author_member(ctx.author, f"Total Militarization: {sum([mil['total'] for mil in alliance_members_militarization])/len(alliance_members):.2f}\nSoldier Militarization: {sum([mil['soldiers'] for mil in alliance_members_militarization])/len(alliance_members):.2f}\nTank Militarization: {sum([mil['tanks'] for mil in alliance_members_militarization])/len(alliance_members):.2f}\nAircraft Militarization: {sum([mil['aircraft'] for mil in alliance_members_militarization])/len(alliance_members):.2f}\nShip Militarization: {sum([mil['ships'] for mil in alliance_members_militarization])/len(alliance_members):.2f}",
-                                             title=f"Militarization Graph for {alliance[2]} (`{alliance_id}`)", image_url=f"attachment://militarization_{alliance_id}.png")
+            BytesIO(byte), f"militarization_{alliance.id}.png")
+        embed = rift.get_embed_author_member(ctx.author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization Graph for {alliance.name} (`{alliance.id}`)", image_url=f"attachment://militarization_{alliance.id}.png")
         await ctx.send(file=image, embed=embed)
+
+    @militarization.command(name="nation", aliases=["n", "nat"])
+    async def militarization_nation(self, ctx, *, search=None):
+        if search == None:
+            nation_id = (await rift.get_link_user(self.bot.connection, ctx.author.id))[1]
+            nation = cache.nations[nation_id]
+        else:
+            try:
+                user = (await commands.UserConverter().convert(ctx, search))
+                try:
+                    nation_id = (await rift.get_link_user(self.bot.connection, user.id))[1]
+                except IndexError:
+                    await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"No link found for user {user.mention}."))
+                    return
+                nation = cache.nations[nation_id]
+            except commands.BadArgument:
+                try:
+                    nation_id = int(search)
+                    nation = cache.nations[nation_id]
+                except ValueError:
+                    try:
+                        nation = await rift.get_nation_name(self.bot.connection, search)
+                        nation = cache.nations[nation[0]]
+                    except IndexError:
+                        await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"Nation `{search}` not found."))
+                        return
+                except KeyError:
+                    await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"Nation `{search}` not found."))
+                    return
+        militarization = nation.get_militarization()
+        await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}%\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization for {nation.name} (`{nation.id}`)"))
 
 
 def setup(bot):

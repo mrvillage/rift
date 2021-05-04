@@ -12,7 +12,7 @@ bot = rift.bot
 
 @bot.event
 async def on_message(message):
-    if message.channel.type != discord.ChannelType.private and message.author.id == 258298021266063360:
+    if message.channel.type != discord.ChannelType.private:
         await bot.process_commands(message)
 
 
@@ -20,8 +20,11 @@ async def on_message(message):
 async def on_raw_message_edit(payload):
     message = await bot.get_channel(
         payload.channel_id).fetch_message(payload.message_id)
-    if message.created_at + datetime.timedelta(minutes=10) >= message.edited_at:
-        await bot.process_commands(message)
+    try:
+        if message.created_at + datetime.timedelta(minutes=10) >= message.edited_at:
+            await bot.process_commands(message)
+    except TypeError:
+        pass
 
 
 @bot.event

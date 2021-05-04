@@ -11,7 +11,7 @@ class PnWInfo(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="nation", aliases=["whois", "who", "check-link", "checklink"], help="Get information about a nation.", case_insensitive=True)
+    @commands.command(name="nation", aliases=["whois", "who", "check-link", "checklink", "nat"], help="Get information about a nation.", case_insensitive=True)
     async def nation(self, ctx, *, search=None):
         user = None
         if search == None:

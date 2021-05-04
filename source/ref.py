@@ -7,6 +7,7 @@ from .errors import LoginError
 from discord.ext.commands import Bot, when_mentioned_or
 from .data.db.connect import connection
 from .data.db import execute_read_query
+from .help import EmbedHelpCommand
 
 
 class Rift(Bot):
@@ -47,4 +48,4 @@ class Rift(Bot):
 
 intents = Intents.all()
 bot = Rift(command_prefix=when_mentioned_or("?"), intents=intents, case_insensitive=True,
-           allowed_mentions=AllowedMentions(replied_user=False), activity=Game(name=__version__), strip_after_prefix=True)
+           allowed_mentions=AllowedMentions(replied_user=False), activity=Game(name=__version__), strip_after_prefix=True, help_command=EmbedHelpCommand())
