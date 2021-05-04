@@ -43,7 +43,7 @@ class Rift(Bot):
 
     async def close(self):
         await self.pnw_session.close()
-        super().close()
+        await super().close()
 
 
 intents = Intents.all()

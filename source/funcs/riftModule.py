@@ -1,7 +1,6 @@
 import discord, json, os, asyncio, random, time, datetime
 from dotenv import load_dotenv
 from discord.ext import commands
-import aiosqlite
 from discord.ext.commands import MemberConverter
 from .core import * # pylint: disable=unused-wildcard-import
 from ..data.db.sql import * # pylint: disable=unused-wildcard-import
