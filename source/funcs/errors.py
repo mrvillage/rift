@@ -16,8 +16,6 @@ async def print_handler(ctx, error):
         ctx.command), file=sys.stderr)
     traceback.print_exception(
         type(error), error, error.__traceback__, file=sys.stderr)
-    traceback.print_exception(
-        type(error), error, error.__traceback__, file="errorLogs.txt")
 
 
 async def handler(ctx, error):

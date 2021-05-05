@@ -40,6 +40,7 @@ class Rift(Bot):
 
     async def get_staff(self):
         self.staff = [i[0] for i in await execute_read_query("SELECT * FROM staff;")]
+        return self.staff
 
     async def close(self):
         await self.pnw_session.close()

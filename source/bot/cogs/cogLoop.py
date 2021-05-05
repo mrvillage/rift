@@ -75,9 +75,6 @@ class Loop(commands.Cog):
         # wait = now
         await discord.utils.sleep_until(wait)
 
-    def cog_unload(self):
-        print("Unloaded api!")
-
 
 def setup(bot):
     bot.add_cog(Loop(bot))
