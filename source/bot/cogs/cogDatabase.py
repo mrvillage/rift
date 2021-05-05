@@ -40,7 +40,7 @@ class Database(commands.Cog):
     @database.command(name="submissions")
     @checks.is_staff()
     async def database_submissions(self, ctx):
-        submissions = await rift.get_submissions()
+        submissions = await rift.get_document_submissions()
         try:
             subs = '\n'.join([f"{i[0]} - {i[1]}" for i in submissions])
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"There are {len(submissions)} pending submissions:\n{subs}"))
@@ -55,7 +55,7 @@ class Database(commands.Cog):
         except ZeroDivisionError:
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"`{status}` is not a valid status."))
             return
-        submission = await rift.get_submission(sub_id=sub_id)
+        submission = await rift.get_document_submission(sub_id=sub_id)
         if len(submission) == 0:
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"`{sub_id}` is not a valid submission ID."))
             return
@@ -63,7 +63,7 @@ class Database(commands.Cog):
         if submission[2] is not None:
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"Submission #{sub_id} is not a pending submission."))
             return
-        await rift.edit_submission(sub_id=sub_id, status=status)
+        await rift.edit_document_submission(sub_id=sub_id, status=status)
         if status:
             doc_id = await rift.add_document(name=name, url=submission[1])
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"Submission #{sub_id} has been approved."))

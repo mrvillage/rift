@@ -21,7 +21,7 @@ search_documents = search_document
 
 async def get_document_embeds(author, docs):
     if len(docs) == 1:
-        return get_embed_author_member(author, description=f"[{docs[0].name} - {docs[0].id}]({docs[0].url}\"{docs[0].url}\")" + f"\n\n{docs[0].description.encode('utf-8').decode('unicode-escape') if docs[0].description is not None else ''}", fields=[
+        return get_embed_author_member(author, description=f"[{docs[0].name} - {docs[0].id}]({docs[0].url} \"{docs[0].url}\")" + f"\n\n{docs[0].description.encode('utf-8').decode('unicode-escape') if docs[0].description is not None else ''}", fields=[
             {"name": "Categories", "value": ", ".join(
                 docs[0].categories) if docs[0].categories is not None else "None"},
             {"name": "Keywords", "value": ", ".join(
@@ -29,7 +29,7 @@ async def get_document_embeds(author, docs):
         ])
     else:
         l = len(docs)
-        embeds = [get_embed_author_member(author, title=doc.name, description=f"[Document ID: {doc.id}]({doc.url}\"{doc.url}\")" + f"\n\n{doc.description.encode('utf-8').decode('unicode-escape') if doc.description is not None else ''}", fields=[
+        embeds = [get_embed_author_member(author, title=doc.name, description=f"[Document ID: {doc.id}]({doc.url} \"{doc.url}\")" + f"\n\n{doc.description.encode('utf-8').decode('unicode-escape') if doc.description is not None else ''}", fields=[
             {"name": "Categories", "value": ", ".join(
                 doc.categories) if doc.categories is not None else "None"},
             {"name": "Keywords", "value": ", ".join(
