@@ -84,3 +84,27 @@ class Alliance(Base):
         }
         militarization["total"] = sum(militarization.values())/4
         return militarization
+
+    def get_soldiers(self, vm=None):
+        members = self.list_members(vm=vm)
+        return sum(i.soldiers for i in members)
+
+    def get_tanks(self, vm=None):
+        members = self.list_members(vm=vm)
+        return sum(i.tanks for i in members)
+
+    def get_aircraft(self, vm=None):
+        members = self.list_members(vm=vm)
+        return sum(i.aircraft for i in members)
+
+    def get_ships(self, vm=None):
+        members = self.list_members(vm=vm)
+        return sum(i.ships for i in members)
+
+    def get_missiles(self, vm=None):
+        members = self.list_members(vm=vm)
+        return sum(i.missiles for i in members)
+
+    def get_nukes(self, vm=None):
+        members = self.list_members(vm=vm)
+        return sum(i.nukes for i in members)
