@@ -29,7 +29,7 @@ async def get_server_embeds(ctx, servers):
         except BadInviteArgument:
             invalid.append(server)
     if len(servers) == 1:
-        return get_embed_author_member(ctx.author, description=f"[{servers[0].name} - {servers[0].id}]({servers[0].invite}\"{servers[0].invite}\")" + f"{f'{NEWLINE}{NEWLINE}{servers[0].description}' if servers[0].description is not None else ''}" + f"{f'{NEWLINE}INVALID LINK' if server in invalid else ''}", fields=[
+        return get_embed_author_member(ctx.author, description=f"[{servers[0].name} - {servers[0].id}]({servers[0].invite} \"{servers[0].invite}\")" + f"{f'{NEWLINE}{NEWLINE}{servers[0].description}' if servers[0].description is not None else ''}" + f"{f'{NEWLINE}INVALID LINK' if server in invalid else ''}", fields=[
             {"name": "Categories", "value": ", ".join(
                 servers[0].categories) if servers[0].categories is not None else "None"},
             {"name": "Keywords", "value": ", ".join(
@@ -37,7 +37,7 @@ async def get_server_embeds(ctx, servers):
         ]), invalid
     else:
         l = len(servers)
-        embeds = [get_embed_author_member(ctx.author, title=server.name, description=f"[Server ID: {server.id}]({server.invite}\"{server.invite}\")" + f"{f'{NEWLINE}{NEWLINE}{server.description}' if server.description is not None else ''}" + f"{f'{NEWLINE}INVALID LINK' if server in invalid else ''}", fields=[
+        embeds = [get_embed_author_member(ctx.author, title=server.name, description=f"[Server ID: {server.id}]({server.invite} \"{server.invite}\")" + f"{f'{NEWLINE}{NEWLINE}{server.description}' if server.description is not None else ''}" + f"{f'{NEWLINE}INVALID LINK' if server in invalid else ''}", fields=[
             {"name": "Categories", "value": ", ".join(
                 server.categories) if server.categories is not None else "None"},
             {"name": "Keywords", "value": ", ".join(
