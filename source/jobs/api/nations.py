@@ -118,5 +118,7 @@ async def fetch_nations():
     await jobs.target_check()
     try:
         await cache.refresh_cache_nations(nation_data=nations_)
+        await cache.link_cache_cities()
+        await cache.link_cache_nations()
     except UnboundLocalError:
         pass
