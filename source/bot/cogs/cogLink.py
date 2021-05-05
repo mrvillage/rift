@@ -18,7 +18,7 @@ class Link(commands.Cog):
             else:
                 nation_id = int(nation)
         except ValueError:
-            await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"`{nation_id}` is not a valid nation!"))
+            await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"`{nation_id}` is not a valid nation!"))
             return
         if user == None:
             user = ctx.author
@@ -27,13 +27,13 @@ class Link(commands.Cog):
             user_id = user.id
         links = await rift.get_links(self.bot.connection)
         if any(user_id in tuple(i) for i in links):
-            await ctx.send(embed=rift.get_embed_author_member(user, f"<@!{user_id}> is already linked!"))
+            await ctx.reply(embed=rift.get_embed_author_member(user, f"<@!{user_id}> is already linked!"))
             return
         if any(user_id in tuple(i) for i in links):
-            await ctx.send(embed=rift.get_embed_author_member(user, f"Nation {nation_id} is already linked!"))
+            await ctx.reply(embed=rift.get_embed_author_member(user, f"Nation {nation_id} is already linked!"))
             return
         await rift.add_link(self.bot.connection, user_id, nation_id)
-        await ctx.send(embed=rift.get_embed_author_member(user, f"<@!{user_id}> is now linked to nation {nation_id}!"))
+        await ctx.reply(embed=rift.get_embed_author_member(user, f"<@!{user_id}> is now linked to nation {nation_id}!"))
 
 
 def setup(bot):

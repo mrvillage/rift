@@ -13,5 +13,6 @@ class Fun(commands.Cog):
     async def link(self, ctx):
         await ctx.send("Toot tooooooot!")
 
+
 def setup(bot):
     bot.add_cog(Fun(bot))
