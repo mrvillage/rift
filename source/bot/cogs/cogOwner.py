@@ -93,6 +93,16 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         self.bot.staff.append(member.id)
         await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"{member.menton} is now Staff."))
 
+    @staff.command(name="remove")
+    async def staff_remove(self, ctx, member: discord.Member):
+        staff = self.bot.get_staff()
+        if member.id not in staff:
+            await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"{member.mention} is not Staff."))
+            return
+        await execute_query("DELETE FROM staff WHERE id = $1;", member.id)
+        self.bot.staff.remove(member.id)
+        await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"{member.menton} has been removed from Staff."))
+
 
 def setup(bot):
     bot.add_cog(Owner(bot))
