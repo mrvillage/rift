@@ -25,16 +25,16 @@ class Loop(commands.Cog):
     async def pnw_session_refresh(self):
         await self.bot.update_pnw_session()
 
-    @tasks.loop(minutes=15)
+    @tasks.loop(minutes=5)
     async def fetch_nations(self):
         await jobs.target_check()
         await api.fetch_nations()
 
-    @tasks.loop(minutes=15)
+    @tasks.loop(minutes=5)
     async def fetch_alliances(self):
         await api.fetch_alliances()
 
-    @tasks.loop(minutes=15)
+    @tasks.loop(minutes=5)
     async def fetch_cities(self):
         await api.fetch_cities()
 
@@ -52,7 +52,7 @@ class Loop(commands.Cog):
         now = datetime.datetime.utcnow()
         wait = now.replace(minute=5, second=0)
         while wait < now:
-            wait += datetime.timedelta(minutes=15)
+            wait += datetime.timedelta(minutes=5)
         print("wait", wait)
         # wait = now
         await discord.utils.sleep_until(wait)
@@ -62,7 +62,7 @@ class Loop(commands.Cog):
         now = datetime.datetime.utcnow()
         wait = now.replace(minute=5, second=0)
         while wait < now:
-            wait += datetime.timedelta(minutes=15)
+            wait += datetime.timedelta(minutes=5)
         # wait = now
         await discord.utils.sleep_until(wait)
 
@@ -71,7 +71,7 @@ class Loop(commands.Cog):
         now = datetime.datetime.utcnow()
         wait = now.replace(minute=5, second=0)
         while wait < now:
-            wait += datetime.timedelta(minutes=15)
+            wait += datetime.timedelta(minutes=5)
         # wait = now
         await discord.utils.sleep_until(wait)
 
