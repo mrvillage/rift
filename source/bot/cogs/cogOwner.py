@@ -5,7 +5,7 @@ from ...data.db import execute_query, execute_read_query  # pylint: disable=rela
 
 
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     async def cog_check(self, ctx):
@@ -79,29 +79,37 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         except commands.ExtensionNotFound:
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"Extension `{extension}` does not exist."))
 
-    @commands.group(name="staff")
+    @commands.group(name="staff", invoke_without_command=True)
     async def staff(self, ctx):
         await ctx.reply(embed=rift.get_embed_author_member(ctx.author, "You forgot to give a subcommand!"))
 
     @staff.command(name="add")
     async def staff_add(self, ctx, member: discord.Member):
-        staff = self.bot.get_staff()
+        staff = await self.bot.get_staff()
         if member.id in staff:
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"{member.mention} is already Staff."))
             return
         await execute_query("INSERT INTO staff VALUES ($1);", member.id)
         self.bot.staff.append(member.id)
-        await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"{member.menton} is now Staff."))
+        await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"{member.mention} is now Staff."))
 
     @staff.command(name="remove")
     async def staff_remove(self, ctx, member: discord.Member):
-        staff = self.bot.get_staff()
+        staff = await self.bot.get_staff()
         if member.id not in staff:
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"{member.mention} is not Staff."))
             return
         await execute_query("DELETE FROM staff WHERE id = $1;", member.id)
         self.bot.staff.remove(member.id)
-        await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"{member.menton} has been removed from Staff."))
+        await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"{member.mention} has been removed from Staff."))
+
+    @staff.command(name="list")
+    async def staff_list(self, ctx):
+        staff = await self.bot.get_staff()
+        staff = [await self.bot.fetch_user(s) for s in staff]
+        staff = [i for i in staff if i is not None]
+        mentions = "\n".join([i.mention for i in staff])
+        await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"There are {len(staff):,} Staff:\n{mentions}"))
 
 
 def setup(bot):
