@@ -1,4 +1,4 @@
-__version__ = "Alpha 2.0.0"
+__version__ = "Alpha 2.0.1"
 
 import os
 from dotenv import load_dotenv
