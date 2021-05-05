@@ -122,6 +122,8 @@ class Military(commands.Cog):
         if search == None:
             nation_id = (await rift.get_link_user(self.bot.connection, ctx.author.id))[1]
             alliance = (cache.nations[nation_id]).alliance
+            if isinstance(alliance, str):
+                alliance = cache.alliances[(await rift.get_alliance_name(self.bot.connection, alliance))[0]]
         else:
             try:
                 user = (await commands.UserConverter().convert(ctx, search))
