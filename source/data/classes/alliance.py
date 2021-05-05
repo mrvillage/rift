@@ -23,6 +23,7 @@ class Alliance(Base):
         self.flagurl = self.data[12] if self.data[12] is not None else None
         self.forumurl = self.data[13] if self.data[13] is not None else None
         self.ircchan = self.data[14] if self.data[14] is not None else None
+        self.discord = self.ircchan
 
     def __repr__(self):
         return f"{self.id}-{self.name}"
