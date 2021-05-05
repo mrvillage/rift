@@ -80,9 +80,7 @@ async def fetch_alliances():
                 str(i['ircchan']) if not i['ircchan'] == "" else None,
             ) for i in alliances['alliances']]
             # await rift.execute_query_many( "INSERT INTO alliancesnew VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",alliances_)
-            for i, alliance in enumerate(alliances_):
-                await asyncio.sleep(0)
-                await execute_query("INSERT INTO alliancesnew (id, founddate, name, acronym, color, rank, members, score, leaderids, officerids, heirids, avgscore, flagurl, forumurl, ircchan) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);", *alliance)
+            await execute_query_many("INSERT INTO alliancesnew (id, founddate, name, acronym, color, rank, members, score, leaderids, officerids, heirids, avgscore, flagurl, forumurl, ircchan) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);", alliances_)
         await execute_query(f"""
             DROP TABLE alliances;
             ALTER TABLE alliancesnew RENAME TO alliances;

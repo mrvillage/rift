@@ -53,9 +53,7 @@ async def fetch_cities():
                 float(i['land'])
             ) for i in cities['all_cities']]
             # await rift.execute_query_many( "INSERT INTO alliancesnew VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",alliances_)
-            for city in cities_:
-                await asyncio.sleep(0)
-                await execute_query("INSERT INTO citiesnew (id, nation_id, city_name, capital, infrastructure, maxinfra, land) VALUES ($1, $2, $3, $4, $5, $6, $7);", *city)
+            await execute_query_many("INSERT INTO citiesnew (id, nation_id, city_name, capital, infrastructure, maxinfra, land) VALUES ($1, $2, $3, $4, $5, $6, $7);", cities_)
         await execute_query(f"""
             DROP TABLE cities;
             ALTER TABLE citiesnew RENAME TO cities;

@@ -1,7 +1,6 @@
 import datetime
 import json
 import aiohttp
-import asyncio
 from ...data.db import execute_query, execute_query_many
 from ...env import BASEURL, APIKEY
 from ... import jobs
@@ -107,9 +106,7 @@ async def fetch_nations():
             int(i['nukes'])
         ) for i in nations]
         # await rift.execute_query_many( "INSERT INTO nationsnew VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", nations_)
-        for nation in nations_:
-            await asyncio.sleep(0)
-            await execute_query("INSERT INTO nationsnew VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25);", nation)
+        await execute_query_many("INSERT INTO nationsnew VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25);", nations_)
         await execute_query(f"""
             DROP TABLE nations;
             ALTER TABLE nationsnew RENAME TO nations;
