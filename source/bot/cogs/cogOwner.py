@@ -85,7 +85,13 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
     @staff.command(name="add")
     async def staff_add(self, ctx, member: discord.Member):
-        await ctx.reply()
+        staff = self.bot.get_staff()
+        if member.id in staff:
+            await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"{member.mention} is already Staff."))
+            return
+        await execute_query("INSERT INTO staff VALUES ($1);", member.id)
+        self.bot.staff.append(member.id)
+        await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"{member.menton} is now Staff."))
 
 
 def setup(bot):
