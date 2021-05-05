@@ -1,6 +1,7 @@
 import datetime
 import json
 import aiohttp
+import asyncio
 from ...data.db import execute_query, execute_query_many
 from ...env import BASEURL, APIKEY
 from ... import jobs
@@ -53,6 +54,7 @@ async def fetch_cities():
             ) for i in cities['all_cities']]
             # await rift.execute_query_many( "INSERT INTO alliancesnew VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",alliances_)
             for city in cities_:
+                await asyncio.sleep(0)
                 await execute_query("INSERT INTO citiesnew (id, nation_id, city_name, capital, infrastructure, maxinfra, land) VALUES ($1, $2, $3, $4, $5, $6, $7);", *city)
         await execute_query(f"""
             DROP TABLE cities;
