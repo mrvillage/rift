@@ -25,7 +25,7 @@ class Military(commands.Cog):
             return
         nation = await rift.get_nation(self.bot.connection, target[1])
         embed = rift.get_embed_author_member(discord.utils.find(lambda c: c.id == target[3], self.bot.get_all_members(
-        )), f"{nation[1]} - {nation[0]}\nCurrent Color: {rift.get_color(nation[6], nation[16])}")
+        )), f"{nation[1]} - {nation[0]}\nCurrent Color: {rift.get_color(nation[6]) if nation[6] != 0 else f'Beige ({nation[16]} Turns)'}")
         channels, roles, members = [str(i) for i in json.loads(target[4])], [str(
             i) for i in json.loads(target[5])], [str(i) for i in json.loads(target[6])]
         if len(channels) != 0:
@@ -76,7 +76,7 @@ class Military(commands.Cog):
                         pass
         await rift.add_target(self.bot.connection, nation_id, nation[6], ctx.author.id, channels, roles, members)
         embed = rift.get_embed_author_member(
-            ctx.author, f"`{nation[1]}` added as target.\nCurrent Color: {rift.get_color(nation[6],nation[16])}")
+            ctx.author, f"`{nation[1]}` added as target.\nCurrent Color: {rift.get_color(nation[6]) if nation[6] != 0 else f'Beige ({nation[16]} Turns)'}")
         channels, roles, members = [str(i) for i in channels], [
             str(i) for i in roles], [str(i) for i in members]
         if len(channels) != 0:
@@ -121,7 +121,7 @@ class Military(commands.Cog):
     async def militarization(self, ctx, *, search=None):
         if search == None:
             nation_id = (await rift.get_link_user(self.bot.connection, ctx.author.id))[1]
-            alliance = cache.nations[nation_id].alliance
+            alliance = (cache.nations[nation_id]).alliance
         else:
             try:
                 user = (await commands.UserConverter().convert(ctx, search))
@@ -154,7 +154,7 @@ class Military(commands.Cog):
         embed = rift.get_embed_author_member(ctx.author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization Graph for {alliance.name} (`{alliance.id}`)", image_url=f"attachment://militarization_{alliance.id}.png")
         await ctx.send(file=image, embed=embed)
 
-    @militarization.command(name="nation", aliases=["n", "nat"])
+    @militarization.command(name="nation", aliases=["n", "nat", "me"])
     async def militarization_nation(self, ctx, *, search=None):
         if search == None:
             nation_id = (await rift.get_link_user(self.bot.connection, ctx.author.id))[1]

@@ -45,5 +45,5 @@ for cog in cogs:
 bot.loop.create_task(cache.create_cache())
 bot.loop.create_task(bot.update_pnw_session())
 bot.loop.create_task(bot.get_staff())
-# bot.command_prefix = "!!"
+bot.command_prefix = "!!"
 bot.run(TOKEN)

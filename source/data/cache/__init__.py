@@ -69,4 +69,4 @@ async def create_cache(*, alliance_data=None, city_data=None, nation_data=None, 
     s = [list(i.data) for i in s]
     await link_cache_cities()
     await link_cache_nations()
-    pass
+    print("Cache Created")
