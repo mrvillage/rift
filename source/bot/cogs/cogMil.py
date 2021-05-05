@@ -151,7 +151,7 @@ class Military(commands.Cog):
         militarization = alliance.get_militarization(vm=False)
         image = discord.File(
             BytesIO(byte), f"militarization_{alliance.id}.png")
-        embed = rift.get_embed_author_member(ctx.author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization Graph for {alliance.name} (`{alliance.id}`)", image_url=f"attachment://militarization_{alliance.id}.png")
+        embed = rift.get_embed_author_member(ctx.author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization Graph for {alliance.name} (`{alliance.id}`)", image_url=f"attachment://militarization_{alliance.id}.png", timestamp=self.bot.nations_update, footer="Data collected at")
         await ctx.send(file=image, embed=embed)
 
     @militarization.command(name="nation", aliases=["n", "nat", "me"])
@@ -183,7 +183,7 @@ class Military(commands.Cog):
                     await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"Nation `{search}` not found."))
                     return
         militarization = nation.get_militarization()
-        await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}%\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization for {nation.name} (`{nation.id}`)"))
+        await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}%\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization for {nation.name} (`{nation.id}`)", timestamp=self.bot.nations_update, footer="Data collected at"))
 
 
 def setup(bot):
