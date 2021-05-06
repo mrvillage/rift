@@ -153,12 +153,13 @@ class Military(commands.Cog):
         militarization = alliance.get_militarization(vm=False)
         image = discord.File(
             BytesIO(byte), f"militarization_{alliance.id}.png")
+        cities = alliance.get_cities()
         embed = rift.get_embed_author_member(ctx.author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization Graph for {alliance.name} (`{alliance.id}`)", image_url=f"attachment://militarization_{alliance.id}.png", timestamp=self.bot.nations_update, footer="Data collected at", fields=[
-            {"name": "Soldiers", "value": f"{alliance.get_soldiers():,}"},
-            {"name": "Tanks", "value": f"{alliance.get_tanks():,}"},
-            {"name": "Aircraft", "value": f"{alliance.get_aircraft():,}"},
-            {"name": "Ships", "value": f"{alliance.get_ships():,}"},
-            {"name": "Missiles", "value": f"{alliance.get_ships():,}"},
+            {"name": "Soldiers", "value": f"{alliance.get_soldiers():,}/{cities*15000:,}"},
+            {"name": "Tanks", "value": f"{alliance.get_tanks():,}/{cities*1250:,}"},
+            {"name": "Aircraft", "value": f"{alliance.get_aircraft():,}/{cities*75:,}"},
+            {"name": "Ships", "value": f"{alliance.get_ships():,}/{cities*15:,}"},
+            {"name": "Missiles", "value": f"{alliance.get_missiles():,}"},
             {"name": "Nukes", "value": f"{alliance.get_nukes():,}"},
         ])
         await ctx.send(file=image, embed=embed)
@@ -193,11 +194,11 @@ class Military(commands.Cog):
                     return
         militarization = nation.get_militarization()
         await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}%\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization for {nation.name} (`{nation.id}`)", timestamp=self.bot.nations_update, footer="Data collected at", fields=[
-            {"name": "Soldiers", "value": f"{nation.soldiers:,}"},
-            {"name": "Tanks", "value": f"{nation.tanks:,}"},
-            {"name": "Aircraft", "value": f"{nation.aircraft:,}"},
-            {"name": "Ships", "value": f"{nation.ships:,}"},
-            {"name": "Missiles", "value": f"{nation.ships:,}"},
+            {"name": "Soldiers", "value": f"{nation.soldiers:,}/{nation.cities*15000:,}"},
+            {"name": "Tanks", "value": f"{nation.tanks:,}/{nation.cities*1250:,}"},
+            {"name": "Aircraft", "value": f"{nation.aircraft:,}/{nation.cities*75:,}"},
+            {"name": "Ships", "value": f"{nation.ships:,}/{nation.cities*15:,}"},
+            {"name": "Missiles", "value": f"{nation.missiles:,}"},
             {"name": "Nukes", "value": f"{nation.nukes:,}"},
         ]))
 
