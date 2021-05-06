@@ -113,3 +113,15 @@ class Alliance(Base):
     def get_cities(self, vm=None):
         members = self.list_members(vm=vm)
         return sum(i.cities for i in members)
+
+    def __str__(self):
+        return self.name
+
+    def __int__(self):
+        return self.id
+
+    def __float__(self):
+        return sum(i[0] for i in self.list_members(vm=False))
+
+    def __len__(self):
+        return len(i[0] for i in self.list_members(vm=False))
