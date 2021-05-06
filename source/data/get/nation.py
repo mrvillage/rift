@@ -1,6 +1,5 @@
 from ..db import execute_query, execute_read_query
 
-from ..db import connection
 
 async def get_nation(*, nation_id=None, nation_name=None):
     if nation_id is not None:
