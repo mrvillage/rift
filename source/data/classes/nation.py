@@ -110,3 +110,15 @@ class Nation(Base):
         }
         militarization['total'] = sum(militarization.values())/4
         return militarization
+
+    def __str__(self):
+        return self.name
+
+    def __int__(self):
+        return self.id
+
+    def __float__(self):
+        return self.score
+
+    def __len__(self):
+        return self.cities

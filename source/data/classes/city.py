@@ -43,3 +43,12 @@ class City(Base):
 
     async def get_build(self):
         return await get_city_build(city_id=self.id)
+
+    def __str__(self):
+        return self.name
+
+    def __int__(self):
+        return self.id
+
+    def __float__(self):
+        return self.infrastructure, self.land
