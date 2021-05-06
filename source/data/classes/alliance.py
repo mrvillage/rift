@@ -109,3 +109,7 @@ class Alliance(Base):
     def get_nukes(self, vm=None):
         members = self.list_members(vm=vm)
         return sum(i.nukes for i in members)
+
+    def get_cities(self, vm=None):
+        members = self.list_members(vm=vm)
+        return sum(i.cities for i in members)
