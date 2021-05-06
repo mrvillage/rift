@@ -26,6 +26,8 @@ async def handler(ctx, error):
             await ctx.reply(f"I don't have permission to do that! Please make sure I have the \"Embed Links\" permission.")
         elif isinstance(error, commands.MemberNotFound):
             await ctx.reply(embed=get_embed_author_member(ctx.author, f"I couldn't find that member!"))
+        elif isinstance(error, commands.BadArgument):
+            await ctx.reply(embed=get_embed_author_member(ctx.author, f"You gave an invalid argument!\n\n`{await get_command_signature(ctx)}`"))
         else:
             await ctx.reply(embed=get_embed_author_member(ctx.author, f"Unknown Fatal Error. Please try again. If this problem persists please contact <@!258298021266063360> for assistance."))
             await print_handler(ctx, error)
