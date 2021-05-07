@@ -1,6 +1,5 @@
 from __future__ import print_function
 from .alliance import *
-# from . import cache
 from .city import *
 from .database import *
 from .nation import *
@@ -21,7 +20,9 @@ async def create_cache(*, alliance_data=None, city_data=None, nation_data=None, 
     await create_cache_cities(city_data=city_data)
     await create_cache_nations(nation_data=nation_data)
     await create_cache_alliances(alliance_data=alliance_data)
-    s = list(cache.nations.values())+list(cache.alliances.values())+list(cache.cities.values())+list(cache.documents.values())+list(cache.servers.values())
+    s = list(cache.nations.values())+list(cache.alliances.values()) + \
+        list(cache.cities.values())+list(cache.documents.values()) + \
+        list(cache.servers.values())
     s = [list(i.data) for i in s]
     await link_cache_cities()
     await link_cache_nations()
