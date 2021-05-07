@@ -26,7 +26,7 @@ class Alliance(Base):
         self.discord = self.ircchan
 
     def __repr__(self):
-        return f"{self.id}-{self.name}"
+        return f"{self.id} - {self.name}"
 
     def _update(self, *, alliance_id=None, alliance_name=None, data=None):
         if data is None:
@@ -124,4 +124,4 @@ class Alliance(Base):
         return sum(i[0] for i in self.list_members(vm=False))
 
     def __len__(self):
-        return len(i[0] for i in self.list_members(vm=False))
+        return len([i[0] for i in self.list_members(vm=False)])
