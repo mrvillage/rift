@@ -1,5 +1,4 @@
 from ..db import execute_query, execute_read_query
-from . import query
 
 
 async def add_submit_server(*, invite: str, status: bool, userid: int):
@@ -52,4 +51,7 @@ async def edit_server(*, server_id, name=None, invite=None, categories=None, key
 
 
 async def get_server(*, server_id):
-    return await query.get_server(server_id=server_id)
+    return (await execute_read_query("""
+        SELECT * FROM servers
+        WHERE id = $1;
+    """, server_id))[0]
