@@ -57,7 +57,7 @@ async def fetch_alliances():
     try:
         async with aiohttp.request("GET", f"{BASEURL}/alliances/?key={APIKEY}") as response:
             collected = datetime.datetime.utcnow()
-            print("Alliances", collected)
+            # print("Alliances", collected)
             alliances = json.loads(await response.text())
             alliances_ = [(
                 int(i['id']),

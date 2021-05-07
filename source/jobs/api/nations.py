@@ -76,7 +76,7 @@ async def fetch_nations():
     try:
         async with aiohttp.request("GET", f"{BASEURL}/v2/nations/{APIKEY}/&cities=1") as response1, aiohttp.request("GET", f"{BASEURL}/v2/nations/{APIKEY}/&min_cities=2") as response2:
             collected = datetime.datetime.utcnow()
-            print("Nations", collected)
+            # print("Nations", collected)
             nations = ((await response1.json())['data'])+((await response2.json())['data'])
         nations_ = [(
             int(i['nation_id']),
@@ -112,7 +112,7 @@ async def fetch_nations():
             ALTER TABLE nationsnew RENAME TO nations;
         """)
         bot.nations_update = collected
-        print("Saved", datetime.datetime.utcnow())
+        # print("Saved", datetime.datetime.utcnow())
     except Exception as error:
         print("FATAL ERROR RETRIEVING NATION DATA", error)
     await jobs.target_check()
