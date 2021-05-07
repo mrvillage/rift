@@ -1,5 +1,4 @@
 from ..db import execute_query, execute_read_query
-from . import query
 
 
 async def add_submit_document(*, url: str, status: bool, userid: int):
@@ -52,4 +51,7 @@ async def edit_document(*, document_id, name=None, url=None, categories=None, ke
 
 
 async def get_document(*, document_id):
-    return await query.get_document(document_id=document_id)
+    return (await execute_read_query("""
+        SELECT * FROM documents
+        WHERE id = $1;
+    """, document_id))[0]
