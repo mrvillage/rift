@@ -9,11 +9,6 @@ from functools import partial
 import asyncio
 from .. import query
 
-import time
-from sys import getsizeof, stderr
-from itertools import chain
-from collections import deque
-
 
 async def create_cache(*, alliance_data=None, city_data=None, nation_data=None, document_data=None, server_data=None):
     nation_data = await query.get_nations()
