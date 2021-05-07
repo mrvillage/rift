@@ -43,7 +43,7 @@ class Nation(Base):
         self.nukes = self.data[24]
 
     def __repr__(self):
-        return f"{self.id}-{self.name}"
+        return f"{self.id} - {self.name}"
 
     def _update(self, *, nation_id=None, nation_name=None, data=None):
         if data is None:

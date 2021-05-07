@@ -20,7 +20,7 @@ class City(Base):
         self.land = self.data[6]
 
     def __repr__(self):
-        return f"{self.id}-{self.name}"
+        return f"{self.id} - {self.name}"
 
     def _update(self, *, city_id=None, city_name=None, data=None):
         if data is None:
