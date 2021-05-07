@@ -41,7 +41,7 @@ async def fetch_cities():
     try:
         async with aiohttp.request("GET", f"{BASEURL}/all-cities/key={APIKEY}") as response:
             collected = datetime.datetime.utcnow()
-            print("Cities", collected)
+            # print("Cities", collected)
             cities = json.loads(await response.text())
             cities_ = [(
                 int(i['city_id']),
