@@ -13,6 +13,10 @@ def get_color(id, *, beige_turns=None):
     #     return color_map[id]
 
 
+def get_color_id(name):
+    return color_map.index(name)
+
+
 domestic_policy_map = ("Manifest Destiny", "Open Markets",
                        "Technological Advancement", "Imperialism", "Urbanization")
 
