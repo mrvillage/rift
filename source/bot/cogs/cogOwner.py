@@ -21,7 +21,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             user = await commands.MemberConverter().convert(ctx, arg)
             user_id = user.id
             try:
-                nation_id = (await rift.get_link_user(self.bot.connection, user_id))[1]
+                nation_id = (await rift.get_link_user(user_id))[1]
             except:
                 await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"<@{user_id}> is not linked."))
                 return
@@ -35,14 +35,14 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                 else:
                     nation_id = int(arg)
                 try:
-                    link = await rift.get_link_nation(self.bot.connection, nation_id)
+                    link = await rift.get_link_nation(nation_id)
                     user_id = link[1]
                 except:
                     await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"`{nation_id}` is not linked!"))
             except ValueError:
                 await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"`{arg}` is not a valid argument!"))
                 return
-        await rift.remove_link_nation(self.bot.connection, nation_id)
+        await rift.remove_link_nation(nation_id)
         await ctx.send(embed=rift.get_embed_author_member(user, f"<@{user_id}> has been unlinked from nation `{nation_id}`."))
 
     @commands.group(name="extension", invoke_without_command=True)

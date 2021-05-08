@@ -20,11 +20,11 @@ class Military(commands.Cog):
             await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"You forgot an argument!\n\n`?target <add/remove/list>`"))
             return
         try:
-            target = await rift.get_target(self.bot.connection, int(target_id))
+            target = await rift.get_target(int(target_id))
         except:
             await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"`{target_id}` is not a valid target."))
             return
-        nation = await rift.get_nation(self.bot.connection, target[1])
+        nation = await rift.get_nation(target[1])
         embed = rift.get_embed_author_member(discord.utils.find(lambda c: c.id == target[3], self.bot.get_all_members(
         )), f"{nation[1]} - {nation[0]}\nCurrent Color: {rift.get_color(nation[6]) if nation[6] != 0 else f'Beige ({nation[16]} Turns)'}")
         channels, roles, members = [str(i) for i in json.loads(target[4])], [str(
@@ -58,11 +58,11 @@ class Military(commands.Cog):
             nation_id = int(search)
         else:
             try:
-                nation_id = (await rift.get_nation_name(self.bot.connection, search))[0][0]
+                nation_id = (await rift.get_nation_name(search))[0][0]
             except:
                 await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"Nation `{search}` doesn't exist! Please try again.\n\nIf the nation name is multiple words remember to surround it in quotes (\"\")"))
                 return
-        nation = await rift.get_nation(self.bot.connection, nation_id)
+        nation = await rift.get_nation(nation_id)
         channels, roles, members = [], [], []
         for arg in args:
             try:
@@ -75,7 +75,7 @@ class Military(commands.Cog):
                         members.append((await commands.MemberConverter().convert(ctx, arg)).id)
                     except:
                         pass
-        await rift.add_target(self.bot.connection, nation_id, nation[6], ctx.author.id, channels, roles, members)
+        await rift.add_target(nation_id, nation[6], ctx.author.id, channels, roles, members)
         embed = rift.get_embed_author_member(
             ctx.author, f"`{nation[1]}` added as target.\nCurrent Color: {rift.get_color(nation[6]) if nation[6] != 0 else f'Beige ({nation[16]} Turns)'}")
         channels, roles, members = [str(i) for i in channels], [
@@ -103,20 +103,20 @@ class Military(commands.Cog):
     @target.command(name="remove")
     async def target_remove(self, ctx, target_id):
         try:
-            target = await rift.get_target(self.bot.connection, int(target_id))
+            target = await rift.get_target(int(target_id))
         except:
             await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"`{target_id}` is not a valid target."))
             return
         if target[3] == ctx.author.id:
-            await rift.remove_target(self.bot.connection, int(target_id))
+            await rift.remove_target(int(target_id))
             await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"Removed target `{target_id}`."))
         else:
             await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"You're not the owner of that target."))
 
     @target.command(name="list")
     async def target_list(self, ctx):
-        targets = await rift.get_targets_owner(self.bot.connection, ctx.author.id)
-        await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"**Target ID | Nation ID | Nation Name**\n\n{f'{rift.NEWLINE}'.join([f'{target[0]} | {target[1]} | {(await rift.get_nation(self.bot.connection, target[1]))[1]}' for target in targets])}"))
+        targets = await rift.get_targets_owner(ctx.author.id)
+        await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"**Target ID | Nation ID | Nation Name**\n\n{f'{rift.NEWLINE}'.join([f'{target[0]} | {target[1]} | {(await rift.get_nation(target[1]))[1]}' for target in targets])}"))
 
     @commands.group(name="militarization", aliases=["mil", "military"], case_insensitive=True, invoke_without_command=True)
     async def militarization(self, ctx, *, search=None):

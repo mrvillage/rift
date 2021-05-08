@@ -32,7 +32,7 @@ class Link(commands.Cog):
         if any(user_id in tuple(i) for i in links):
             await ctx.reply(embed=rift.get_embed_author_member(user, f"Nation {nation_id} is already linked!"))
             return
-        await rift.add_link(self.bot.connection, user_id, nation_id)
+        await rift.add_link(user_id, nation_id)
         await ctx.reply(embed=rift.get_embed_author_member(user, f"<@!{user_id}> is now linked to nation {nation_id}!"))
 
 

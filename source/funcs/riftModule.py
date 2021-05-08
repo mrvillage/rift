@@ -46,7 +46,7 @@ async def get_alliance_name(alliance):
         WHERE LOWER(name) = LOWER('{alliance}');
     """))[0]
 
-async def get_alliance_members(connection,alliance_id):
+async def get_alliance_members(alliance_id):
     return await execute_read_query(f"""
         SELECT * FROM nations
         WHERE alliance_id = {alliance_id} AND alliance_position != 1 AND v_mode = 'False';
