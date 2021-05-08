@@ -122,3 +122,8 @@ class Nation(Base):
 
     def __len__(self):
         return self.cities
+
+    def get_average_infrastructure(self):
+        return sum(i.infrastructure for i in cache.cities.values() if i.nation_id == self.id)/self.cities
+    
+    avg_infra = get_average_infrastructure
