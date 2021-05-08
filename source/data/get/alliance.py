@@ -1,7 +1,11 @@
-from .. import query
-from .. import classes
+from ..db import execute_query, execute_read_query
+from ... import cache
 
 
-async def get_applicants(*, alliance_id: int):
-    applicants = await query.get_applicants(alliance_id=alliance_id)
-    return [classes.Nation(data=i) for i in applicants]
+async def get_alliance(search):
+    alliance = await execute_read_query("SELECT * FROM alliances WHERE LOWER(name) = LOWER($1);", search)
+    if alliance:
+        return cache.alliances[alliance[0][0]]
+    alliance = await execute_read_query("SELECT * FROM alliances WHERE LOWER(acronym) = LOWER($1);", search)
+    if alliance:
+        return cache.alliances[alliance[0][0]]
