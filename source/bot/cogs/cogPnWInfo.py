@@ -47,7 +47,7 @@ class PnWInfo(commands.Cog):
             {"name": "Continent", "value": nation.continent},
             {"name": "Color", "value": nation.color if nation.color !=
                 "Beige" else f"Beige ({nation.beige_turns:,} Turns"},
-            {"name": "Alliance", "value": repr(nation.alliance)},
+            {"name": "Alliance", "value": f"[{repr(nation.alliance)}](https://politicsandwar.com/alliance/id={nation.alliance.id} \"https://politicsandwar.com/alliance/id={nation.alliance.id}\")"},
             {"name": "Alliance Position", "value": nation.alliance_position},
             {"name": "Cities", "value": nation.cities},
             {"name": "Score", "value": f"{nation.score:,.2f}"},
@@ -59,6 +59,9 @@ class PnWInfo(commands.Cog):
             {"name": "Ships", "value": f"{nation.ships:,}"},
             {"name": "Missiles", "value": f"{nation.missiles:,}"},
             {"name": "Nukes", "value": f"{nation.nukes:,}"},
+            {"name": "Offensive Wars", "value": nation.offensive_wars},
+            {"name": "Defensive Wars", "value": nation.defensive_wars},
+            {"name": "Average Infrastructure", "value": f"{nation.avg_infra():,.2f}"},
         ])
         await ctx.reply(embed=embed)
 
