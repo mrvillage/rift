@@ -1,11 +1,16 @@
 from discord.ext.commands import Context, MemberConverter, UserConverter, MemberNotFound, UserNotFound
 from .link import get_link_user, get_link_nation
 from .. import cache
-from ..errors import AllianceNotFoundError
+from ..errors import AllianceNotFoundError, LinkError
 from ..data import get
+from ..funcs.utils import convert_link
 
 
 async def search_alliance(ctx: Context, search):
+    try:
+        search = convert_link(search)
+    except LinkError:
+        pass
     try:
         user = await MemberConverter().convert(ctx, search)
     except MemberNotFound:
