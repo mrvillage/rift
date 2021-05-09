@@ -17,33 +17,11 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command(name="unlink", aliases=["unverify", "remove-link", "removelink"])
     async def unlink(self, ctx, arg):
-        try:
-            user = await commands.MemberConverter().convert(ctx, arg)
-            user_id = user.id
-            try:
-                nation_id = (await rift.get_link_user(user_id))[1]
-            except:
-                await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"<@{user_id}> is not linked."))
-                return
-        except:
-            try:
-                if "politicsandwar" in arg:
-                    if "http" in arg:
-                        arg = arg.replace("https://", "")
-                    nation_id = int(
-                        arg.strip("/\\").replace("politicsandwar.com/nation/id=", ""))
-                else:
-                    nation_id = int(arg)
-                try:
-                    link = await rift.get_link_nation(nation_id)
-                    user_id = link[1]
-                except:
-                    await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"`{nation_id}` is not linked!"))
-            except ValueError:
-                await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"`{arg}` is not a valid argument!"))
-                return
-        await rift.remove_link_nation(nation_id)
-        await ctx.send(embed=rift.get_embed_author_member(user, f"<@{user_id}> has been unlinked from nation `{nation_id}`."))
+        nation = await rift.search_nation(ctx, arg)
+        link = await rift.get_link_nation(nation.id)
+        await rift.remove_link_nation(nation.id)
+        user = await commands.UserConverter().convert(ctx, str(link[0]))
+        await ctx.send(embed=rift.get_embed_author_member(user, f"{user.mention} has been unlinked from nation `{nation.id}`."))
 
     @commands.group(name="extension", invoke_without_command=True)
     async def extension(self, ctx):
