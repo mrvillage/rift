@@ -1,7 +1,7 @@
 import random
 import string
 from asyncio import sleep
-from ..errors import ConvertError, LinkError  # pylint: disable=relative-beyond-top-level
+from ..errors import BoolError, LinkError  # pylint: disable=relative-beyond-top-level
 
 
 color_map = ("Beige", "Gray", "Lime", "Green", "White", "Brown", "Maroon",
@@ -64,7 +64,11 @@ async def find(predicate, iterable):
 
 
 async def convert_bool(value):
-    return True if value.lower() in {"true", "yes", "approve", "go", "accept"} else False if value.lower() in {"false", "no", "deny"} else 1/0
+    if value.lower() in {"true", "yes", "approve", "go", "accept"}:
+        return True
+    if value.lower() in {"false", "no", "deny"}:
+        return False
+    raise BoolError
 
 
 async def get_command_signature(ctx):
