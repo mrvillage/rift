@@ -1,7 +1,7 @@
 import random
 import string
 from asyncio import sleep
-from ..errors import ConvertError  # pylint: disable=relative-beyond-top-level
+from ..errors import ConvertError, LinkError  # pylint: disable=relative-beyond-top-level
 
 
 color_map = ("Beige", "Gray", "Lime", "Green", "White", "Brown", "Maroon",
@@ -75,3 +75,9 @@ get_command_help = get_command_signature
 
 async def generate_code(length=16):
     return "".join(random.choices(string.ascii_letters, string.digits, k=length))
+
+
+async def convert_link(search):
+    if "politicsandwar" in search:
+        return search.strip(string.ascii_letters+"/")
+    raise LinkError
