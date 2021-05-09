@@ -1,5 +1,9 @@
-from .base import BaseError
+from .base import BaseError, ConvertError
 
 
-class ConvertError(BaseError):
+class BoolError(ConvertError):
+    pass
+
+
+class LinkError(ConvertError):
     pass

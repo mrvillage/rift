@@ -4,3 +4,7 @@ class BaseError(Exception):
 
 class SearchError(BaseError):
     pass
+
+
+class ConvertError(BaseError):
+    pass

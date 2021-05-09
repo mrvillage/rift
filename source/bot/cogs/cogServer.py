@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from ... import funcs as rift  # pylint: disable=relative-beyond-top-level
-from ...errors import ServerNotFoundError, ConvertError  # pylint: disable=relative-beyond-top-level
+from ...errors import ServerNotFoundError, BoolError  # pylint: disable=relative-beyond-top-level
 from ...menus import Confirm  # pylint: disable=relative-beyond-top-level
 from ... import checks  # pylint: disable=relative-beyond-top-level
 from ... import cache  # pylint: disable=relative-beyond-top-level
@@ -65,7 +65,7 @@ class Server(commands.Cog):
     async def server_review(self, ctx, sub_id: int, status, *, name=None):
         try:
             status = await rift.convert_bool(status)
-        except ZeroDivisionError:
+        except BoolError:
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"`{status}` is not a valid status."))
             return
         submission = await rift.get_server_submission(sub_id=sub_id)
