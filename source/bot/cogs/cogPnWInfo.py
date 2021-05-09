@@ -7,7 +7,7 @@ from ... import funcs as rift  # pylint: disable=relative-beyond-top-level
 from ...data.get import get_nation  # pylint: disable=relative-beyond-top-level
 from ... import cache  # pylint: disable=relative-beyond-top-level
 from ...errors import AllianceNotFoundError, NationNotFoundError  # pylint: disable=relative-beyond-top-level
-from ... import search  # pylint: disable=relative-beyond-top-level
+from ... import find  # pylint: disable=relative-beyond-top-level
 
 
 NEWLINE = '\n'
@@ -19,7 +19,7 @@ class PnWInfo(commands.Cog):
 
     @commands.command(name="nation", aliases=["whois", "who", "check-link", "checklink", "nat"], help="Get information about a nation.", case_insensitive=True)
     async def nation(self, ctx, *, search=None):
-        author, nation = search.search_nation_author(ctx, search)
+        author, nation = await find.search_nation_author(ctx, search)
         fields = [
             {"name": "Nation ID", "value": nation.id},
             {"name": "Nation Name", "value": nation.name},
@@ -63,7 +63,7 @@ class PnWInfo(commands.Cog):
 
     @commands.command(name="alliance", help="Get information about an alliance.", case_insensitive=True)
     async def alliance(self, ctx, *, search=None):
-        alliance = search.search_alliance(ctx, search)
+        alliance = await find.search_alliance(ctx, search)
         alliance_members = alliance.list_members(vm=False)
         alliance_score = sum(i.score for i in alliance_members)
         leaders = alliance.list_leaders()
