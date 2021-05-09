@@ -19,7 +19,11 @@ class PnWInfo(commands.Cog):
 
     @commands.command(name="nation", aliases=["whois", "who", "check-link", "checklink", "nat"], help="Get information about a nation.", case_insensitive=True)
     async def nation(self, ctx, *, search=None):
-        author, nation = await find.search_nation_author(ctx, search)
+        try:
+            author, nation = await find.search_nation_author(ctx, search)
+        except NationNotFoundError:
+            await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"No nation found with argument `{search}`."))
+            return
         fields = [
             {"name": "Nation ID", "value": nation.id},
             {"name": "Nation Name", "value": nation.name},
