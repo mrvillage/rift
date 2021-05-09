@@ -19,7 +19,10 @@ async def search_nation(ctx: Context, search):
         except UserNotFound:
             pass
     if "user" in locals():
-        return cache.nations[(await get_link_user(user.id))[1]]
+        try:
+            return cache.nations[(await get_link_user(user.id))[1]]
+        except IndexError:
+            pass
     if search.isdigit():
         try:
             return cache.nations[int(search)]
@@ -28,5 +31,4 @@ async def search_nation(ctx: Context, search):
     nation = await get.get_nation(search)
     if nation is not None:
         return nation
-    nation = await get.get_nation(search)
     raise NationNotFoundError
