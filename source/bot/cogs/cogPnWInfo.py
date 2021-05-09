@@ -7,6 +7,7 @@ from ... import funcs as rift  # pylint: disable=relative-beyond-top-level
 from ...data.get import get_nation  # pylint: disable=relative-beyond-top-level
 from ... import cache  # pylint: disable=relative-beyond-top-level
 from ...errors import AllianceNotFoundError, NationNotFoundError  # pylint: disable=relative-beyond-top-level
+from ... import search  # pylint: disable=relative-beyond-top-level
 
 
 NEWLINE = '\n'
@@ -18,27 +19,8 @@ class PnWInfo(commands.Cog):
 
     @commands.command(name="nation", aliases=["whois", "who", "check-link", "checklink", "nat"], help="Get information about a nation.", case_insensitive=True)
     async def nation(self, ctx, *, search=None):
-        author = ctx.author if search is None else None
-        search = str(ctx.author.id) if search is None else search
-        try:
-            nation = await rift.search_nation(ctx, search)
-        except NationNotFoundError:
-            if int(search) == ctx.author.id:
-                await ctx.reply(ctx.author, f"No link found")
-                return
-            else:
-                await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"No nation found with argument `{search}`."))
-                raise NationNotFoundError
-        if author is None:
-            try:
-                author = await rift.get_links_nation(nation.id)
-                try:
-                    author = await commands.UserConverter().convert(ctx, author)
-                except commands.UserNotFound:
-                    author = ctx.guild
-            except IndexError:
-                author = ctx.guild
-        embed = rift.get_embed_author_member(author, f"[Nation Page](https://politicsandwar.com/nation/id={nation.id} \"https://politicsandwar.com/nation/id={nation.id}\")", timestamp=self.bot.nations_update, footer="Data collected at", fields=[
+        author, nation = search.search_nation_author(ctx, search)
+        fields = [
             {"name": "Nation ID", "value": nation.id},
             {"name": "Nation Name", "value": nation.name},
             {"name": "Leader Name", "value": nation.leader},
@@ -47,9 +29,11 @@ class PnWInfo(commands.Cog):
             {"name": "Continent", "value": nation.continent},
             {"name": "Color", "value": nation.color if nation.color !=
                 "Beige" else f"Beige ({nation.beige_turns:,} Turns"},
-            {"name": "Alliance", "value": f"[{repr(nation.alliance)}](https://politicsandwar.com/alliance/id={nation.alliance.id} \"https://politicsandwar.com/alliance/id={nation.alliance.id}\")"},
+            {"name": "Alliance",
+                "value": f"[{repr(nation.alliance)}](https://politicsandwar.com/alliance/id={nation.alliance.id} \"https://politicsandwar.com/alliance/id={nation.alliance.id}\")" if nation.alliance is not None else "None"},
             {"name": "Alliance Position", "value": nation.alliance_position},
-            {"name": "Cities", "value": nation.cities},
+            {"name": "Cities",
+                "value": f"[{nation.cities}](https://politicsandwar.com/?id=62&n={'+'.join(nation.name.split(' '))} \"https://politicsandwar.com/?id=62&n={'+'.join(nation.name.split(' '))}\")"},
             {"name": "Score", "value": f"{nation.score:,.2f}"},
             {"name": "Vacation Mode",
                 "value": f"True ({nation.v_mode_turns:,} Turns)" if nation.v_mode else "False"},
@@ -59,20 +43,27 @@ class PnWInfo(commands.Cog):
             {"name": "Ships", "value": f"{nation.ships:,}"},
             {"name": "Missiles", "value": f"{nation.missiles:,}"},
             {"name": "Nukes", "value": f"{nation.nukes:,}"},
-            {"name": "Offensive Wars", "value": nation.offensive_wars},
-            {"name": "Defensive Wars", "value": nation.defensive_wars},
-            {"name": "Average Infrastructure", "value": f"{nation.avg_infra():,.2f}"},
-        ])
+            {"name": "Offensive Wars",
+                "value": f"[{nation.offensive_wars}](https://politicsandwar.com/nation/id={nation.id}&display=war \"https://politicsandwar.com/nation/id={nation.id}&display=war\")"},
+            {"name": "Defensive Wars",
+                "value": f"[{nation.defensive_wars}](https://politicsandwar.com/nation/id={nation.id}&display=war \"https://politicsandwar.com/nation/id={nation.id}&display=war\")"},
+            {"name": "Average Infrastructure",
+                "value": f"{nation.avg_infra():,.2f}"},
+            {"name": "Actions", "value":
+                f"[Message](https://politicsandwar.com/inbox/message/receiver={'+'.join(nation.leader.split(' '))} \"https://politicsandwar.com/inbox/message/receiver={'+'.join(nation.leader.split(' '))}\") "
+                f"[Trade](https://politicsandwar.com/nation/trade/create/nation={'+'.join(nation.name.split(' '))} \"https://politicsandwar.com/nation/trade/create/nation={'+'.join(nation.name.split(' '))}\") "
+                f"[Embargo](https://politicsandwar.com/index.php?id=68&name={'+'.join(nation.name.split(' '))}&type=n \"https://politicsandwar.com/index.php?id=68&name={'+'.join(nation.name.split(' '))}&type=n\") "
+                f"[War](https://politicsandwar.com/nation/war/declare/id={nation.id} \"https://politicsandwar.com/nation/war/declare/id={nation.id}\") "
+                f"[Espionage](https://politicsandwar.com/nation/espionage/eid={nation.id} \"https://politicsandwar.com/nation/espionage/eid={nation.id}\") "
+             }
+        ]
+        embed = rift.get_embed_author_guild(author, f"[Nation Page](https://politicsandwar.com/nation/id={nation.id} \"https://politicsandwar.com/nation/id={nation.id}\")", timestamp=self.bot.nations_update, footer="Data collected at", fields=fields) if isinstance(
+            author, discord.Guild) else rift.get_embed_author_member(author, f"[Nation Page](https://politicsandwar.com/nation/id={nation.id} \"https://politicsandwar.com/nation/id={nation.id}\")", timestamp=self.bot.nations_update, footer="Data collected at", fields=fields)
         await ctx.reply(embed=embed)
 
     @commands.command(name="alliance", help="Get information about an alliance.", case_insensitive=True)
     async def alliance(self, ctx, *, search=None):
-        search = str(ctx.author.id) if search is None else search
-        try:
-            alliance = await rift.search_alliance(ctx, search)
-        except AllianceNotFoundError:
-            await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"No alliance found with argument `{search}`."))
-            raise AllianceNotFoundError
+        alliance = search.search_alliance(ctx, search)
         alliance_members = alliance.list_members(vm=False)
         alliance_score = sum(i.score for i in alliance_members)
         leaders = alliance.list_leaders()
@@ -85,18 +76,18 @@ class PnWInfo(commands.Cog):
                 "value": alliance.acronym if not alliance.acronym == "" else "None"},
             {"name": "Color", "value": alliance.color},
             {"name": "Rank", "value": f"#{alliance.rank}"},
-            {"name": "Members", "value": f"{len(alliance_members):,}"},
+            {"name": "Members", "value": f"[{len(alliance_members):,}](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\")"},
             {"name": "Score", "value": f"{alliance_score:,.2f}"},
             {"name": "Average Score",
                 "value": f"{alliance_score/len(alliance_members) if len(alliance_members) != 0 else 0:,.2f}"},
             {"name": "Applicants",
                 "value": f"{len(alliance.list_applicants()):,}"},
             {"name": "Leaders",
-                "value": f"{NEWLINE.join(repr(i) for i in leaders) if len(leaders) != 0 else 'None'}"},
+                "value": NEWLINE.join(f"[{repr(i)}](https://politicsandwar.com/nation/id={i.id} \"https://politicsandwar.com/nation/id={i.id}\")" for i in leaders) if len(leaders) != 0 else 'None'},
             {"name": "Heirs",
-                "value": f"{NEWLINE.join(repr(i) for i in heirs) if len(heirs) != 0 else 'None'}"},
+                "value": NEWLINE.join(f"[{repr(i)}](https://politicsandwar.com/nation/id={i.id} \"https://politicsandwar.com/nation/id={i.id}\")" for i in heirs) if len(heirs) != 0 else 'None'},
             {"name": "Officers",
-                "value": f"{NEWLINE.join(repr(i) for i in officers) if len(officers) != 0 else 'None'}"},
+                "value": NEWLINE.join(f"[{repr(i)}](https://politicsandwar.com/nation/id={i.id} \"https://politicsandwar.com/nation/id={i.id}\")" for i in officers) if len(officers) != 0 else 'None'},
             {"name": "Forum Link",
                 "value": f"[Click Here]({alliance.forumurl} \"{alliance.forumurl}\")" if alliance.forumurl is not None else "None"},
             {"name": "Discord Link",
@@ -116,7 +107,7 @@ class PnWInfo(commands.Cog):
             raise AllianceNotFoundError
         members = alliance.list_members(vm=False)
         full = "\n".join(
-            [f"{i+1}. {member.id} | {member.name} | {member.score:,.2f}" for i, member in enumerate(members)])+"\n"
+            [f"[{i+1}. {member.id} | {member.name} | {member.score:,.2f}](https://politicsandwar.com/nation/id={member.id} \"https://politicsandwar.com/nation/id={member.id}\")" for i, member in enumerate(members)])+"\n"
         fields = []
         if len(full) >= 6000:
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"There's too many members to display! You can find the full list [here](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\").", title=alliance.name))

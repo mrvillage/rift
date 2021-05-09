@@ -158,9 +158,9 @@ class Military(commands.Cog):
                 raise NationNotFoundError
         if author is None:
             try:
-                author = await rift.get_links_nation(nation.id)
+                author = await rift.get_link_nation(nation.id)
                 try:
-                    author = await commands.UserConverter().convert(ctx, author)
+                    author = await commands.UserConverter().convert(ctx, str(author))
                 except commands.UserNotFound:
                     author = ctx.guild
             except IndexError:
