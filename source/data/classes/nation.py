@@ -6,8 +6,6 @@ from ...funcs.core import bot
 from ...errors import SentError
 from ... import cache
 
-import time
-
 
 class Nation(Base):
     def __init__(self, *, nation_id=None, nation_name=None, data=None):
