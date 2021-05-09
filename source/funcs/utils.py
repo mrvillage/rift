@@ -78,7 +78,7 @@ get_command_help = get_command_signature
 
 
 async def generate_code(length=16):
-    return "".join(random.choices(string.ascii_letters, string.digits, k=length))
+    return "".join(random.choices(string.ascii_letters+string.digits, k=length))
 
 
 async def convert_link(search):

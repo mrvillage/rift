@@ -19,7 +19,10 @@ async def search_alliance(ctx: Context, search):
         except UserNotFound:
             pass
     if "user" in locals():
-        return cache.nations[(await get_link_user(user.id))[1]].alliance
+        try:
+            return cache.nations[(await get_link_user(user.id))[1]].alliance
+        except IndexError:
+            pass
     if search.isdigit():
         try:
             return cache.alliances[int(search)]
