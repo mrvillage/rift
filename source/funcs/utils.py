@@ -1,5 +1,8 @@
-from ..errors import ConvertError  # pylint: disable=relative-beyond-top-level
+import random
+import string
 from asyncio import sleep
+from ..errors import ConvertError  # pylint: disable=relative-beyond-top-level
+
 
 color_map = ("Beige", "Gray", "Lime", "Green", "White", "Brown", "Maroon",
              "Purple", "Blue", "Red", "Orange", "Olive", "Aqua", "Black", "Yellow", "Pink")
@@ -68,3 +71,7 @@ async def get_command_signature(ctx):
     return f"{ctx.bot.command_prefix}{ctx.command.qualified_name} {ctx.command.signature}"
 
 get_command_help = get_command_signature
+
+
+async def generate_code(length=16):
+    return "".join(random.choices(string.ascii_letters, string.digits, k=length))
