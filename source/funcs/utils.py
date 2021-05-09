@@ -83,5 +83,5 @@ async def generate_code(length=16):
 
 async def convert_link(search):
     if "politicsandwar" in search:
-        return search.strip(string.ascii_letters+"/")
+        return search.strip(string.ascii_letters+".:/=")
     raise LinkError
