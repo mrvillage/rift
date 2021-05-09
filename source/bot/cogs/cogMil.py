@@ -8,6 +8,7 @@ from discord.ext import commands, tasks
 from ... import funcs as rift  # pylint: disable=relative-beyond-top-level
 from ... import cache  # pylint: disable=relative-beyond-top-level
 from ...errors import AllianceNotFoundError, NationNotFoundError  # pylint: disable=relative-beyond-top-level
+from ... import find  # pylint: disable=relative-beyond-top-level
 
 
 class Military(commands.Cog):
@@ -125,7 +126,7 @@ class Military(commands.Cog):
             alliance = await rift.search_alliance(ctx, search)
         except AllianceNotFoundError:
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"No alliance found with argument `{search}`."))
-            raise AllianceNotFoundError 
+            return
         async with ctx.typing():
             async with aiohttp.request("GET", f"https://checkapi.bsnk.dev/getChart?allianceID={alliance.id}") as req:
                 byte = await req.read()
@@ -145,28 +146,13 @@ class Military(commands.Cog):
 
     @militarization.command(name="nation", aliases=["n", "nat", "me"])
     async def militarization_nation(self, ctx, *, search=None):
-        author = ctx.author if search is None else None
-        search = str(ctx.author.id) if search is None else search
         try:
-            nation = await rift.search_nation(ctx, search)
+            author, nation = find.search_nation_author(ctx, search)
         except NationNotFoundError:
-            if int(search) == ctx.author.id:
-                await ctx.reply(ctx.author, f"No link found")
-                return
-            else:
-                await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"No nation found with argument `{search}`."))
-                raise NationNotFoundError
-        if author is None:
-            try:
-                author = await rift.get_link_nation(nation.id)
-                try:
-                    author = await commands.UserConverter().convert(ctx, str(author))
-                except commands.UserNotFound:
-                    author = ctx.guild
-            except IndexError:
-                author = ctx.guild
+            await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"No nation found with argument `{search}`."))
+            return
         militarization = nation.get_militarization()
-        await ctx.send(embed=rift.get_embed_author_member(ctx.author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}%\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization for {nation.name} (`{nation.id}`)", timestamp=self.bot.nations_update, footer="Data collected at", fields=[
+        await ctx.send(embed=rift.get_embed_author_member(author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}%\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization for {nation.name} (`{nation.id}`)", timestamp=self.bot.nations_update, footer="Data collected at", fields=[
             {"name": "Soldiers", "value": f"{nation.soldiers:,}/{nation.cities*15000:,}"},
             {"name": "Tanks", "value": f"{nation.tanks:,}/{nation.cities*1250:,}"},
             {"name": "Aircraft", "value": f"{nation.aircraft:,}/{nation.cities*75:,}"},
