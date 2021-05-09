@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from ... import funcs as rift  # pylint: disable=relative-beyond-top-level
-from ...errors import DocumentNotFoundError, ConvertError  # pylint: disable=relative-beyond-top-level
+from ...errors import DocumentNotFoundError, BoolError  # pylint: disable=relative-beyond-top-level
 from ...menus import Confirm  # pylint: disable=relative-beyond-top-level
 from ... import checks  # pylint: disable=relative-beyond-top-level
 from ... import cache  # pylint: disable=relative-beyond-top-level
@@ -52,7 +52,7 @@ class Database(commands.Cog):
     async def database_review(self, ctx, sub_id: int, status, *, name=None):
         try:
             status = await rift.convert_bool(status)
-        except ZeroDivisionError:
+        except BoolError:
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"`{status}` is not a valid status."))
             return
         submission = await rift.get_document_submission(sub_id=sub_id)
