@@ -1,3 +1,2 @@
 *.env
 *.pyc
-source/bot/cogs/cogLoop.py
