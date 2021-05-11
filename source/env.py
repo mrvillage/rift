@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
 TOKEN = os.getenv("Rift_discord_token")
 PATH = f"{os.getcwd()}"
 FOOTER = os.getenv("footer")
