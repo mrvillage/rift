@@ -98,3 +98,11 @@ async def convert_number(num):
         return (float(num))
     else:
         return int(num)
+
+
+resources = ("credit", "credits", "coal", "oil", "uranium", "lead", "iron",
+             "bauxite", "gasoline", "munitions", "steel", "aluminum", "food", "money")
+
+
+async def check_resource(arg):
+    return arg.lower() in resources
