@@ -85,3 +85,15 @@ async def convert_link(search):
     if "politicsandwar" in search:
         return search.strip(string.ascii_letters+".:/=")
     raise LinkError
+
+async def convert_number(num):
+    num = "".join([i for i in num if i in string.digits or i == "."])
+    if num.count(".") > 1:
+        last = num.rfind(".")
+        beginning = num[:last]
+        end = num[last:]
+        return float(beginning.replace(".", "")+end)
+    elif num.count(".") == 1:
+        return (float(num))
+    else:
+        return int(num)
