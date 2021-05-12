@@ -86,6 +86,7 @@ async def convert_link(search):
         return search.strip(string.ascii_letters+".:/=")
     raise LinkError
 
+
 async def convert_number(num):
     num = "".join([i for i in num if i in string.digits or i == "."])
     if num.count(".") > 1:
