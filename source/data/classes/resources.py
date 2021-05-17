@@ -113,6 +113,8 @@ class Resources(Base):
                     resources_dict[args[i+1].lower()] = num
             except ValueError:
                 pass
+        if args[-1].startswith("$"):
+            resources_dict['money'] = await convert_number(arg)
         return cls(**resources_dict)
 
     @classmethod

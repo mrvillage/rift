@@ -27,7 +27,7 @@ class Bank(commands.Cog):
             author, recipient = await find.search_nation_author(ctx, recipient)
         except NationNotFoundError:
             try:
-                recipient = rift.search_alliance(ctx, recipient)
+                recipient = await rift.search_alliance(ctx, recipient)
                 author = ctx.guild
             except AllianceNotFoundError:
                 await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"I couldn't find a nation or alliance with argument `{recipient}`."))
