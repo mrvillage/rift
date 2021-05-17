@@ -79,7 +79,6 @@ class Bank(commands.Cog):
     @bank.command(name="balance", aliases=["bal"])
     async def bank_balance(self, ctx: commands.Context, *, search=None):
         search = str(ctx.author.id) if search is None else search
-        author = ctx.author
         try:
             alliance = (await rift.search_nation(ctx, search)).alliance
         except NationNotFoundError:
