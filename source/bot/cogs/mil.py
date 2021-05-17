@@ -159,7 +159,7 @@ class Military(commands.Cog):
     @militarization.command(name="nation", aliases=["n", "nat", "me"])
     async def militarization_nation(self, ctx, *, search=None):
         try:
-            author, nation = find.search_nation_author(ctx, search)
+            author, nation = await find.search_nation_author(ctx, search)
         except NationNotFoundError:
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"No nation found with argument `{search}`."))
             return
