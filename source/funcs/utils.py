@@ -1,15 +1,15 @@
 import random
 import string
 from asyncio import sleep
-from ..errors import BoolError, LinkError  # pylint: disable=relative-beyond-top-level
+from ..errors import BoolError, LinkError
 
 
 color_map = ("Beige", "Gray", "Lime", "Green", "White", "Brown", "Maroon",
              "Purple", "Blue", "Red", "Orange", "Olive", "Aqua", "Black", "Yellow", "Pink")
 
 
-def get_color(id, *, beige_turns=None):
-    return color_map[id]
+def get_color(color_id):
+    return color_map[color_id]
     # if id == 0:
     #     return f"{color_map[id]} ({beige_turns} Turns)"
     # else:
@@ -24,32 +24,36 @@ domestic_policy_map = ("Manifest Destiny", "Open Markets",
                        "Technological Advancement", "Imperialism", "Urbanization")
 
 
-def get_domestic_policy(id):
-    return domestic_policy_map[id-1]
+def get_domestic_policy(policy_id):
+    return domestic_policy_map[policy_id-1]
 
 
 war_policy_map = ("Attrition", "Turtle", "Blitzkrieg", "Fortress",
                   "Moneybags", "Pirate", "Tactician", "Guardian", "Covert", "Arcane")
 
 
-def get_war_policy(id):
-    return war_policy_map[id-1]
+def get_war_policy(policy_id):
+    return war_policy_map[policy_id-1]
 
 
 alliance_position_map = ("None", "Applicant", "Member",
                          "Officer", "Heir", "Leader")
 
 
-def get_alliance_position(id):
-    return alliance_position_map[id]
+def get_alliance_position(position_id):
+    return alliance_position_map[position_id]
+
+
+def get_alliance_position_id(position):
+    return alliance_position_map.index(position)
 
 
 continent_map = ("North America", "South America", "Europe",
                  "Africa", "Asia", "Australia", "Antarctica")
 
 
-def get_continent(id):
-    return continent_map[id-1]
+def get_continent(continent_id):
+    return continent_map[continent_id-1]
 
 
 async def find(predicate, iterable):
@@ -95,7 +99,7 @@ async def convert_number(num):
         end = num[last:]
         return float(beginning.replace(".", "")+end)
     elif num.count(".") == 1:
-        return (float(num))
+        return float(num)
     else:
         return int(num)
 

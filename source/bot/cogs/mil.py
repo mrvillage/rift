@@ -1,14 +1,12 @@
-import discord
-import asyncio
 import json
-import time
-import aiohttp
 from io import BytesIO
-from discord.ext import commands, tasks
-from ... import funcs as rift  # pylint: disable=relative-beyond-top-level
-from ... import cache  # pylint: disable=relative-beyond-top-level
-from ...errors import AllianceNotFoundError, NationNotFoundError  # pylint: disable=relative-beyond-top-level
-from ... import find  # pylint: disable=relative-beyond-top-level
+import discord
+import aiohttp
+from discord.ext import commands
+from ... import funcs as rift
+from ... import cache
+from ...errors import AllianceNotFoundError, NationNotFoundError
+from ... import find
 
 
 class Military(commands.Cog):
@@ -32,20 +30,20 @@ class Military(commands.Cog):
             i) for i in json.loads(target[5])], [str(i) for i in json.loads(target[6])]
         if len(channels) != 0:
             embed.add_field(name="Channel Notifications",
-                            value=f"<#{f'><#'.join(channels)}>", inline=True)
+                            value=f"<#{'><#'.join(channels)}>", inline=True)
         else:
             embed.add_field(name="Channel Notifications",
-                            value=f"None", inline=True)
+                            value="None", inline=True)
         if len(roles) != 0:
             embed.add_field(name="Role Mentions",
-                            value=f"<@&{f'><@&'.join(roles)}>", inline=True)
+                            value=f"<@&{'><@&'.join(roles)}>", inline=True)
         else:
-            embed.add_field(name="Role Mentions", value=f"None", inline=True)
+            embed.add_field(name="Role Mentions", value="None", inline=True)
         if len(members) != 0:
             embed.add_field(name="Member Mentions",
-                            value=f"<@{f'><@'.join(members)}>", inline=True)
+                            value=f"<@{'><@'.join(members)}>", inline=True)
         else:
-            embed.add_field(name="Member Mentions", value=f"None", inline=True)
+            embed.add_field(name="Member Mentions", value="None", inline=True)
         await ctx.send(embed=embed)
 
     @target.command(name="add")
@@ -134,14 +132,28 @@ class Military(commands.Cog):
         image = discord.File(
             BytesIO(byte), f"militarization_{alliance.id}.png")
         cities = alliance.get_cities()
-        embed = rift.get_embed_author_member(ctx.author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}%\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization Graph for {alliance.name} (`{alliance.id}`)", image_url=f"attachment://militarization_{alliance.id}.png", timestamp=self.bot.nations_update, footer="Data collected at", fields=[
-            {"name": "Soldiers", "value": f"{alliance.get_soldiers():,}/{cities*15000:,}"},
-            {"name": "Tanks", "value": f"{alliance.get_tanks():,}/{cities*1250:,}"},
-            {"name": "Aircraft", "value": f"{alliance.get_aircraft():,}/{cities*75:,}"},
-            {"name": "Ships", "value": f"{alliance.get_ships():,}/{cities*15:,}"},
-            {"name": "Missiles", "value": f"{alliance.get_missiles():,}"},
-            {"name": "Nukes", "value": f"{alliance.get_nukes():,}"},
-        ])
+        embed = rift.get_embed_author_member(
+            ctx.author, f"""
+            Total Militarization: {militarization['total']*100:.2f}%
+            Soldier Militarization: {militarization['soldiers']*100:.2f}%
+            Tank Militarization: {militarization['tanks']*100:.2f}%
+            Aircraft Militarization: {militarization['aircraft']*100:.2f}%
+            Ship Militarization: {militarization['ships']*100:.2f}%
+            """,
+            title=f"Militarization Graph for {alliance.name} (`{alliance.id}`)",
+            image_url=f"attachment://militarization_{alliance.id}.png",
+            timestamp=self.bot.nations_update,
+            footer="Data collected at",
+            fields=[
+                {"name": "Soldiers",
+                    "value": f"{alliance.get_soldiers():,}/{cities*15000:,}"},
+                {"name": "Tanks", "value": f"{alliance.get_tanks():,}/{cities*1250:,}"},
+                {"name": "Aircraft", "value": f"{alliance.get_aircraft():,}/{cities*75:,}"},
+                {"name": "Ships", "value": f"{alliance.get_ships():,}/{cities*15:,}"},
+                {"name": "Missiles", "value": f"{alliance.get_missiles():,}"},
+                {"name": "Nukes", "value": f"{alliance.get_nukes():,}"},
+            ]
+        )
         await ctx.send(file=image, embed=embed)
 
     @militarization.command(name="nation", aliases=["n", "nat", "me"])

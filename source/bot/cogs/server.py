@@ -1,10 +1,10 @@
 import discord
 from discord.ext import commands
-from ... import funcs as rift  # pylint: disable=relative-beyond-top-level
-from ...errors import ServerNotFoundError, BoolError  # pylint: disable=relative-beyond-top-level
-from ...menus import Confirm  # pylint: disable=relative-beyond-top-level
-from ... import checks  # pylint: disable=relative-beyond-top-level
-from ... import cache  # pylint: disable=relative-beyond-top-level
+from ... import funcs as rift
+from ...errors import ServerNotFoundError, BoolError
+from ...menus import Confirm
+from ... import checks
+from ... import cache
 
 
 class Server(commands.Cog):

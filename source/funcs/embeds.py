@@ -15,11 +15,11 @@ def get_embed(title: str):
 
 
 def get_embed_author(author_name, author_icon_url, description, color=COLOR, timestamp=None, footer=FOOTER):
-    return Embed(color=color, description=description, timestamp=datetime.utcnow() if timestamp == None else timestamp).set_footer(text=footer).set_author(name=author_name, icon_url=author_icon_url)
+    return Embed(color=color, description=description, timestamp=datetime.utcnow() if timestamp is None else timestamp).set_footer(text=footer).set_author(name=author_name, icon_url=author_icon_url)
 
 
 def get_embed_author_member(member, description=Embed.Empty, color=COLOR, timestamp=None, footer=FOOTER, title=Embed.Empty, fields=[], image_url=Embed.Empty):
-    return add_fields(Embed(color=color, description=description, timestamp=datetime.utcnow() if timestamp == None else timestamp, title=title).set_footer(text=footer).set_author(name=f"{member.name}#{member.discriminator}", icon_url=str(member.avatar_url)).set_image(url=image_url), fields)
+    return add_fields(Embed(color=color, description=description, timestamp=datetime.utcnow() if timestamp is None else timestamp, title=title).set_footer(text=footer).set_author(name=f"{member.name}#{member.discriminator}", icon_url=str(member.avatar_url)).set_image(url=image_url), fields)
 
 
 def get_embed_author_guild(guild, description=Embed.Empty, color=COLOR, timestamp=datetime.utcnow(), footer=FOOTER, title=Embed.Empty, fields=[]):

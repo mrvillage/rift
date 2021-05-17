@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from ... import funcs as rift  # pylint: disable=relative-beyond-top-level
+from ... import funcs as rift
 
 
 class Errors(commands.Cog):

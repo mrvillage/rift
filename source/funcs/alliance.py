@@ -8,7 +8,7 @@ from ..funcs.utils import convert_link
 
 async def search_alliance(ctx: Context, search):
     try:
-        search = convert_link(search)
+        search = await convert_link(search)
     except LinkError:
         pass
     try:

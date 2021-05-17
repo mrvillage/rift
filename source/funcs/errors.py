@@ -21,17 +21,17 @@ async def print_handler(ctx, error):
 async def handler(ctx, error):
     try:
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.reply(embed=get_embed_author_member(ctx.author, f"You forgot an argument!\n\n`{await get_command_signature(ctx)}`"))
+            await ctx.reply(embed=get_embed_author_member(ctx.author, "You forgot an argument!\n\n`{await get_command_signature(ctx)}`"))
         elif isinstance(error, discord.Forbidden):
-            await ctx.reply(f"I don't have permission to do that! Please make sure I have the \"Embed Links\" permission.")
+            await ctx.reply("I don't have permission to do that! Please make sure I have the \"Embed Links\" permission.")
         elif isinstance(error, commands.MemberNotFound):
-            await ctx.reply(embed=get_embed_author_member(ctx.author, f"I couldn't find that member!"))
+            await ctx.reply(embed=get_embed_author_member(ctx.author, "I couldn't find that member!"))
         elif isinstance(error, commands.BadArgument):
-            await ctx.reply(embed=get_embed_author_member(ctx.author, f"You gave an invalid argument!\n\n`{await get_command_signature(ctx)}`"))
+            await ctx.reply(embed=get_embed_author_member(ctx.author, "You gave an invalid argument!\n\n`{await get_command_signature(ctx)}`"))
         elif isinstance(error, discord.Forbidden):
             await ctx.reply(f"I don't have permission to do that! Please make sure I have the \"Embed Links\" permission.")
         else:
-            await ctx.reply(embed=get_embed_author_member(ctx.author, f"Unknown Fatal Error. Please try again. If this problem persists please contact <@!258298021266063360> for assistance.\nPlease remember the bot is still in Alpha, there is a good chance new features may result in new bugs to older features. To report an issue please send a message to <@!258298021266063360> so it can be addressed as soon as possible."))
+            await ctx.reply(embed=get_embed_author_member(ctx.author, "Unknown Fatal Error. Please try again. If this problem persists please contact <@!258298021266063360> for assistance.\nPlease remember the bot is still in Alpha, there is a good chance new features may result in new bugs to older features. To report an issue please send a message to <@!258298021266063360> so it can be addressed as soon as possible."))
             await print_handler(ctx, error)
     except discord.Forbidden:
-        await ctx.reply(f"I don't have permission to do that! Please make sure I have the \"Embed Links\" permission.")
+        await ctx.reply("I don't have permission to do that! Please make sure I have the \"Embed Links\" permission.")

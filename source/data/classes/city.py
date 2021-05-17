@@ -1,6 +1,5 @@
 from .base import Base
 from ..query import get_city
-from ...funcs import utils
 from ... import cache
 from ..requests import get_city_build
 

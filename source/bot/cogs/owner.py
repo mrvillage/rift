@@ -1,14 +1,14 @@
 import discord
 from discord.ext import commands
-from ... import funcs as rift  # pylint: disable=relative-beyond-top-level
-from ...data.db import execute_query, execute_read_query  # pylint: disable=relative-beyond-top-level
+from ... import funcs as rift
+from ...data.db import execute_query, execute_read_query
 
 
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    async def cog_check(self, ctx):
+    async def cog_check(self, ctx):  # pylint: disable=invalid-overridden-method
         return await self.bot.is_owner(ctx.author)
 
     async def cog_command_error(self, ctx, error):

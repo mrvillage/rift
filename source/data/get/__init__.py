@@ -7,3 +7,4 @@ from .mmr import *
 from .nation import *
 from .server import *
 from .staff import *
+from .trade import *
