@@ -1,17 +1,16 @@
-import datetime
-import json
+from datetime import datetime
 import aiohttp
+from asyncpg.exceptions import DuplicateTableError
 from ...data.db import execute_query, execute_query_many
 from ...env import BASEURL, APIKEY
 from ... import jobs
 from ... import bot
 from ...data import cache
-from asyncpg.exceptions import DuplicateTableError
 
 
 async def fetch_nations():
     try:
-        await execute_query(f"""
+        await execute_query("""
             CREATE TABLE "nationsnew" (
                 "nation_id"	INTEGER NOT NULL UNIQUE,
                 "nation"	TEXT,
@@ -42,8 +41,8 @@ async def fetch_nations():
             );
         """)
     except DuplicateTableError:
-        await execute_query(f"DROP TABLE nationsnew;")
-        await execute_query(f"""
+        await execute_query("DROP TABLE nationsnew;")
+        await execute_query("""
             CREATE TABLE "nationsnew" (
                 "nation_id"	INTEGER NOT NULL UNIQUE,
                 "nation"	TEXT,
@@ -74,9 +73,8 @@ async def fetch_nations():
             );
         """)
     try:
-        async with aiohttp.request("GET", f"{BASEURL}/v2/nations/{APIKEY}/&cities=1") as response1, aiohttp.request("GET", f"{BASEURL}/v2/nations/{APIKEY}/&min_cities=2") as response2:
-            collected = datetime.datetime.utcnow()
-            # print("Nations", collected)
+        async with aiohttp.request("GET", f"{BASEURL}/v2/nations/{APIKEY}/&cities=1") as response1, aiohttp.request("GET", f"{BASEURL}/v2/nations/{APIKEY}/&min_cities=2") as response2:  # pylint: disable=line-too-long
+            collected = datetime.utcnow()
             nations = ((await response1.json())['data'])+((await response2.json())['data'])
         nations_ = [(
             int(i['nation_id']),
@@ -105,15 +103,13 @@ async def fetch_nations():
             int(i['missiles']),
             int(i['nukes'])
         ) for i in nations]
-        # await rift.execute_query_many( "INSERT INTO nationsnew VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", nations_)
-        await execute_query_many("INSERT INTO nationsnew VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25);", nations_)
-        await execute_query(f"""
+        await execute_query_many("INSERT INTO nationsnew VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25);", nations_)  # pylint: disable=line-too-long
+        await execute_query("""
             DROP TABLE nations;
             ALTER TABLE nationsnew RENAME TO nations;
         """)
         bot.nations_update = collected
-        # print("Saved", datetime.datetime.utcnow())
-    except Exception as error:
+    except Exception as error:  # pylint: disable=broad-except
         print("FATAL ERROR RETRIEVING NATION DATA", error)
     await jobs.target_check()
     try:

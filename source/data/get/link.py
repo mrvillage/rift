@@ -1,8 +1,8 @@
 from ..db import execute_query, execute_read_query
 
 
-async def get_links(connection):
-    return await execute_read_query(f"""
+async def get_links():
+    return await execute_read_query("""
         SELECT * FROM links;
     """)
 

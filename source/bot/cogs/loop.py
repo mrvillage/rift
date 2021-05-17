@@ -1,16 +1,7 @@
-import discord
-import asyncio
-import json
-import aiohttp
-import time
 import datetime
+import discord
 from discord.ext import commands, tasks
-from ... import funcs as rift  # pylint: disable=relative-beyond-top-level
-from ... import jobs  # pylint: disable=relative-beyond-top-level
-from ...data import cache  # pylint: disable=relative-beyond-top-level
-from ...jobs import api  # pylint: disable=relative-beyond-top-level
-from ... import jobs  # pylint: disable=relative-beyond-top-level
-BASEURL = "https://politicsandwar.com/api"
+from ...jobs import api
 
 
 class Loop(commands.Cog):
@@ -20,14 +11,14 @@ class Loop(commands.Cog):
         self.fetch_nations.start()  # pylint: disable=no-member
         self.fetch_alliances.start()  # pylint: disable=no-member
         self.fetch_cities.start()  # pylint: disable=no-member
+        self.fetch_prices.start()  # pylint: disable=no-member
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(minutes=5)
     async def pnw_session_refresh(self):
         await self.bot.update_pnw_session()
 
     @tasks.loop(minutes=5)
     async def fetch_nations(self):
-        await jobs.target_check()
         await api.fetch_nations()
 
     @tasks.loop(minutes=5)
@@ -38,10 +29,14 @@ class Loop(commands.Cog):
     async def fetch_cities(self):
         await api.fetch_cities()
 
+    @tasks.loop(minutes=5)
+    async def fetch_prices(self):
+        await api.fetch_prices()
+
     @pnw_session_refresh.before_loop
     async def pnw_session_refresh_wait(self):
         now = datetime.datetime.utcnow()
-        wait = now.replace(minute=3, second=0)
+        wait = now.replace(minute=5, second=0)
         while wait < now:
             wait += datetime.timedelta(minutes=10)
         # wait = now
@@ -68,6 +63,15 @@ class Loop(commands.Cog):
 
     @fetch_cities.before_loop
     async def fetch_cities_wait(self):
+        now = datetime.datetime.utcnow()
+        wait = now.replace(minute=5, second=0)
+        while wait < now:
+            wait += datetime.timedelta(minutes=5)
+        # wait = now
+        await discord.utils.sleep_until(wait)
+
+    @fetch_prices.before_loop
+    async def fetch_prices_wait(self):
         now = datetime.datetime.utcnow()
         wait = now.replace(minute=5, second=0)
         while wait < now:

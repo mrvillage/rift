@@ -1,7 +1,7 @@
 import json
 import discord
 from discord.ext import commands
-from ... import logs  # pylint: disable=relative-beyond-top-level
+from ... import logs
 
 
 class Logs(commands.Cog):

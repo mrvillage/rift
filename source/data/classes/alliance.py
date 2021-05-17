@@ -1,8 +1,10 @@
+import json
 from .base import Base
 from ..query import get_alliance
-from ...funcs import utils
-import json
 from ... import cache
+from ...funcs.parse import parse_alliance_bank
+from ...ref import bot
+from .resources import Resources
 
 
 class Alliance(Base):
@@ -125,3 +127,9 @@ class Alliance(Base):
 
     def __len__(self):
         return len([i[0] for i in self.list_members(vm=False)])
+
+    async def get_resources(self):
+        async with bot.pnw_session.request("GET", "https://politicsandwar.com/alliance/id=7719&display=bank") as response:
+            content = await response.text()
+        await bot.parse_token(content)
+        return await Resources.from_dict(await parse_alliance_bank(content))

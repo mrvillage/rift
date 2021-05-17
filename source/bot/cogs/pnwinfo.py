@@ -1,13 +1,8 @@
 import discord
-import asyncio
-import json
-import time
 from discord.ext import commands
-from ... import funcs as rift  # pylint: disable=relative-beyond-top-level
-from ...data.get import get_nation  # pylint: disable=relative-beyond-top-level
-from ... import cache  # pylint: disable=relative-beyond-top-level
-from ...errors import AllianceNotFoundError, NationNotFoundError  # pylint: disable=relative-beyond-top-level
-from ... import find  # pylint: disable=relative-beyond-top-level
+from ... import funcs as rift
+from ...errors import AllianceNotFoundError, NationNotFoundError
+from ... import find
 
 
 NEWLINE = '\n'
@@ -17,7 +12,11 @@ class PnWInfo(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="nation", aliases=["whois", "who", "check-link", "checklink", "nat"], help="Get information about a nation.", case_insensitive=True)
+    @commands.command(name="nation",
+                      aliases=["whois", "who",
+                               "check-link", "checklink", "nat"],
+                      help="Get information about a nation.",
+                      case_insensitive=True)
     async def nation(self, ctx, *, search=None):
         try:
             author, nation = await find.search_nation_author(ctx, search)
@@ -32,9 +31,10 @@ class PnWInfo(commands.Cog):
             {"name": "Domestic Policy", "value": nation.domestic_policy},
             {"name": "Continent", "value": nation.continent},
             {"name": "Color", "value": nation.color if nation.color !=
-                "Beige" else f"Beige ({nation.beige_turns:,} Turns"},
+                "Beige" else f"Beige ({nation.beige_turns:,} Turns)"},
             {"name": "Alliance",
-                "value": f"[{repr(nation.alliance)}](https://politicsandwar.com/alliance/id={nation.alliance.id} \"https://politicsandwar.com/alliance/id={nation.alliance.id}\")" if nation.alliance is not None else "None"},
+                "value": f"[{repr(nation.alliance)}](https://politicsandwar.com/alliance/id={nation.alliance.id} \"https://politicsandwar.com/alliance/id={nation.alliance.id}\")"
+             if nation.alliance is not None else "None"},
             {"name": "Alliance Position", "value": nation.alliance_position},
             {"name": "Cities",
                 "value": f"[{nation.cities}](https://politicsandwar.com/?id=62&n={'+'.join(nation.name.split(' '))} \"https://politicsandwar.com/?id=62&n={'+'.join(nation.name.split(' '))}\")"},
@@ -54,16 +54,20 @@ class PnWInfo(commands.Cog):
             {"name": "Average Infrastructure",
                 "value": f"{nation.avg_infra():,.2f}"},
             {"name": "Actions", "value":
-                f"[Message](https://politicsandwar.com/inbox/message/receiver={'+'.join(nation.leader.split(' '))} \"https://politicsandwar.com/inbox/message/receiver={'+'.join(nation.leader.split(' '))}\") "
-                f"[Trade](https://politicsandwar.com/nation/trade/create/nation={'+'.join(nation.name.split(' '))} \"https://politicsandwar.com/nation/trade/create/nation={'+'.join(nation.name.split(' '))}\") "
-                f"[Embargo](https://politicsandwar.com/index.php?id=68&name={'+'.join(nation.name.split(' '))}&type=n \"https://politicsandwar.com/index.php?id=68&name={'+'.join(nation.name.split(' '))}&type=n\") "
-                f"[War](https://politicsandwar.com/nation/war/declare/id={nation.id} \"https://politicsandwar.com/nation/war/declare/id={nation.id}\") "
-                f"[Espionage](https://politicsandwar.com/nation/espionage/eid={nation.id} \"https://politicsandwar.com/nation/espionage/eid={nation.id}\") "
+                f"[\U0001f4e7](https://politicsandwar.com/inbox/message/receiver={'+'.join(nation.leader.split(' '))} \"https://politicsandwar.com/inbox/message/receiver={'+'.join(nation.leader.split(' '))}\") "
+                f"[\U0001f4e4](https://politicsandwar.com/nation/trade/create/nation={'+'.join(nation.name.split(' '))} \"https://politicsandwar.com/nation/trade/create/nation={'+'.join(nation.name.split(' '))}\") "
+                f"[\U000026d4](https://politicsandwar.com/index.php?id=68&name={'+'.join(nation.name.split(' '))}&type=n \"https://politicsandwar.com/index.php?id=68&name={'+'.join(nation.name.split(' '))}&type=n\") "
+                f"[\U00002694](https://politicsandwar.com/nation/war/declare/id={nation.id} \"https://politicsandwar.com/nation/war/declare/id={nation.id}\") "
+                f"[\U0001f575](https://politicsandwar.com/nation/espionage/eid={nation.id} \"https://politicsandwar.com/nation/espionage/eid={nation.id}\") "
              }
         ]
         embed = rift.get_embed_author_guild(author, f"[Nation Page](https://politicsandwar.com/nation/id={nation.id} \"https://politicsandwar.com/nation/id={nation.id}\")", timestamp=self.bot.nations_update, footer="Data collected at", fields=fields) if isinstance(
             author, discord.Guild) else rift.get_embed_author_member(author, f"[Nation Page](https://politicsandwar.com/nation/id={nation.id} \"https://politicsandwar.com/nation/id={nation.id}\")", timestamp=self.bot.nations_update, footer="Data collected at", fields=fields)
         await ctx.reply(embed=embed)
+
+    @commands.command(name="me")
+    async def me(self, ctx):
+        await ctx.invoke(self.nation, search=None)
 
     @commands.command(name="alliance", help="Get information about an alliance.", case_insensitive=True)
     async def alliance(self, ctx, *, search=None):
@@ -73,7 +77,7 @@ class PnWInfo(commands.Cog):
         leaders = alliance.list_leaders()
         heirs = alliance.list_heirs()
         officers = alliance.list_officers()
-        embed = rift.get_embed_author_member(ctx.author, f"[Alliance Page](https://politicsandwar.com/alliance/id={alliance.id} \"https://politicsandwar.com/alliance/id={alliance.id}\")", timestamp=self.bot.alliances_update, footer="Data collected at", fields=[
+        embed = rift.get_embed_author_member(ctx.author, f"[Alliance Page](https://politicsandwar.com/alliance/id={alliance.id} \"https://politicsandwar.com/alliance/id={alliance.id}\")\n[War Activity](https://politicsandwar.com/alliance/id={alliance.id}&display=war \"https://politicsandwar.com/alliance/id={alliance.id}&display=war\")", timestamp=self.bot.alliances_update, footer="Data collected at", fields=[
             {"name": "Alliance ID", "value": alliance.id},
             {"name": "Alliance Name", "value": alliance.name},
             {"name": "Alliance Acronym",

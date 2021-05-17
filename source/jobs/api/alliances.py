@@ -1,18 +1,15 @@
 import datetime
-import json
 import aiohttp
-import asyncio
+from asyncpg.exceptions import DuplicateTableError
 from ...data.db import execute_query, execute_query_many
 from ...env import BASEURL, APIKEY
-from ... import jobs
 from ... import bot
 from ...data import cache
-from asyncpg.exceptions import DuplicateTableError
 
 
 async def fetch_alliances():
     try:
-        await execute_query(f"""
+        await execute_query("""
             CREATE TABLE "alliancesnew" (
                 "id"	INTEGER,
                 "founddate"	TEXT,
@@ -33,8 +30,8 @@ async def fetch_alliances():
             );
             """)
     except DuplicateTableError:
-        await execute_query(f"DROP TABLE alliancesnew;")
-        await execute_query(f"""
+        await execute_query("DROP TABLE alliancesnew;")
+        await execute_query("""
             CREATE TABLE "alliancesnew" (
                 "id"	INTEGER,
                 "founddate"	TEXT,
@@ -58,7 +55,7 @@ async def fetch_alliances():
         async with aiohttp.request("GET", f"{BASEURL}/alliances/?key={APIKEY}") as response:
             collected = datetime.datetime.utcnow()
             # print("Alliances", collected)
-            alliances = json.loads(await response.text())
+            alliances = await response.json()
             alliances_ = [(
                 int(i['id']),
                 i['founddate'],
@@ -79,14 +76,13 @@ async def fetch_alliances():
                 str(i['forumurl']) if not i['forumurl'] == "" else None,
                 str(i['ircchan']) if not i['ircchan'] == "" else None,
             ) for i in alliances['alliances']]
-            # await rift.execute_query_many( "INSERT INTO alliancesnew VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",alliances_)
-            await execute_query_many("INSERT INTO alliancesnew (id, founddate, name, acronym, color, rank, members, score, leaderids, officerids, heirids, avgscore, flagurl, forumurl, ircchan) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);", alliances_)
-        await execute_query(f"""
+            await execute_query_many("INSERT INTO alliancesnew (id, founddate, name, acronym, color, rank, members, score, leaderids, officerids, heirids, avgscore, flagurl, forumurl, ircchan) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);", alliances_)  # pylint: disable=line-too-long
+        await execute_query("""
             DROP TABLE alliances;
             ALTER TABLE alliancesnew RENAME TO alliances;
         """)
         bot.alliances_update = collected
-    except Exception as error:
+    except Exception as error:  # pylint: disable=broad-except
         print("FATAL ERROR RETRIEVING ALLIANCE DATA", error)
     try:
         await cache.refresh_cache_alliances(alliance_data=alliances_)

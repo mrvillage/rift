@@ -1,10 +1,11 @@
 from .base import Base
 from ..query import get_nation
 from ...funcs import utils
-import aiohttp
+from aiohttp import request
 from ...funcs.core import bot
 from ...errors import SentError
 from ... import cache
+from bs4 import BeautifulSoup
 
 
 class Nation(Base):
@@ -125,3 +126,7 @@ class Nation(Base):
         return sum(i.infrastructure for i in cache.cities.values() if i.nation_id == self.id)/self.cities
 
     avg_infra = get_average_infrastructure
+
+    async def get_discord_page_username(self):
+        async with request("GET", f"https://politicsandwar.com/nation/id={self.id}") as response:
+            return [i.contents[1].text for i in BeautifulSoup(await response.text(), "html.parser").find_all("tr", class_="notranslate") if any("Discord Username:" in str(j) for j in i.contents)][0]

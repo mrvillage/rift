@@ -4,4 +4,6 @@ from .document import *
 from .militarization import *
 from .mmr import *
 from .nation import *
+from .resources import *
 from .server import *
+from .trade import *

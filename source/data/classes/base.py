@@ -1,2 +1,2 @@
-class Base():
+class Base:
     pass

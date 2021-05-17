@@ -1,10 +1,10 @@
 import discord
 from discord.ext import commands
-from ... import funcs as rift  # pylint: disable=relative-beyond-top-level
-from ...errors import DocumentNotFoundError, BoolError  # pylint: disable=relative-beyond-top-level
-from ...menus import Confirm  # pylint: disable=relative-beyond-top-level
-from ... import checks  # pylint: disable=relative-beyond-top-level
-from ... import cache  # pylint: disable=relative-beyond-top-level
+from ... import funcs as rift
+from ...errors import DocumentNotFoundError, BoolError
+from ...menus import Confirm
+from ... import checks
+from ... import cache
 
 
 class Database(commands.Cog):
@@ -35,7 +35,7 @@ class Database(commands.Cog):
                 await rift.submit_document(url=arg, userid=ctx.author.id)
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"The following documents have been submitted:\n{docs}"))
         else:
-            await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"No documents have been submitted."))
+            await ctx.reply(embed=rift.get_embed_author_member(ctx.author, "No documents have been submitted."))
 
     @database.command(name="submissions")
     @checks.is_staff()

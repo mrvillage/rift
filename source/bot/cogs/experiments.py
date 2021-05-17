@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from ...data.query import get_mmr  # pylint: disable=relative-beyond-top-level
+from ...data.query import get_mmr
 
 
 class Experiments(commands.Cog, command_attrs=dict(hidden=True)):
