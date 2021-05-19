@@ -34,7 +34,7 @@ class Link(commands.Cog):
                     user,
                     f"""
                     The Discord username on your nation page doesn't match the one on your account!
-                    Head down to https://politicsandwar.com/nation/edit/ and scroll to the very bottom where it says "Discord Username:" and put `{user.name}{user.discriminator}` in the space, hit Save Changes and run the command again!
+                    Head down to https://politicsandwar.com/nation/edit/ and scroll to the very bottom where it says "Discord Username:" and put `{user.name}#{user.discriminator}` in the space, hit Save Changes and run the command again!
                     """
                 ))
         except IndexError:
@@ -42,7 +42,7 @@ class Link(commands.Cog):
                 user,
                 f"""
                 The Discord username on your nation page doesn't match the one on your account!
-                Head down to https://politicsandwar.com/nation/edit/ and scroll to the very bottom where it says "Discord Username:" and put `{user.name}{user.discriminator}` in the space, hit Save Changes and run the command again!
+                Head down to https://politicsandwar.com/nation/edit/ and scroll to the very bottom where it says "Discord Username:" and put `{user.name}#{user.discriminator}` in the space, hit Save Changes and run the command again!
                 """
             ))
 
