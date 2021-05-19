@@ -164,14 +164,25 @@ class Military(commands.Cog):
             await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"No nation found with argument `{search}`."))
             return
         militarization = nation.get_militarization()
-        await ctx.send(embed=rift.get_embed_author_member(author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}%\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization for {nation.name} (`{nation.id}`)", timestamp=self.bot.nations_update, footer="Data collected at", fields=[
-            {"name": "Soldiers", "value": f"{nation.soldiers:,}/{nation.cities*15000:,}"},
-            {"name": "Tanks", "value": f"{nation.tanks:,}/{nation.cities*1250:,}"},
-            {"name": "Aircraft", "value": f"{nation.aircraft:,}/{nation.cities*75:,}"},
-            {"name": "Ships", "value": f"{nation.ships:,}/{nation.cities*15:,}"},
-            {"name": "Missiles", "value": f"{nation.missiles:,}"},
-            {"name": "Nukes", "value": f"{nation.nukes:,}"},
-        ]))
+        if isinstance(author, discord.Guild):
+            embed = rift.get_embed_author_guild(author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}%\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization for {nation.name} (`{nation.id}`)", timestamp=self.bot.nations_update, footer="Data collected at", fields=[
+                {"name": "Soldiers", "value": f"{nation.soldiers:,}/{nation.cities*15000:,}"},
+                {"name": "Tanks", "value": f"{nation.tanks:,}/{nation.cities*1250:,}"},
+                {"name": "Aircraft", "value": f"{nation.aircraft:,}/{nation.cities*75:,}"},
+                {"name": "Ships", "value": f"{nation.ships:,}/{nation.cities*15:,}"},
+                {"name": "Missiles", "value": f"{nation.missiles:,}"},
+                {"name": "Nukes", "value": f"{nation.nukes:,}"},
+            ])
+        else:
+            embed =  rift.get_embed_author_member(author, f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}%\nShip Militarization: {militarization['ships']*100:.2f}%", title=f"Militarization for {nation.name} (`{nation.id}`)", timestamp=self.bot.nations_update, footer="Data collected at", fields=[
+                {"name": "Soldiers", "value": f"{nation.soldiers:,}/{nation.cities*15000:,}"},
+                {"name": "Tanks", "value": f"{nation.tanks:,}/{nation.cities*1250:,}"},
+                {"name": "Aircraft", "value": f"{nation.aircraft:,}/{nation.cities*75:,}"},
+                {"name": "Ships", "value": f"{nation.ships:,}/{nation.cities*15:,}"},
+                {"name": "Missiles", "value": f"{nation.missiles:,}"},
+                {"name": "Nukes", "value": f"{nation.nukes:,}"},
+            ])
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
