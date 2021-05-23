@@ -60,7 +60,7 @@ class Bank(commands.Cog):
             await message.edit(embed=rift.get_embed_author_member(ctx.author, "You didn't confirm your transaction in time!"))
             return
         if msg.content in ("c", "cancel"):
-            await message.edit(embed = rift.get_embed_author_guild(author, f"You have cancelled the transfer of {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**...") if isinstance(author, discord.Guild) else rift.get_embed_author_member(author, f"You have cancelled the transfer of {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**..."))
+            await message.edit(embed = rift.get_embed_author_guild(author, f"You have cancelled the transfer of {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.") if isinstance(author, discord.Guild) else rift.get_embed_author_member(author, f"You have cancelled the transfer of {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**."))
             return
         await message.edit(embed = rift.get_embed_author_guild(author, f"Sending {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**...") if isinstance(author, discord.Guild) else rift.get_embed_author_member(author, f"Sending {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**..."))
         complete = await transaction.complete(receiver=recipient, action="send")
