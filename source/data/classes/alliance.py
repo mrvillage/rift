@@ -5,6 +5,7 @@ from ... import cache
 from ...funcs.parse import parse_alliance_bank
 from ...ref import bot
 from .resources import Resources
+from ...find import search_alliance
 
 
 class Alliance(Base):
@@ -133,3 +134,7 @@ class Alliance(Base):
             content = await response.text()
         await bot.parse_token(content)
         return await Resources.from_dict(await parse_alliance_bank(content))
+
+    @classmethod
+    async def convert(cls, ctx, search):
+        return await search_alliance(ctx, search)

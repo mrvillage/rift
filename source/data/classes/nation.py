@@ -6,6 +6,7 @@ from ...funcs.core import bot
 from ...errors import SentError
 from ... import cache
 from bs4 import BeautifulSoup
+from ...find import search_nation
 
 
 class Nation(Base):
@@ -130,3 +131,7 @@ class Nation(Base):
     async def get_discord_page_username(self):
         async with request("GET", f"https://politicsandwar.com/nation/id={self.id}") as response:
             return [i.contents[1].text for i in BeautifulSoup(await response.text(), "html.parser").find_all("tr", class_="notranslate") if any("Discord Username:" in str(j) for j in i.contents)][0]
+
+    @classmethod
+    async def convert(cls, ctx, search):
+        return await search_nation(ctx, search)
