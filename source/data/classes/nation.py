@@ -1,11 +1,11 @@
+from aiohttp import request
+from bs4 import BeautifulSoup
 from .base import Base
 from ..query import get_nation
 from ...funcs import utils
-from aiohttp import request
 from ...funcs.core import bot
 from ...errors import SentError
 from ... import cache
-from bs4 import BeautifulSoup
 from ...find import search_nation
 
 
@@ -95,7 +95,9 @@ class Nation(Base):
             "body": content,
             "sndmsg": "Send Message"
         }
-        async with bot.pnw_session.post("https://politicsandwar.com/inbox/message", data=message_data, timeout=30.0) as response:
+        async with bot.pnw_session.post("https://politicsandwar.com/inbox/message",
+                                        data=message_data,
+                                        timeout=30.0) as response:
             if "successfully" in (await response.text()).lower():
                 return True
             else:
@@ -124,13 +126,16 @@ class Nation(Base):
         return self.cities
 
     def get_average_infrastructure(self):
-        return sum(i.infrastructure for i in cache.cities.values() if i.nation_id == self.id)/self.cities
+        return sum(i.infrastructure for i in cache.cities.values()
+                   if i.nation_id == self.id)/self.cities
 
     avg_infra = get_average_infrastructure
 
     async def get_discord_page_username(self):
         async with request("GET", f"https://politicsandwar.com/nation/id={self.id}") as response:
-            return [i.contents[1].text for i in BeautifulSoup(await response.text(), "html.parser").find_all("tr", class_="notranslate") if any("Discord Username:" in str(j) for j in i.contents)][0]
+            return [i.contents[1].text for i in BeautifulSoup(
+                    await response.text(), "html.parser").find_all("tr", class_="notranslate")
+                    if any("Discord Username:" in str(j) for j in i.contents)][0]
 
     @classmethod
     async def convert(cls, ctx, search):
