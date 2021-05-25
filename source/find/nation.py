@@ -17,3 +17,9 @@ async def search_nation_author(ctx, search):
         except IndexError:
             author = ctx.guild
     return author, nation
+
+
+async def search_nation(ctx, search):
+    author = ctx.author if search is None else None
+    search = str(ctx.author.id) if search is None else search
+    return await rift.search_nation(ctx, search)
