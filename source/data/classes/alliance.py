@@ -1,4 +1,3 @@
-import json
 from .base import Base
 from ..query import get_alliance
 from ... import cache
@@ -56,10 +55,14 @@ class Alliance(Base):
                     self.id and i.alliance_position in ("Member", "Officer", "Heir", "Leader")]
         elif vm:
             return [i for i in cache.nations.values() if i.alliance_id ==
-                    self.id and i.alliance_position in ("Member", "Officer", "Heir", "Leader") and i.v_mode]
+                    self.id and
+                    i.alliance_position in ("Member", "Officer", "Heir", "Leader") and
+                    i.v_mode]
         else:
             return [i for i in cache.nations.values() if i.alliance_id ==
-                    self.id and i.alliance_position in ("Member", "Officer", "Heir", "Leader") and not i.v_mode]
+                    self.id and
+                    i.alliance_position in ("Member", "Officer", "Heir", "Leader") and
+                    not i.v_mode]
 
     def list_applicants(self):
         return [i for i in cache.nations.values() if i.alliance_id ==
@@ -130,7 +133,9 @@ class Alliance(Base):
         return len([i[0] for i in self.list_members(vm=False)])
 
     async def get_resources(self):
-        async with bot.pnw_session.request("GET", "https://politicsandwar.com/alliance/id=7719&display=bank") as response:
+        async with bot.pnw_session.request(
+            "GET", "https://politicsandwar.com/alliance/id=7719&display=bank"
+        ) as response:
             content = await response.text()
         await bot.parse_token(content)
         return await Resources.from_dict(await parse_alliance_bank(content))
