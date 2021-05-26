@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from ... import funcs as rift
-from ...data.db import execute_query, execute_read_query
+from ...data.db import execute_query
 
 
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):
