@@ -8,8 +8,7 @@ class Trade(commands.Cog):
         self.bot = bot
 
     @commands.command(name="price",
-                      aliases=["resource", "prices", "trade-profit", "tradeprofit",
-                               "tp", "trade-margin", "trademargin", "margin", "tm"])
+                      aliases=["resource", "prices"])
     async def price(self, ctx: commands.Context):
         prices: TradePrices = await rift.get_trade_prices()
         await ctx.reply(embed=rift.get_embed_author_member(
@@ -100,6 +99,66 @@ class Trade(commands.Cog):
                 Highest Buy: ${prices.aluminum.highest_buy.price:,} ({prices.aluminum.highest_buy.amount:,} Aluminum)
                 Lowest Sell: ${prices.aluminum.lowest_sell.price:,} ({prices.aluminum.lowest_sell.amount:,} Aluminum)
                 Trade Margin: ${prices.aluminum.trade_margin:,}
+                """},
+            ]))
+
+    @commands.command(name="trade-margins",
+                      aliases=["trade-margin", "trademargin", "margin", "tm", "margins"])
+    async def trade_margins(self, ctx):
+        prices: TradePrices = await rift.get_trade_prices()
+        await ctx.reply(embed=rift.get_embed_author_member(
+            ctx.author,
+            f"Market Index: ${prices.market_index:,}",
+            timestamp=self.bot.prices_update,
+            title="Trade Margins",
+            fields=[
+                {"name": "Credits",
+                 "value": f"""
+                ${prices.credit.trade_margin:,}
+                """},
+                {"name": "Food",
+                 "value": f"""
+                ${prices.food.trade_margin:,}
+                """},
+                {"name": "Coal",
+                 "value": f"""
+                ${prices.coal.trade_margin:,}
+                """},
+                {"name": "Oil",
+                 "value": f"""
+                ${prices.oil.trade_margin:,}
+                """},
+                {"name": "Uranium",
+                 "value": f"""
+                ${prices.uranium.trade_margin:,}
+                """},
+                {"name": "Lead",
+                 "value": f"""
+                ${prices.lead.trade_margin:,}
+                """},
+                {"name": "Iron",
+                 "value": f"""
+                ${prices.iron.trade_margin:,}
+                """},
+                {"name": "Bauxite",
+                 "value": f"""
+                ${prices.bauxite.trade_margin:,}
+                """},
+                {"name": "Gasoline",
+                 "value": f"""
+                ${prices.gasoline.trade_margin:,}
+                """},
+                {"name": "Munitions",
+                 "value": f"""
+                ${prices.munitions.trade_margin:,}
+                """},
+                {"name": "Steel",
+                 "value": f"""
+                ${prices.steel.trade_margin:,}
+                """},
+                {"name": "Aluminum",
+                 "value": f"""
+                ${prices.aluminum.trade_margin:,}
                 """},
             ]))
 
