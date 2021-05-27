@@ -9,7 +9,7 @@ class Link(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="link", aliases=["verify"], help="Links your Politics and War nation to your Discord account.", case_insensitive=True)
+    @commands.command(name="link", aliases=["verify"], help="Links your Politics and War nation to your Discord account.")
     async def link(self, ctx, nation, user: discord.Member = None):
         try:
             nation = await rift.search_nation(ctx, nation)
