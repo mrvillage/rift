@@ -25,12 +25,13 @@ class Link(commands.Cog):
             await ctx.reply(embed=rift.get_embed_author_member(user, f"Nation `{nation.id}` is already linked!"))
             return
         try:
+            message = await ctx.reply(embed=rift.get_embed_author_member( user, "Fetching Discord username..."))
             name = await nation.get_discord_page_username()
             if name == f"{user.name}#{user.discriminator}":
                 await rift.add_link(user.id, nation.id)
-                await ctx.reply(embed=rift.get_embed_author_member(user, f"Success! {user.mention} is now linked to nation `{nation.id}`!"))
+                await message.edit(embed=rift.get_embed_author_member(user, f"Success! {user.mention} is now linked to nation `{nation.id}`!"))
             else:
-                await ctx.reply(embed=rift.get_embed_author_member(
+                await message.edit(embed=rift.get_embed_author_member(
                     user,
                     f"""
                     The Discord username on your nation page doesn't match the one on your account!
@@ -38,7 +39,7 @@ class Link(commands.Cog):
                     """
                 ))
         except IndexError:
-            await ctx.reply(embed=rift.get_embed_author_member(
+            await message.edit(embed=rift.get_embed_author_member(
                 user,
                 f"""
                 The Discord username on your nation page doesn't match the one on your account!
