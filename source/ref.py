@@ -47,9 +47,26 @@ class Rift(Bot):
         data = BeautifulSoup(content, "html.parser")
         self.auth_token = data.find('input', {"name": "token"}).attrs['value']
 
+    async def get_guild_prefix(self, guild_id):
+        prefixes = [i for i in await execute_read_query(
+            "SELECT prefix FROM prefixes WHERE guild_id = $1;", guild_id)]
+        if prefixes:
+            return prefixes
+        return default_prefixes
+
+    get_guild_prefixes = get_guild_prefix
+
+
+default_prefixes = ["?"]
+
+
+async def get_prefix(rift: Rift, message):
+    prefixes = await rift.get_guild_prefixes(message.guild.id)
+    return when_mentioned_or(*prefixes)(rift, message)
+
 
 intents = Intents.all()
-bot = Rift(command_prefix=when_mentioned_or("?"),
+bot = Rift(command_prefix=get_prefix,
            intents=intents,
            case_insensitive=True,
            allowed_mentions=AllowedMentions(replied_user=False),
