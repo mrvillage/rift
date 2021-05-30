@@ -5,7 +5,6 @@ from discord.ext.commands import Bot, when_mentioned_or
 import aiohttp
 from .env import EMAIL, PASSWORD, __version__
 from .errors import LoginError
-from .data.db.connect import connection
 from .data.db import execute_read_query
 from .help import EmbedHelpCommand
 
