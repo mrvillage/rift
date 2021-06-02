@@ -65,9 +65,8 @@ async def get_prefix(rift: Rift, message):
     return when_mentioned_or(*prefixes)(rift, message)
 
 
-intents = Intents.all()
 bot = Rift(command_prefix=get_prefix,
-           intents=intents,
+           intents=Intents.all(),
            case_insensitive=True,
            allowed_mentions=AllowedMentions(replied_user=False),
            activity=Game(name=__version__),
