@@ -5,7 +5,7 @@ from ...data.db import execute_query
 
 
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: rift.Rift):
         self.bot = bot
 
     async def cog_check(self, ctx):  # pylint: disable=invalid-overridden-method
