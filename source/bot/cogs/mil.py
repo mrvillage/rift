@@ -4,7 +4,6 @@ import discord
 import aiohttp
 from discord.ext import commands
 from ... import funcs as rift
-from ... import cache
 from ...errors import AllianceNotFoundError, NationNotFoundError
 from ... import find
 
