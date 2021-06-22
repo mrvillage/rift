@@ -13,10 +13,8 @@ class PnWInfo(commands.Cog):
         self.bot = bot
 
     @commands.command(name="nation",
-                      aliases=["whois", "who",
-                               "check-link", "checklink", "nat"],
-                      help="Get information about a nation.",
-                      case_insensitive=True)
+                      aliases=["check-link", "checklink", "nat"],
+                      help="Get information about a nation.",)
     async def nation(self, ctx, *, search=None):
         try:
             author, nation = await find.search_nation_author(ctx, search)
@@ -104,6 +102,19 @@ class PnWInfo(commands.Cog):
                 "value": f"{len(alliance.list_members(vm=True)):,}"},
         ]).set_thumbnail(url=alliance.flagurl)
         await ctx.reply(embed=embed)
+    
+    @commands.command(name="who", alises=["who-is", "whois"])
+    async def who(self, ctx, *, search=None):
+        try:
+            await find.search_nation(ctx, search)
+            await ctx.invoke(self.nation, search=search)
+        except NationNotFoundError:
+            try:
+                await find.search_alliance(ctx, search)
+                await ctx.invoke(self.alliance, search=search)
+            except AllianceNotFoundError:
+                embed = rift.get_embed_author_member(ctx.author, f"No nation or alliance found with argument `{search}`.")
+                await ctx.reply(embed=embed)
 
     @commands.command(name="members")
     async def members(self, ctx, *, search=None):
