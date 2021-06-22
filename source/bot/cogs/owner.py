@@ -1,7 +1,9 @@
+import asyncio
 import discord
 from discord.ext import commands
 from ... import funcs as rift
 from ...data.db import execute_query
+from ... import cache
 
 
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):
@@ -88,7 +90,35 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         staff = [i for i in staff if i is not None]
         mentions = "\n".join([i.mention for i in staff])
         await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"There are {len(staff):,} Staff:\n{mentions}"))
+    
+    @commands.command(name="server-dump")
+    async def server_dump(self, ctx, purge=0):
+        try:
+            await ctx.message.delete()
+        except discord.Forbidden:
+            pass
+        if purge > 0:
+            await ctx.channel.purge(limit=purge)
+        message = await ctx.send("Fetching...")
+        invites = []
+        for alliance in cache.alliances.values():
+            try:
+                if alliance.discord is None:
+                    continue
+                await self.bot.fetch_invite(alliance.discord)
+                invites.append(alliance)
+            except discord.NotFound:
+                pass
+            await asyncio.sleep(1)
+        try:
+            await message.delete()
+        except discord.Forbidden:
+            pass
+        for invite in invites:
+            await ctx.send(f"**{invite.name} ({invite.acronym} - {invite.id})**\n{invite.discord}")
+            await asyncio.sleep(1)
+        await ctx.send("Servers sent!")
 
 
-def setup(bot):
+def setup(bot: rift.Rift):
     bot.add_cog(Owner(bot))
