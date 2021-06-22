@@ -90,7 +90,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         staff = [i for i in staff if i is not None]
         mentions = "\n".join([i.mention for i in staff])
         await ctx.reply(embed=rift.get_embed_author_member(ctx.author, f"There are {len(staff):,} Staff:\n{mentions}"))
-    
+
     @commands.command(name="server-dump")
     async def server_dump(self, ctx, purge=0):
         try:
