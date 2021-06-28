@@ -140,3 +140,9 @@ class Nation(Base):
     @classmethod
     async def convert(cls, ctx, search):
         return await search_nation(ctx, search)
+
+    async def get_revenue_modifiers(self):
+        pass
+
+    async def get_revenue(self):
+        return sum(city.get_revenue() for city in self.list_cities()) + self.get_revenue_modifiers()
