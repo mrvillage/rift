@@ -14,7 +14,10 @@ class Errors(commands.Cog):
         if ctx.command.has_error_handler():
             return
         cog = ctx.cog
-        if cog and commands.Cog._get_overridden_method(cog.cog_command_error) is not None:
+        if (
+            cog
+            and commands.Cog._get_overridden_method(cog.cog_command_error) is not None
+        ):
             return
         await rift.handler(ctx, error)
 
