@@ -10,8 +10,7 @@ bot = rift.bot
 
 @bot.event
 async def on_message(message):
-    if message.channel.type != discord.ChannelType.private:
-        await bot.process_commands(message)
+    await bot.process_commands(message)
 
 
 @bot.event
