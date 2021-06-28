@@ -1,7 +1,6 @@
 from ..classes import Alliance
 from ... import cache
 import asyncio
-from ...funcs import utils
 
 
 async def create_cache_alliances(*, alliance_data):
