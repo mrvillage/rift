@@ -143,3 +143,9 @@ class Alliance(Base):
     @classmethod
     async def convert(cls, ctx, search):
         return await search_alliance(ctx, search)
+
+    async def get_revenue_modifiers(self):
+        pass
+
+    async def get_revenue(self):
+        return sum(nation.get_revenue() for nation in self.list_members(vm=False)) + self.get_revenue_modifiers()
