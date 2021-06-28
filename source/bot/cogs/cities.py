@@ -10,6 +10,7 @@ class Cities(commands.Cog):
 def setup(bot):
     bot.add_cog(Cities(bot))
 
+
 # Will accept every parameter but will ignore imp_total
 # If nothing is set then it will not check anything for that improvement
 # Integers will say it needs to be exactly at this point, <, <=, =, ==, >=, > will all also work
