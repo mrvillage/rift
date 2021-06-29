@@ -10,10 +10,10 @@ class Loop(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.pnw_session_refresh.start()  # pylint: disable=no-member
-        self.fetch_nations.start()  # pylint: disable=no-member
-        self.fetch_alliances.start()  # pylint: disable=no-member
-        self.fetch_cities.start()  # pylint: disable=no-member
-        self.fetch_prices.start()  # pylint: disable=no-member
+        # self.fetch_nations.start()  # pylint: disable=no-member
+        # self.fetch_alliances.start()  # pylint: disable=no-member
+        # self.fetch_cities.start()  # pylint: disable=no-member
+        # self.fetch_prices.start()  # pylint: disable=no-member
 
     @tasks.loop(minutes=5)
     async def pnw_session_refresh(self):
