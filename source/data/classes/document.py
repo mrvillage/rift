@@ -1,7 +1,8 @@
-from .base import Base
-from ..query import get_document
-import json
 import asyncio
+import json
+
+from ..query import get_document
+from .base import Base
 
 
 class Document(Base):

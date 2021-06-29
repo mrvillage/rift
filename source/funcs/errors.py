@@ -1,7 +1,9 @@
-import traceback
 import sys
+import traceback
+
 import discord
 from discord.ext import commands
+
 from .embeds import get_embed_author_member
 from .utils import get_command_signature
 

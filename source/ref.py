@@ -1,11 +1,13 @@
 import datetime
-from bs4 import BeautifulSoup
-from discord import Intents, AllowedMentions, Game
-from discord.ext.commands import Bot, when_mentioned_or
+
 import aiohttp
+from bs4 import BeautifulSoup
+from discord import AllowedMentions, Game, Intents
+from discord.ext.commands import Bot, when_mentioned_or
+
+from .data.db import execute_read_query
 from .env import EMAIL, PASSWORD, __version__
 from .errors import LoginError
-from .data.db import execute_read_query
 from .help import EmbedHelpCommand
 
 

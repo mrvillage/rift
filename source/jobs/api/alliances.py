@@ -1,10 +1,12 @@
 import datetime
+
 import aiohttp
 from asyncpg.exceptions import DuplicateTableError
-from ...data.db import execute_query, execute_query_many
-from ...env import BASEURL, APIKEY
+
 from ... import bot
 from ...data import cache
+from ...data.db import execute_query, execute_query_many
+from ...env import APIKEY, BASEURL
 
 
 async def fetch_alliances():

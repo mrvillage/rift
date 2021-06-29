@@ -1,5 +1,5 @@
-import discord
 from discord.ext import commands
+
 from ... import funcs as rift
 
 

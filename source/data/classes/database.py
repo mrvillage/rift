@@ -1,7 +1,8 @@
-from .base import Base
-from ..query import get_document, get_server
 import json
-from discord.ext.commands import InviteConverter, BadInviteArgument
+
+from discord.ext.commands import BadInviteArgument
+
+from .base import Base
 
 
 class Document(Base):

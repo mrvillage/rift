@@ -1,12 +1,8 @@
-from __future__ import print_function
+from .. import query
 from .alliance import *
 from .city import *
 from .database import *
 from .nation import *
-from ...funcs import bot
-from functools import partial
-import asyncio
-from .. import query
 
 
 async def create_cache(

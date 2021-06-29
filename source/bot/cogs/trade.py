@@ -1,4 +1,5 @@
 from discord.ext import commands
+
 from ... import funcs as rift
 from ...data.classes import TradePrices
 

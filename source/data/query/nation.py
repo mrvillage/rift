@@ -1,6 +1,4 @@
-from ..db import execute_query, execute_read_query
-
-from ..db import connection
+from ..db import execute_read_query
 
 
 async def get_nation(*, nation_id=None, nation_name=None):

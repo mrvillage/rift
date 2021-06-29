@@ -1,6 +1,6 @@
 import datetime
 from pathlib import Path
-import discord
+
 from .. import funcs as rift
 from ..data import cache
 from ..env import TOKEN, __version__

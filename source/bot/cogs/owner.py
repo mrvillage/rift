@@ -1,9 +1,11 @@
 import asyncio
+
 import discord
 from discord.ext import commands
+
+from ... import cache
 from ... import funcs as rift
 from ...data.db import execute_query
-from ... import cache
 
 
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):

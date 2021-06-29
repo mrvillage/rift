@@ -1,9 +1,10 @@
 import json
+
 import discord
-from .. import funcs as rift
-from ..data.db import connection
-from ..funcs import bot
+
 from .. import cache
+from .. import funcs as rift
+from ..funcs import bot
 
 
 async def target_check():

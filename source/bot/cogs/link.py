@@ -1,6 +1,8 @@
 from typing import Union
+
 import discord
 from discord.ext import commands
+
 from ... import funcs as rift
 from ...errors import NationNotFoundError
 

@@ -1,9 +1,5 @@
-import discord, json, os, asyncio, random, time, datetime
-from dotenv import load_dotenv
-from discord.ext import commands
-from discord.ext.commands import MemberConverter
-from .core import *  # pylint: disable=unused-wildcard-import
 from ..data.db.sql import *  # pylint: disable=unused-wildcard-import
+from .core import *  # pylint: disable=unused-wildcard-import
 
 
 def key0(item):

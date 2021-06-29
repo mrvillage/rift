@@ -1,5 +1,4 @@
 import aiohttp
-from ...ref import bot
 
 
 async def get_city_build(*, city_id):

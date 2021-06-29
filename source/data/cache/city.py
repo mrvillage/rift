@@ -1,6 +1,7 @@
-from ..classes import City
-from ... import cache
 import asyncio
+
+from ... import cache
+from ..classes import City
 
 
 async def create_cache_cities(*, city_data):

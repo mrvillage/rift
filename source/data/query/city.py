@@ -1,4 +1,4 @@
-from ..db import execute_query, execute_read_query, execute_query_many
+from ..db import execute_read_query
 
 
 async def get_city(*, city_id=None, city_name=None):

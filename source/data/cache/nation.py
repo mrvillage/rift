@@ -1,6 +1,7 @@
-from ..classes.nation import Nation
-from ... import cache
 import asyncio
+
+from ... import cache
+from ..classes.nation import Nation
 
 
 async def create_cache_nations(*, nation_data):
