@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from discord import Embed
+from discord import Embed, utils
 from discord.ext import commands
 
 from .env import COLOR, FOOTER
@@ -30,7 +30,7 @@ def get_embed_author_member(
         Embed(
             color=color,
             description=description,
-            timestamp=datetime.utcnow() if timestamp == None else timestamp,
+            timestamp=utils.utcnow() if timestamp == None else timestamp,
             title=title,
         )
         .set_footer(text=footer)
