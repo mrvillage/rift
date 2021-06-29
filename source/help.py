@@ -36,7 +36,7 @@ def get_embed_author_member(
         .set_footer(text=footer)
         .set_author(
             name=f"{member.name}#{member.discriminator}",
-            icon_url=str(member.avatar_url),
+            icon_url=str(member.avatar.url),
         )
         .set_image(url=image_url),
         fields,
