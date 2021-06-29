@@ -4,8 +4,7 @@ import discord
 from .. import funcs as rift
 from ..data import cache
 from ..env import TOKEN, __version__
-
-bot = rift.bot
+from ..ref import bot
 
 
 @bot.event
@@ -40,15 +39,15 @@ async def rift_about(ctx):
     )
 
 
-cogPath = Path.cwd() / "source" / "bot" / "cogs"
-cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
-for cog in cogs:
-    bot.load_extension(f"source.bot.cogs.{cog}")
-    print(f"Loaded {cog}!")
+def main():
+    cogPath = Path.cwd() / "source" / "bot" / "cogs"
+    cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
+    for cog in cogs:
+        bot.load_extension(f"source.bot.cogs.{cog}")
+        print(f"Loaded {cog}!")
 
-
-bot.loop.create_task(cache.create_cache())
-bot.loop.create_task(bot.update_pnw_session())
-bot.loop.create_task(bot.get_staff())
-bot.command_prefix = "!!"
-bot.run(TOKEN)
+    bot.loop.create_task(cache.create_cache())
+    bot.loop.create_task(bot.update_pnw_session())
+    bot.loop.create_task(bot.get_staff())
+    bot.command_prefix = "!!"
+    bot.run(TOKEN)
