@@ -1,4 +1,10 @@
-from discord.ext.commands import Context, MemberConverter, UserConverter, MemberNotFound, UserNotFound
+from discord.ext.commands import (
+    Context,
+    MemberConverter,
+    UserConverter,
+    MemberNotFound,
+    UserNotFound,
+)
 from .link import get_link_user, get_link_nation
 from .. import cache
 from ..errors import AllianceNotFoundError, LinkError

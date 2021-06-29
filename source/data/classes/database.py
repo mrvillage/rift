@@ -13,7 +13,7 @@ class Document(Base):
         self.categories = json.loads(self.data[3])
         self.keywords = json.loads(self.data[4])
         self.description = self.data[5]
-        self.search_args = self.categories+self.keywords
+        self.search_args = self.categories + self.keywords
         self.search_args.append(self.name)
         self.search_args = [i.lower() for i in self.search_args]
         self.search_args.append(self.id)
@@ -34,7 +34,7 @@ class Server(Base):
         self.categories = json.loads(self.data[3])
         self.keywords = json.loads(self.data[4])
         self.description = self.data[5]
-        self.search_args = self.categories+self.keywords
+        self.search_args = self.categories + self.keywords
         self.search_args.append(self.name)
         self.search_args = [i.lower() for i in self.search_args]
         self.search_args.append(self.id)

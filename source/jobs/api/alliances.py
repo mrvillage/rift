@@ -9,7 +9,8 @@ from ...data import cache
 
 async def fetch_alliances():
     try:
-        await execute_query("""
+        await execute_query(
+            """
             CREATE TABLE "alliancesnew" (
                 "id"	INTEGER,
                 "founddate"	TEXT,
@@ -28,10 +29,12 @@ async def fetch_alliances():
                 "ircchan"	TEXT,
                 PRIMARY KEY("id")
             );
-            """)
+            """
+        )
     except DuplicateTableError:
         await execute_query("DROP TABLE alliancesnew;")
-        await execute_query("""
+        await execute_query(
+            """
             CREATE TABLE "alliancesnew" (
                 "id"	INTEGER,
                 "founddate"	TEXT,
@@ -50,37 +53,47 @@ async def fetch_alliances():
                 "ircchan"	TEXT,
                 PRIMARY KEY("id")
             );
-            """)
+            """
+        )
     try:
-        async with aiohttp.request("GET", f"{BASEURL}/alliances/?key={APIKEY}") as response:
+        async with aiohttp.request(
+            "GET", f"{BASEURL}/alliances/?key={APIKEY}"
+        ) as response:
             collected = datetime.datetime.utcnow()
             # print("Alliances", collected)
             alliances = await response.json()
-            alliances_ = [(
-                int(i['id']),
-                i['founddate'],
-                i['name'],
-                i['acronym'],
-                i['color'],
-                int(i['rank']),
-                int(i['members']) if 'members' in i else None,
-                float(i['score']) if 'score' in i else None,
-                str([int(j) for j in i['leaderids']]
-                    ) if 'leaderids' in i else None,
-                str([int(j) for j in i['officerids']]
-                    ) if 'officerids' in i else None,
-                str([int(j) for j in i['heirids']]
-                    ) if 'heirids' in i else None,
-                float(i['avgscore']),
-                str(i['flagurl']) if not i['flagurl'] == "" else None,
-                str(i['forumurl']) if not i['forumurl'] == "" else None,
-                str(i['ircchan']) if not i['ircchan'] == "" else None,
-            ) for i in alliances['alliances']]
-            await execute_query_many("INSERT INTO alliancesnew (id, founddate, name, acronym, color, rank, members, score, leaderids, officerids, heirids, avgscore, flagurl, forumurl, ircchan) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);", alliances_)  # pylint: disable=line-too-long
-        await execute_query("""
+            alliances_ = [
+                (
+                    int(i["id"]),
+                    i["founddate"],
+                    i["name"],
+                    i["acronym"],
+                    i["color"],
+                    int(i["rank"]),
+                    int(i["members"]) if "members" in i else None,
+                    float(i["score"]) if "score" in i else None,
+                    str([int(j) for j in i["leaderids"]]) if "leaderids" in i else None,
+                    str([int(j) for j in i["officerids"]])
+                    if "officerids" in i
+                    else None,
+                    str([int(j) for j in i["heirids"]]) if "heirids" in i else None,
+                    float(i["avgscore"]),
+                    str(i["flagurl"]) if not i["flagurl"] == "" else None,
+                    str(i["forumurl"]) if not i["forumurl"] == "" else None,
+                    str(i["ircchan"]) if not i["ircchan"] == "" else None,
+                )
+                for i in alliances["alliances"]
+            ]
+            await execute_query_many(
+                "INSERT INTO alliancesnew (id, founddate, name, acronym, color, rank, members, score, leaderids, officerids, heirids, avgscore, flagurl, forumurl, ircchan) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);",
+                alliances_,
+            )  # pylint: disable=line-too-long
+        await execute_query(
+            """
             DROP TABLE alliances;
             ALTER TABLE alliancesnew RENAME TO alliances;
-        """)
+        """
+        )
         bot.alliances_update = collected
     except Exception as error:  # pylint: disable=broad-except
         print("FATAL ERROR RETRIEVING ALLIANCE DATA", error)

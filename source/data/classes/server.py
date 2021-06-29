@@ -13,10 +13,8 @@ class Server(Base):
             self.invite = self.data[2]
         except BadInviteArgument:
             self.invite = "Invalid Invite"
-        self.categories = json.loads(
-            self.data[3]) if self.data[3] is not None else None
-        self.keywords = json.loads(
-            self.data[4]) if self.data[4] is not None else None
+        self.categories = json.loads(self.data[3]) if self.data[3] is not None else None
+        self.keywords = json.loads(self.data[4]) if self.data[4] is not None else None
         self.description = self.data[5]
         self.search_args = []
         if self.categories is not None:

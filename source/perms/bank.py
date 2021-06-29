@@ -28,16 +28,27 @@ from ..funcs.utils import get_alliance_position_id
 async def check_bank_perms(*, nation: Nation, author: Union[Member, User], action):
     """ACTION MUST BE 'send' or 'view'"""
     try:
-        perm = (await execute_read_query("SELECT * FROM bankpermissions WHERE allianceid = 7719;"))[0]
+        perm = (
+            await execute_read_query(
+                "SELECT * FROM bankpermissions WHERE allianceid = 7719;"
+            )
+        )[0]
         nation_position = get_alliance_position_id(nation.alliance_position)
         alliance_position = get_alliance_position_id(perm[f"{action}rank"])
         if nation_position >= alliance_position and nation.alliance.id == 7719:
             return True
-        if author.id in json.loads(perm[f'{action}users']) if perm[f'{action}users'] is not None else []:
+        if (
+            author.id in json.loads(perm[f"{action}users"])
+            if perm[f"{action}users"] is not None
+            else []
+        ):
             return True
         roles = [role.id for role in author.roles]
-        role_perms = json.loads(
-            perm[f'{action}roles']) if perm[f'{action}roles'] is not None else []
+        role_perms = (
+            json.loads(perm[f"{action}roles"])
+            if perm[f"{action}roles"] is not None
+            else []
+        )
         if any(role in role_perms for role in roles):
             return True
         return False

@@ -13,10 +13,16 @@ class Document(Base):
         self.id = self.data[0]
         self.name = self.data[1]
         self.url = self.data[2]
-        self.categories = json.loads(
-            self.data[3]) if self.data[3] is not None and self.data[3] else None
-        self.keywords = json.loads(
-            self.data[4]) if self.data[4] is not None and self.data[4] else None
+        self.categories = (
+            json.loads(self.data[3])
+            if self.data[3] is not None and self.data[3]
+            else None
+        )
+        self.keywords = (
+            json.loads(self.data[4])
+            if self.data[4] is not None and self.data[4]
+            else None
+        )
         self.description = self.data[5]
         self.search_args = []
         if self.categories is not None:

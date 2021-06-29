@@ -9,7 +9,23 @@ from ....funcs.bank import withdraw
 
 
 class Transaction(BankBase):
-    def __init__(self, *, resources: Resources = None, money: Union[float, int] = 0, food: Union[float, int] = 0, coal: Union[float, int] = 0, oil: Union[float, int] = 0, uranium: Union[float, int] = 0, lead: Union[float, int] = 0, iron: Union[float, int] = 0, bauxite: Union[float, int] = 0, gasoline: Union[float, int] = 0, munitions: Union[float, int] = 0, steel: Union[float, int] = 0, aluminum: Union[float, int] = 0):
+    def __init__(
+        self,
+        *,
+        resources: Resources = None,
+        money: Union[float, int] = 0,
+        food: Union[float, int] = 0,
+        coal: Union[float, int] = 0,
+        oil: Union[float, int] = 0,
+        uranium: Union[float, int] = 0,
+        lead: Union[float, int] = 0,
+        iron: Union[float, int] = 0,
+        bauxite: Union[float, int] = 0,
+        gasoline: Union[float, int] = 0,
+        munitions: Union[float, int] = 0,
+        steel: Union[float, int] = 0,
+        aluminum: Union[float, int] = 0,
+    ):
         if resources is None:
             self.money = money
             self.food = food
@@ -64,35 +80,72 @@ class Transaction(BankBase):
         return cls(resources=(await Resources.convert_resources(argument)))
 
     def __str__(self):
-        return ", ".join([f"{value:,.2f} {name}" for name, value in (("Money", self.money), ("Food", self.food), ("Coal", self.coal), ("Oil", self.oil), ("Uranium", self.uranium), ("Lead", self.lead), ("Iron", self.iron), ("Bauxite", self.bauxite), ("Gasoline", self.gasoline), ("Munitions", self.munitions), ("Steel", self.steel), ("Aluminum", self.aluminum)) if value > 0])
-    
+        return ", ".join(
+            [
+                f"{value:,.2f} {name}"
+                for name, value in (
+                    ("Money", self.money),
+                    ("Food", self.food),
+                    ("Coal", self.coal),
+                    ("Oil", self.oil),
+                    ("Uranium", self.uranium),
+                    ("Lead", self.lead),
+                    ("Iron", self.iron),
+                    ("Bauxite", self.bauxite),
+                    ("Gasoline", self.gasoline),
+                    ("Munitions", self.munitions),
+                    ("Steel", self.steel),
+                    ("Aluminum", self.aluminum),
+                )
+                if value > 0
+            ]
+        )
+
     def __len__(self):
-        return len([i for i in (self.money, self.food, self.coal, self.oil, self.uranium, self.lead, self.iron, self.bauxite, self.gasoline, self.munitions, self.steel, self.aluminum)])
+        return len(
+            [
+                i
+                for i in (
+                    self.money,
+                    self.food,
+                    self.coal,
+                    self.oil,
+                    self.uranium,
+                    self.lead,
+                    self.iron,
+                    self.bauxite,
+                    self.gasoline,
+                    self.munitions,
+                    self.steel,
+                    self.aluminum,
+                )
+            ]
+        )
 
 
 class CompletedTransaction(Transaction):
     def __init__(self, data):
         self.data = data
-        self.id = self.data['tx_id']
-        self.datetime = self.data['tx_datetime']
-        self.sender_id = self.data['sender_id']
-        self.sender_type = self.data['sender_type']
-        self.receiver_id = self.data['receiver_id']
-        self.receiver_type = self.data['receiver_type']
-        self.banker_id = self.data['banker_nation_id']
-        self.note = self.data['note']
-        self.money = self.data['money']
-        self.food = self.data['food']
-        self.coal = self.data['coal']
-        self.oil = self.data['oil']
-        self.uranium = self.data['uranium']
-        self.lead = self.data['lead']
-        self.iron = self.data['iron']
-        self.bauxite = self.data['bauxite']
-        self.gasoline = self.data['gasoline']
-        self.munitions = self.data['munitions']
-        self.steel = self.data['steel']
-        self.aluminum = self.data['aluminum']
+        self.id = self.data["tx_id"]
+        self.datetime = self.data["tx_datetime"]
+        self.sender_id = self.data["sender_id"]
+        self.sender_type = self.data["sender_type"]
+        self.receiver_id = self.data["receiver_id"]
+        self.receiver_type = self.data["receiver_type"]
+        self.banker_id = self.data["banker_nation_id"]
+        self.note = self.data["note"]
+        self.money = self.data["money"]
+        self.food = self.data["food"]
+        self.coal = self.data["coal"]
+        self.oil = self.data["oil"]
+        self.uranium = self.data["uranium"]
+        self.lead = self.data["lead"]
+        self.iron = self.data["iron"]
+        self.bauxite = self.data["bauxite"]
+        self.gasoline = self.data["gasoline"]
+        self.munitions = self.data["munitions"]
+        self.steel = self.data["steel"]
+        self.aluminum = self.data["aluminum"]
         if self.sender_type == 1:
             self.sender = cache.nations[self.sender_id]
         elif self.sender_type == 2:
