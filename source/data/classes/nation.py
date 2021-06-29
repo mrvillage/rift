@@ -12,8 +12,7 @@ from ...find import search_nation
 class Nation(Base):
     def __init__(self, *, nation_id=None, nation_name=None, data=None):
         if data is None:
-            self.data = get_nation(nation_id=nation_id,
-                                   nation_name=nation_name)
+            self.data = get_nation(nation_id=nation_id, nation_name=nation_name)
         else:
             self.data = data
         self.id = self.data[0]
@@ -47,8 +46,7 @@ class Nation(Base):
 
     def _update(self, *, nation_id=None, nation_name=None, data=None):
         if data is None:
-            self.data = get_nation(nation_id=nation_id,
-                                   nation_name=nation_name)
+            self.data = get_nation(nation_id=nation_id, nation_name=nation_name)
         else:
             self.data = data
         self.id = self.data[0]
@@ -80,7 +78,9 @@ class Nation(Base):
 
     async def _link(self):
         try:
-            self.alliance = cache.alliances[self.alliance_id] if self.alliance is not None else None
+            self.alliance = (
+                cache.alliances[self.alliance_id] if self.alliance is not None else None
+            )
         except KeyError:
             self.alliance = None
 
@@ -93,11 +93,11 @@ class Nation(Base):
             "receiver": self.leader,
             "subject": subject,
             "body": content,
-            "sndmsg": "Send Message"
+            "sndmsg": "Send Message",
         }
-        async with bot.pnw_session.post("https://politicsandwar.com/inbox/message",
-                                        data=message_data,
-                                        timeout=30.0) as response:
+        async with bot.pnw_session.post(
+            "https://politicsandwar.com/inbox/message", data=message_data, timeout=30.0
+        ) as response:
             if "successfully" in (await response.text()).lower():
                 return True
             else:
@@ -105,12 +105,12 @@ class Nation(Base):
 
     def get_militarization(self):
         militarization = {
-            "soldiers": self.soldiers/(self.cities*15000),
-            "tanks": self.tanks/(self.cities*1250),
-            "aircraft": self.aircraft/(self.cities*75),
-            "ships": self.ships/(self.cities*15),
+            "soldiers": self.soldiers / (self.cities * 15000),
+            "tanks": self.tanks / (self.cities * 1250),
+            "aircraft": self.aircraft / (self.cities * 75),
+            "ships": self.ships / (self.cities * 15),
         }
-        militarization['total'] = sum(militarization.values())/4
+        militarization["total"] = sum(militarization.values()) / 4
         return militarization
 
     def __str__(self):
@@ -126,16 +126,28 @@ class Nation(Base):
         return self.cities
 
     def get_average_infrastructure(self):
-        return sum(i.infrastructure for i in cache.cities.values()
-                   if i.nation_id == self.id)/self.cities
+        return (
+            sum(
+                i.infrastructure
+                for i in cache.cities.values()
+                if i.nation_id == self.id
+            )
+            / self.cities
+        )
 
     avg_infra = get_average_infrastructure
 
     async def get_discord_page_username(self):
-        async with request("GET", f"https://politicsandwar.com/nation/id={self.id}") as response:
-            return [i.contents[1].text for i in BeautifulSoup(
-                    await response.text(), "html.parser").find_all("tr", class_="notranslate")
-                    if any("Discord Username:" in str(j) for j in i.contents)][0]
+        async with request(
+            "GET", f"https://politicsandwar.com/nation/id={self.id}"
+        ) as response:
+            return [
+                i.contents[1].text
+                for i in BeautifulSoup(await response.text(), "html.parser").find_all(
+                    "tr", class_="notranslate"
+                )
+                if any("Discord Username:" in str(j) for j in i.contents)
+            ][0]
 
     @classmethod
     async def convert(cls, ctx, search):
@@ -145,4 +157,7 @@ class Nation(Base):
         pass
 
     async def get_revenue(self):
-        return sum(city.get_revenue() for city in self.list_cities()) + self.get_revenue_modifiers()
+        return (
+            sum(city.get_revenue() for city in self.list_cities())
+            + self.get_revenue_modifiers()
+        )

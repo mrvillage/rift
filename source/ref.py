@@ -18,18 +18,17 @@ class Rift(Bot):
         self.prices_update = datetime.datetime.utcnow()
         print("Starting up!")
         self.pnw_session = aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=30.0))
+            timeout=aiohttp.ClientTimeout(total=30.0)
+        )
         self.staff = None
         self.auth_token = None
 
     async def update_pnw_session(self):
-        login_data = {
-            "email": EMAIL,
-            "password": PASSWORD,
-            "loginform": "Login"
-        }
+        login_data = {"email": EMAIL, "password": PASSWORD, "loginform": "Login"}
         try:
-            async with self.pnw_session.request("POST", "https://politicsandwar.com/login/", data=login_data) as response:  # pylint: disable=line-too-long
+            async with self.pnw_session.request(
+                "POST", "https://politicsandwar.com/login/", data=login_data
+            ) as response:  # pylint: disable=line-too-long
                 if "login failure" in (await response.text()).lower():
                     raise LoginError
         except LoginError:
@@ -45,11 +44,15 @@ class Rift(Bot):
 
     async def parse_token(self, content):
         data = BeautifulSoup(content, "html.parser")
-        self.auth_token = data.find('input', {"name": "token"}).attrs['value']
+        self.auth_token = data.find("input", {"name": "token"}).attrs["value"]
 
     async def get_guild_prefix(self, guild_id):
-        prefixes = [i for i in await execute_read_query(
-            "SELECT prefix FROM prefixes WHERE guild_id = $1;", guild_id)]
+        prefixes = [
+            i
+            for i in await execute_read_query(
+                "SELECT prefix FROM prefixes WHERE guild_id = $1;", guild_id
+            )
+        ]
         if prefixes:
             return prefixes
         return default_prefixes
@@ -65,10 +68,12 @@ async def get_prefix(rift: Rift, message):
     return when_mentioned_or(*prefixes)(rift, message)
 
 
-bot = Rift(command_prefix=get_prefix,
-           intents=Intents.all(),
-           case_insensitive=True,
-           allowed_mentions=AllowedMentions(replied_user=False),
-           activity=Game(name=__version__),
-           strip_after_prefix=True,
-           help_command=EmbedHelpCommand())
+bot = Rift(
+    command_prefix=get_prefix,
+    intents=Intents.all(),
+    case_insensitive=True,
+    allowed_mentions=AllowedMentions(replied_user=False),
+    activity=Game(name=__version__),
+    strip_after_prefix=True,
+    help_command=EmbedHelpCommand(),
+)

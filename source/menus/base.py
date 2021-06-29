@@ -7,7 +7,9 @@ from ..ref import bot
 class Menu(menus.Menu):
     async def update(self, payload):
         try:
-            await bot.get_channel(payload.channel_id).get_partial_message(payload.message_id).remove_reaction(payload.emoji, payload.member)
+            await bot.get_channel(payload.channel_id).get_partial_message(
+                payload.message_id
+            ).remove_reaction(payload.emoji, payload.member)
         except discord.Forbidden:
             pass
         await super().update(payload)
@@ -15,7 +17,11 @@ class Menu(menus.Menu):
     def reaction_check(self, payload):
         if payload.message_id != self.message.id:
             return False
-        if payload.user_id not in {self.bot.owner_id, self._author_id, *self.bot.owner_ids}:
+        if payload.user_id not in {
+            self.bot.owner_id,
+            self._author_id,
+            *self.bot.owner_ids,
+        }:
             return False
         if payload.event_type == "REACTION_REMOVE":
             return False
@@ -39,7 +45,9 @@ class EmbedPageSource(menus.ListPageSource):
 class MenuPages(menus.MenuPages):
     async def update(self, payload):
         try:
-            await bot.get_channel(payload.channel_id).get_partial_message(payload.message_id).remove_reaction(payload.emoji, payload.member)
+            await bot.get_channel(payload.channel_id).get_partial_message(
+                payload.message_id
+            ).remove_reaction(payload.emoji, payload.member)
         except discord.Forbidden:
             pass
         await super().update(payload)
@@ -59,7 +67,11 @@ class MenuPages(menus.MenuPages):
     def reaction_check(self, payload):
         if payload.message_id != self.message.id:
             return False
-        if payload.user_id not in {self.bot.owner_id, self._author_id, *self.bot.owner_ids}:
+        if payload.user_id not in {
+            self.bot.owner_id,
+            self._author_id,
+            *self.bot.owner_ids,
+        }:
             return False
         if payload.event_type == "REACTION_REMOVE":
             return False

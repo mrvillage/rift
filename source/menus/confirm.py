@@ -3,7 +3,7 @@ from discord.ext import menus
 
 
 class Confirm(Menu):
-    def __init__(self, msg=None,  embed=None):
+    def __init__(self, msg=None, embed=None):
         super().__init__(timeout=30.0)
         self.msg = msg
         self.embed = embed
@@ -28,7 +28,7 @@ class Confirm(Menu):
 
 
 class ConfirmMessage(Menu):
-    def __init__(self, msg=None,  embed=None):
+    def __init__(self, msg=None, embed=None):
         super().__init__(timeout=30.0)
         self.msg = msg
         self.embed = embed

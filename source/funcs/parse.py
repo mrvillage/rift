@@ -9,5 +9,7 @@ async def parse_alliance_bank(content):
     contents = [i for i in table.contents if i != "\n"]
     data = {}
     for content in contents[1:]:
-        data[content.contents[0].contents[1].strip(" ").lower()] = await convert_number(content.contents[1].contents[0])
+        data[content.contents[0].contents[1].strip(" ").lower()] = await convert_number(
+            content.contents[1].contents[0]
+        )
     return data

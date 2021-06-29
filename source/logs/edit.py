@@ -1,8 +1,19 @@
 from ..data.db import execute_query
 
 
-async def edit_log(time, message_id, channel_id, guild_id, author_id, message_content, qualified_name, success=None, errormessage=None):
-    await execute_query("""
+async def edit_log(
+    time,
+    message_id,
+    channel_id,
+    guild_id,
+    author_id,
+    message_content,
+    qualified_name,
+    success=None,
+    errormessage=None,
+):
+    await execute_query(
+        """
         UPDATE commandlogs
         SET
             success = $8,
@@ -15,4 +26,14 @@ async def edit_log(time, message_id, channel_id, guild_id, author_id, message_co
             authorid = $5 AND
             messagecontent = $6 AND
             qualifiedname = $7;
-        """, time, message_id, channel_id, guild_id, author_id, message_content, qualified_name, success, errormessage)
+        """,
+        time,
+        message_id,
+        channel_id,
+        guild_id,
+        author_id,
+        message_content,
+        qualified_name,
+        success,
+        errormessage,
+    )
