@@ -1,8 +1,4 @@
-import discord
-import asyncio
-import json
 from discord.ext import commands
-from ... import funcs as rift
 
 
 class Fun(commands.Cog):

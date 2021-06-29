@@ -1,9 +1,11 @@
 import datetime
 import json
+
 import aiohttp
-from ...data.db import execute_query
-from ...env import BASEURL, APIKEY
+
 from ... import bot
+from ...data.db import execute_query
+from ...env import APIKEY, BASEURL
 
 
 async def fetch_prices():

@@ -1,8 +1,8 @@
 import random
 import string
 from asyncio import sleep
-from ..errors import BoolError, LinkError
 
+from ..errors import BoolError, LinkError
 
 color_map = (
     "Beige",

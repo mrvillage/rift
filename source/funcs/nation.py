@@ -1,15 +1,16 @@
 from discord.ext.commands import (
     Context,
     MemberConverter,
-    UserConverter,
     MemberNotFound,
+    UserConverter,
     UserNotFound,
 )
-from .link import get_link_user, get_link_nation
+
 from .. import cache
-from ..errors import NationNotFoundError, LinkError
 from ..data import get
+from ..errors import LinkError, NationNotFoundError
 from ..funcs.utils import convert_link
+from .link import get_link_nation, get_link_user
 
 
 async def search_nation(ctx: Context, search):

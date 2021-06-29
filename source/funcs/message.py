@@ -1,6 +1,6 @@
 import aiohttp
-from .. import APIKEY, EMAIL, PASSWORD  # pylint: disable=relative-beyond-top-level
-from ..errors.message import *  # pylint: disable=unused-wildcard-import
+
+from ..errors.message import LoginError, SentError
 
 
 async def send_message(*, receiver=None, subject=None, content=None):

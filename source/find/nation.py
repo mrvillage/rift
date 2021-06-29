@@ -1,6 +1,6 @@
-from .. import funcs as rift
 from discord.ext.commands import UserConverter, UserNotFound
-from ..errors import NationNotFoundError
+
+from .. import funcs as rift
 
 
 async def search_nation_author(ctx, search):

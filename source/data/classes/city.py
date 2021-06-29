@@ -1,7 +1,7 @@
-from .base import Base
-from ..query import get_city
 from ... import cache
+from ..query import get_city
 from ..requests import get_city_build
+from .base import Base
 
 
 class City(Base):

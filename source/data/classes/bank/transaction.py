@@ -1,11 +1,9 @@
 from typing import Union
-import aiohttp
-from .base import BankBase
-from .. import Alliance, Nation
+
 from .... import cache
-from ....funcs.utils import convert_number
-from .. import Resources
 from ....funcs.bank import withdraw
+from .. import Alliance, Nation, Resources
+from .base import BankBase
 
 
 class Transaction(BankBase):

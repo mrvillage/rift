@@ -1,10 +1,11 @@
 import json
 from typing import Union
-from discord import Member, User
-from ..data.db import execute_read_query
-from ..data.classes import Nation
-from ..funcs.utils import get_alliance_position_id
 
+from discord import Member, User
+
+from ..data.classes import Nation
+from ..data.db import execute_read_query
+from ..funcs.utils import get_alliance_position_id
 
 # async def check_bank_perms(*, nation: Nation, author: Union[Member, User], action):
 #     """ACTION MUST BE 'send' or 'view'"""

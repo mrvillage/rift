@@ -1,5 +1,5 @@
-from .base import Base
 from ..query import get_mmr
+from .base import Base
 
 
 class MMR(Base):

@@ -1,5 +1,6 @@
-from .base import Menu
 from discord.ext import menus
+
+from .base import Menu
 
 
 class Confirm(Menu):

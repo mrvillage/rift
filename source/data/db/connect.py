@@ -1,6 +1,8 @@
-from asyncpg import create_pool
 from asyncio import get_event_loop
-from ...env import DBHOST, DBPORT, DBUSER, DBPASSWORD, DBNAME
+
+from asyncpg import create_pool
+
+from ...env import DBHOST, DBNAME, DBPASSWORD, DBPORT, DBUSER
 
 
 async def _create_connection():

@@ -1,4 +1,4 @@
-from .base import BaseError, SearchError
+from .base import SearchError
 
 
 class NationNotFoundError(SearchError):

@@ -1,7 +1,3 @@
-import discord
-from discord.ext import commands, menus
-
-
 class MenuManager:
     def __init__(self, channel, content=None, embed=None):
         self.channel = channel

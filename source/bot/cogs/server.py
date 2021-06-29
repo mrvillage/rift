@@ -1,10 +1,10 @@
 import discord
 from discord.ext import commands
+
+from ... import cache, checks
 from ... import funcs as rift
-from ...errors import ServerNotFoundError, BoolError
+from ...errors import BoolError, ServerNotFoundError
 from ...menus import Confirm
-from ... import checks
-from ... import cache
 
 
 class Server(commands.Cog):

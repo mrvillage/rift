@@ -1,10 +1,11 @@
+import json
+
 from .. import cache
-from ..errors import DocumentNotFoundError
-from .embeds import get_embed_author_member
-from ..menus import EmbedPageSource, MenuPages
 from ..data import get
 from ..data.classes import Document
-import json
+from ..errors import DocumentNotFoundError
+from ..menus import EmbedPageSource, MenuPages
+from .embeds import get_embed_author_member
 
 
 async def search_document(*args):

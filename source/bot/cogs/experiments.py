@@ -1,4 +1,5 @@
 from discord.ext import commands
+
 from ...data.query import get_mmr
 
 

@@ -1,4 +1,4 @@
-from .base import BaseError, ConvertError
+from .base import ConvertError
 
 
 class BoolError(ConvertError):

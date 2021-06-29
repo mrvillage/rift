@@ -1,10 +1,10 @@
 import discord
 from discord.ext import commands
+
+from ... import cache, checks
 from ... import funcs as rift
-from ...errors import DocumentNotFoundError, BoolError
+from ...errors import BoolError, DocumentNotFoundError
 from ...menus import Confirm
-from ... import checks
-from ... import cache
 
 
 class Database(commands.Cog):

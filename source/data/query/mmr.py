@@ -1,4 +1,4 @@
-from ..db import execute_query, execute_read_query
+from ..db import execute_read_query
 
 
 async def get_mmr(*, mmr_id=None, alliance_id=None):
