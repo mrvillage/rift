@@ -51,6 +51,13 @@ async def handler(ctx, error):
                     "You can't use that command in DMs! Try it in a server instead.",
                 )
             )
+        elif isinstance(error, commands.PrivateMessageOnly):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    "You can't use that command in a server! Try it in DMs instead.",
+                )
+            )
         else:
             await ctx.reply(
                 embed=get_embed_author_member(
