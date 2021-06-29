@@ -18,6 +18,8 @@ async def print_handler(ctx, error):
 
 async def handler(ctx, error):
     try:
+        if isinstance(error, commands.CommandInvokeError):
+            error = error.original
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.reply(
                 embed=get_embed_author_member(
@@ -42,9 +44,12 @@ async def handler(ctx, error):
                     f"You gave an invalid argument!\n\n`{await get_command_signature(ctx)}`",
                 )
             )
-        elif isinstance(error, discord.Forbidden):
+        elif isinstance(error, commands.NoPrivateMessage):
             await ctx.reply(
-                'I don\'t have permission to do that! Please make sure I have the "Embed Links" permission.'
+                embed=get_embed_author_member(
+                    ctx.author,
+                    "You can't use that command in DMs! Try it in a server instead.",
+                )
             )
         else:
             await ctx.reply(
