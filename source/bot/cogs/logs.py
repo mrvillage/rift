@@ -1,4 +1,5 @@
 import json
+import discord
 
 from discord.ext import commands
 
@@ -10,7 +11,7 @@ class Logs(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_command(self, ctx):
+    async def on_command(self, ctx: commands.Context):
         if ctx.command is None:
             if hasattr(ctx.message, "edited_at"):
                 if ctx.message.edited_at is not None:
@@ -18,7 +19,7 @@ class Logs(commands.Cog):
                         str(ctx.message.edited_at),
                         ctx.message.id,
                         ctx.channel.id,
-                        ctx.guild.id,
+                        ctx.guild.id if ctx.guild is not None else None,
                         ctx.author.id,
                         ctx.message.content,
                         None,
@@ -30,7 +31,7 @@ class Logs(commands.Cog):
                 str(ctx.message.created_at),
                 ctx.message.id,
                 ctx.channel.id,
-                ctx.guild.id,
+                ctx.guild.id if ctx.guild is not None else None,
                 ctx.author.id,
                 ctx.message.content,
                 ctx.command.qualified_name,
@@ -44,7 +45,7 @@ class Logs(commands.Cog):
                     str(ctx.message.edited_at),
                     ctx.message.id,
                     ctx.channel.id,
-                    ctx.guild.id,
+                    ctx.guild.id if ctx.guild is not None else None,
                     ctx.author.id,
                     ctx.message.content,
                     None,
@@ -56,7 +57,7 @@ class Logs(commands.Cog):
             str(ctx.message.created_at),
             ctx.message.id,
             ctx.channel.id,
-            ctx.guild.id,
+            ctx.guild.id if ctx.guild is not None else None,
             ctx.author.id,
             ctx.message.content,
             ctx.command.qualified_name,
@@ -72,7 +73,7 @@ class Logs(commands.Cog):
                     str(ctx.message.edited_at),
                     ctx.message.id,
                     ctx.channel.id,
-                    ctx.guild.id,
+                    ctx.guild.id if ctx.guild is not None else None,
                     ctx.author.id,
                     ctx.message.content,
                     ctx.command.qualified_name,
@@ -83,7 +84,7 @@ class Logs(commands.Cog):
             str(ctx.message.created_at),
             ctx.message.id,
             ctx.channel.id,
-            ctx.guild.id,
+            ctx.guild.id if ctx.guild is not None else None,
             ctx.author.id,
             ctx.message.content,
             ctx.command.qualified_name,
@@ -99,7 +100,7 @@ class Logs(commands.Cog):
                         str(ctx.message.edited_at),
                         ctx.message.id,
                         ctx.channel.id,
-                        ctx.guild.id,
+                        ctx.guild.id if ctx.guild is not None else None,
                         ctx.author.id,
                         ctx.message.content,
                         None,
@@ -111,7 +112,7 @@ class Logs(commands.Cog):
                 str(ctx.message.created_at),
                 ctx.message.id,
                 ctx.channel.id,
-                ctx.guild.id,
+                ctx.guild.id if ctx.guild is not None else None,
                 ctx.author.id,
                 ctx.message.content,
                 None,
@@ -125,7 +126,7 @@ class Logs(commands.Cog):
                     str(ctx.message.edited_at),
                     ctx.message.id,
                     ctx.channel.id,
-                    ctx.guild.id,
+                    ctx.guild.id if ctx.guild is not None else None,
                     ctx.author.id,
                     ctx.message.content,
                     ctx.command.qualified_name,
@@ -137,7 +138,7 @@ class Logs(commands.Cog):
             str(ctx.message.created_at),
             ctx.message.id,
             ctx.channel.id,
-            ctx.guild.id,
+            ctx.guild.id if ctx.guild is not None else None,
             ctx.author.id,
             ctx.message.content,
             ctx.command.qualified_name,
