@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from discord import Embed
+from discord import Embed, utils
 
 from ..env import COLOR, FOOTER
 
@@ -31,7 +29,7 @@ def get_embed_author(
         Embed(
             color=color,
             description=description,
-            timestamp=datetime.utcnow() if timestamp is None else timestamp,
+            timestamp=utils.utcnow() if timestamp is None else timestamp,
         )
         .set_footer(text=footer)
         .set_author(name=author_name, icon_url=author_icon_url)
@@ -52,7 +50,7 @@ def get_embed_author_member(
         Embed(
             color=color,
             description=description,
-            timestamp=datetime.utcnow() if timestamp is None else timestamp,
+            timestamp=utils.utcnow() if timestamp is None else timestamp,
             title=title,
         )
         .set_footer(text=footer)
@@ -79,7 +77,7 @@ def get_embed_author_guild(
         Embed(
             color=color,
             description=description,
-            timestamp=datetime.utcnow() if timestamp is None else timestamp,
+            timestamp=utils.utcnow() if timestamp is None else timestamp,
             title=title,
         )
         .set_footer(text=footer)
