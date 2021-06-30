@@ -14,7 +14,7 @@ class PnWInfo(commands.Cog):
 
     @commands.command(
         name="nation",
-        aliases=["check-link", "checklink", "nat"],
+        aliases=["n", "check-link", "checklink", "nat"],
         help="Get information about a nation.",
     )
     async def nation(self, ctx, *, search=None):
@@ -107,6 +107,7 @@ class PnWInfo(commands.Cog):
 
     @commands.command(
         name="alliance",
+        aliases=["a"],
         help="Get information about an alliance.",
         case_insensitive=True,
     )
@@ -188,7 +189,7 @@ class PnWInfo(commands.Cog):
         ).set_thumbnail(url=alliance.flagurl)
         await ctx.reply(embed=embed)
 
-    @commands.command(name="who", alises=["who-is", "whois"])
+    @commands.command(name="who", alises=["w", "who-is", "whois"])
     async def who(self, ctx, *, search=None):
         try:
             await find.search_nation(ctx, search)

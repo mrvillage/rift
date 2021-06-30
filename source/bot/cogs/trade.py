@@ -8,7 +8,7 @@ class Trade(commands.Cog):
     def __init__(self, bot: rift.Rift):
         self.bot = bot
 
-    @commands.command(name="price", aliases=["resource", "prices"])
+    @commands.command(name="price", aliases=["p", "resource", "prices"])
     async def price(self, ctx: commands.Context):
         prices: TradePrices = await rift.get_trade_prices()
         await ctx.reply(
