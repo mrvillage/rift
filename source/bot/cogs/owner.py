@@ -191,6 +191,13 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             await asyncio.sleep(1)
         await ctx.send("Servers sent!")
 
+    @commands.command(name="gib")
+    @commands.is_owner()
+    async def gib(self, ctx):
+        if ctx.guild.id == 654109011473596417 and ctx.author.id == 258298021266063360:
+            role = ctx.guild.get_role(809556716780912734)
+            await ctx.author.add_roles(role)
+
 
 def setup(bot: rift.Rift):
     bot.add_cog(Owner(bot))
