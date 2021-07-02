@@ -1,3 +1,7 @@
+from __future__ import annotations
+from ...errors import NationNotFoundError
+from typing import Union
+
 from aiohttp import request
 from bs4 import BeautifulSoup
 
@@ -162,3 +166,16 @@ class Nation(Base):
             sum(city.get_revenue() for city in self.list_cities())
             + self.get_revenue_modifiers()
         )
+
+    @classmethod
+    async def fetch(cls, nation_id: Union[int, str] = None) -> Nation:
+        try:
+            return cls(data=await get_nation(nation_id=nation_id))
+        except IndexError:
+            raise NationNotFoundError
+
+    async def _make_alliance(self):
+        from .alliance import Alliance
+
+        if self.alliance_id != 0:
+            self.alliance = await Alliance.fetch(self.alliance_id)
