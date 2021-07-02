@@ -11,6 +11,7 @@ from .mmr import *
 from .nation import *
 from .parse import *
 from .server import *
+from .settings import *
 from .targets import *
 from .trade import *
 from .utils import *
