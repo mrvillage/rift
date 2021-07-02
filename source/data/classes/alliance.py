@@ -1,4 +1,9 @@
+from __future__ import annotations
+
+from typing import Union
+
 from ... import cache
+from ...errors import AllianceNotFoundError
 from ...find import search_alliance
 from ...funcs.parse import parse_alliance_bank
 from ...ref import bot
@@ -176,3 +181,10 @@ class Alliance(Base):
             sum(nation.get_revenue() for nation in self.list_members(vm=False))
             + self.get_revenue_modifiers()
         )
+
+    @classmethod
+    async def fetch(cls, alliance_id: Union[int, str] = None) -> Alliance:
+        try:
+            return cls(data=await get_alliance(alliance_id=alliance_id))
+        except IndexError:
+            raise AllianceNotFoundError
