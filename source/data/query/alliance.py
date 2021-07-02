@@ -17,7 +17,7 @@ async def get_alliance(*, alliance_id=None, alliance_name=None):
             await execute_read_query(
                 f"""
             SELECT * FROM alliances
-            WHERE nation_id = {alliance_id};
+            WHERE id = {alliance_id};
         """
             )
         )[0]
