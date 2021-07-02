@@ -43,6 +43,7 @@ class Settings(commands.Cog):
             nation = await funcs.get_link_user(member.id)
             nation = int(nation[1])
             nation: Nation = await Nation.fetch(nation)
+            await nation.make_attrs("alliance")
         except IndexError:
             nation = None
         settings = await GuildSettings.fetch(str(member.guild.id), "welcome_settings")
