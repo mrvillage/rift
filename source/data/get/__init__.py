@@ -6,5 +6,6 @@ from .militarization import *
 from .mmr import *
 from .nation import *
 from .server import *
+from .settings import *
 from .staff import *
 from .trade import *
