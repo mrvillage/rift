@@ -2,7 +2,8 @@ import datetime
 from pathlib import Path
 
 from .. import funcs as rift
-from ..data import cache
+
+# from ..data import cache
 from ..env import TOKEN, __version__
 from ..ref import bot
 
@@ -46,7 +47,7 @@ def main():
         bot.load_extension(f"source.bot.cogs.{cog}")
         print(f"Loaded {cog}!")
 
-    bot.loop.create_task(cache.create_cache())
+    # bot.loop.create_task(cache.create_cache())
     bot.loop.create_task(bot.update_pnw_session())
     bot.loop.create_task(bot.get_staff())
     bot.command_prefix = "!!"
