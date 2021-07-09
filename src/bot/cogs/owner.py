@@ -1,9 +1,10 @@
 import asyncio
+from src.data.query.alliance import get_alliances
+from src.data.classes.alliance import Alliance
 
 import discord
 from discord.ext import commands
 
-from ... import cache
 from ... import funcs as rift
 from ...data.db import execute_query
 
@@ -154,7 +155,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         staff = await self.bot.get_staff()
         staff = [await self.bot.fetch_user(s) for s in staff]
         staff = [i for i in staff if i is not None]
-        mentions = "\n".join([i.mention for i in staff])
+        mentions = "\n".join(i.mention for i in staff)
         await ctx.reply(
             embed=rift.get_embed_author_member(
                 ctx.author, f"There are {len(staff):,} Staff:\n{mentions}"
@@ -171,7 +172,8 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             await ctx.channel.purge(limit=purge)
         message = await ctx.send("Fetching...")
         invites = []
-        for alliance in cache.alliances.values():
+        alliances = [Alliance(tuple(i)) for i in await get_alliances()]
+        for alliance in alliances:
             try:
                 if alliance.discord is None:
                     continue
