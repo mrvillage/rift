@@ -41,11 +41,13 @@ async def rift_about(ctx):
 
 
 def main():
-    cogPath = Path.cwd() / "source" / "bot" / "cogs"
+    cogPath = Path.cwd() / "src" / "bot" / "cogs"
     cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
     for cog in cogs:
-        bot.load_extension(f"source.bot.cogs.{cog}")
+        bot.load_extension(f"src.bot.cogs.{cog}")
         print(f"Loaded {cog}!")
+    bot.unload_extension("src.bot.cogs.database")
+    bot.unload_extension("src.bot.cogs.server")
 
     # bot.loop.create_task(cache.create_cache())
     bot.loop.create_task(bot.update_pnw_session())
