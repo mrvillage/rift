@@ -13,15 +13,9 @@ async def search_nation_author(ctx, search):
             try:
                 author = await UserConverter().convert(ctx, str(author[0]))
             except UserNotFound:
-                if ctx.guild is None:
-                    author = ctx.author
-                else:
-                    author = ctx.guild
+                author = ctx.author if ctx.guild is None else ctx.guild
         except IndexError:
-            if ctx.guild is None:
-                author = ctx.author
-            else:
-                author = ctx.guild
+            author = ctx.author if ctx.guild is None else ctx.guild
     return author, nation
 
 
