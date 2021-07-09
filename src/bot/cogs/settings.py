@@ -21,22 +21,29 @@ class Settings(commands.Cog):
         self.bot = bot
 
     @commands.group(
-        name="user-settings", aliases=["usersettings"], invoke_without_command=True
+        name="user-settings",
+        aliases=["us", "usersettings", "my-settings", "mysettings"],
+        invoke_without_command=True,
     )
     async def user_settings(self, ctx: commands.Context):
-        pass
+        ...
 
     @commands.group(
         name="server-settings",
-        aliases=["ss", "serversettings"],
+        aliases=["ss", "serversettings", "settings"],
         invoke_without_command=True,
     )
     @commands.guild_only()
     async def server_settings(self, ctx: commands.Context):
-        pass
+        ...
+
+    @server_settings.command(name="purpose", aliases=["p"])
+    async def server_settings_purpose(self, ctx: commands.Context):
+        ...
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
+        # sourcery skip: merge-nested-ifs
         if member.pending:
             return
         try:
