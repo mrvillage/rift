@@ -3,9 +3,8 @@ from discord.ext import commands
 
 from ... import find
 from ... import funcs as rift
+from ...data.classes import Alliance, Nation
 from ...errors import AllianceNotFoundError, NationNotFoundError
-
-NEWLINE = "\n"
 
 
 class PnWInfo(commands.Cog):
@@ -17,21 +16,13 @@ class PnWInfo(commands.Cog):
         aliases=["n", "check-link", "checklink", "nat"],
         help="Get information about a nation.",
     )
-    async def nation(self, ctx, *, search=None):
-        try:
-            author, nation = await find.search_nation_author(ctx, search)
-        except NationNotFoundError:
-            await ctx.reply(
-                embed=rift.get_embed_author_member(
-                    ctx.author, f"No nation found with argument `{search}`."
-                )
-            )
-            return
+    async def nation(self, ctx, *, nation=None):
+        nation = await Nation.convert(ctx, nation)
         await ctx.reply(embed=await nation.get_info_embed(ctx))
 
     @commands.command(name="me")
     async def me(self, ctx):
-        await ctx.invoke(self.nation, search=None)
+        await ctx.invoke(self.nation, nation=None)
 
     @commands.command(
         name="alliance",
@@ -39,19 +30,19 @@ class PnWInfo(commands.Cog):
         help="Get information about an alliance.",
         case_insensitive=True,
     )
-    async def alliance(self, ctx, *, search=None):
-        alliance = await find.search_alliance(ctx, search)
+    async def alliance(self, ctx, *, alliance=None):
+        alliance = await Alliance.convert(ctx, alliance)
         await ctx.reply(embed=await alliance.get_info_embed(ctx))
 
     @commands.command(name="who", alises=["w", "who-is", "whois"])
     async def who(self, ctx, *, search=None):
         try:
             await find.search_nation(ctx, search)
-            await ctx.invoke(self.nation, search=search)
+            await ctx.invoke(self.nation, nation=search)
         except NationNotFoundError:
             try:
                 await find.search_alliance(ctx, search)
-                await ctx.invoke(self.alliance, search=search)
+                await ctx.invoke(self.alliance, alliance=search)
             except AllianceNotFoundError:
                 embed = rift.get_embed_author_member(
                     ctx.author, f"No nation or alliance found with argument `{search}`."
