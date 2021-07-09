@@ -130,7 +130,7 @@ async def convert_link(search):
 
 
 async def convert_number(num):
-    num = "".join([i for i in num if i in string.digits or i == "."])
+    num = "".join(i for i in num if i in string.digits or i == ".")
     if num.count(".") > 1:
         last = num.rfind(".")
         beginning = num[:last]
