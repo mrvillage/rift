@@ -1,17 +1,24 @@
 from __future__ import annotations
-from ...errors import NationNotFoundError
-from typing import Union
+
+from datetime import datetime
+from typing import TYPE_CHECKING, Union
 
 from aiohttp import request
 from bs4 import BeautifulSoup
+from discord import Embed, Guild, NotFound
+from discord.ext.commands import Context
+from discord import User
 
 from ... import cache
-from ...errors import SentError
+from ...data.get import get_link_nation
+from ...errors import NationNotFoundError, SentError
 from ...find import search_nation
-from ...funcs import utils
-from ...funcs.core import bot
+from ...funcs import bot, utils
 from ..query import get_nation
 from .base import Base
+
+if TYPE_CHECKING:
+    from .alliance import Alliance
 
 
 class Nation(Base):
@@ -168,14 +175,97 @@ class Nation(Base):
         )
 
     @classmethod
-    async def fetch(cls, nation_id: Union[int, str] = None) -> Nation:
+    async def fetch(cls: Nation, nation_id: Union[int, str] = None) -> Nation:
         try:
             return cls(data=await get_nation(nation_id=nation_id))
         except IndexError:
             raise NationNotFoundError
 
-    async def _make_alliance(self):
+    async def _make_alliance(self: Nation) -> Alliance:
         from .alliance import Alliance
 
         if self.alliance_id != 0:
             self.alliance = await Alliance.fetch(self.alliance_id)
+
+    async def _make_user(self: Nation) -> User:
+        try:
+            self.user = await bot.fetch_user((await get_link_nation(self.id))[0])
+        except (IndexError, NotFound):
+            self.user = None
+
+    async def get_info_embed(self: Nation, ctx: Context) -> Embed:
+        from ...funcs import get_embed_author_guild, get_embed_author_member
+
+        await self.make_attrs("alliance", "user")
+        fields = [
+            {"name": "Nation ID", "value": self.id},
+            {"name": "Nation Name", "value": self.name},
+            {"name": "Leader Name", "value": self.leader},
+            {"name": "War Policy", "value": self.war_policy},
+            {"name": "Domestic Policy", "value": self.domestic_policy},
+            {"name": "Continent", "value": self.continent},
+            {
+                "name": "Color",
+                "value": self.color
+                if self.color != "Beige"
+                else f"Beige ({self.beige_turns:,} Turns)",
+            },
+            {
+                "name": "Alliance",
+                "value": f'[{repr(self.alliance)}](https://politicsandwar.com/alliance/id={self.alliance.id} "https://politicsandwar.com/alliance/id={self.alliance.id}")'
+                if self.alliance is not None
+                else "None",
+            },
+            {"name": "Alliance Position", "value": self.alliance_position},
+            {
+                "name": "Cities",
+                "value": f"[{self.cities}](https://politicsandwar.com/?id=62&n={'+'.join(self.name.split(' '))} \"https://politicsandwar.com/?id=62&n={'+'.join(self.name.split(' '))}\")",
+            },
+            {"name": "Score", "value": f"{self.score:,.2f}"},
+            {
+                "name": "Vacation Mode",
+                "value": f"True ({self.v_mode_turns:,} Turns)"
+                if self.v_mode
+                else "False",
+            },
+            {"name": "Soldiers", "value": f"{self.soldiers:,}"},
+            {"name": "Tanks", "value": f"{self.tanks:,}"},
+            {"name": "Aircraft", "value": f"{self.aircraft:,}"},
+            {"name": "Ships", "value": f"{self.ships:,}"},
+            {"name": "Missiles", "value": f"{self.missiles:,}"},
+            {"name": "Nukes", "value": f"{self.nukes:,}"},
+            {
+                "name": "Offensive Wars",
+                "value": f'[{self.offensive_wars}](https://politicsandwar.com/nation/id={self.id}&display=war "https://politicsandwar.com/nation/id={self.id}&display=war")',
+            },
+            {
+                "name": "Defensive Wars",
+                "value": f'[{self.defensive_wars}](https://politicsandwar.com/nation/id={self.id}&display=war "https://politicsandwar.com/nation/id={self.id}&display=war")',
+            },
+            {"name": "Average Infrastructure", "value": f"{self.avg_infra():,.2f}"},
+            {
+                "name": "Actions",
+                "value": f"[\U0001f4e7](https://politicsandwar.com/inbox/message/receiver={'+'.join(self.leader.split(' '))} \"https://politicsandwar.com/inbox/message/receiver={'+'.join(self.leader.split(' '))}\") "
+                f"[\U0001f4e4](https://politicsandwar.com/nation/trade/create/nation={'+'.join(self.name.split(' '))} \"https://politicsandwar.com/nation/trade/create/nation={'+'.join(self.name.split(' '))}\") "
+                f"[\U000026d4](https://politicsandwar.com/index.php?id=68&name={'+'.join(self.name.split(' '))}&type=n \"https://politicsandwar.com/index.php?id=68&name={'+'.join(self.name.split(' '))}&type=n\") "
+                f'[\U00002694](https://politicsandwar.com/nation/war/declare/id={self.id} "https://politicsandwar.com/nation/war/declare/id={self.id}") '
+                f'[\U0001f575](https://politicsandwar.com/nation/espionage/eid={self.id} "https://politicsandwar.com/nation/espionage/eid={self.id}") ',
+            },
+        ]
+        return (
+            get_embed_author_guild(
+                ctx.guild,
+                f'[Nation Page](https://politicsandwar.com/nation/id={self.id} "https://politicsandwar.com/nation/id={self.id}")',
+                timestamp=datetime.fromisoformat(self.founded),
+                footer="Nation created",
+                fields=fields,
+            )
+            if self.user is None
+            else get_embed_author_member(
+                self.user,
+                f'[Nation Page](https://politicsandwar.com/nation/id={self.id} "https://politicsandwar.com/nation/id={self.id}")',
+                timestamp=datetime.fromisoformat(self.founded),
+                footer="Nation created",
+                fields=fields,
+            )
+        )
