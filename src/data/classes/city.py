@@ -1,4 +1,3 @@
-from ... import cache
 from ..query import get_city
 from ..requests import get_city_build
 from .base import Base
@@ -34,10 +33,12 @@ class City(Base):
         self.land = self.data[6]
         return self
 
-    async def _link(self):
+    async def _make_nation(self):
+        from .nation import Nation
+
         try:
-            self.nation = cache.nations[self.nation_id]
-        except KeyError:
+            self.nation = Nation.fetch(self.nation_id)
+        except IndexError:
             self.nation = None
 
     async def get_build(self):

@@ -3,7 +3,6 @@ from pathlib import Path
 
 from .. import funcs as rift
 
-# from ..data import cache
 from ..env import TOKEN, __version__
 from ..ref import bot
 
@@ -49,7 +48,6 @@ def main():
     bot.unload_extension("src.bot.cogs.database")
     bot.unload_extension("src.bot.cogs.server")
 
-    # bot.loop.create_task(cache.create_cache())
     bot.loop.create_task(bot.update_pnw_session())
     bot.loop.create_task(bot.get_staff())
     bot.command_prefix = "!!"

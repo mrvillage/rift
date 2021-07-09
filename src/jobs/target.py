@@ -1,8 +1,8 @@
 import json
+from src.data.classes.nation import Nation
 
 import discord
 
-from .. import cache
 from .. import funcs as rift
 from ..funcs import bot
 
@@ -11,9 +11,9 @@ async def target_check():
     targets = await rift.get_targets()
     for target in targets:
         try:
-            nation = cache.nations[target[1]]
+            nation = Nation.fetch(target[1])
             if nation.color != "Beige" and target[2] == 0:
-                if target[3] == "[]":
+                if target[3] != "[]":
                     pass
                 else:
                     for id in json.loads(target[4]):

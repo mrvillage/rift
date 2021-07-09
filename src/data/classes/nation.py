@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from ..query.city import get_nation_cities
 from typing import TYPE_CHECKING, Union
 
 from aiohttp import request
@@ -9,11 +10,10 @@ from discord import Embed, Guild, NotFound
 from discord.ext.commands import Context
 from discord import User
 
-from ... import cache
 from ...data.get import get_link_nation
 from ...errors import NationNotFoundError, SentError
 from ...find import search_nation
-from ...funcs import bot, utils
+from ...funcs import utils
 from ..query import get_nation
 from .base import Base
 
@@ -88,18 +88,9 @@ class Nation(Base):
         self.nukes = self.data[24]
         return self
 
-    async def _link(self):
-        try:
-            self.alliance = (
-                cache.alliances[self.alliance_id] if self.alliance is not None else None
-            )
-        except KeyError:
-            self.alliance = None
-
-    def list_cities(self):
-        return [i for i in cache.cities.values() if i.nation_id == self.id]
-
     async def send_message(self, *, subject=None, content=None):
+        from ...ref import bot
+
         message_data = {
             "newconversation": "true",
             "receiver": self.leader,
@@ -138,14 +129,7 @@ class Nation(Base):
         return self.cities
 
     def get_average_infrastructure(self):
-        return (
-            sum(
-                i.infrastructure
-                for i in cache.cities.values()
-                if i.nation_id == self.id
-            )
-            / self.cities
-        )
+        return sum(i.infrastructure for i in self.partial_cities) / self.cities
 
     avg_infra = get_average_infrastructure
 
@@ -188,15 +172,24 @@ class Nation(Base):
             self.alliance = await Alliance.fetch(self.alliance_id)
 
     async def _make_user(self: Nation) -> User:
+        from ...ref import bot
+
         try:
             self.user = await bot.fetch_user((await get_link_nation(self.id))[0])
         except (IndexError, NotFound):
             self.user = None
 
+    async def _make_partial_cities(self):
+        from .city import City
+
+        partial_cities = await get_nation_cities(self.id)
+        partial_cities = [tuple(i) for i in partial_cities]
+        self.partial_cities = [City(data=i) for i in partial_cities]
+
     async def get_info_embed(self: Nation, ctx: Context) -> Embed:
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
-        await self.make_attrs("alliance", "user")
+        await self.make_attrs("alliance", "user", "partial_cities")
         fields = [
             {"name": "Nation ID", "value": self.id},
             {"name": "Nation Name", "value": self.name},

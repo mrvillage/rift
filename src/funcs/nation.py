@@ -6,8 +6,8 @@ from discord.ext.commands import (
     UserNotFound,
 )
 
-from .. import cache
 from ..data import get
+from ..data.classes.nation import Nation
 from ..errors import LinkError, NationNotFoundError
 from ..funcs.utils import convert_link
 from .link import get_link_nation, get_link_user
@@ -27,12 +27,12 @@ async def search_nation(ctx: Context, search):
             pass
     if "user" in locals():
         try:
-            return cache.nations[(await get_link_user(user.id))[1]]
+            return await Nation.fetch((await get_link_user(user.id))[1])
         except IndexError:
             pass
     if search.isdigit():
         try:
-            return cache.nations[int(search)]
+            return await Nation.fetch(int(search))
         except KeyError:
             pass
     nation = await get.get_nation(search)
