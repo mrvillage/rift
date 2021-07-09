@@ -101,8 +101,7 @@ class GuildWelcomeSettings(BaseSettings):
             message = f"Welcome to {member.guild.name}!"
         if not verified:
             message += "\n\nIt doesn't look like you're verified! Be sure to run `?verify <nation>` to verify."
-        embed = get_embed_author_member(member, message)
-        return embed
+        return get_embed_author_member(member, message)
 
     async def set_verified_nickname(
         self, member: discord.Member, nation: Nation
