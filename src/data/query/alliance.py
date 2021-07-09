@@ -4,8 +4,18 @@ from ..db import execute_read_query
 async def get_applicants(*, alliance_id: int):
     return await execute_read_query(
         """
-        SELECT * FROM alliances
+        SELECT * FROM nations
         WHERE alliance_id = $1 AND alliance_position = 1;
+    """,
+        alliance_id,
+    )
+
+
+async def get_members(*, alliance_id: int):
+    return await execute_read_query(
+        """
+        SELECT * FROM nations
+        WHERE alliance_id = $1 AND alliance_position != 1;
     """,
         alliance_id,
     )

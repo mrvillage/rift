@@ -1,3 +1,5 @@
+from src.data.classes.alliance import Alliance
+from src.data.classes.nation import Nation
 from discord.ext.commands import (
     Context,
     MemberConverter,
@@ -6,7 +8,6 @@ from discord.ext.commands import (
     UserNotFound,
 )
 
-from .. import cache
 from ..data import get
 from ..errors import AllianceNotFoundError, LinkError
 from ..funcs.utils import convert_link
@@ -27,19 +28,21 @@ async def search_alliance(ctx: Context, search):
             pass
     if "user" in locals():
         try:
-            return cache.nations[(await get_link_user(user.id))[1]].alliance
+            return await Alliance.fetch(
+                (await Nation.fetch((await get_link_user(user.id))[1])).alliance_id
+            )
         except IndexError:
             pass
     if search.isdigit():
         try:
-            return cache.alliances[int(search)]
+            return await Alliance.fetch(int(search))
         except KeyError:
             pass
     alliance = await get.get_alliance(search)
     if alliance is not None:
-        return cache.alliances[alliance.id]
+        return Alliance.fetch(alliance.id)
     nation = await get.get_nation(search)
     if nation is not None:
         if nation.alliance_id != 0:
-            return cache.alliances[nation.alliance_id]
+            return Alliance.fetch(nation.alliance_id)
     raise AllianceNotFoundError

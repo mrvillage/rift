@@ -1,6 +1,5 @@
 from typing import Union
 
-from .... import cache
 from ....funcs.bank import withdraw
 from .. import Alliance, Nation, Resources
 from .base import BankBase
@@ -123,6 +122,9 @@ class Transaction(BankBase):
 
 class CompletedTransaction(Transaction):
     def __init__(self, data):
+        from ..nation import Nation
+        from ..alliance import Alliance
+
         self.data = data
         self.id = self.data["tx_id"]
         self.datetime = self.data["tx_datetime"]
@@ -145,11 +147,11 @@ class CompletedTransaction(Transaction):
         self.steel = self.data["steel"]
         self.aluminum = self.data["aluminum"]
         if self.sender_type == 1:
-            self.sender = cache.nations[self.sender_id]
+            self.sender = Nation.fetch(self.sender_id)
         elif self.sender_type == 2:
-            self.sender = cache.alliances[self.sender_id]
+            self.sender = Nation.fetch(self.sender_id)
         if self.receiver_type == 1:
-            self.receiver = cache.nations[self.receiver_id]
+            self.receiver = Nation.fetch(self.receiver_id)
         elif self.receiver_type == 2:
-            self.receiver = cache.alliances[self.receiver_id]
-        self.banker = cache.nations[self.banker_id]
+            self.receiver = Nation.fetch(self.receiver_id)
+        self.banker = Nation.fetch(self.banker_id)

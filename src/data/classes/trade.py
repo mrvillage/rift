@@ -1,16 +1,17 @@
 import json
 from datetime import datetime
 
-from ...cache import nations
 from .base import Base
 
 
 class TradeOffer(Base):
     def __init__(self, data: dict):
+        from .nation import Nation
+
         self.data = data
         self.datetime = datetime.fromisoformat(data["date"])
         self.nation_id = int(data["nationid"])
-        self.nation = nations[self.nation_id]
+        self.nation = Nation.fetch(self.nation_id)
         self.amount = int(data["amount"])
         self.price = int(data["price"])
         self.total_value = int(data["totalvalue"])
