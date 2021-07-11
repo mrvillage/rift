@@ -1,28 +1,33 @@
 from __future__ import annotations
 
-from json import loads
-from typing import Union
 from abc import ABC, abstractclassmethod, abstractmethod
+from json import loads
+from typing import Any, Mapping, Union
 
 import discord
 
+from ..db.sql import execute_query
+from ..get import get_guild_settings, get_guild_welcome_settings
 from .base import Base
 from .nation import Nation
-from ..get import get_guild_settings, get_guild_welcome_settings
 
 
 class BaseSettings(Base, ABC):
     @abstractmethod
     def __init__(self, data: Union[list, tuple]) -> None:
-        pass
+        ...
 
     @abstractclassmethod
     def default(cls: BaseSettings) -> BaseSettings:
-        pass
+        ...
 
     @abstractclassmethod
     async def fetch(cls: BaseSettings) -> BaseSettings:
-        pass
+        ...
+
+    @abstractmethod
+    async def set_(cls: BaseSettings, **kwargs: Mapping[str, Any]) -> BaseSettings:
+        ...
 
 
 class UserSettings(BaseSettings):
@@ -40,6 +45,7 @@ class UserSettings(BaseSettings):
 
 class GuildWelcomeSettings(BaseSettings):
     def __init__(self: GuildWelcomeSettings, data: Union[list, tuple]) -> None:
+        self.default = False
         self.welcome_data = data
         self.guild_id: int = int(data[0])
         self.welcome_message: Union[str, None] = data[1]
@@ -76,9 +82,11 @@ class GuildWelcomeSettings(BaseSettings):
 
     @classmethod
     def default(cls: GuildWelcomeSettings, guild_id: int) -> GuildWelcomeSettings:
-        return cls(
+        settings = cls(
             (guild_id, None, "[]", "[]", "[]", "[]", "{}", "{}", "{}", "{}", "{}", None)
         )
+        settings.default = True
+        return settings
 
     @classmethod
     async def fetch(cls: GuildWelcomeSettings, guild_id: int) -> GuildWelcomeSettings:
@@ -133,6 +141,30 @@ class GuildWelcomeSettings(BaseSettings):
         nickname = nickname[:32]
         await member.edit(nick=nickname)
 
+    async def set_(
+        self: GuildWelcomeSettings, **kwargs: Mapping[str, Any]
+    ) -> GuildWelcomeSettings:
+        sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
+        sets = ", ".join(sets)
+        args = tuple(kwargs.values())
+        if self.default:
+            await execute_query(
+                f"""
+            INSERT INTO guild_welcome_settings (guild_id, {', '.join(kwargs.keys())}) VALUES ({', '.join(f'${i}' for i in range(1, len(kwargs)+2))});
+            """,
+                str(self.guild_id),
+                *tuple(kwargs.values()),
+            )
+        else:
+            await execute_query(
+                f"""
+            UPDATE guild_welcome_settings SET {sets} WHERE guild_id = $1;
+            """,
+                str(self.guild_id),
+                *args,
+            )
+            return self
+
 
 class GuildSettings(BaseSettings):
     welcome_settings: GuildWelcomeSettings
@@ -148,7 +180,9 @@ class GuildSettings(BaseSettings):
 
     @classmethod
     def default(cls: GuildSettings, guild_id: int) -> GuildSettings:
-        return cls((guild_id, ...))
+        settings = cls((guild_id, ...))
+        settings.default = True
+        return settings
 
     @classmethod
     async def fetch(cls: GuildSettings, guild_id: int, *attrs) -> GuildSettings:
@@ -159,3 +193,8 @@ class GuildSettings(BaseSettings):
             settings = cls.default(guild_id)
         await settings.make_attrs(*attrs)
         return settings
+
+    async def set_(
+        self: GuildWelcomeSettings, **kwargs: Mapping[str, Any]
+    ) -> GuildWelcomeSettings:
+        ...
