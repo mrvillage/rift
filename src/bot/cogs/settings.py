@@ -57,6 +57,23 @@ class Settings(commands.Cog):
             )
         )
 
+    @server_settings.command(
+        name="verified-nickname", aliases=["vn", "verifiednickname"]
+    )
+    @has_manage_permissions()
+    async def server_settings_verified_nickname(
+        self, ctx: commands.Context, nickname: str = None
+    ):
+        settings = await GuildSettings.fetch(str(ctx.guild.id), "welcome_settings")
+        message = nickname.strip("\n ")
+        await settings.welcome_settings.set_(verified_nickname=nickname)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                description=f"The verified nickname format has been set to:\n\n`{nickname}`",
+            )
+        )
+
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         # sourcery skip: merge-nested-ifs
