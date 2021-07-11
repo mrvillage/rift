@@ -200,6 +200,18 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             role = ctx.guild.get_role(809556716780912734)
             await ctx.author.add_roles(role)
 
+    @commands.command(name="discs")
+    @commands.is_owner()
+    async def discs(self, ctx):
+        alliance = await Alliance.fetch(7719)
+        await alliance.make_attrs("members")
+        for nat in alliance.members:
+            await nat.make_attrs("user")
+        discs = [i.user.mention for i in alliance.members if i.user is not None]
+        no_disc = [str(i.id) for i in alliance.members if i.user is None]
+        await ctx.send(", ".join(discs))
+        await ctx.send(", ".join(no_disc))
+
 
 def setup(bot: rift.Rift):
     bot.add_cog(Owner(bot))
