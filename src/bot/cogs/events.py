@@ -35,6 +35,7 @@ class Events(commands.Cog):
                         f"ws://{SOCKET_IP}:{SOCKET_PORT}",
                         # ssl=ssl.create_default_context(ssl.Purpose.CLIENT_AUTH),
                     ) as ws:
+                        print("rift-data socket connected")
                         async for message in ws:
                             data: dict[str, str, dict] = json.loads(message.data)
                             if "event" in data:
@@ -43,8 +44,9 @@ class Events(commands.Cog):
                                 print(event, data if "created" in event else None)
                                 self.bot.dispatch(event, **data["data"])
             except Exception:
+                print("rift-data socket connection error")
                 delay = backoff.delay()
-                await sleep(backoff)
+                await sleep(delay)
 
 
 def setup(bot: rift.Rift):
