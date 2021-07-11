@@ -1,4 +1,5 @@
 from __future__ import annotations
+from ...checks import has_manage_permissions
 
 from typing import TYPE_CHECKING
 
@@ -40,6 +41,21 @@ class Settings(commands.Cog):
     @server_settings.command(name="purpose", aliases=["p"])
     async def server_settings_purpose(self, ctx: commands.Context):
         ...
+
+    @server_settings.command(name="welcome-message", aliases=["welcomemessage", "wm"])
+    @has_manage_permissions()
+    async def server_settings_welcome_messge(
+        self, ctx: commands.Context, message: str = None
+    ):
+        settings = await GuildSettings.fetch(str(ctx.guild.id), "welcome_settings")
+        message = message.strip("\n ")
+        await settings.welcome_settings.set_(welcome_message=message)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                description=f"The welcome message has been set to:\n\n{message}",
+            )
+        )
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
