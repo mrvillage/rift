@@ -42,7 +42,7 @@ class Settings(commands.Cog):
     async def server_settings_purpose(self, ctx: commands.Context):
         ...
 
-    @server_settings.command(name="welcome-message", aliases=["welcomemessage", "wm"])
+    @server_settings.command(name="welcome-message", aliases=["wm", "welcomemessage"])
     @has_manage_permissions()
     async def server_settings_welcome_messge(
         self, ctx: commands.Context, message: str = None
