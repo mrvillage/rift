@@ -1,5 +1,9 @@
 import json
+import ssl
 import aiohttp
+from asyncio import sleep
+from discord import backoff
+from discord.backoff import ExponentialBackoff
 from discord.ext import commands
 
 from ... import funcs as rift
@@ -23,14 +27,24 @@ class Events(commands.Cog):
         self.bot.loop.create_task(self.socket())
 
     async def socket(self):
-        async with aiohttp.ClientSession() as session:
-            async with session.ws_connect(f"wss://{SOCKET_IP}:{SOCKET_PORT}") as ws:
-                async for message in ws:
-                    data: dict[str, str, dict] = json.loads(message.data)
-                    if "event" in data:
-                        event: str = data["event"]
-                        event = EVENTS.get(event, default=event)
-                        self.bot.dispatch(data["event"], **data["data"])
+        backoff = ExponentialBackoff()
+        while True:
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.ws_connect(
+                        f"ws://{SOCKET_IP}:{SOCKET_PORT}",
+                        # ssl=ssl.create_default_context(ssl.Purpose.CLIENT_AUTH),
+                    ) as ws:
+                        async for message in ws:
+                            data: dict[str, str, dict] = json.loads(message.data)
+                            if "event" in data:
+                                event: str = data["event"]
+                                event = EVENTS.get(event, event)
+                                print(event, data if "created" in event else None)
+                                self.bot.dispatch(event, **data["data"])
+            except Exception:
+                delay = backoff.delay()
+                await sleep(backoff)
 
 
 def setup(bot: rift.Rift):
