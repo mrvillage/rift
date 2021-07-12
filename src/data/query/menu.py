@@ -7,5 +7,7 @@ from ..db import execute_read_query
 
 async def get_menu(*, menu_id: str) -> Tuple[Any]:
     return tuple(
-        (await execute_read_query("SELECT * FROM menus WHERE id = $1;", menu_id))[0]
+        (await execute_read_query("SELECT * FROM menus WHERE menu_id = $1;", menu_id))[
+            0
+        ]
     )
