@@ -133,42 +133,42 @@ class Alliance(Base):
         )
 
     @classmethod
-    async def fetch(cls: Alliance, alliance_id: Union[int, str] = None) -> Alliance:
+    async def fetch(cls, alliance_id: Union[int, str] = None) -> Alliance:
         try:
             return cls(data=await get_alliance(alliance_id=alliance_id))
         except IndexError:
             raise AllianceNotFoundError
 
-    async def _make_members(self: Alliance) -> None:
+    async def _make_members(self) -> None:
         from .nation import Nation
 
         members = await get_members(alliance_id=self.id)
         members = [tuple(i) for i in members]
         self.members = [Nation(data=i) for i in members]
 
-    async def _make_vm_members(self: Alliance) -> None:
+    async def _make_vm_members(self) -> None:
         self.vm_members = [i for i in self.members if i.v_mode]
 
-    async def _make_leaders(self: Alliance) -> None:
+    async def _make_leaders(self) -> None:
         self.leaders = [i for i in self.members if i.alliance_position == "Leader"]
 
-    async def _make_heirs(self: Alliance) -> None:
+    async def _make_heirs(self) -> None:
         self.heirs = [i for i in self.members if i.alliance_position == "Heir"]
 
-    async def _make_officers(self: Alliance) -> None:
+    async def _make_officers(self) -> None:
         self.officers = [i for i in self.members if i.alliance_position == "Officer"]
 
-    async def _make_applicants(self: Alliance) -> None:
+    async def _make_applicants(self) -> None:
         from .nation import Nation
 
         applicants = await get_applicants(alliance_id=self.id)
         applicants = [tuple(i) for i in applicants]
         self.applicants = [Nation(data=i) for i in applicants]
 
-    async def _make_calculated_score(self: Alliance) -> None:
+    async def _make_calculated_score(self) -> None:
         self.calculated_score = sum(i.score for i in self.members)
 
-    async def get_info_embed(self: Alliance, ctx: Context) -> Embed:
+    async def get_info_embed(self, ctx: Context) -> Embed:
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
         await self.make_attrs(

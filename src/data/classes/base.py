@@ -19,29 +19,29 @@ class Makeable(Base):
 
 class Fetchable(Base, metaclass=ABCMeta):
     @abstractclassmethod
-    async def fetch(cls: Fetchable) -> Fetchable:
+    async def fetch(cls) -> Fetchable:
         ...
 
 
 class Defaultable(Base, metaclass=ABCMeta):
     @abstractclassmethod
-    def default(cls: Defaultable) -> Defaultable:
+    def default(cls) -> Defaultable:
         ...
 
 
 class Setable(Base, metaclass=ABCMeta):
     @abstractmethod
-    async def set_(self: Setable, **kwargs: Mapping[str, Any]) -> Setable:
+    async def set_(self, **kwargs: Mapping[str, Any]) -> Setable:
         ...
 
 
 class Embedable(Base, metaclass=ABCMeta):
     @abstractmethod
-    async def get_info_embed(self: Embedable, ctx: Context) -> Embed:
+    async def get_info_embed(self, ctx: Context) -> Embed:
         ...
 
 
 class Initable(Base, metaclass=ABCMeta):
     @abstractmethod
-    def __init__(self: Initable) -> None:
+    def __init__(self) -> None:
         ...

@@ -159,19 +159,19 @@ class Nation(Base):
         )
 
     @classmethod
-    async def fetch(cls: Nation, nation_id: Union[int, str] = None) -> Nation:
+    async def fetch(cls, nation_id: Union[int, str] = None) -> Nation:
         try:
             return cls(data=await get_nation(nation_id=nation_id))
         except IndexError:
             raise NationNotFoundError
 
-    async def _make_alliance(self: Nation) -> Alliance:
+    async def _make_alliance(self) -> Alliance:
         from .alliance import Alliance
 
         if self.alliance_id != 0:
             self.alliance = await Alliance.fetch(self.alliance_id)
 
-    async def _make_user(self: Nation) -> User:
+    async def _make_user(self) -> User:
         from ...ref import bot
 
         try:
@@ -186,7 +186,7 @@ class Nation(Base):
         partial_cities = [tuple(i) for i in partial_cities]
         self.partial_cities = [City(data=i) for i in partial_cities]
 
-    async def get_info_embed(self: Nation, ctx: Context) -> Embed:
+    async def get_info_embed(self, ctx: Context) -> Embed:
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
         await self.make_attrs("alliance", "user", "partial_cities")
