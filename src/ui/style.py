@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from discord.ui import ButtonStyle
+from discord.enums import ButtonStyle
 
 
 class ButtonStyle(ButtonStyle):
