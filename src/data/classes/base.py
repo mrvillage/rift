@@ -19,13 +19,13 @@ class Makeable(Base):
 
 class Fetchable(Base, metaclass=ABCMeta):
     @abstractclassmethod
-    async def fetch(self: Fetchable) -> Fetchable:
+    async def fetch(cls: Fetchable) -> Fetchable:
         ...
 
 
 class Defaultable(Base, metaclass=ABCMeta):
     @abstractclassmethod
-    def default(self: Defaultable) -> Defaultable:
+    def default(cls: Defaultable) -> Defaultable:
         ...
 
 
