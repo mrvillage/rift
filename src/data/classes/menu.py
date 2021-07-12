@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 from json import dumps, loads
-from typing import Any, Mapping, Sequence, Tuple, Union
+from typing import Any, Mapping, Sequence, Union
 
-from discord import Emoji, PartialEmoji
-from discord.enums import ButtonStyle
+from discord import ButtonStyle, Embed, Emoji, PartialEmoji
 from discord.ext.commands import FlagConverter
+from discord.ext.commands.context import Context
 
-from ..db import execute_query
-from ..query.menu import get_menu
 from ... import ui
+from ..db import execute_query
+from ..query import get_menu
 from .base import Defaultable, Fetchable, Initable, Setable
 
 
@@ -21,20 +21,21 @@ class Menu(Defaultable, Fetchable, Initable, Setable):
         self.default = False
         self.menu_id = data[0]
         self.owner_id = data[1]
-        self.items = loads(data[2]) if data[2] else []
-        self.permissions = loads(data[3]) if data[3] else {}
+        self.description = data[2]
+        self.items = loads(data[3]) if data[3] else []
+        self.permissions = loads(data[4]) if data[4] else {}
 
     @classmethod
-    async def fetch(cls: Menu, menu_id: Union[int, str]) -> Menu:
+    async def fetch(
+        cls: Menu, menu_id: Union[int, str], owner_id: Union[int, str]
+    ) -> Menu:
         try:
             return cls(data=await get_menu(menu_id=menu_id))
         except IndexError:
-            return cls.default()
+            return cls.default(menu_id=menu_id, owner_id=owner_id)
 
     @classmethod
-    async def default(
-        cls: Menu, menu_id: Union[int, str], owner_id: Union[int, str]
-    ) -> Menu:
+    def default(cls: Menu, menu_id: Union[int, str], owner_id: Union[int, str]) -> Menu:
         menu = cls(data=[str(menu_id), str(owner_id), None, None])
         menu.default = True
         return menu
@@ -88,10 +89,10 @@ class Menu(Defaultable, Fetchable, Initable, Setable):
             )
         return self
 
-    async def add_item(self: Menu, item: Mapping[str, Union[int, str]]) -> None:
+    def add_item(self: Menu, item: Mapping[str, Union[int, str]]) -> None:
         self.items.append(item)
 
-    async def remove_item(self: Menu, item_id: str) -> None:
+    def remove_item(self: Menu, item_id: str) -> None:
         self.items = [i for i in self.items if i["id"] != item_id]
 
     def get_view(self: Menu) -> ui.View:
@@ -127,3 +128,9 @@ class Menu(Defaultable, Fetchable, Initable, Setable):
                 )
                 self.view.add_item(select)
         return self.view
+
+    def get_description_embed(self, ctx: Context) -> Embed:
+        from ...funcs import get_embed_author_guild
+
+        self.embed = get_embed_author_guild(ctx.guild, self.description)
+        return self.embed
