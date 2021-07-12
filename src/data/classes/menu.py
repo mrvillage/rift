@@ -99,7 +99,7 @@ class Menu(Defaultable, Fetchable, Initable, Setable):
         for item in self.items:
             if item["type"] == "button":
                 button = ui.Button(
-                    style=ButtonStyle[item["color"]],
+                    style=ButtonStyle[item["style"]],
                     label=item["label"],
                     disabled=item["disabled"],
                     custom_id=item["id"],
