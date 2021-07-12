@@ -1,6 +1,7 @@
 from .alliance import *
 from .city import *
 from .document import *
+from .menu import *
 from .militarization import *
 from .mmr import *
 from .nation import *
