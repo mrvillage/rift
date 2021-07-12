@@ -17,7 +17,7 @@ class Menu(Defaultable, Fetchable, Initable, Setable):
     menu_id: str
     items: list[Mapping[str, Union[int, str]]]
 
-    def __init__(self: Menu, data: Sequence[Any]) -> None:
+    def __init__(self, data: Sequence[Any]) -> None:
         self.default = False
         self.menu_id = data[0]
         self.owner_id = data[1]
@@ -26,21 +26,19 @@ class Menu(Defaultable, Fetchable, Initable, Setable):
         self.permissions = loads(data[4]) if data[4] else {}
 
     @classmethod
-    async def fetch(
-        cls: Menu, menu_id: Union[int, str], owner_id: Union[int, str]
-    ) -> Menu:
+    async def fetch(cls, menu_id: Union[int, str], owner_id: Union[int, str]) -> Menu:
         try:
             return cls(data=await get_menu(menu_id=menu_id))
         except IndexError:
             return cls.default(menu_id=menu_id, owner_id=owner_id)
 
     @classmethod
-    def default(cls: Menu, menu_id: Union[int, str], owner_id: Union[int, str]) -> Menu:
+    def default(cls, menu_id: Union[int, str], owner_id: Union[int, str]) -> Menu:
         menu = cls(data=[str(menu_id), str(owner_id), None, None])
         menu.default = True
         return menu
 
-    async def set_(self: Menu, **kwargs: Mapping[str, Any]) -> Menu:
+    async def set_(self, **kwargs: Mapping[str, Any]) -> Menu:
         sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
         sets = ", ".join(sets)
         args = tuple(kwargs.values())
@@ -62,7 +60,7 @@ class Menu(Defaultable, Fetchable, Initable, Setable):
             )
         return self
 
-    async def save(self: Menu) -> Menu:
+    async def save(self) -> Menu:
         if self.default:
             await execute_query(
                 f"""
@@ -89,13 +87,13 @@ class Menu(Defaultable, Fetchable, Initable, Setable):
             )
         return self
 
-    def add_item(self: Menu, item: Mapping[str, Union[int, str]]) -> None:
+    def add_item(self, item: Mapping[str, Union[int, str]]) -> None:
         self.items.append(item)
 
-    def remove_item(self: Menu, item_id: str) -> None:
+    def remove_item(self, item_id: str) -> None:
         self.items = [i for i in self.items if i["id"] != item_id]
 
-    def get_view(self: Menu) -> ui.View:
+    def get_view(self) -> ui.View:
         self.view = ui.View(timeout=None)
         for item in self.items:
             if item["type"] == "button":
