@@ -163,7 +163,7 @@ class GuildWelcomeSettings(BaseSettings):
                 str(self.guild_id),
                 *args,
             )
-            return self
+        return self
 
 
 class GuildSettings(BaseSettings):
