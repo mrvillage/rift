@@ -194,7 +194,5 @@ class GuildSettings(BaseSettings):
         await settings.make_attrs(*attrs)
         return settings
 
-    async def set_(
-        self: GuildWelcomeSettings, **kwargs: Mapping[str, Any]
-    ) -> GuildWelcomeSettings:
+    async def set_(self: GuildSettings, **kwargs: Mapping[str, Any]) -> GuildSettings:
         ...
