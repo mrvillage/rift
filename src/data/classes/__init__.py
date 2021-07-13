@@ -9,3 +9,4 @@ from .resources import *
 from .server import *
 from .settings import *
 from .trade import *
+from .treaty import *
