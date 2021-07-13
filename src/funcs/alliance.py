@@ -40,9 +40,9 @@ async def search_alliance(ctx: Context, search):
             pass
     alliance = await get.get_alliance(search)
     if alliance is not None:
-        return Alliance.fetch(alliance.id)
+        return await Alliance.fetch(alliance.id)
     nation = await get.get_nation(search)
     if nation is not None:
         if nation.alliance_id != 0:
-            return Alliance.fetch(nation.alliance_id)
+            return await Alliance.fetch(nation.alliance_id)
     raise AllianceNotFoundError
