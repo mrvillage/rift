@@ -1,22 +1,22 @@
 from __future__ import annotations
 
 from datetime import datetime
-from src.data.query.alliance import get_applicants, get_members
 from typing import Union
 
 from discord import Embed, Guild
 from discord.ext.commands.context import Context
+from src.data.query.alliance import get_applicants, get_members
 
 from ...errors import AllianceNotFoundError
 from ...find import search_alliance
 from ...funcs.parse import parse_alliance_bank
 from ...ref import bot
 from ..query import get_alliance
-from .base import Base
+from .base import Embedable, Fetchable, Initable, Makeable
 from .resources import Resources
 
 
-class Alliance(Base):
+class Alliance(Embedable, Fetchable, Initable, Makeable):
     def __init__(self, *, alliance_id=None, alliance_name=None, data=None):
         if data is None:
             self.data = get_alliance(
