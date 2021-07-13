@@ -64,10 +64,8 @@ class PnWInfo(commands.Cog):
         members = alliance.list_members(vm=False)
         full = (
             "\n".join(
-                [
-                    f'[{i+1}. {member.id} | {member.name} | {member.score:,.2f}](https://politicsandwar.com/nation/id={member.id} "https://politicsandwar.com/nation/id={member.id}")'
-                    for i, member in enumerate(members)
-                ]
+                f'[{i+1}. {member.id} | {member.name} | {member.score:,.2f}](https://politicsandwar.com/nation/id={member.id} "https://politicsandwar.com/nation/id={member.id}")'
+                for i, member in enumerate(members)
             )
             + "\n"
         )
