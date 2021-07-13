@@ -8,11 +8,11 @@ import discord
 
 from ..db.sql import execute_query
 from ..get import get_guild_settings, get_guild_welcome_settings
-from .base import Base
+from .base import Makeable
 from .nation import Nation
 
 
-class BaseSettings(Base, ABC):
+class BaseSettings(Makeable, ABC):
     @abstractmethod
     def __init__(self, data: Union[list, tuple]) -> None:
         ...

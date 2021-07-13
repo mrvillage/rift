@@ -15,13 +15,13 @@ from ...errors import NationNotFoundError, SentError
 from ...find import search_nation
 from ...funcs import utils
 from ..query import get_nation
-from .base import Base
+from .base import Embedable, Fetchable, Initable, Makeable
 
 if TYPE_CHECKING:
     from .alliance import Alliance
 
 
-class Nation(Base):
+class Nation(Embedable, Fetchable, Initable, Makeable):
     def __init__(self, *, nation_id=None, nation_name=None, data=None):
         if data is None:
             self.data = get_nation(nation_id=nation_id, nation_name=nation_name)
