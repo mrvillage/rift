@@ -34,7 +34,7 @@ class Menu(Defaultable, Fetchable, Initable, Setable):
 
     @classmethod
     def default(cls, menu_id: Union[int, str], owner_id: Union[int, str]) -> Menu:
-        menu = cls(data=[str(menu_id), str(owner_id), None, None])
+        menu = cls(data=[str(menu_id), str(owner_id), None, None, None])
         menu.default = True
         return menu
 
@@ -97,7 +97,12 @@ class Menu(Defaultable, Fetchable, Initable, Setable):
         self.view = ui.View(timeout=None)
         for item in self.items:
             if item["type"] == "button":
-                button = ui.Button(
+
+                class Buttoon(ui.Button):
+                    async def callback(self, interaction):
+                        print("hi")
+
+                button = Buttoon(
                     style=ButtonStyle[item["style"]],
                     label=item["label"],
                     disabled=item["disabled"],
