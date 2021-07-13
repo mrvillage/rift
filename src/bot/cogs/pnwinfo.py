@@ -92,6 +92,18 @@ class PnWInfo(commands.Cog):
         )
         await ctx.reply(embed=embed)
 
+    @commands.command(
+        name="treaties",
+        aliases=["t", "treaty"],
+        description="Displays the treaties of the target alliance.",
+    )
+    async def treaties(self, ctx: commands.Context, *, alliance=None):
+        alliance = await Alliance.convert(ctx, alliance)
+        await alliance.make_attrs("treaties")
+        await ctx.reply(
+            embed=rift.get_embed_author_member(ctx.author, str(alliance.treaties))
+        )
+
 
 def setup(bot):
     bot.add_cog(PnWInfo(bot))
