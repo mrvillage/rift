@@ -168,6 +168,11 @@ class Alliance(Embedable, Fetchable, Initable, Makeable):
     async def _make_calculated_score(self) -> None:
         self.calculated_score = sum(i.score for i in self.members)
 
+    async def _make_treaties(self) -> None:
+        from .treaty import Treaties
+
+        self.treaties = await Treaties.fetch(self)
+
     async def get_info_embed(self, ctx: Context) -> Embed:
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
