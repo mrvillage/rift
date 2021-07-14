@@ -33,3 +33,10 @@ async def insert_interface(*, menu_id: int, message_id: int) -> None:
 
 async def get_menus() -> List[Tuple[Any]]:
     return [tuple(i) for i in await execute_read_query("SELECT * FROM menus;")]
+
+
+async def get_user_menus(*, user_id: int) -> List[Tuple[Any]]:
+    return [
+        tuple(i)
+        for i in await execute_read_query("SELECT * FROM menus WHERE owner_id = $1;")
+    ]
