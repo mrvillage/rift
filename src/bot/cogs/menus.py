@@ -3,7 +3,7 @@ from discord.ext import commands
 from ...ref import Rift
 
 
-class Menu(commands.Cog):
+class Menus(commands.Cog):
     def __init__(self, bot: Rift):
         self.bot = bot
 
@@ -15,4 +15,4 @@ class Menu(commands.Cog):
 
 
 def setup(bot: Rift):
-    bot.add_cog(Menu(bot))
+    bot.add_cog(Menus(bot))
