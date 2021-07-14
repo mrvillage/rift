@@ -26,15 +26,15 @@ class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
         self.permissions = loads(data[5]) if data[5] else {}
 
     @classmethod
-    async def fetch(cls, menu_id: Union[int, str], owner_id: Union[int, str]) -> Menu:
+    async def fetch(cls, menu_id: int, owner_id: int) -> Menu:
         try:
             return cls(data=await get_menu(menu_id=menu_id))
         except IndexError:
             return cls.default(menu_id=menu_id, owner_id=owner_id)
 
     @classmethod
-    def default(cls, menu_id: Union[int, str], owner_id: Union[int, str]) -> Menu:
-        menu = cls(data=[str(menu_id), str(owner_id), None, None, None])
+    def default(cls, menu_id: int, owner_id: int) -> Menu:
+        menu = cls(data=[menu_id, owner_id, None, None, None])
         menu.default = True
         return menu
 
