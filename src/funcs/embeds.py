@@ -1,4 +1,4 @@
-from discord import Embed, utils
+import discord
 
 from ..env import COLOR, FOOTER
 
@@ -14,7 +14,7 @@ def add_fields(embed, fields):
 
 
 def get_embed(title: str):
-    return Embed(title=title, COLOR=COLOR).set_footer(text=FOOTER)
+    return discord.Embed(title=title, COLOR=COLOR).set_footer(text=FOOTER)
 
 
 def get_embed_author(
@@ -26,10 +26,10 @@ def get_embed_author(
     footer=FOOTER,
 ):
     return (
-        Embed(
+        discord.Embed(
             color=color,
             description=description,
-            timestamp=utils.utcnow() if timestamp is None else timestamp,
+            timestamp=discord.utils.utcnow() if timestamp is None else timestamp,
         )
         .set_footer(text=footer)
         .set_author(name=author_name, icon_url=author_icon_url)
@@ -38,19 +38,19 @@ def get_embed_author(
 
 def get_embed_author_member(
     member,
-    description=Embed.Empty,
+    description=discord.Embed.Empty,
     color=COLOR,
     timestamp=None,
     footer=FOOTER,
-    title=Embed.Empty,
+    title=discord.Embed.Empty,
     fields=[],
-    image_url=Embed.Empty,
+    image_url=discord.Embed.Empty,
 ):
     return add_fields(
-        Embed(
+        discord.Embed(
             color=color,
             description=description,
-            timestamp=utils.utcnow() if timestamp is None else timestamp,
+            timestamp=discord.utils.utcnow() if timestamp is None else timestamp,
             title=title,
         )
         .set_footer(text=footer)
@@ -65,19 +65,19 @@ def get_embed_author_member(
 
 def get_embed_author_guild(
     guild,
-    description=Embed.Empty,
+    description=discord.Embed.Empty,
     color=COLOR,
     timestamp=None,
     footer=FOOTER,
-    title=Embed.Empty,
+    title=discord.Embed.Empty,
     fields=[],
-    image_url=Embed.Empty,
+    image_url=discord.Embed.Empty,
 ):
     return add_fields(
-        Embed(
+        discord.Embed(
             color=color,
             description=description,
-            timestamp=utils.utcnow() if timestamp is None else timestamp,
+            timestamp=discord.utils.utcnow() if timestamp is None else timestamp,
             title=title,
         )
         .set_footer(text=footer)
@@ -88,7 +88,7 @@ def get_embed_author_guild(
 
 
 def get_embed_no_title():
-    return Embed(COLOR=COLOR).set_footer(text=FOOTER)
+    return discord.Embed(COLOR=COLOR).set_footer(text=FOOTER)
 
 
 def get_embed_check_dm_page_author_member(author):
