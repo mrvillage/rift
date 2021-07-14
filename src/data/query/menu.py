@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from typing import Any, Tuple, Union
+from typing import Any, List, Tuple, Union
+
+from discord import Message
 
 from ..db import execute_query, execute_read_query
 
@@ -23,11 +25,13 @@ async def get_menu_item(*, item_id: int) -> Tuple[Any]:
     )
 
 
-async def insert_interface(*, menu_id: int, message_id: int) -> None:
+async def insert_interface(*, menu_id: int, message: Message) -> None:
     await execute_query(
         "INSERT INTO menu_interfaces (menu_id, message_id) VALUES ($1, $2);",
         menu_id,
-        message_id,
+        message.id,
+        message.channel.id,
+        message.guild.id,
     )
 
 
