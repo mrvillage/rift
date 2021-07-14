@@ -4,7 +4,6 @@ from discord.ext.commands import BadInviteArgument, InviteConverter
 
 from .. import cache
 from ..data import get
-from ..data.classes import Server
 from ..errors import ServerNotFoundError
 from ..menus import EmbedPageSource, MenuPages
 from .embeds import get_embed_author_member
@@ -124,6 +123,8 @@ async def edit_server_submission(*, sub_id, status):
 async def add_server(
     *, name=None, invite=None, categories=None, keywords=None, description=None
 ):
+    from ..data.classes import Server
+
     await get.add_server(
         name=name,
         invite=invite,

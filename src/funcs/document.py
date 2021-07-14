@@ -2,7 +2,6 @@ import json
 
 from .. import cache
 from ..data import get
-from ..data.classes import Document
 from ..errors import DocumentNotFoundError
 from ..menus import EmbedPageSource, MenuPages
 from .embeds import get_embed_author_member
@@ -109,6 +108,8 @@ async def edit_document_submission(*, sub_id, status):
 async def add_document(
     *, name=None, url=None, categories=None, keywords=None, description=None
 ):
+    from ..data.classes import Document
+
     await get.add_document(
         name=name,
         url=url,

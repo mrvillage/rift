@@ -7,13 +7,14 @@ from discord.ext.commands import (
 )
 
 from ..data import get
-from ..data.classes.nation import Nation
 from ..errors import LinkError, NationNotFoundError
 from ..funcs.utils import convert_link
 from .link import get_link_nation, get_link_user
 
 
 async def search_nation(ctx: Context, search):
+    from ..data.classes import Nation
+
     try:
         search = await convert_link(search)
     except LinkError:
