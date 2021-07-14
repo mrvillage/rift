@@ -45,3 +45,9 @@ class Initable(Base, metaclass=ABCMeta):
     @abstractmethod
     def __init__(self) -> None:
         ...
+
+
+class Saveable(Base, metaclass=ABCMeta):
+    @abstractmethod
+    async def save(self) -> None:
+        ...
