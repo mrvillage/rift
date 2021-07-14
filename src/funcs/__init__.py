@@ -14,6 +14,6 @@ from .server import *
 from .settings import *
 from .targets import *
 from .trade import *
-from .utils import *
+from . import utils
 
 from .riftModule import *
