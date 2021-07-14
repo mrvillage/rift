@@ -1,5 +1,7 @@
 import datetime
 from pathlib import Path
+from src.data.classes.menu import Menu
+from src.data.query.menu import get_menus
 
 from .. import funcs as rift
 
@@ -26,6 +28,12 @@ async def on_raw_message_edit(payload):
 
 @bot.event
 async def on_ready():
+    if bot.persistent_views_loaded:
+        views = await get_menus()
+        views = [Menu(data=i) for i in views]
+        for view in views:
+            bot.add_view(await view.get_view())
+        bot.persistent_view_loaded = True
     print("Startup complete!")
 
 
@@ -48,6 +56,7 @@ def main():
     bot.unload_extension("src.bot.cogs.database")
     bot.unload_extension("src.bot.cogs.server")
 
+    bot.persistent_views_loaded = False
     bot.loop.create_task(bot.update_pnw_session())
     bot.loop.create_task(bot.get_staff())
     bot.command_prefix = "!!"
