@@ -3,7 +3,7 @@ from __future__ import annotations
 from json import dumps, loads
 from typing import Any, Mapping, Sequence, Union
 
-from discord import Embed
+from discord import Embed, Message
 from discord.ext.commands import Context
 
 from ... import ui
@@ -108,8 +108,8 @@ class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
         self.embed = get_embed_author_guild(ctx.guild, self.description)
         return self.embed
 
-    async def new_interface(self, *, message_id: int) -> None:
-        await insert_interface(menu_id=self.menu_id, message_id=message_id)
+    async def new_interface(self, *, message: Message) -> None:
+        await insert_interface(menu_id=self.menu_id, message=message)
 
 
 class MenuItem(Fetchable, Initable, Saveable, Setable):
