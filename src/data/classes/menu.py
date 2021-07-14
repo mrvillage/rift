@@ -3,26 +3,25 @@ from __future__ import annotations
 from json import dumps, loads
 from typing import Any, Mapping, Sequence, Union
 
-from discord import ButtonStyle, Embed, Emoji, PartialEmoji
-from discord.ext.commands import FlagConverter
-from discord.ext.commands.context import Context
+from discord import Embed
+from discord.ext.commands import Context
 
 from ... import ui
 from ..db import execute_query
-from ..query import get_menu
-from .base import Defaultable, Fetchable, Initable, Setable
+from ..query import get_menu, get_menu_item, insert_interface
+from .base import Defaultable, Fetchable, Initable, Makeable, Saveable, Setable
 
 
-class Menu(Defaultable, Fetchable, Initable, Setable):
+class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
     menu_id: str
     items: list[Mapping[str, Union[int, str]]]
 
-    def __init__(self, data: Sequence[Any]) -> None:
+    def __init__(self, *, data: Sequence[Any]) -> None:
         self.default = False
         self.menu_id = data[0]
         self.owner_id = data[1]
         self.description = data[2]
-        self.items = loads(data[3]) if data[3] else []
+        self.item_ids = loads(data[3])
         self.permissions = loads(data[4]) if data[4] else {}
 
     @classmethod
@@ -37,6 +36,9 @@ class Menu(Defaultable, Fetchable, Initable, Setable):
         menu = cls(data=[str(menu_id), str(owner_id), None, None, None])
         menu.default = True
         return menu
+
+    async def _make_items(self) -> None:
+        self.items = [await MenuItem.fetch(i) for i in self.item_ids]
 
     async def set_(self, **kwargs: Mapping[str, Any]) -> Menu:
         sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
@@ -93,43 +95,11 @@ class Menu(Defaultable, Fetchable, Initable, Setable):
     def remove_item(self, item_id: str) -> None:
         self.items = [i for i in self.items if i["id"] != item_id]
 
-    def get_view(self) -> ui.View:
+    async def get_view(self) -> ui.View:
+        await self.make_attrs("items")
         self.view = ui.View(timeout=None)
-        for item in self.items:
-            if item["type"] == "button":
-
-                class Buttoon(ui.Button):
-                    async def callback(self, interaction):
-                        print("hi")
-
-                button = Buttoon(
-                    style=ButtonStyle[item["style"]],
-                    label=item["label"],
-                    disabled=item["disabled"],
-                    custom_id=item["id"],
-                    url=item["url"],
-                    emoji=item["emoji"],
-                    row=item["row"],
-                )
-                self.view.add_item(button)
-            else:
-                select = ui.Select(
-                    custom_id=item["custom_id"],
-                    placeholder=item["placeholder"],
-                    min_values=item["min_values"],
-                    max_values=item["max_values"],
-                    options=[
-                        ui.SelectOption(
-                            label=option["label"],
-                            description=option["description"],
-                            emoji=option["emoji"],
-                            default=option["default"],
-                        )
-                        for option in item["options"]
-                    ],
-                    row=item["row"],
-                )
-                self.view.add_item(select)
+        for item in self.item_ids:
+            self.view.add_item(item.get_item())
         return self.view
 
     def get_description_embed(self, ctx: Context) -> Embed:
@@ -137,3 +107,48 @@ class Menu(Defaultable, Fetchable, Initable, Setable):
 
         self.embed = get_embed_author_guild(ctx.guild, self.description)
         return self.embed
+
+    async def new_interface(self, *, message_id: int) -> None:
+        await insert_interface(menu_id=self.menu_id, message_id=message_id)
+
+
+class MenuItem(Fetchable, Initable, Saveable, Setable):
+    def __init__(self, *, data: Mapping[str, Any]) -> None:
+        self.item_id = data[0]
+        self.owner_id = data[1]
+        self.type = data[2]
+        self.data = data[3]
+
+    @classmethod
+    async def fetch(cls, item_id: int) -> MenuItem:
+        return cls(data=await get_menu_item(item_id=item_id))
+
+    def get_item(self, menu_id: int) -> Union[ui.Button, ui.Select]:
+        custom_id = f"{menu_id}-{self.item_id}"
+        if self.type == "button":
+            return ui.Button(
+                style=ui.ButtonStyle[self.data["style"]],
+                label=self.data["label"],
+                disabled=self.data["disabled"],
+                custom_id=custom_id,
+                url=self.data["url"],
+                emoji=self.data["emoji"],
+                row=self.data["row"],
+            )
+        elif self.type == "select":
+            return ui.Select(
+                custom_id=custom_id,
+                placeholder=self.data["placeholder"],
+                min_values=self.data["min_values"],
+                max_values=self.data["max_values"],
+                options=[
+                    ui.SelectOption(
+                        label=option["label"],
+                        description=option["description"],
+                        emoji=option["emoji"],
+                        default=option["default"],
+                    )
+                    for option in self.data["options"]
+                ],
+                row=self.data["row"],
+            )
