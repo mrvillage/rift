@@ -29,3 +29,7 @@ async def insert_interface(*, menu_id: int, message_id: int) -> None:
         menu_id,
         message_id,
     )
+
+
+async def get_menus():
+    return [tuple(i) for i in await execute_read_query("SELECT * FROM menus;")]
