@@ -166,7 +166,10 @@ class Alliance(Embedable, Fetchable, Initable, Makeable):
         self.applicants = [Nation(data=i) for i in applicants]
 
     async def _make_calculated_score(self) -> None:
-        self.calculated_score = sum(i.score for i in self.members)
+        self.calculated_score = sum(i.score for i in self.members if not i.v_mode)
+
+    async def _make_member_count(self) -> None:
+        self.member_count = len(i for i in self.members if not i.v_mode)
 
     async def _make_treaties(self) -> None:
         from .treaty import Treaties
@@ -184,6 +187,7 @@ class Alliance(Embedable, Fetchable, Initable, Makeable):
             "officers",
             "applicants",
             "calculated_score",
+            "member_count",
         )
         fields = [
             {"name": "Alliance ID", "value": self.id},
@@ -201,7 +205,7 @@ class Alliance(Embedable, Fetchable, Initable, Makeable):
             {"name": "Score", "value": f"{self.calculated_score:,.2f}"},
             {
                 "name": "Average Score",
-                "value": f"{self.calculated_score/len(self.members) if len(self.members) != 0 else 0:,.2f}",
+                "value": f"{self.calculated_score/self.member_count if self.member_count != 0 else 0:,.2f}",
             },
             {
                 "name": "Applicants",
