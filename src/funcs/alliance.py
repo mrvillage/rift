@@ -1,5 +1,3 @@
-from src.data.classes.alliance import Alliance
-from src.data.classes.nation import Nation
 from discord.ext.commands import (
     Context,
     MemberConverter,
@@ -15,6 +13,8 @@ from .link import get_link_user
 
 
 async def search_alliance(ctx: Context, search):
+    from ..data.classes import Alliance, Nation
+
     try:
         search = await convert_link(search)
     except LinkError:
