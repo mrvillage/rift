@@ -26,6 +26,10 @@ class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
         self.permissions = loads(data[5]) if data[5] else {}
 
     @classmethod
+    async def convert(cls, ctx: Context, argument):
+        return await cls.fetch(int(argument), ctx.author.id)
+
+    @classmethod
     async def fetch(cls, menu_id: int, owner_id: int) -> Menu:
         try:
             return cls(data=await get_menu(menu_id=menu_id))
