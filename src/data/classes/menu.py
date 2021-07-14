@@ -20,9 +20,10 @@ class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
         self.default = False
         self.menu_id = data[0]
         self.owner_id = data[1]
-        self.description = data[2]
-        self.item_ids = loads(data[3])
-        self.permissions = loads(data[4]) if data[4] else {}
+        self.name = data[2]
+        self.description = data[3]
+        self.item_ids = loads(data[4])
+        self.permissions = loads(data[5]) if data[5] else {}
 
     @classmethod
     async def fetch(cls, menu_id: Union[int, str], owner_id: Union[int, str]) -> Menu:
