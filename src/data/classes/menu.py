@@ -112,6 +112,11 @@ class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
     async def new_interface(self, *, message: Message) -> None:
         await insert_interface(menu_id=self.menu_id, message=message)
 
+    def __str__(self) -> str:
+        if self.name is None:
+            return f"{self.id}"
+        return f"{self.id} - {self.name}"
+
 
 class MenuItem(Fetchable, Initable, Saveable, Setable):
     def __init__(self, *, data: Mapping[str, Any]) -> None:
