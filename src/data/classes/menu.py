@@ -47,7 +47,10 @@ class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
         return menu
 
     async def _make_items(self) -> None:
-        self.items = [[await MenuItem.fetch(j) for j in i] for i in self.item_ids]
+        self.items = []
+        for i in self.item_ids:
+            items = [await MenuItem.fetch(j) for j in i]
+            self.items.append(items)
 
     async def set_(self, **kwargs: Mapping[str, Any]) -> Menu:
         sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
@@ -75,24 +78,31 @@ class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
         if self.default:
             await execute_query(
                 f"""
-            INSERT INTO menus (menu_id, owner_id, items, permissions) VALUES ($1, $2, $3, $4);
+            INSERT INTO menus (menu_id, owner_id, name, description, items, permissions) VALUES ($1, $2, $3, $4, $5, $6);
             """,
                 self.menu_id,
                 self.owner_id,
+                self.name,
+                self.description,
                 dumps(self.items) if self.items else None,
                 dumps(self.permissions) if self.permissions else None,
             )
         else:
             await execute_query(
                 f"""
-            UPDATE menu_id SET menu_id = $1,
+            UPDATE menu_id SET
+            menu_id = $1,
             owner_id = $2,
-            items = $3,
-            permissions = $4
+            name = $3,
+            description = $4
+            items = $5,
+            permissions = $6
             WHERE menu_id = $1;
             """,
                 self.menu_id,
                 self.owner_id,
+                self.name,
+                self.description,
                 dumps(self.items) if self.items else None,
                 dumps(self.permissions) if self.permissions else None,
             )
