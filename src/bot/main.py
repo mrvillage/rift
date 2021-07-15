@@ -1,10 +1,9 @@
 import datetime
 from pathlib import Path
-from src.data.classes.menu import Menu
-from src.data.query.menu import get_menus
 
 from .. import funcs as rift
-
+from ..data.classes import Menu
+from ..data.query import get_menus
 from ..env import TOKEN, __version__
 from ..ref import bot
 
