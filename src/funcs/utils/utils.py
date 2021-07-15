@@ -2,8 +2,6 @@ import random
 import string
 from asyncio import sleep
 
-from ..errors import BoolError, LinkError
-
 color_map = (
     "Beige",
     "Gray",
@@ -105,6 +103,8 @@ async def find(predicate, iterable):
 
 
 async def convert_bool(value):
+    from ..errors import BoolError
+
     if value.lower() in {"true", "yes", "approve", "go", "accept"}:
         return True
     if value.lower() in {"false", "no", "deny"}:
@@ -124,6 +124,8 @@ async def generate_code(length=16):
 
 
 async def convert_link(search):
+    from ..errors import LinkError
+
     if "politicsandwar" in search:
         return search.strip(string.ascii_letters + ".:/=")
     raise LinkError
