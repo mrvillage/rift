@@ -12,25 +12,26 @@ class ButtonFlags(BaseFlagConverter, case_insensitive=True):
     url: Optional[str]
     disabled: Optional[bool] = flag(default=False)
     style: Optional[str] = flag(aliases=["color"], default=2)
-    label: str = flag(aliases=["name"])
+    label: Optional[str] = flag(aliases=["name"])
     emoji: Optional[Union[PartialEmoji, Emoji]]
-    options: Tuple[str, ...]
+    options: Optional[Tuple[str, ...]]
     row: Optional[int]
     id: Optional[int]
 
 
 class SelectFlags(BaseFlagConverter, case_insensitive=True):
     placeholder: Optional[str]
-    min_values: Optional[int]
-    max_values: Optional[int]
+    min_values: Optional[int] = flag(default=1)
+    max_values: Optional[int] = flag(default=1)
     id: Optional[int]
+    row: Optional[int]
 
 
 class SelectOptionFlags(BaseFlagConverter, case_insensitive=True):
-    default: bool
-    description: str
-    emoji: Union[PartialEmoji, Emoji]
-    label: str = flag(name="label", aliases=["name"])
-    action: str
-    options: Tuple[str, ...]
+    default: Optional[bool] = flag(default=False)
+    description: Optional[str]
+    emoji: Optional[Union[PartialEmoji, Emoji]]
+    label: str = flag(aliases=["name"])
+    action: Optional[str]
+    options: Optional[Tuple[str, ...]]
     row: Optional[int]
