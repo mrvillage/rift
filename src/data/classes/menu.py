@@ -44,6 +44,7 @@ class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
     def default(cls, menu_id: int, owner_id: int) -> Menu:
         menu = cls(data=[menu_id, owner_id, None, None, None, None])
         menu.default = True
+        menu.items = [[], [], [], [], []]
         return menu
 
     async def _make_items(self) -> None:
