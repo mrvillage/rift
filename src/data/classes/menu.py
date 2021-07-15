@@ -90,7 +90,7 @@ class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
         else:
             await execute_query(
                 f"""
-            UPDATE menu_id SET
+            UPDATE menus SET
             menu_id = $1,
             owner_id = $2,
             name = $3,
