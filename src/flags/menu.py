@@ -7,7 +7,7 @@ from discord.ext.commands.flags import flag
 from .base import BaseFlagConverter
 
 
-class ButtonFlags(BaseFlagConverter):
+class ButtonFlags(BaseFlagConverter, case_insensitive=True):
     action: Optional[str]
     url: Optional[str]
     disabled: Optional[bool] = flag(default=False)
@@ -19,14 +19,14 @@ class ButtonFlags(BaseFlagConverter):
     id: Optional[int]
 
 
-class SelectFlags(BaseFlagConverter):
+class SelectFlags(BaseFlagConverter, case_insensitive=True):
     placeholder: Optional[str]
     min_values: Optional[int]
     max_values: Optional[int]
     id: Optional[int]
 
 
-class SelectOptionFlags(BaseFlagConverter):
+class SelectOptionFlags(BaseFlagConverter, case_insensitive=True):
     default: bool
     description: str
     emoji: Union[PartialEmoji, Emoji]
