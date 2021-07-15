@@ -11,17 +11,19 @@ class ButtonFlags(BaseFlagConverter):
     action: Optional[str]
     url: Optional[str]
     disabled: Optional[bool] = flag(default=False)
-    style: Optional[str] = flag(aliases=["color"])
+    style: Optional[str] = flag(aliases=["color"], default=2)
     label: str = flag(aliases=["name"])
     emoji: Optional[Union[PartialEmoji, Emoji]]
     options: Tuple[str, ...]
     row: Optional[int]
+    id: Optional[int]
 
 
 class SelectFlags(BaseFlagConverter):
     placeholder: Optional[str]
     min_values: Optional[int]
     max_values: Optional[int]
+    id: Optional[int]
 
 
 class SelectOptionFlags(BaseFlagConverter):
