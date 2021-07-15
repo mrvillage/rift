@@ -26,7 +26,7 @@ class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
         self.owner_id = data[1]
         self.name = data[2]
         self.description = data[3]
-        self.item_ids = loads(data[4])
+        self.item_ids = loads(data[4]) if data[4] else []
         self.permissions = loads(data[5]) if data[5] else {}
 
     @classmethod
@@ -42,7 +42,7 @@ class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
 
     @classmethod
     def default(cls, menu_id: int, owner_id: int) -> Menu:
-        menu = cls(data=[menu_id, owner_id, None, None, None])
+        menu = cls(data=[menu_id, owner_id, None, None, None, None])
         menu.default = True
         return menu
 
