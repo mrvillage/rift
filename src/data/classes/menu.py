@@ -15,6 +15,10 @@ from .base import Defaultable, Fetchable, Initable, Makeable, Saveable, Setable
 class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
     menu_id: str
     items: list[Mapping[str, Union[int, str]]]
+    name: str
+    description: str
+    item_ids: Sequence[Sequence[int]]
+    permissions: Mapping[str, Any]
 
     def __init__(self, *, data: Sequence[Any]) -> None:
         self.default = False
@@ -43,7 +47,7 @@ class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
         return menu
 
     async def _make_items(self) -> None:
-        self.items = [await MenuItem.fetch(i) for i in self.item_ids]
+        self.items = [[await MenuItem.fetch(j) for j in i] for i in self.item_ids]
 
     async def set_(self, **kwargs: Mapping[str, Any]) -> Menu:
         sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
@@ -103,8 +107,9 @@ class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
     async def get_view(self) -> ui.View:
         await self.make_attrs("items")
         self.view = ui.View(timeout=None)
-        for item in self.item_ids:
-            self.view.add_item(item.get_item())
+        for index, item_set in enumerate(self.items):
+            for item in item_set:
+                self.view.add_item(item.get_item(self.menu_id, index))
         return self.view
 
     def get_description_embed(self, ctx: Context) -> Embed:
@@ -133,7 +138,7 @@ class MenuItem(Fetchable, Initable, Saveable, Setable):
     async def fetch(cls, item_id: int) -> MenuItem:
         return cls(data=await get_menu_item(item_id=item_id))
 
-    def get_item(self, menu_id: int) -> Union[ui.Button, ui.Select]:
+    def get_item(self, menu_id: int, row: int) -> Union[ui.Button, ui.Select]:
         custom_id = f"{menu_id}-{self.item_id}"
         if self.type == "button":
             return ui.Button(
@@ -143,7 +148,7 @@ class MenuItem(Fetchable, Initable, Saveable, Setable):
                 custom_id=custom_id,
                 url=self.data["url"],
                 emoji=self.data["emoji"],
-                row=self.data["row"],
+                row=row,
             )
         elif self.type == "select":
             return ui.Select(
@@ -160,5 +165,5 @@ class MenuItem(Fetchable, Initable, Saveable, Setable):
                     )
                     for option in self.data["options"]
                 ],
-                row=self.data["row"],
+                row=row,
             )
