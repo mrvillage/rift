@@ -177,3 +177,15 @@ class MenuItem(Fetchable, Initable, Saveable, Setable):
                 ],
                 row=row,
             )
+
+    async def save(self) -> None:
+        await execute_query(
+            f"""
+        INSERT INTO menu_items (item_id, owner_id, type_, data_) VALUES ($1, $2, $3, $4, $5, $6);
+        """,
+            self.item_id,
+            self.owner_id,
+            self.type,
+            dumps(self.data_),
+        )
+        return self
