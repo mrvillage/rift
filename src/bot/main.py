@@ -54,6 +54,7 @@ def main():
         print(f"Loaded {cog}!")
     bot.unload_extension("src.bot.cogs.database")
     bot.unload_extension("src.bot.cogs.server")
+    bot.unload_extension("src.bot.cogs.menus")
 
     bot.persistent_views_loaded = False
     bot.loop.create_task(bot.update_pnw_session())
