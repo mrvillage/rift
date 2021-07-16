@@ -5,7 +5,7 @@ async def get_nation(search):
     from ..classes import Nation
 
     nation = await execute_read_query(
-        "SELECT * FROM nations WHERE LOWER(nation) = LOWER($1);", search
+        "SELECT * FROM nations WHERE LOWER(name) = LOWER($1);", search
     )
     if nation:
         return await Nation.fetch(nation[0][0])
