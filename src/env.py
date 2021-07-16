@@ -1,4 +1,4 @@
-__version__ = "Alpha 3.1.0"
+__version__ = "Alpha 4.0.0"
 
 import os
 
