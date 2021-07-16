@@ -215,8 +215,6 @@ class Military(commands.Cog):
             """,
             title=f"Militarization Graph for {alliance.name} (`{alliance.id}`)",
             image_url=f"attachment://militarization_{alliance.id}.png",
-            timestamp=self.bot.nations_update,
-            footer="Data collected at",
             fields=[
                 {
                     "name": "Soldiers",
@@ -255,8 +253,6 @@ class Military(commands.Cog):
                 author,
                 f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}%\nShip Militarization: {militarization['ships']*100:.2f}%",
                 title=f"Militarization for {nation.name} (`{nation.id}`)",
-                timestamp=self.bot.nations_update,
-                footer="Data collected at",
                 fields=[
                     {
                         "name": "Soldiers",
@@ -283,8 +279,6 @@ class Military(commands.Cog):
                 author,
                 f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}%\nShip Militarization: {militarization['ships']*100:.2f}%",
                 title=f"Militarization for {nation.name} (`{nation.id}`)",
-                timestamp=self.bot.nations_update,
-                footer="Data collected at",
                 fields=[
                     {
                         "name": "Soldiers",

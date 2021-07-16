@@ -61,11 +61,11 @@ class PnWInfo(commands.Cog):
                 )
             )
             raise AllianceNotFoundError
-        members = alliance.list_members(vm=False)
+        await alliance.make_attrs("members")
         full = (
             "\n".join(
                 f'[{i+1}. {member.id} | {member.name} | {member.score:,.2f}](https://politicsandwar.com/nation/id={member.id} "https://politicsandwar.com/nation/id={member.id}")'
-                for i, member in enumerate(members)
+                for i, member in enumerate(alliance.members)
             )
             + "\n"
         )
@@ -86,7 +86,6 @@ class PnWInfo(commands.Cog):
         embed = rift.get_embed_author_member(
             ctx.author,
             f"You can find the full list [here](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\").",
-            timestamp=self.bot.nations_update,
             fields=fields,
             title=alliance.name,
         )

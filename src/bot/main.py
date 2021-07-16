@@ -55,6 +55,7 @@ def main():
     bot.unload_extension("src.bot.cogs.database")
     bot.unload_extension("src.bot.cogs.server")
     bot.unload_extension("src.bot.cogs.menus")
+    bot.unload_extension("src.bot.cogs.revenue")
 
     bot.persistent_views_loaded = False
     bot.loop.create_task(bot.update_pnw_session())
