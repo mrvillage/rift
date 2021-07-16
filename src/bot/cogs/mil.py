@@ -195,6 +195,7 @@ class Military(commands.Cog):
                 )
             )
             return
+        await alliance.make_attrs("members", "member_count")
         async with ctx.typing():
             async with aiohttp.request(
                 "GET", f"https://checkapi.bsnk.dev/getChart?allianceID={alliance.id}"

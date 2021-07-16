@@ -61,43 +61,39 @@ class Alliance(Embedable, Fetchable, Initable, Makeable):
         return self
 
     def get_militarization(self, vm=None):
-        cities = sum(i.cities for i in self.members)
+        cities = sum(i.cities for i in self.members if not i.v_mode)
         militarization = {
-            "soldiers": sum(i.soldiers for i in self.members) / (cities * 15000),
-            "tanks": sum(i.tanks for i in self.members) / (cities * 1250),
-            "aircraft": sum(i.aircraft for i in self.members) / (cities * 75),
-            "ships": sum(i.ships for i in self.members) / (cities * 15),
+            "soldiers": sum(i.soldiers for i in self.members if not i.v_mode)
+            / (cities * 15000),
+            "tanks": sum(i.tanks for i in self.members if not i.v_mode)
+            / (cities * 1250),
+            "aircraft": sum(i.aircraft for i in self.members if not i.v_mode)
+            / (cities * 75),
+            "ships": sum(i.ships for i in self.members if not i.v_mode) / (cities * 15),
         }
         militarization["total"] = sum(militarization.values()) / 4
         return militarization
 
     def get_soldiers(self, vm=None):
-        members = self.list_members(vm=vm)
-        return sum(i.soldiers for i in members)
+        return sum(i.soldiers for i in self.members if not i.v_mode)
 
     def get_tanks(self, vm=None):
-        members = self.list_members(vm=vm)
-        return sum(i.tanks for i in members)
+        return sum(i.tanks for i in self.members if not i.v_mode)
 
     def get_aircraft(self, vm=None):
-        members = self.list_members(vm=vm)
-        return sum(i.aircraft for i in members)
+        return sum(i.aircraft for i in self.members if not i.v_mode)
 
     def get_ships(self, vm=None):
-        members = self.list_members(vm=vm)
-        return sum(i.ships for i in members)
+        return sum(i.ships for i in self.members if not i.v_mode)
 
     def get_missiles(self, vm=None):
-        members = self.list_members(vm=vm)
-        return sum(i.missiles for i in members)
+        return sum(i.missiles for i in self.members if not i.v_mode)
 
     def get_nukes(self, vm=None):
-        members = self.list_members(vm=vm)
-        return sum(i.nukes for i in members)
+        return sum(i.nukes for i in self.members if not i.v_mode)
 
     def get_cities(self, vm=None):
-        members = self.list_members(vm=vm)
-        return sum(i.cities for i in members)
+        return sum(i.cities for i in self.members if not i.v_mode)
 
     def __str__(self):
         return self.name
