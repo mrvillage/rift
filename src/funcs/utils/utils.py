@@ -103,7 +103,7 @@ async def find(predicate, iterable):
 
 
 async def convert_bool(value):
-    from ..errors import BoolError
+    from ...errors import BoolError
 
     if value.lower() in {"true", "yes", "approve", "go", "accept"}:
         return True
@@ -124,7 +124,7 @@ async def generate_code(length=16):
 
 
 async def convert_link(search):
-    from ..errors import LinkError
+    from ...errors import LinkError
 
     if "politicsandwar" in search:
         return search.strip(string.ascii_letters + ".:/=")
