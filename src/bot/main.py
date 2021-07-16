@@ -58,5 +58,5 @@ def main():
     bot.persistent_views_loaded = False
     bot.loop.create_task(bot.update_pnw_session())
     bot.loop.create_task(bot.get_staff())
-    bot.command_prefix = "!!"
+    # bot.command_prefix = "!!"
     bot.run(TOKEN)
