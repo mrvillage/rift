@@ -169,7 +169,7 @@ class Alliance(Embedable, Fetchable, Initable, Makeable):
         self.calculated_score = sum(i.score for i in self.members if not i.v_mode)
 
     async def _make_member_count(self) -> None:
-        self.member_count = len(i for i in self.members if not i.v_mode)
+        self.member_count = len([i for i in self.members if not i.v_mode])
 
     async def _make_treaties(self) -> None:
         from .treaty import Treaties
