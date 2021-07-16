@@ -7,7 +7,7 @@ async def get_nation(*, nation_id=None, nation_name=None):
             await execute_read_query(
                 f"""
             SELECT * FROM nations
-            WHERE nation_id = $1;
+            WHERE id = $1;
         """,
                 int(nation_id),
             )
@@ -17,7 +17,7 @@ async def get_nation(*, nation_id=None, nation_name=None):
             await execute_read_query(
                 f"""
             SELECT * FROM nations
-            WHERE LOWER(nation) = LOWER($1);
+            WHERE LOWER(name) = LOWER($1);
         """,
                 str(nation_name),
             )
