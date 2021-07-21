@@ -63,6 +63,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                 )
             )
             return
+        await rift.add_link(user.id, nation.id)
         await ctx.reply(
             embed=rift.get_embed_author_member(
                 user,
