@@ -1,12 +1,14 @@
 import asyncio
-from src.data.query.alliance import get_alliances
-from src.data.classes.alliance import Alliance
+from typing import Union
 
 import discord
 from discord.ext import commands
 
 from ... import funcs as rift
+from ...data.classes import Alliance
 from ...data.db import execute_query
+from ...data.query import get_alliances
+from ...errors import NationNotFoundError
 
 
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):
@@ -29,6 +31,42 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         await ctx.send(
             embed=rift.get_embed_author_member(
                 user, f"{user.mention} has been unlinked from nation `{nation.id}`."
+            )
+        )
+
+    @commands.command(name="force-link", aliases=["force-verify"])
+    async def force_link(
+        self, ctx, nation, user: Union[discord.Member, discord.User] = None
+    ):
+        try:
+            nation = await rift.search_nation(ctx, nation)
+        except NationNotFoundError:
+            await ctx.reply(
+                embed=rift.get_embed_author_member(
+                    ctx.author, f"No nation found with argument `{nation}`."
+                )
+            )
+            return
+        user = ctx.author if user is None else user
+        links = await rift.get_links()
+        if any(user.id in tuple(i) for i in links):
+            await ctx.reply(
+                embed=rift.get_embed_author_member(
+                    user, f"{user.mention} is already linked!"
+                )
+            )
+            return
+        if any(user.id in tuple(i) for i in links):
+            await ctx.reply(
+                embed=rift.get_embed_author_member(
+                    user, f"Nation `{nation.id}` is already linked!"
+                )
+            )
+            return
+        await ctx.reply(
+            embed=rift.get_embed_author_member(
+                user,
+                f"Success! {user.mention} is now linked to nation `{nation.id}`!",
             )
         )
 
