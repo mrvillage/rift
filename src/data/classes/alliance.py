@@ -196,7 +196,7 @@ class Alliance(Embedable, Fetchable, Initable, Makeable):
             {"name": "Rank", "value": f"#{self.rank}"},
             {
                 "name": "Members",
-                "value": f"[{len(self.members):,}](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\")",
+                "value": f"[{self.member_count:,}](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\")",
             },
             {"name": "Score", "value": f"{self.calculated_score:,.2f}"},
             {
