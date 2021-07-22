@@ -49,6 +49,7 @@ async def rift_about(ctx):
 def main():
     cogPath = Path.cwd() / "src" / "bot" / "cogs"
     cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
+    cogs = [i for i in cogs if i != "__init__"]
     for cog in cogs:
         bot.load_extension(f"src.bot.cogs.{cog}")
         print(f"Loaded {cog}!")
