@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 from ... import find
-from ... import funcs as rift
+from ... import funcs
 from ...data.classes import Alliance, Nation
 from ...errors import AllianceNotFoundError, NationNotFoundError
 
@@ -44,7 +44,7 @@ class PnWInfo(commands.Cog):
                 await find.search_alliance(ctx, search)
                 await ctx.invoke(self.alliance, alliance=search)
             except AllianceNotFoundError:
-                embed = rift.get_embed_author_member(
+                embed = funcs.get_embed_author_member(
                     ctx.author, f"No nation or alliance found with argument `{search}`."
                 )
                 await ctx.reply(embed=embed)
@@ -53,10 +53,10 @@ class PnWInfo(commands.Cog):
     async def members(self, ctx, *, search=None):
         search = str(ctx.author.id) if search is None else search
         try:
-            alliance = await rift.search_alliance(ctx, search)
+            alliance = await funcs.search_alliance(ctx, search)
         except AllianceNotFoundError:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, f"No alliance found with argument `{search}`."
                 )
             )
@@ -72,7 +72,7 @@ class PnWInfo(commands.Cog):
         fields = []
         if len(full) >= 6000:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author,
                     f"There's too many members to display! You can find the full list [here](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\").",
                     title=alliance.name,
@@ -83,7 +83,7 @@ class PnWInfo(commands.Cog):
             i = full[:1024].rfind("\n")
             fields.append({"name": "\u200b", "value": full[: i + 1].strip("\n")})
             full = full[i + 1 :]
-        embed = rift.get_embed_author_member(
+        embed = funcs.get_embed_author_member(
             ctx.author,
             f"You can find the full list [here](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\").",
             fields=fields,
@@ -100,7 +100,7 @@ class PnWInfo(commands.Cog):
         alliance = await Alliance.convert(ctx, alliance)
         await alliance.make_attrs("treaties")
         await ctx.reply(
-            embed=rift.get_embed_author_member(ctx.author, str(alliance.treaties))
+            embed=funcs.get_embed_author_member(ctx.author, str(alliance.treaties))
         )
 
 
