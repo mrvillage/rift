@@ -6,4 +6,5 @@ from .database import *
 from .message import *
 from .nation import *
 from .perms import *
+from .spies import *
 from .utils import *
