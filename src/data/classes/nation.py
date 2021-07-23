@@ -165,7 +165,7 @@ class Nation(Embedable, Fetchable, Initable, Makeable):
         except IndexError:
             raise NationNotFoundError
 
-    async def _make_alliance(self) -> Alliance:
+    async def _make_alliance(self) -> None:
         from .alliance import Alliance
 
         if self.alliance_id != 0:
