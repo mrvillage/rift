@@ -3,6 +3,7 @@ __version__ = "Alpha 4.0.0"
 import os
 
 from dotenv import load_dotenv
+from pnwkit import set_key
 
 load_dotenv()
 
@@ -21,3 +22,5 @@ DBPASSWORD = os.getenv("db_password")
 DBNAME = os.getenv("db_name")
 SOCKET_PORT = os.getenv("socket_port")
 SOCKET_IP = os.getenv("socket_ip")
+
+set_key(APIKEY)
