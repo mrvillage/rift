@@ -1,0 +1,6 @@
+git+git://github.com/Rapptz/discord.py.git
+asyncpg
+beautifulsoup4
+pnwkit
+git+https://github.com/Rapptz/discord-ext-menus
+python-dotenv
