@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from discord.ext import commands
 
 from ... import funcs as rift
 from ...data.classes import TradePrices
+from ...views import Margins
 
 
 class Trade(commands.Cog):
@@ -136,6 +139,7 @@ class Trade(commands.Cog):
     async def trade_margins(self, ctx):
         prices: TradePrices = await rift.get_trade_prices()
         await ctx.reply(
+            view=Margins(),
             embed=rift.get_embed_author_member(
                 ctx.author,
                 f"Market Index: ${prices.market_index:,}",
@@ -215,7 +219,7 @@ class Trade(commands.Cog):
                 """,
                     },
                 ],
-            )
+            ),
         )
 
 
