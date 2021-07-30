@@ -140,10 +140,10 @@ async def register_slash_command(
     from .ref import bot
 
     bot.global_application_commands.append(
-        # await bot.http.upsert_global_command(
-        await bot.http.upsert_guild_command(
+        await bot.http.upsert_global_command(
+            # await bot.http.upsert_guild_command(
             bot.application_id,
-            654109011473596417,
+            # 654109011473596417,
             {
                 "name": command.name,
                 "description": command.description or command.name,
