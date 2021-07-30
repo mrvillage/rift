@@ -1,6 +1,7 @@
 import random
 import string
 from asyncio import sleep
+from typing import Mapping
 
 color_map = (
     "Beige",
@@ -164,3 +165,48 @@ resources = (
 
 async def check_resource(arg):
     return arg.lower() in resources
+
+
+durations = {"w": "weeks", "d": "days", "h": "hours", "m": "minutes", "s": "seconds"}
+
+
+def parse_time(time: str) -> Mapping[str, int]:
+    time = time.lower().replace(",", "").replace(".", "")
+    w = time.index("w") if "w" in time else -2
+    d = time.index("d") if "d" in time else -2
+    h = time.index("h") if "h" in time else -2
+    m = time.index("m") if "m" in time else -2
+    s = time.index("s") if "s" in time else -2
+    indexes = {"start": -1, "w": w, "d": d, "h": h, "m": m, "s": s}
+    indexes = {key: value for key, value in indexes.items() if value != -2}
+    keys = sorted(indexes, key=lambda x: indexes[x])
+    if len(keys) == 1:
+        raise ValueError("No valid time was specified")
+    kwargs = {}
+    for index in range(1, len(keys)):
+        duration = durations[keys[index]]
+        value = time[indexes[keys[index - 1]] + 1 : indexes[keys[index]]]
+        kwargs[duration] = int(value)
+    return kwargs
+
+
+def convert_seconds_to_text(seconds: float) -> str:
+    if seconds < 60:
+        return f"{seconds:,.2f} seconds"
+    minutes = int(seconds // 60)
+    seconds -= minutes * 60
+    if minutes < 60:
+        return f"{minutes} minutes, and {seconds:,.2f} seconds"
+    hours = int(minutes // 60)
+    minutes -= hours * 60
+    if hours < 24:
+        return f"{hours} hours, {minutes} minutes, and {seconds:,.2f} seconds"
+    days = int(hours // 24)
+    hours -= days * 24
+    if days < 7:
+        return (
+            f"{days} days, {hours} hours, {minutes} minutes, and {seconds:,.2f} seconds"
+        )
+    weeks = int(days // 7)
+    days -= weeks * 7
+    return f"{weeks} weeks, {days} days, {hours} hours, {minutes} minutes, and {seconds:,.2f} seconds"
