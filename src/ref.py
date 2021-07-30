@@ -46,7 +46,7 @@ class Rift(Bot):
 
     async def parse_token(self, content):
         data = BeautifulSoup(content, "html.parser")
-        self.auth_token = data.find("input", {"name": "token"}).attrs["value"]
+        self.auth_token = data.find("input", {"name": "token"}).attrs["value"]  # type: ignore
 
     async def get_guild_prefix(self, guild_id):
         prefixes = [
@@ -60,6 +60,16 @@ class Rift(Bot):
         return default_prefixes
 
     get_guild_prefixes = get_guild_prefix
+
+    async def get_slash_commands(self):
+        from .env import TOKEN
+
+        async with aiohttp.request(
+            "GET",
+            f"https://discord.com/api/v9/applications/{self.application_id}/commands",
+            headers={"Authorization": f"Bot {TOKEN}"},
+        ) as response:
+            self.slash_commands = await response.json()
 
 
 default_prefixes = ["?"]
