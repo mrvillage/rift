@@ -100,6 +100,7 @@ def convert_slash_command_type(type_: type) -> int:
         return 8
     if type_ is float:
         return 10
+    return 3
 
 
 # "<command name>-<argument name>": description
