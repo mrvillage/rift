@@ -27,12 +27,23 @@ async def on_raw_message_edit(payload):
 
 @bot.event
 async def on_ready():
-    if bot.persistent_views_loaded:
+    if not bot.persistent_views_loaded:
         views = await get_menus()
         views = [Menu(data=i) for i in views]
         for view in views:
             bot.add_view(await view.get_view())
         bot.persistent_view_loaded = True
+    if not bot.cogs_added:
+        cogPath = Path.cwd() / "src" / "bot" / "cogs"
+        cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
+        cogs = [i for i in cogs if i != "__init__"]
+        for cog in cogs:
+            bot.load_extension(f"src.bot.cogs.{cog}")
+            print(f"Loaded {cog}!")
+        bot.unload_extension("src.bot.cogs.database")
+        bot.unload_extension("src.bot.cogs.server")
+        bot.unload_extension("src.bot.cogs.menus")
+        bot.unload_extension("src.bot.cogs.revenue")
     print("Startup complete!")
 
 
@@ -47,17 +58,8 @@ async def rift_about(ctx):
 
 
 def main():
-    cogPath = Path.cwd() / "src" / "bot" / "cogs"
-    cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
-    cogs = [i for i in cogs if i != "__init__"]
-    for cog in cogs:
-        bot.load_extension(f"src.bot.cogs.{cog}")
-        print(f"Loaded {cog}!")
-    bot.unload_extension("src.bot.cogs.database")
-    bot.unload_extension("src.bot.cogs.server")
-    bot.unload_extension("src.bot.cogs.menus")
-    bot.unload_extension("src.bot.cogs.revenue")
 
+    bot.cogs_loaded = False
     bot.persistent_views_loaded = False
     bot.loop.create_task(bot.update_pnw_session())
     bot.loop.create_task(bot.get_staff())
