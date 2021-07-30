@@ -22,10 +22,12 @@ class PnWInfo(commands.Cog):
         nation = await Nation.convert(ctx, nation)
         await ctx.reply(embed=await nation.get_info_embed(ctx))
 
+    @commands._slash  # type: ignore
     @commands.command(name="me")
     async def me(self, ctx):
         await ctx.invoke(self.nation, nation=None)
 
+    @commands._slash  # type: ignore
     @commands.command(
         name="alliance",
         aliases=["a"],
@@ -36,6 +38,7 @@ class PnWInfo(commands.Cog):
         alliance = await Alliance.convert(ctx, alliance)
         await ctx.reply(embed=await alliance.get_info_embed(ctx))
 
+    @commands._slash  # type: ignore
     @commands.command(name="who", alises=["w", "who-is", "whois"])
     async def who(self, ctx, *, search=None):
         try:
@@ -51,6 +54,7 @@ class PnWInfo(commands.Cog):
                 )
                 await ctx.reply(embed=embed)
 
+    @commands._slash  # type: ignore
     @commands.command(name="members")
     async def members(self, ctx, *, search=None):
         search = str(ctx.author.id) if search is None else search
@@ -93,6 +97,7 @@ class PnWInfo(commands.Cog):
         )
         await ctx.reply(embed=embed)
 
+    @commands._slash  # type: ignore
     @commands.command(
         name="treaties",
         aliases=["t", "treaty"],
@@ -105,6 +110,7 @@ class PnWInfo(commands.Cog):
             embed=funcs.get_embed_author_member(ctx.author, str(alliance.treaties))
         )
 
+    @commands._slash  # type: ignore
     @commands.command(name="spies")
     async def spies(self, ctx, *, nation: Nation):
         message = await ctx.reply(
