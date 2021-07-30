@@ -2,11 +2,11 @@ import datetime
 
 import aiohttp
 from bs4 import BeautifulSoup
-from discord import AllowedMentions, Game, Intents
+from discord import AllowedMentions, Game, Intents, Object
 from discord.ext.commands import Bot, when_mentioned_or
 
 from .data.db import execute_read_query
-from .env import EMAIL, PASSWORD, __version__
+from .env import APPLICATION_ID, EMAIL, PASSWORD, __version__
 from .errors import LoginError
 from .help import EmbedHelpCommand
 
@@ -61,15 +61,11 @@ class Rift(Bot):
 
     get_guild_prefixes = get_guild_prefix
 
-    async def get_slash_commands(self):
-        from .env import TOKEN
-
-        async with aiohttp.request(
-            "GET",
-            f"https://discord.com/api/v9/applications/{self.application_id}/commands",
-            headers={"Authorization": f"Bot {TOKEN}"},
-        ) as response:
-            self.slash_commands = await response.json()
+    async def get_global_application_commands(self):
+        self.application_id: int
+        self.global_application_commands = await bot.http.get_global_commands(
+            self.application_id
+        )
 
 
 default_prefixes = ["?"]
@@ -88,4 +84,5 @@ bot = Rift(
     activity=Game(name=__version__),
     strip_after_prefix=True,
     help_command=EmbedHelpCommand(),
+    application_id=APPLICATION_ID,
 )

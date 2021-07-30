@@ -22,5 +22,6 @@ DBPASSWORD = os.getenv("db_password")
 DBNAME = os.getenv("db_name")
 SOCKET_PORT = os.getenv("socket_port")
 SOCKET_IP = os.getenv("socket_ip")
+APPLICATION_ID = os.getenv("application_id")
 
 set_key(APIKEY)
