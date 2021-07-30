@@ -1,10 +1,19 @@
+from __future__ import annotations
+
+from datetime import datetime
+
 import discord
+from typing import Sequence, Mapping, TYPE_CHECKING, Union, cast
 
 from ..env import COLOR, FOOTER
 
 
-def add_fields(embed, fields):
+def add_fields(
+    embed: discord.Embed, fields: Sequence[Mapping[str, Union[bool, str]]]
+) -> discord.Embed:
     for field in fields:
+        if TYPE_CHECKING:
+            assert isinstance(field["inline"], bool)
         embed.add_field(
             name=field["name"],
             value=field["value"],
@@ -13,44 +22,23 @@ def add_fields(embed, fields):
     return embed
 
 
-def get_embed(title: str):
-    return discord.Embed(title=title, COLOR=COLOR).set_footer(text=FOOTER)
-
-
-def get_embed_author(
-    author_name,
-    author_icon_url,
-    description,
-    color=COLOR,
-    timestamp=None,
-    footer=FOOTER,
-):
-    return (
-        discord.Embed(
-            color=color,
-            description=description,
-            timestamp=discord.utils.utcnow() if timestamp is None else timestamp,
-        )
-        .set_footer(text=footer)
-        .set_author(name=author_name, icon_url=author_icon_url)
-    )
-
-
 def get_embed_author_member(
-    member,
-    description=discord.Embed.Empty,
-    color=COLOR,
-    timestamp=None,
-    footer=FOOTER,
-    title=discord.Embed.Empty,
-    fields=[],
-    image_url=discord.Embed.Empty,
-):
+    member: Union[discord.Member, discord.User],
+    description: Union[str, discord.embeds._EmptyEmbed] = discord.Embed.Empty,
+    color: Union[discord.Color, int] = COLOR,
+    timestamp: datetime = None,
+    footer: str = FOOTER,
+    title: Union[str, discord.embeds._EmptyEmbed] = discord.Embed.Empty,
+    fields: Sequence[Mapping[str, str]] = [],
+    image_url: Union[str, discord.embeds._EmptyEmbed] = discord.Embed.Empty,
+) -> discord.Embed:
+    if isinstance(member, discord.Member):
+        member = member._user
     return add_fields(
         discord.Embed(
             color=color,
             description=description,
-            timestamp=discord.utils.utcnow() if timestamp is None else timestamp,
+            timestamp=timestamp or discord.utils.utcnow(),
             title=title,
         )
         .set_footer(text=footer)
@@ -64,42 +52,26 @@ def get_embed_author_member(
 
 
 def get_embed_author_guild(
-    guild,
-    description=discord.Embed.Empty,
-    color=COLOR,
-    timestamp=None,
-    footer=FOOTER,
-    title=discord.Embed.Empty,
-    fields=[],
-    image_url=discord.Embed.Empty,
-):
+    guild: discord.Guild,
+    description: Union[str, discord.embeds._EmptyEmbed] = discord.Embed.Empty,
+    color: Union[discord.Color, int] = COLOR,
+    timestamp: datetime = None,
+    footer: str = FOOTER,
+    title: Union[str, discord.embeds._EmptyEmbed] = discord.Embed.Empty,
+    fields: Sequence[Mapping[str, str]] = [],
+    image_url: Union[str, discord.embeds._EmptyEmbed] = discord.Embed.Empty,
+) -> discord.Embed:
+    if TYPE_CHECKING:
+        assert isinstance(guild.icon, discord.Asset)
     return add_fields(
         discord.Embed(
             color=color,
             description=description,
-            timestamp=discord.utils.utcnow() if timestamp is None else timestamp,
+            timestamp=timestamp or discord.utils.utcnow(),
             title=title,
         )
         .set_footer(text=footer)
         .set_author(name=guild.name, icon_url=str(guild.icon.url))
         .set_image(url=image_url),
         fields,
-    )
-
-
-def get_embed_no_title():
-    return discord.Embed(COLOR=COLOR).set_footer(text=FOOTER)
-
-
-def get_embed_check_dm_page_author_member(author):
-    return get_embed_author_member(author, f"Please check your Direct Messages!")
-
-
-def get_embed_send_dm_error_page_author_member(author):
-    return get_embed_author_member(author, f"I couldn't send you a Direct Message!")
-
-
-def add_timed_out_page(message):
-    return message.embeds[0].add_field(
-        name="Timed Out", value="The command timed out.", inline=False
     )
