@@ -33,7 +33,8 @@ async def on_ready():
         for view in views:
             bot.add_view(await view.get_view())
         bot.persistent_view_loaded = True
-    if not bot.cogs_added:
+    if not bot.cogs_loaded:
+        await bot.get_global_application_commands()
         cogPath = Path.cwd() / "src" / "bot" / "cogs"
         cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
         cogs = [i for i in cogs if i != "__init__"]
