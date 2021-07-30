@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import inspect
-from typing import Any, Coroutine, Dict, List
+from typing import Any, Coroutine, Dict, List, Union
 
 import discord
 from discord.ext.commands.converter import _actual_conversion
@@ -43,11 +43,25 @@ async def parse_arguments(
         name = option["name"]
         value = option["value"]
         if option["type"] in {1, 2, 3, 4, 5, 10}:
+            ctx.args.append(value)
+            ctx.kwargs[name] = value
             continue
         conv = coro.__annotations__.get(option["name"], None)
         if conv is None:
             ctx.args.append(value)
             ctx.kwargs[name] = value
+        elif conv is Union:
+            for c in conv.__dict__["__args__"]:
+                try:
+                    arg = await _actual_conversion(ctx, c, value, FakeParam(name))
+                except Exception:
+                    continue
+                else:
+                    ctx.args.append(arg)
+                    ctx.kwargs[name] = arg
+                    break
+            else:
+                raise commands.BadArgument(f"Could not parse {value} as {conv}")
         else:
             arg = await _actual_conversion(ctx, conv, value, FakeParam(name))
             ctx.args.append(arg)
@@ -95,10 +109,10 @@ class Interactions(commands.Cog):
                     ctx, command._callback, interaction.data.get("options", [])  # type: ignore
                 )
             await command.call_before_hooks(ctx)
-        except:
+        except Exception as error:
             if command._max_concurrency is not None:
                 await command._max_concurrency.release(ctx)
-            raise
+            await command.dispatch_error(ctx, error)
         try:
             await ctx.invoke(command, **ctx.kwargs)
         except Exception as error:
