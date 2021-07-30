@@ -3,10 +3,9 @@ from __future__ import annotations
 from json import dumps, loads
 from typing import Any, Mapping, Sequence, Union
 
-from discord import Embed, Message
+from discord import Embed, Message, ui
 from discord.ext.commands import Context
 
-from ... import ui
 from ..db import execute_query
 from ..query import get_menu, get_menu_item, insert_interface
 from .base import Defaultable, Fetchable, Initable, Makeable, Saveable, Setable
