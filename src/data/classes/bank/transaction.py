@@ -146,12 +146,12 @@ class CompletedTransaction(Transaction):
         self.munitions = self.data["munitions"]
         self.steel = self.data["steel"]
         self.aluminum = self.data["aluminum"]
-        if self.sender_type == 1:
-            self.sender = Nation.fetch(self.sender_id)
-        elif self.sender_type == 2:
-            self.sender = Nation.fetch(self.sender_id)
-        if self.receiver_type == 1:
-            self.receiver = Nation.fetch(self.receiver_id)
-        elif self.receiver_type == 2:
-            self.receiver = Nation.fetch(self.receiver_id)
-        self.banker = Nation.fetch(self.banker_id)
+        # if self.sender_type == 1:
+        #     self.sender = await Nation.fetch(self.sender_id)
+        # elif self.sender_type == 2:
+        #     self.sender = await Nation.fetch(self.sender_id)
+        # if self.receiver_type == 1:
+        #     self.receiver = await Nation.fetch(self.receiver_id)
+        # elif self.receiver_type == 2:
+        #     self.receiver = await Nation.fetch(self.receiver_id)
+        # self.banker = await Nation.fetch(self.banker_id)
