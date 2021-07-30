@@ -16,10 +16,10 @@ from discord.ext.commands.converter import CONVERTER_MAPPING, _convert_to_bool
 async def _actual_conversion(
     ctx: Context, converter: Any, argument: str, param: inspect.Parameter
 ) -> Any:
-    from .funcs.utils import convert_number
+    from .funcs.utils import convert_bool, convert_number
 
     if converter is bool:
-        return _convert_to_bool(argument)
+        return convert_bool(argument)
 
     if converter is int or converter is float:
         try:
@@ -33,12 +33,6 @@ async def _actual_conversion(
             raise BadArgument(
                 f'Converting to "{name}" failed for parameter "{param.name}".'
             ) from exc
-
-    if converter is int:
-        return int(num)
-
-    if converter is float:
-        return float(num)
 
     try:
         module = converter.__module__
