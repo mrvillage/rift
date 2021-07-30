@@ -1,3 +1,4 @@
+from src.errors.spies import SpiesNotFoundError
 import discord
 from discord.ext import commands
 
@@ -11,6 +12,7 @@ class PnWInfo(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands._slash  # type: ignore
     @commands.command(
         name="nation",
         aliases=["n", "check-link", "checklink", "nat"],
@@ -101,6 +103,21 @@ class PnWInfo(commands.Cog):
         await alliance.make_attrs("treaties")
         await ctx.reply(
             embed=funcs.get_embed_author_member(ctx.author, str(alliance.treaties))
+        )
+
+    @commands.command(name="spies")
+    async def spies(self, ctx, *, nation: Nation):
+        message = await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author, f"Fetching spies for {repr(nation)}..."
+            )
+        )
+        num = await funcs.calculate_spies(nation)
+        await message.edit(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"{repr(nation)} has **{num}** spies.",
+            )
         )
 
 
