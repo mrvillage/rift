@@ -6,6 +6,7 @@ from ..data.classes import Menu
 from ..data.query import get_menus
 from ..env import TOKEN, __version__
 from ..ref import bot
+from ..views import Margins
 
 
 @bot.event
@@ -32,7 +33,9 @@ async def on_ready():
         views = [Menu(data=i) for i in views]
         for view in views:
             bot.add_view(await view.get_view())
+        bot.add_view(Margins())
         bot.persistent_view_loaded = True
+
     if not bot.cogs_loaded:
         await bot.get_global_application_commands()
         cogPath = Path.cwd() / "src" / "bot" / "cogs"
