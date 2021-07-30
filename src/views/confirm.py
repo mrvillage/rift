@@ -19,12 +19,12 @@ class Confirm(ui.View):
         self.value = None
 
     @ui.button(label="Yes", style=ButtonStyle.green)
-    async def yes(self, button: ui.Button, interaction: Interaction) -> None:
+    async def yes(self, button: ui.Button, interaction: Interaction):
         self.interaction = interaction
         self.value = True
         self.stop()
 
     @ui.button(label="No", style=ButtonStyle.red)
-    async def no(self, button: ui.Button, interaction: Interaction) -> None:
+    async def no(self, button: ui.Button, interaction: Interaction):
         self.interaction = interaction
         self.value = False
