@@ -12,6 +12,7 @@ from .nation import *
 from .parse import *
 from .server import *
 from .settings import *
+from .spies import *
 from .targets import *
 from .trade import *
 from . import utils
