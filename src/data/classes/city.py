@@ -37,7 +37,7 @@ class City(Base):
         from .nation import Nation
 
         try:
-            self.nation = Nation.fetch(self.nation_id)
+            self.nation = await Nation.fetch(self.nation_id)
         except IndexError:
             self.nation = None
 
