@@ -178,6 +178,7 @@ class Military(commands.Cog):
             )
         )
 
+    @commands._slash  # type: ignore
     @commands.group(
         name="militarization",
         aliases=["m", "mil", "military"],
@@ -232,7 +233,8 @@ class Military(commands.Cog):
         )
         await ctx.send(file=image, embed=embed)
 
-    @commands.command(name="mn", hidden=True)
+    @commands._slash  # type: ignore
+    @commands.command(name="militarization-nation", aliases=["mn"], hidden=True)
     async def mn_shortcut(self, ctx: commands.Context, *, search=None):
         await ctx.invoke(self.militarization_nation, search=search)
 

@@ -11,12 +11,13 @@ class Link(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands._slash  # type: ignore
     @commands.command(
         name="link",
         aliases=["verify", "validate"],
         help="Links your Politics and War nation to your Discord account.",
     )
-    async def link(self, ctx, nation, user: Union[discord.Member, discord.User] = None):
+    async def link(self, ctx, nation, user: discord.User = None):
         try:
             nation = await rift.search_nation(ctx, nation)
         except NationNotFoundError:
@@ -42,10 +43,10 @@ class Link(commands.Cog):
                 )
             )
             return
+        message = await ctx.reply(
+            embed=rift.get_embed_author_member(user, "Fetching Discord username...")
+        )
         try:
-            message = await ctx.reply(
-                embed=rift.get_embed_author_member(user, "Fetching Discord username...")
-            )
             name = await nation.get_discord_page_username()
             if name == f"{user.name}#{user.discriminator}":
                 await rift.add_link(user.id, nation.id)
