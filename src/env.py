@@ -8,9 +8,9 @@ from pnwkit import set_key
 load_dotenv()
 
 TOKEN = str(os.getenv("Rift_discord_token"))
-PATH = f"{os.getcwd()}")
+PATH = f"{os.getcwd()}"
 FOOTER = str(os.getenv("footer"))
-COLOR = int(os.getenv("color")))
+COLOR = int(os.getenv("color"))
 APIKEY = str(os.getenv("pnw_api_key"))
 EMAIL = str(os.getenv("pnw_email"))
 PASSWORD = str(os.getenv("pnw_password"))
