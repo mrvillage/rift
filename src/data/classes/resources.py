@@ -1,10 +1,28 @@
-from typing import Union
+from __future__ import annotations
+
+from typing import Dict, Union
 
 from ...funcs.utils import check_resource, convert_number
 from .base import Base
 
+__all__ = ("Resources",)
+
 
 class Resources(Base):
+    credit: Union[float, int]
+    money: Union[float, int]
+    food: Union[float, int]
+    coal: Union[float, int]
+    oil: Union[float, int]
+    uranium: Union[float, int]
+    lead: Union[float, int]
+    iron: Union[float, int]
+    bauxite: Union[float, int]
+    gasoline: Union[float, int]
+    munitions: Union[float, int]
+    steel: Union[float, int]
+    aluminum: Union[float, int]
+
     def __init__(
         self,
         *,
@@ -21,7 +39,7 @@ class Resources(Base):
         munitions: Union[float, int] = 0,
         steel: Union[float, int] = 0,
         aluminum: Union[float, int] = 0,
-    ):
+    ) -> None:
         self.credit = credit
         self.money = money
         self.food = food
@@ -36,54 +54,50 @@ class Resources(Base):
         self.steel = steel
         self.aluminum = aluminum
 
-    def __str__(self):
+    def __str__(self) -> str:
         return ", ".join(
-            [
-                f"{value:,.2f} {name}"
-                for name, value in (
-                    ("Credit" if self.credit == 1 else "Credits", self.credit),
-                    ("Money", self.money),
-                    ("Food", self.food),
-                    ("Coal", self.coal),
-                    ("Oil", self.oil),
-                    ("Uranium", self.uranium),
-                    ("Lead", self.lead),
-                    ("Iron", self.iron),
-                    ("Bauxite", self.bauxite),
-                    ("Gasoline", self.gasoline),
-                    ("Munitions", self.munitions),
-                    ("Steel", self.steel),
-                    ("Aluminum", self.aluminum),
-                )
-                if value > 0
-            ]
+            f"{value:,.2f} {name}"
+            for name, value in (
+                ("Credit" if self.credit == 1 else "Credits", self.credit),
+                ("Money", self.money),
+                ("Food", self.food),
+                ("Coal", self.coal),
+                ("Oil", self.oil),
+                ("Uranium", self.uranium),
+                ("Lead", self.lead),
+                ("Iron", self.iron),
+                ("Bauxite", self.bauxite),
+                ("Gasoline", self.gasoline),
+                ("Munitions", self.munitions),
+                ("Steel", self.steel),
+                ("Aluminum", self.aluminum),
+            )
+            if value > 0
         )
 
-    def newline(self):
+    def newline(self) -> str:
         return "\n".join(
-            [
-                f"{value:,.2f} {name}"
-                for name, value in (
-                    ("Credit" if self.credit == 1 else "Credits", self.credit),
-                    ("Money", self.money),
-                    ("Food", self.food),
-                    ("Coal", self.coal),
-                    ("Oil", self.oil),
-                    ("Uranium", self.uranium),
-                    ("Lead", self.lead),
-                    ("Iron", self.iron),
-                    ("Bauxite", self.bauxite),
-                    ("Gasoline", self.gasoline),
-                    ("Munitions", self.munitions),
-                    ("Steel", self.steel),
-                    ("Aluminum", self.aluminum),
-                )
-                if value > 0
-            ]
+            f"{value:,.2f} {name}"
+            for name, value in (
+                ("Credit" if self.credit == 1 else "Credits", self.credit),
+                ("Money", self.money),
+                ("Food", self.food),
+                ("Coal", self.coal),
+                ("Oil", self.oil),
+                ("Uranium", self.uranium),
+                ("Lead", self.lead),
+                ("Iron", self.iron),
+                ("Bauxite", self.bauxite),
+                ("Gasoline", self.gasoline),
+                ("Munitions", self.munitions),
+                ("Steel", self.steel),
+                ("Aluminum", self.aluminum),
+            )
+            if value > 0
         )
 
     @classmethod
-    async def convert_resources(cls, argument):
+    async def convert_resources(cls, argument: str) -> Resources:
         args = [i.strip(" ,.") for i in argument.split(" ")]
         args = [i if i.lower() != "credits" else "credit" for i in args]
         resources_dict = {}
@@ -104,11 +118,11 @@ class Resources(Base):
             except ValueError:
                 pass
         if args[-1].startswith("$"):
-            resources_dict["money"] = await convert_number(arg)
+            resources_dict["money"] = await convert_number(args[-1])
         return cls(**resources_dict)
 
     @classmethod
-    async def from_dict(cls, resources: dict):
+    async def from_dict(cls, resources: Dict[str, Union[float, int]]) -> Resources:
         return cls(
             money=resources["money"],
             food=resources["food"],
