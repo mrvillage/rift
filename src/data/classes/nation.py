@@ -1,20 +1,22 @@
 from __future__ import annotations
 
 from datetime import datetime
-from ..query.city import get_nation_cities
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, Dict, Sequence, Union
+from urllib.parse import quote
 
+import aiohttp
 from aiohttp import request
 from bs4 import BeautifulSoup
-from discord import Embed, Guild, NotFound
+from discord import Embed, Guild, NotFound, User
 from discord.ext.commands import Context
-from discord import User
+from discord.utils import valid_icon_size
 
 from ...data.get import get_link_nation
 from ...errors import NationNotFoundError, SentError
 from ...find import search_nation
 from ...funcs import utils
 from ..query import get_nation
+from ..query.city import get_nation_cities
 from .base import Embedable, Fetchable, Initable, Makeable
 
 if TYPE_CHECKING:
@@ -262,3 +264,45 @@ class Nation(Embedable, Fetchable, Initable, Makeable):
                 fields=fields,
             )
         )
+
+    async def scrape_city_manager(self) -> Sequence[Dict[str, Any]]:
+        from ...funcs.utils import convert_link
+
+        async with aiohttp.request(
+            "GET", f"https://politicsandwar.com/city/manager/n={quote(self.name)}"
+        ) as response:
+            soup = BeautifulSoup(await response.text(), "html.parser")
+        table = soup.find_all(class_="nationtable")[1]
+        rows = table.find_all("tr")
+        ids = [
+            int(await convert_link(i.contents[0].attrs["href"]))
+            for i in rows[0].contents[2:]
+        ]
+        del rows[:2]
+        items = [(row.contents[0].contents[0].contents[0].lower(), row) for row in rows]
+        for row in rows:
+            del row.contents[:2]
+        values = {}
+        for key, row in items:
+            values[key] = []
+            for i in row.contents:
+                val = i.contents[0]
+                if val == "Yes":
+                    values[key].append(True)
+                elif val == "No":
+                    values[key].append(False)
+                elif "%" in val:
+                    values[key].append(float(val.replace("%", "")))
+                elif "." in val:
+                    values[key].append(float(val.replace(",", "")))
+                elif "," in val:
+                    values[key].append(int(val.replace(",", "")))
+                else:
+                    values[key].append(int(val))
+        cities = []
+        for index, id in enumerate(ids):
+            city = {"city_id": id}
+            for key, value in list(values.items()):
+                city[key] = value[index]
+            cities.append(city)
+        return cities
