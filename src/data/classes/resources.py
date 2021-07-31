@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Dict, Union
 
+from discord.ext.commands import Context
+
 from ...funcs.utils import check_resource, convert_number
 from .base import Base
 
@@ -137,3 +139,7 @@ class Resources(Base):
             steel=resources["steel"],
             aluminum=resources["aluminum"],
         )
+
+    @classmethod
+    async def convert(cls, ctx: Context, argument: str) -> Resources:
+        return await cls.convert_resources(argument)
