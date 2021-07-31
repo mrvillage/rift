@@ -143,3 +143,76 @@ class Resources(Base):
     @classmethod
     async def convert(cls, ctx: Context, argument: str) -> Resources:
         return await cls.convert_resources(argument)
+
+    def __eq__(self, other: Resources) -> bool:
+        return self.__dict__ == other.__dict__
+
+    def __ne__(self, other: Resources) -> bool:
+        return not self.__eq__(other)
+
+    def __add__(self, other: Union[float, int, Resources]) -> Resources:
+        if isinstance(other, Resources):
+            return Resources(
+                **{
+                    key: value + other.__dict__[key]
+                    for key, value in self.__dict__.items()
+                }
+            )
+        return Resources(**{key: value + other for key, value in self.__dict__.items()})
+
+    def __sub__(self, other: Union[float, int, Resources]) -> Resources:
+        if isinstance(other, Resources):
+            return Resources(
+                **{
+                    key: value - other.__dict__[key]
+                    for key, value in self.__dict__.items()
+                }
+            )
+        return Resources(**{key: value - other for key, value in self.__dict__.items()})
+
+    def __mul__(self, other: Union[float, int, Resources]) -> Resources:
+        if isinstance(other, Resources):
+            return Resources(
+                **{
+                    key: value * other.__dict__[key]
+                    for key, value in self.__dict__.items()
+                }
+            )
+        return Resources(**{key: value * other for key, value in self.__dict__.items()})
+
+    def __truediv__(self, other: Union[float, int, Resources]) -> Resources:
+        if isinstance(other, Resources):
+            return Resources(
+                **{
+                    key: value / other.__dict__[key]
+                    for key, value in self.__dict__.items()
+                }
+            )
+        return Resources(**{key: value / other for key, value in self.__dict__.items()})
+
+    def __pow__(self, other: Union[float, int, Resources]) -> Resources:
+        if isinstance(other, Resources):
+            return Resources(
+                **{
+                    key: value ** other.__dict__[key]
+                    for key, value in self.__dict__.items()
+                }
+            )
+        return Resources(
+            **{key: value ** other for key, value in self.__dict__.items()}
+        )
+
+    def __iadd__(self, other: Union[float, int]) -> Resources:
+        return self.__add__(other)
+
+    def __isub__(self, other: Union[float, int]) -> Resources:
+        return self.__sub__(other)
+
+    def __imul__(self, other: Union[float, int]) -> Resources:
+        return self.__mul__(other)
+
+    def __itruediv__(self, other: Union[float, int]) -> Resources:
+        return self.__truediv__(other)
+
+    def __ipow__(self, other: Union[float, int]) -> Resources:
+        return self.__pow__(other)
