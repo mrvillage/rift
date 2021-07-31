@@ -62,9 +62,6 @@ async def rift_about(ctx):
 
 
 def main():
-
-    bot.cogs_loaded = False
-    bot.persistent_views_loaded = False
     bot.loop.create_task(bot.update_pnw_session())
     bot.loop.create_task(bot.get_staff())
     # bot.command_prefix = "!!"
