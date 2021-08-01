@@ -53,9 +53,9 @@ async def _actual_conversion(
             if inspect.ismethod(converter.convert):
                 return await converter.convert(ctx, argument)
             else:
-                return await converter().convert(ctx, argument)
+                return await converter().convert(ctx, argument)  # type: ignore
         elif isinstance(converter, Converter):
-            return await converter.convert(ctx, argument)
+            return await converter.convert(ctx, argument)  # type: ignore
     except CommandError:
         raise
     except Exception as exc:
