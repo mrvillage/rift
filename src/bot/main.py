@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import discord
-from discord.ext.commands import Context
+from discord.ext.commands import Context, _slash  # type: ignore
 
 from .. import funcs
 from ..data.classes import Menu
@@ -56,6 +56,8 @@ async def on_ready():
 
     if not bot.cogs_loaded:
         await bot.get_global_application_commands()
+        _slash(bot.get_command("help"))
+        _slash(bot.get_command("rift"))
         cogPath = Path.cwd() / "src" / "bot" / "cogs"
         cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
         cogs = [i for i in cogs if i != "__init__"]
