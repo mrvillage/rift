@@ -1,5 +1,11 @@
+from __future__ import annotations
+
 import datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+import discord
+from discord.ext.commands import Context
 
 from .. import funcs
 from ..data.classes import Menu
@@ -10,15 +16,18 @@ from ..views import Margins
 
 
 @bot.event
-async def on_message(message):
+async def on_message(message: discord.Message):
     await bot.process_commands(message)
 
 
 @bot.event
-async def on_raw_message_edit(payload):
-    message = await bot.get_channel(payload.channel_id).fetch_message(
-        payload.message_id
-    )
+async def on_raw_message_edit(payload: discord.RawMessageUpdateEvent):
+    channel = bot.get_channel(payload.channel_id)
+    if TYPE_CHECKING:
+        assert isinstance(channel, (discord.TextChannel, discord.DMChannel))
+    message = await channel.fetch_message(payload.message_id)
+    if TYPE_CHECKING:
+        assert isinstance(message.edited_at, datetime.datetime)
     try:
         if message.created_at + datetime.timedelta(minutes=10) >= message.edited_at:
             await bot.process_commands(message)
@@ -34,7 +43,7 @@ async def on_ready():
         for view in views:
             bot.add_view(await view.get_view())
         bot.add_view(Margins())
-        bot.persistent_view_loaded = True
+        bot.persistent_views_loaded = True
 
     if not bot.cogs_loaded:
         await bot.get_global_application_commands()
@@ -48,11 +57,12 @@ async def on_ready():
         bot.unload_extension("src.bot.cogs.server")
         bot.unload_extension("src.bot.cogs.menus")
         bot.unload_extension("src.bot.cogs.revenue")
+        bot.cogs_loaded = True
     print("Startup complete!")
 
 
 @bot.command(name="rift", aliases=["version", "about", "credits"])
-async def rift_about(ctx):
+async def rift_about(ctx: Context):
     await ctx.reply(
         embed=funcs.get_embed_author_member(
             ctx.author,
@@ -61,7 +71,7 @@ async def rift_about(ctx):
     )
 
 
-def main():
+def main() -> None:
     bot.loop.create_task(bot.update_pnw_session())
     bot.loop.create_task(bot.get_staff())
     # bot.command_prefix = "!!"
