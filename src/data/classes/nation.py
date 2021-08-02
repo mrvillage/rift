@@ -279,7 +279,7 @@ class Nation(Embedable, Fetchable, Initable, Makeable):
             for i in rows[0].contents[2:]
         ]
         del rows[:2]
-        items = [(row.contents[0].contents[0].contents[0].lower(), row) for row in rows]
+        items = [(row.contents[0].contents[0].contents[0].lower().replace(" ", "_"), row) for row in rows]
         for row in rows:
             del row.contents[:2]
         values = {}
@@ -301,7 +301,7 @@ class Nation(Embedable, Fetchable, Initable, Makeable):
                     values[key].append(int(val))
         cities = []
         for index, id in enumerate(ids):
-            city = {"city_id": id}
+            city = {"city_id": id, "nation_id": self.id}
             for key, value in list(values.items()):
                 city[key] = value[index]
             cities.append(city)
