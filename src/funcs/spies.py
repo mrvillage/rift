@@ -70,19 +70,31 @@ async def get_spies(target: Union[int, Nation], safety: int = 1) -> float:
             if fetch_amount < 0 or fetch_amount > 60:
                 raise SpiesNotFoundError(f"Could not find any spies for {target.id}")
     odds = 50
-    if target.war_policy == "Tactician":
-        mod = 0.88
-    elif target.war_policy == "Arcane":
+    if target.war_policy == "Arcane":
         mod = 0.82
+    elif target.war_policy == "Tactician":
+        mod = 0.88
     else:
         mod = 1
-    return (((100 * fetch_amount) / ((odds * mod) - (25 * safety))) - 1) / 3
+    num = (((100 * fetch_amount) / ((odds * mod) - (25 * safety))) - 1) / 3
+    num = num if num > 0 else num * -1
+    if num < 30:
+        if target.war_policy == "Arcane":
+            mod = 0.8
+        elif target.war_policy == "Tactician":
+            mod = 0.9
+        else:
+            mod = 1
+            if num > 20:
+                odds = 51 if second else 49
+        num = (((100 * fetch_amount) / ((odds * mod) - (25 * safety))) - 1) / 3
+        return num if num > 0 else num * -1
+    return num
+
 
 async def calculate_spies(nation: Nation) -> int:
     safety_levels = (
-        (3, 2, 1)
-        if nation.domestic_policy in {"Tactician", "Arcane"}
-        else (1, 2, 3)
+        (3, 2, 1) if nation.war_policy in {"Tactician", "Arcane"} else (1, 2, 3)
     )
     try:
         num = await get_spies(nation, safety_levels[0])
@@ -90,5 +102,8 @@ async def calculate_spies(nation: Nation) -> int:
         try:
             num = await get_spies(nation, safety_levels[1])
         except SpiesNotFoundError:
-            num = await get_spies(nation, safety_levels[2])
-    return int(round(num if num > 0 else num*-1, 0))
+            try:
+                num = await get_spies(nation, safety_levels[2])
+            except SpiesNotFoundError:
+                return 0
+    return int(round(num, 0)) if num > 30 else int(num)
