@@ -17,7 +17,7 @@ class Military(commands.Cog):
     @commands.group(name="target", invoke_without_command=True)
     async def target(self, ctx, target_id=None):
         if id == None:
-            await ctx.send(
+            await ctx.reply(
                 embed=rift.get_embed_author_member(
                     ctx.author,
                     f"You forgot an argument!\n\n`?target <add/remove/list>`",
@@ -27,7 +27,7 @@ class Military(commands.Cog):
         try:
             target = await rift.get_target(int(target_id))
         except:
-            await ctx.send(
+            await ctx.reply(
                 embed=rift.get_embed_author_member(
                     ctx.author, f"`{target_id}` is not a valid target."
                 )
@@ -63,7 +63,7 @@ class Military(commands.Cog):
             )
         else:
             embed.add_field(name="Member Mentions", value="None", inline=True)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @target.command(name="add")
     async def target_add(self, ctx, search, *args):
@@ -79,7 +79,7 @@ class Military(commands.Cog):
             try:
                 nation_id = (await rift.get_nation_name(search))[0][0]
             except:
-                await ctx.send(
+                await ctx.reply(
                     embed=rift.get_embed_author_member(
                         ctx.author,
                         f'Nation `{search}` doesn\'t exist! Please try again.\n\nIf the nation name is multiple words remember to surround it in quotes ("")',
@@ -123,7 +123,7 @@ class Military(commands.Cog):
             )
         else:
             embed.add_field(name="Channel Notifications", value=f"None", inline=True)
-            await ctx.send(
+            await ctx.reply(
                 embed=rift.get_embed_author_member(
                     ctx.author, f"You forgot to set a channel!"
                 )
@@ -141,14 +141,14 @@ class Military(commands.Cog):
             )
         else:
             embed.add_field(name="Member Mentions", value=f"None", inline=True)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @target.command(name="remove")
     async def target_remove(self, ctx, target_id):
         try:
             target = await rift.get_target(int(target_id))
         except:
-            await ctx.send(
+            await ctx.reply(
                 embed=rift.get_embed_author_member(
                     ctx.author, f"`{target_id}` is not a valid target."
                 )
@@ -156,13 +156,13 @@ class Military(commands.Cog):
             return
         if target[3] == ctx.author.id:
             await rift.remove_target(int(target_id))
-            await ctx.send(
+            await ctx.reply(
                 embed=rift.get_embed_author_member(
                     ctx.author, f"Removed target `{target_id}`."
                 )
             )
         else:
-            await ctx.send(
+            await ctx.reply(
                 embed=rift.get_embed_author_member(
                     ctx.author, f"You're not the owner of that target."
                 )
@@ -171,7 +171,7 @@ class Military(commands.Cog):
     @target.command(name="list")
     async def target_list(self, ctx):
         targets = await rift.get_targets_owner(ctx.author.id)
-        await ctx.send(
+        await ctx.reply(
             embed=rift.get_embed_author_member(
                 ctx.author,
                 f"**Target ID | Nation ID | Nation Name**\n\n{f'{rift.NEWLINE}'.join([f'{target[0]} | {target[1]} | {(await rift.get_nation(target[1]))[1]}' for target in targets])}",
@@ -231,7 +231,7 @@ class Military(commands.Cog):
                 {"name": "Nukes", "value": f"{alliance.get_nukes():,}"},
             ],
         )
-        await ctx.send(file=image, embed=embed)
+        await ctx.reply(file=image, embed=embed)
 
     @commands._slash  # type: ignore
     @commands.command(name="militarization-nation", aliases=["mn"], hidden=True)
@@ -302,7 +302,7 @@ class Military(commands.Cog):
                     {"name": "Nukes", "value": f"{nation.nukes:,}"},
                 ],
             )
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
 
 def setup(bot):
