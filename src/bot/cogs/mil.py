@@ -1,9 +1,11 @@
 import json
 from io import BytesIO
+from typing import TYPE_CHECKING
 
 import aiohttp
 import discord
 from discord.ext import commands
+import pnwkit
 
 from ... import find
 from ... import funcs as rift
@@ -205,14 +207,48 @@ class Military(commands.Cog):
         militarization = alliance.get_militarization(vm=False)
         image = discord.File(BytesIO(byte), f"militarization_{alliance.id}.png")
         cities = alliance.get_cities()
+        alliance_data = await pnwkit.async_alliance_query(
+            {"id": alliance.id, "first": 1},
+            {
+                "nations": [
+                    "alliance_position",
+                    {"cities": ["barracks", "factory", "airforcebase", "drydock"]},
+                ]
+            },
+        )
+        if TYPE_CHECKING:
+            assert isinstance(alliance_data, tuple)
+        nations = [
+            i
+            for i in alliance_data[0].nations
+            if i.alliance_position not in {"NOALLIANCE", "APPLICANT"}
+        ]
+        improvements = {
+            "barracks": sum(
+                sum(city.barracks for city in nation.cities) for nation in nations
+            )
+            / cities,
+            "factories": sum(
+                sum(city.factory for city in nation.cities) for nation in nations
+            )
+            / cities,
+            "hangars": sum(
+                sum(city.airforcebase for city in nation.cities) for nation in nations
+            )
+            / cities,
+            "drydocks": sum(
+                sum(city.drydock for city in nation.cities) for nation in nations
+            )
+            / cities,
+        }
         embed = rift.get_embed_author_member(
             ctx.author,
             f"""
             Total Militarization: {militarization['total']*100:.2f}%
-            Soldier Militarization: {militarization['soldiers']*100:.2f}%
-            Tank Militarization: {militarization['tanks']*100:.2f}%
-            Aircraft Militarization: {militarization['aircraft']*100:.2f}%
-            Ship Militarization: {militarization['ships']*100:.2f}%
+            Soldier Militarization: {militarization['soldiers']*100:.2f}% ({improvements['barracks']:,.3f} Barracks)
+            Tank Militarization: {militarization['tanks']*100:.2f}% ({improvements['factories']:,.3f} factories)
+            Aircraft Militarization: {militarization['aircraft']*100:.2f}% ({improvements['hangars']:,.3f} Hangars)
+            Ship Militarization: {militarization['ships']*100:.2f}% ({improvements['drydocks']:,.3f} Drydocks)
             """,
             title=f"Militarization Graph for {alliance.name} (`{alliance.id}`)",
             image_url=f"attachment://militarization_{alliance.id}.png",
@@ -250,10 +286,14 @@ class Military(commands.Cog):
             )
             return
         militarization = nation.get_militarization()
+        nation_data = await pnwkit.async_nation_query({"id": nation.id}, {"cities": ["barracks", "factory", "airforcebase", "drydock"]})
+        if TYPE_CHECKING:
+            assert isinstance(nation_data, tuple)
+        improvements = {"barracks": sum(city.barracks for city in nation_data[0].cities)/nation.cities, "factories": sum(city.factory for city in nation_data[0].cities)/nation.cities, "hangars": sum(city.airforcebase for city in nation_data[0].cities)/nation.cities, "drydocks": sum(city.drydock for city in nation_data[0].cities)/nation.cities}
         if isinstance(author, discord.Guild):
             embed = rift.get_embed_author_guild(
                 author,
-                f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}%\nShip Militarization: {militarization['ships']*100:.2f}%",
+                f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}% ({improvements['barracks']:,.2f} Barracks)\nTank Militarization: {militarization['tanks']*100:.2f}% ({improvements['factories']:,.2f} Factories)\nAircraft Militarization: {militarization['aircraft']*100:.2f}% ({improvements['hangars']:,.2f} Hangars)\nShip Militarization: {militarization['ships']*100:.2f}% ({improvements['drydocks']:,.2f} Drydocks)",
                 title=f"Militarization for {nation.name} (`{nation.id}`)",
                 fields=[
                     {
@@ -279,7 +319,7 @@ class Military(commands.Cog):
         else:
             embed = rift.get_embed_author_member(
                 author,
-                f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}%\nTank Militarization: {militarization['tanks']*100:.2f}%\nAircraft Militarization: {militarization['aircraft']*100:.2f}%\nShip Militarization: {militarization['ships']*100:.2f}%",
+                f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}% ({improvements['barracks']:,.2f} Barracks)\nTank Militarization: {militarization['tanks']*100:.2f}% ({improvements['factories']:,.2f} Factories)\nAircraft Militarization: {militarization['aircraft']*100:.2f}% ({improvements['hangars']:,.2f} Hangars)\nShip Militarization: {militarization['ships']*100:.2f}% ({improvements['drydocks']:,.2f} Drydocks)",
                 title=f"Militarization for {nation.name} (`{nation.id}`)",
                 fields=[
                     {
