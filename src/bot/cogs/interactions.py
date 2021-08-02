@@ -14,7 +14,7 @@ from ...ref import Rift
 class InteractionContext(commands.Context):
     interaction: discord.Interaction
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.interaction = kwargs["interaction"]
         self.author = self.interaction.user  # type: ignore
@@ -23,15 +23,16 @@ class InteractionContext(commands.Context):
         self.followup = self.interaction.followup
         self.send = self.followup.send  # type: ignore
 
-    async def reply(self, *args, **kwargs):
+    async def reply(self, *args, **kwargs) -> discord.Message:
         if args:
             kwargs["content"] = args[0]
         await self.interaction.edit_original_message(**kwargs)
+        return await self.interaction.original_message()
 
 
 class FakeParam(inspect.Parameter):
     def __init__(self, name: str) -> None:
-        self.name = name
+        self.__dict__["name"] = name
 
 
 async def parse_arguments(
@@ -42,7 +43,7 @@ async def parse_arguments(
     for option in options:
         name = option["name"]
         value = option["value"]
-        if option["type"] in {1, 2, 3, 4, 5, 10}:
+        if option["type"] in {1, 2, 4, 5, 10}:
             ctx.args.append(value)
             ctx.kwargs[name] = value
             continue
@@ -121,5 +122,5 @@ class Interactions(commands.Cog):
             self.bot.dispatch("command_completion", ctx)
 
 
-def setup(bot: Rift):
+def setup(bot: Rift) -> None:
     bot.add_cog(Interactions(bot))
