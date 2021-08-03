@@ -216,3 +216,6 @@ class Resources(Base):
 
     def __ipow__(self, other: Union[float, int]) -> Resources:
         return self.__pow__(other)
+
+    def __getitem__(self, item: str) -> float:
+        return self.__getattribute__(item)
