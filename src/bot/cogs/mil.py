@@ -286,10 +286,22 @@ class Military(commands.Cog):
             )
             return
         militarization = nation.get_militarization()
-        nation_data = await pnwkit.async_nation_query({"id": nation.id}, {"cities": ["barracks", "factory", "airforcebase", "drydock"]})
+        nation_data = await pnwkit.async_nation_query(
+            {"id": nation.id},
+            {"cities": ["barracks", "factory", "airforcebase", "drydock"]},
+        )
         if TYPE_CHECKING:
             assert isinstance(nation_data, tuple)
-        improvements = {"barracks": sum(city.barracks for city in nation_data[0].cities)/nation.cities, "factories": sum(city.factory for city in nation_data[0].cities)/nation.cities, "hangars": sum(city.airforcebase for city in nation_data[0].cities)/nation.cities, "drydocks": sum(city.drydock for city in nation_data[0].cities)/nation.cities}
+        improvements = {
+            "barracks": sum(city.barracks for city in nation_data[0].cities)
+            / nation.cities,
+            "factories": sum(city.factory for city in nation_data[0].cities)
+            / nation.cities,
+            "hangars": sum(city.airforcebase for city in nation_data[0].cities)
+            / nation.cities,
+            "drydocks": sum(city.drydock for city in nation_data[0].cities)
+            / nation.cities,
+        }
         if isinstance(author, discord.Guild):
             embed = rift.get_embed_author_guild(
                 author,
