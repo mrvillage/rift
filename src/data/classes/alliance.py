@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Union
+from typing import Dict, Union
 
 from discord import Embed, Guild
 from discord.ext.commands.context import Context
@@ -9,7 +9,7 @@ from src.data.query.alliance import get_applicants, get_members
 
 from ...errors import AllianceNotFoundError
 from ...find import search_alliance
-from ...funcs.parse import parse_alliance_bank
+from ...funcs import parse_alliance_bank
 from ...ref import bot
 from ..query import get_alliance
 from .base import Embedable, Fetchable, Initable, Makeable
@@ -101,6 +101,9 @@ class Alliance(Embedable, Fetchable, Initable, Makeable):
     def __int__(self):
         return self.id
 
+    def list_members(self, vm):
+        return self.__dict__.get("members", [])
+
     def __float__(self):
         return sum(i[0] for i in self.list_members(vm=False))
 
@@ -118,15 +121,6 @@ class Alliance(Embedable, Fetchable, Initable, Makeable):
     @classmethod
     async def convert(cls, ctx, search):
         return await search_alliance(ctx, search)
-
-    async def get_revenue_modifiers(self):
-        pass
-
-    async def get_revenue(self):
-        return (
-            sum(nation.get_revenue() for nation in self.list_members(vm=False))
-            + self.get_revenue_modifiers()
-        )
 
     @classmethod
     async def fetch(cls, alliance_id: Union[int, str] = None) -> Alliance:
@@ -268,3 +262,26 @@ class Alliance(Embedable, Fetchable, Initable, Makeable):
                 fields=fields,
             ).set_thumbnail(url=self.flagurl)
         )
+
+    async def calculate_revenue(
+        self,
+    ) -> Dict[str, Union[Resources, Dict[str, float], int, float]]:
+        from ...funcs import get_trade_prices
+
+        await self.make_attrs("members")
+        prices = await get_trade_prices()
+        revenues = [await i.calculate_revenue(prices) for i in self.members]
+        return {
+            "gross_income": sum(
+                (i["gross_income"] for i in revenues[1:]), revenues[0]["gross_income"]
+            ),
+            "net_income": sum(
+                (i["net_income"] for i in revenues[1:]), revenues[0]["net_income"]
+            ),
+            "gross_total": sum(
+                (i["gross_total"] for i in revenues[1:]), revenues[0]["gross_total"]
+            ),
+            "net_total": sum(
+                (i["net_total"] for i in revenues[1:]), revenues[0]["net_total"]
+            ),
+        }
