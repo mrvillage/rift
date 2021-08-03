@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING, Union
 from src.errors.spies import SpiesNotFoundError
 import discord
 from discord.ext import commands
@@ -126,6 +127,66 @@ class PnWInfo(commands.Cog):
             )
         )
 
+    @commands._slash  # type: ignore
+    @commands.command(name="revenue")
+    async def revenue(self, ctx, *, search: Union[Alliance, Nation] = None):
+        search = search if search is not None else await Nation.convert(ctx, search)
+        message = await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author, f"Fetching revenue for {repr(search)}..."
+            )
+        )
+        try:
+            rev = await search.calculate_revenue()
+        except IndexError:
+            return await message.edit(
+                content=f"Something went wrong calculating {repr(search)}'s revenue. It's probably a turn, try again in a few minutes!"
+            )
+        if TYPE_CHECKING:
+            from ...data.classes import Resources
+
+            assert (
+                isinstance(rev["gross_income"], Resources)
+                and isinstance(rev["net_income"], Resources)
+                and isinstance(rev["gross_total"], dict)
+                and isinstance(rev["net_total"], dict)
+            )
+        fields = [
+            {
+                "name": key.capitalize(),
+                "value": f"Gross: {getattr(rev['gross_income'], key):,.2f} (${rev['gross_total'][key]:,.2f})\nNet: {getattr(rev['net_income'], key):,.2f} (${rev['net_total'][key]:,.2f})",
+            }
+            for key in rev["gross_income"].__dict__
+            if key not in {"money", "credit"}
+        ]
+        fields.insert(
+            0,
+            {
+                "name": "Money",
+                "value": f"Gross: {rev['gross_income'].money:,.2f}\nNet: {rev['net_income'].money:,.2f}"
+                + (
+                    f"\nTrade Bonus: {rev['trade_bonus']:,}"
+                    if "trade_bonus" in rev
+                    else ""
+                )
+                + (
+                    f"\nNew Player Bonus: {rev['new_player_bonus']:,}"
+                    if "new_player_bonus" in rev
+                    else ""
+                ),
+            },
+        )
+        fields.append(
+            {
+                "name": "Total",
+                "value": f"Gross: ${sum(rev['gross_total'].__dict__.values())+rev['gross_income'].money:,.2f}\nNet: ${sum(rev['net_total'].__dict__.values())+rev['net_income'].money:,.2f}",
+            }
+        )
+        await message.edit(
+            embed=funcs.get_embed_author_member(
+                ctx.author, f"Revenue for {repr(search)}", fields=fields
+            )
+        )
 
 def setup(bot):
     bot.add_cog(PnWInfo(bot))
