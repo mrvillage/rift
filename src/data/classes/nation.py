@@ -7,9 +7,8 @@ from urllib.parse import quote
 import aiohttp
 from aiohttp import request
 from bs4 import BeautifulSoup
-from discord import Embed, Guild, NotFound, User
+from discord import Embed, NotFound, User
 from discord.ext.commands import Context
-from discord.utils import valid_icon_size
 
 from ...data.get import get_link_nation
 from ...errors import NationNotFoundError, SentError
@@ -20,7 +19,8 @@ from ..query.city import get_nation_cities
 from .base import Embedable, Fetchable, Initable, Makeable
 
 if TYPE_CHECKING:
-    from .alliance import Alliance
+    from .resources import Resources
+    from .trade import TradePrices
 
 
 class Nation(Embedable, Fetchable, Initable, Makeable):
@@ -151,15 +151,6 @@ class Nation(Embedable, Fetchable, Initable, Makeable):
     async def convert(cls, ctx, search):
         return await search_nation(ctx, search)
 
-    async def get_revenue_modifiers(self):
-        pass
-
-    async def get_revenue(self):
-        return (
-            sum(city.get_revenue() for city in self.list_cities())
-            + self.get_revenue_modifiers()
-        )
-
     @classmethod
     async def fetch(cls, nation_id: Union[int, str] = None) -> Nation:
         try:
@@ -266,6 +257,7 @@ class Nation(Embedable, Fetchable, Initable, Makeable):
         )
 
     async def scrape_city_manager(self) -> Sequence[Dict[str, Any]]:
+        from ...funcs import get_trade_prices
         from ...funcs.utils import convert_link
 
         async with aiohttp.request(
@@ -279,7 +271,10 @@ class Nation(Embedable, Fetchable, Initable, Makeable):
             for i in rows[0].contents[2:]
         ]
         del rows[:2]
-        items = [(row.contents[0].contents[0].contents[0].lower().replace(" ", "_"), row) for row in rows]
+        items = [
+            (row.contents[0].contents[0].contents[0].lower().replace(" ", "_"), row)
+            for row in rows
+        ]
         for row in rows:
             del row.contents[:2]
         values = {}
@@ -306,3 +301,85 @@ class Nation(Embedable, Fetchable, Initable, Makeable):
                 city[key] = value[index]
             cities.append(city)
         return cities
+
+    async def calculate_revenue(
+        self, prices: TradePrices = None
+    ) -> Dict[str, Union[Resources, Dict[str, float], int, float]]:
+        from ...funcs import calculate_spies, get_trade_prices
+        from .city import FullCity
+        from .color import Color
+        from .resources import Resources
+
+        revenue: Dict[str, Union[Resources, Dict[str, float], int, float]]
+
+        spies = await calculate_spies(self)
+        prices = prices or await get_trade_prices()
+        city_manager = await self.scrape_city_manager()
+        cities = [FullCity(i) for i in city_manager]
+        await cities[0].make_attrs("nation", "projects")
+        for city in cities:
+            city.nation = cities[0].nation
+            city.projects = cities[0].projects
+        revenues = [await i.calculate_income() for i in cities]
+        revenue = {
+            "gross_income": sum(
+                (i["gross_income"] for i in revenues[1:]), revenues[0]["gross_income"]
+            ),
+            "net_income": sum(
+                (i["net_income"] for i in revenues[1:]), revenues[0]["net_income"]
+            ),
+        }
+        color = await Color.fetch(self.color.lower())
+        bonus = color.bonus * 12
+        if TYPE_CHECKING:
+            assert isinstance(revenue["gross_income"], Resources) and isinstance(
+                revenue["net_income"], Resources
+            )
+        if self.cities <= 10:
+            revenue["new_player_bonus"] = revenue["gross_income"].money * 1.1 - (
+                0.1 * self.cities
+            )
+            revenue["gross_income"].money *= 2.1 - (0.1 * self.cities)
+            revenue["net_income"].money = sum(
+                i.calculate_net_money_income(2.1 - (0.1 * self.cities)) for i in cities
+            )
+        revenue["gross_income"].money += bonus
+        revenue["net_income"].money += bonus
+        if self.offensive_wars or self.defensive_wars:
+            revenue["net_income"].money -= (
+                (1.88 * (self.soldiers / 500))
+                + (75 * self.tanks)
+                + (750 * self.aircraft)
+                + (5625 * self.ships)
+                + (2400 * spies)
+                + (31500 * self.missiles)
+                + (52500 * self.nukes)
+            )
+            revenue["net_income"].food -= self.soldiers / 500
+        else:
+            revenue["net_income"].money -= (
+                (1.25 * (self.soldiers / 750))
+                + (50 * self.tanks)
+                + (500 * self.aircraft)
+                + (3750 * self.ships)
+                + (2400 * spies)
+                + (21000 * self.missiles)
+                + (35000 * self.nukes)
+            )
+            revenue["net_income"].food -= self.soldiers / 750
+        revenue["gross_total"] = Resources(
+            **{
+                key: value * getattr(prices, key).lowest_sell.price
+                for key, value in revenue["gross_income"].__dict__.items()
+                if key != "money"
+            }
+        )
+        revenue["net_total"] = Resources(
+            **{
+                key: value * getattr(prices, key).lowest_sell.price
+                for key, value in revenue["net_income"].__dict__.items()
+                if key != "money"
+            }
+        )
+        revenue["trade_bonus"] = bonus
+        return revenue
