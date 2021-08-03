@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from discord import ButtonStyle, Interaction, Message, Member, User, ui
 
+from ..env import APPLICATION_ID
 from ..funcs import get_embed_author_member, get_trade_prices
 
 __all__ = ("Margins",)
@@ -20,7 +21,7 @@ class Margins(ui.View):
             assert isinstance(message, Message)
         if (
             message.embeds[0].title != "Trade Margins"
-            and message.author.id != interaction.application_id
+            and message.author.id != APPLICATION_ID
         ):
             return
         prices = await get_trade_prices()
