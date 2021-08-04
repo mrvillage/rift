@@ -1,11 +1,11 @@
 import asyncio
 from src.flags.base import BooleanFlagConverter
 from typing import Optional
-from ... import ui
 import discord
 from discord.ext import commands
 from discord.ext.commands.flags import FlagConverter
 
+from ...data.classes import FullCity, Nation
 from ...data.query import get_mmr
 from ... import funcs
 
@@ -24,21 +24,10 @@ class Vie(discord.ui.View):
     def __init__(self) -> None:
         super().__init__()
 
-    @discord.ui.select(
-        custom_id="hiahtueaht",
-        options=[discord.SelectOption(label="Hi"), discord.SelectOption(label="Hello")],
-    )
-    async def hiahtueaht(self, ctx):
-        ...
-
 
 class Experiments(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.command(name="mmr")
-    async def mmr(self, ctx):
-        print(await get_mmr(mmr_id=1))
 
     @commands.command(name="flags")
     async def flags(self, ctx, *, flags: Flags):
@@ -47,14 +36,16 @@ class Experiments(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command(name="view")
     async def view(self, ctx):
-        class Viewer(ui.View):
+        class Viewer(discord.ui.View):
             def __init__(self) -> None:
                 print("HI")
                 super().__init__()
                 print("HI")
 
-            @ui.button(label="Hello")
-            async def oogabooga(self, btn: ui.Button, interaction: discord.Interaction):
+            @discord.ui.button(label="Hello")
+            async def oogabooga(
+                self, btn: discord.ui.Button, interaction: discord.Interaction
+            ):
                 followup = interaction.followup
                 await interaction.response.defer()
                 await asyncio.sleep(15)
