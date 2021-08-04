@@ -127,7 +127,7 @@ class PnWInfo(commands.Cog):
             )
         )
 
-    @commands._slash  # type: ignore
+    # @commands._slash  # type: ignore
     @commands.command(name="revenue")
     async def revenue(self, ctx, *, search: Union[Alliance, Nation] = None):
         search = search if search is not None else await Nation.convert(ctx, search)
@@ -187,6 +187,7 @@ class PnWInfo(commands.Cog):
                 ctx.author, f"Revenue for {repr(search)}", fields=fields
             )
         )
+
 
 def setup(bot):
     bot.add_cog(PnWInfo(bot))
