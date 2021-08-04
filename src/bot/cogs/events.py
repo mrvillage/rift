@@ -37,11 +37,11 @@ class Events(commands.Cog):
                     ) as ws:
                         print("rift-data socket connected")
                         async for message in ws:
-                            data: dict[str, str, dict] = json.loads(message.data)
+                            data = json.loads(message.data)
                             if "event" in data:
                                 event: str = data["event"]
                                 event = EVENTS.get(event, event)
-                                print(event, data if "created" in event else None)
+                                # print(event, data if "created" in event else None)
                                 self.bot.dispatch(event, **data["data"])
             except Exception:
                 print("rift-data socket connection error")
