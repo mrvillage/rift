@@ -51,3 +51,9 @@ class Saveable(Base, metaclass=ABCMeta):
     @abstractmethod
     async def save(self) -> None:
         ...
+
+
+class Convertable(Base, metaclass=ABCMeta):
+    @abstractclassmethod
+    async def convert(self, ctx: Context, argument: str) -> Convertable:
+        ...
