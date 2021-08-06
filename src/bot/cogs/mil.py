@@ -225,21 +225,25 @@ class Military(commands.Cog):
         ]
         improvements = {
             "barracks": sum(
-                sum(city.barracks for city in nation.cities) for nation in nations
+                sum(city.barracks for city in nation.cities) / len(nation.cities)
+                for nation in nations
             )
-            / cities,
+            / len(nations),
             "factories": sum(
-                sum(city.factory for city in nation.cities) for nation in nations
+                sum(city.factory for city in nation.cities) / len(nation.cities)
+                for nation in nations
             )
-            / cities,
+            / len(nations),
             "hangars": sum(
-                sum(city.airforcebase for city in nation.cities) for nation in nations
+                sum(city.airforcebase for city in nation.cities) / len(nation.cities)
+                for nation in nations
             )
-            / cities,
+            / len(nations),
             "drydocks": sum(
-                sum(city.drydock for city in nation.cities) for nation in nations
+                sum(city.drydock for city in nation.cities) / len(nation.cities)
+                for nation in nations
             )
-            / cities,
+            / len(nations),
         }
         embed = rift.get_embed_author_member(
             ctx.author,
