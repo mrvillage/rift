@@ -1,6 +1,6 @@
 from asyncio import TimeoutError
-from src.data.query.menu import get_menu_item
-from typing import Optional
+from src.data.classes.menu import MenuItem
+from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands
@@ -22,18 +22,28 @@ class Menus(commands.Cog):
         aliases=["menus", "role-menu", "rolemenu", "reaction-menu", "reactionmenu"],
         invoke_without_command=True,
     )
-    async def menus(self, ctx: commands.Context, menu: Optional[Menu]):
-        if ctx.invoked_with.lower() == "menus":
-            await self.menus_list.invoke(ctx)
-            return
+    @has_manage_permissions()
+    async def menu(self, ctx: commands.Context, menu: Menu = None):
+        # sourcery skip: merge-nested-ifs
+        if ctx.invoked_with is not None:
+            if ctx.invoked_with.lower() == "menus":
+                await self.menu_list.invoke(ctx)
+                return
+        if menu is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "You didn't specify a menu!"
+                )
+            )
+        if TYPE_CHECKING:
+            assert isinstance(menu, Menu)
         await ctx.send(str(menu))
-        menu = await Menu.fetch(1, ctx.author.id)
         view = await menu.get_view()
         message = await ctx.reply("View", view=view)
-        await Menu.new_interface(message=ctx.message)
+        await menu.new_interface(message)
 
-    @menus.command(name="list", aliases=["l", "li"])
-    async def menus_list(self, ctx: commands.Context):
+    @menu.command(name="list", aliases=["l", "li"])
+    async def menu_list(self, ctx: commands.Context):
         menus = await get_menus_user(user_id=ctx.author.id)
         menus = [Menu(data=i) for i in menus]
         if menus:
@@ -49,15 +59,19 @@ class Menus(commands.Cog):
                 )
             )
 
-    @menus.command(name="create", aliases=["new"])
-    async def menus_create(self, ctx: commands.Context):  # sourcery no-metrics
+    @menu.command(name="create", aliases=["new"])
+    @has_manage_permissions()
+    async def menu_create(self, ctx: commands.Context):  # sourcery no-metrics
         message: discord.Message
+        if TYPE_CHECKING:
+            assert isinstance(ctx.message, discord.Message)
         menu = Menu.default(ctx.message.id, ctx.author.id)
-        main_message = await ctx.send(
+        main_message = await ctx.reply(
             embed=funcs.get_embed_author_member(ctx.author, "Placeholder.")
         )
         try:
-            while True:
+            running = True
+            while running:
                 message = await self.bot.wait_for(
                     "message",
                     check=lambda message: message.author.id == ctx.author.id
@@ -71,22 +85,43 @@ class Menus(commands.Cog):
                     or lower.startswith("complete")
                     or lower.startswith("done")
                 ):
-                    break
+                    running = False
+                    continue
                 if lower.startswith("button "):
                     flags = ButtonFlags.parse_flags(message.content[7:])
                     row = await funcs.utils.get_row(
                         message, "button", flags, menu.items
                     )
-                    if row == -1:
+                    if row is None:
                         continue
                     if "id" in flags:
                         try:
-                            item = await get_menu_item(item_id=flags["id"])
-                            continue
+                            if TYPE_CHECKING:
+                                assert isinstance(flags["id"], str)
+                            item = await MenuItem.fetch(int(flags["id"]))
+                            if item.owner_id == ctx.author.id:
+                                menu.add_item(item, row)
+                                continue
                         except IndexError:
                             pass
-
-                if lower.startswith("select "):
+                    if not MenuItem.validate_flags(flags):
+                        await ctx.reply(
+                            embed=funcs.get_embed_author_member(
+                                ctx.author, "Invalid item."
+                            )
+                        )
+                        continue
+                    flags = await MenuItem.format_flags(ctx, flags)
+                    item = MenuItem(
+                        {
+                            "item_id": message.id,
+                            "owner_id": ctx.author.id,
+                            "type": "button",
+                            "data": flags,
+                        }
+                    )
+                    menu.add_item(item, row)
+                elif lower.startswith("select "):
                     flags = SelectFlags.parse_flags(message.content[7:])
                     row = await funcs.utils.get_row(
                         message, "button", flags, menu.items
@@ -110,18 +145,32 @@ class Menus(commands.Cog):
                             break
                         if lower.startswith("option "):
                             flags = SelectOptionFlags.parse_flags(message.content[7:])
-                            x = 1
+            else:
+                if not any(menu.items):
+                    return await ctx.reply(
+                        embed=funcs.get_embed_author_member(
+                            ctx.author, "You didn't add any items!"
+                        )
+                    )
+                for row in menu.items:
+                    for item in row:
+                        await item.save()
+                await menu.save()
+                await main_message.reply(
+                    embed=funcs.get_embed_author_member(ctx.author, "")
+                )
         except TimeoutError:
             pass
 
-    @menus.command(name="send", aliases=["post"])
+    @menu.command(name="send", aliases=["post"])
     @has_manage_permissions()
-    async def menus_send(
+    async def menu_send(
         self, ctx: commands.Context, menu: Menu, *, channel: discord.TextChannel
     ):
         view = await menu.get_view()
         embed = menu.get_description_embed(ctx)
-        await channel.send(embed=embed, view=view)
+        message = await channel.send(embed=embed, view=view)
+        await menu.new_interface(message)
 
 
 def setup(bot: Rift):
