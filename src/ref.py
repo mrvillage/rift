@@ -26,6 +26,7 @@ class Rift(Bot):
         self.auth_token = None
         self.cogs_loaded = False
         self.persistent_views_loaded = False
+        self.subscribable_events = {"war_declaration", }
 
     async def update_pnw_session(self):
         login_data = {"email": EMAIL, "password": PASSWORD, "loginform": "Login"}
