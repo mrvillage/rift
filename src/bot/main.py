@@ -68,7 +68,6 @@ async def on_ready():
             print(f"Loaded {cog}!")
         bot.unload_extension("src.bot.cogs.database")
         bot.unload_extension("src.bot.cogs.server")
-        bot.unload_extension("src.bot.cogs.menus")
         bot.cogs_loaded = True
     print("Startup complete!")
 
