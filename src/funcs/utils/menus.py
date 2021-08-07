@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Mapping, Sequence
+from typing import TYPE_CHECKING, Any, Mapping, Optional, Sequence
 
 import discord
 
@@ -13,25 +13,45 @@ async def get_row(
     type_: str,
     flags: Mapping[str, Any],
     items: Sequence[Sequence[MenuItem]],
-) -> int:  # sourcery skip: merge-nested-ifs
+) -> Optional[
+    int
+]:  # sourcery skip: merge-duplicate-blocks, merge-nested-ifs, remove-redundant-if
     from .. import get_embed_author_member
 
     try:
         if "row" in flags:
             row_num = int(flags["row"][0]) - 1
         else:
+            for index, row in enumerate(items):
+                if len(row) == 5:
+                    continue
+                elif not row:
+                    return index
+                elif row[0].type == "select":
+                    continue
+                else:
+                    return index
+            await message.reply(
+                embed=get_embed_author_member(
+                    message.author, "There's no space for that item in the menu!"
+                )
+            )
             return None
         if 0 < row_num < 6:
-            row = items[row_num - 1]
+            row = items[row_num]
             if row:
-                if row[0].type == "select" and len(row) == 5:
+                if (
+                    row[0].type == "select"
+                    or len(row) == 5
+                    or (type_ == "select" and len(row) != 0)
+                ):
                     await message.reply(
                         embed=get_embed_author_member(
                             message.author,
-                            f"Row {row_num} and all the ones after don't have space for your item!",
+                            f"Row {row_num} doesn't have space for your item!",
                         )
                     )
-                    return -1
+                    return
             return row_num
         raise ValueError
     except ValueError:
@@ -40,4 +60,4 @@ async def get_row(
                 message.author, f"`{flags['row'][0]}` is not a valid row!"
             )
         )
-        return -1
+        return
