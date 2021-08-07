@@ -34,7 +34,10 @@ async def on_raw_message_edit(payload: discord.RawMessageUpdateEvent):
     channel = bot.get_channel(payload.channel_id)
     if TYPE_CHECKING:
         assert isinstance(channel, (discord.TextChannel, discord.DMChannel))
-    message = await channel.fetch_message(payload.message_id)
+    try:
+        message = await channel.fetch_message(payload.message_id)
+    except discord.NotFound:
+        return
     if TYPE_CHECKING:
         assert isinstance(message.edited_at, datetime.datetime)
     try:
