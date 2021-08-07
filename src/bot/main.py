@@ -59,7 +59,6 @@ async def on_ready():
 
     if not bot.cogs_loaded:
         await bot.get_global_application_commands()
-        _slash(bot.get_command("help"))
         _slash(bot.get_command("rift"))
         cogPath = Path.cwd() / "src" / "bot" / "cogs"
         cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
