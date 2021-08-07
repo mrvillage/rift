@@ -76,11 +76,6 @@ async def _actual_conversion(
         ) from exc
 
 
-class ButtonStyleOverride(discord.ButtonStyle):
-    def __get_item__(self, name: str):
-        self.__getattribute__(name)
-
-
 def convert_slash_command_type(type_: type) -> int:
     if type_ is str:
         return 3
@@ -173,5 +168,4 @@ def _slash(command: commands.Command) -> commands.Command:
 
 def override():
     converter._actual_conversion = _actual_conversion
-    discord.ButtonStyle = ButtonStyleOverride
     commands._slash = _slash  # type: ignore
