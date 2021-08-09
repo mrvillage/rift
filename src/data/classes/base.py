@@ -60,6 +60,12 @@ class Convertable(Base, metaclass=ABCMeta):
 
 
 class Createable(Base, metaclass=ABCMeta):
+    @abstractmethod
+    async def create(self) -> Createable:
+        ...
+
+
+class ClassCreateable(Createable, metaclass=ABCMeta):
     @abstractclassmethod
     async def create(self) -> Createable:
         ...
