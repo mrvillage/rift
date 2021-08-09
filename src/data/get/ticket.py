@@ -6,6 +6,7 @@ from src.data.query.ticket import (
     query_ticket,
     query_ticket_config,
     query_ticket_config_by_category,
+    query_current_ticket_number,
 )
 
 from ..query import (
@@ -15,7 +16,7 @@ from ..query import (
     query_ticket_by_guild,
 )
 
-__all__ = ("get_ticket", "get_ticket_config")
+__all__ = ("get_ticket", "get_ticket_config", "get_current_ticket_number")
 
 if TYPE_CHECKING:
     from typings import TicketConfigData, TicketData
@@ -47,3 +48,7 @@ async def get_ticket_config(
     if category_id is not None:
         return await query_ticket_config_by_category(category_id)
     raise ValueError("No arguments given")
+
+
+async def get_current_ticket_number(config_id: int) -> int:
+    return await query_current_ticket_number(config_id)
