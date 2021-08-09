@@ -5,6 +5,7 @@ from .data import *
 from .database import *
 from .message import *
 from .nation import *
+from .notfound import *
 from .perms import *
 from .spies import *
 from .utils import *
