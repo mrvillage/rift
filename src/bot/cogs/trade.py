@@ -4,7 +4,7 @@ from discord.ext import commands
 
 from ... import funcs as rift
 from ...data.classes import TradePrices
-from ...views import Margins
+from ...views import Margins, Prices
 
 
 class Trade(commands.Cog):
@@ -16,10 +16,10 @@ class Trade(commands.Cog):
     async def price(self, ctx: commands.Context):
         prices: TradePrices = await rift.get_trade_prices()
         await ctx.reply(
+            view=Prices(),
             embed=rift.get_embed_author_member(
                 ctx.author,
                 f"Market Index: ${prices.market_index:,}",
-                timestamp=self.bot.prices_update,
                 fields=[
                     {
                         "name": "Credits",
@@ -130,7 +130,7 @@ class Trade(commands.Cog):
                 """,
                     },
                 ],
-            )
+            ),
         )
 
     @commands._slash  # type: ignore
@@ -145,7 +145,6 @@ class Trade(commands.Cog):
             embed=rift.get_embed_author_member(
                 ctx.author,
                 f"Market Index: ${prices.market_index:,}",
-                timestamp=self.bot.prices_update,
                 title="Trade Margins",
                 fields=[
                     {
