@@ -57,6 +57,7 @@ async def on_ready():
         bot.add_view(Margins())
         bot.add_view(Prices())
         bot.persistent_views_loaded = True
+        print("Loaded persistent views!")
 
     if not bot.cogs_loaded:
         await bot.get_global_application_commands()
