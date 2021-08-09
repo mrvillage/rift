@@ -8,4 +8,5 @@ from .nation import *
 from .server import *
 from .settings import *
 from .staff import *
+from .ticket import *
 from .trade import *
