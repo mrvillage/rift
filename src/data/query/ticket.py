@@ -11,6 +11,7 @@ __all__ = (
     "query_ticket_by_guild",
     "query_ticket_config",
     "query_ticket_config_by_guild",
+    "query_current_ticket_number",
 )
 
 if TYPE_CHECKING:
@@ -105,4 +106,16 @@ async def query_ticket_config_by_guild(guild_id: int) -> TicketConfigData:
     )
     if TYPE_CHECKING:
         assert isinstance(data, TicketConfigData)
+    return data
+
+
+async def query_current_ticket_number(config_id: int) -> int:
+    data = (
+        await execute_read_query(
+            "SELECT MAX(ticket_number) FROM tickets WHERE config_id = $1;",
+            config_id,
+        )
+    )[0][0]
+    if TYPE_CHECKING:
+        assert isinstance(data, int)
     return data
