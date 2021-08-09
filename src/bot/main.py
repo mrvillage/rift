@@ -13,7 +13,7 @@ from ..data.classes import Menu
 from ..data.query import get_menus
 from ..env import TOKEN, __version__
 from ..ref import bot
-from ..views import Margins
+from ..views import Margins, Prices
 
 logger = logging.getLogger("discord")
 logger.setLevel(logging.INFO)
@@ -55,6 +55,7 @@ async def on_ready():
         for view in views:
             bot.add_view(await view.get_view())
         bot.add_view(Margins())
+        bot.add_view(Prices())
         bot.persistent_views_loaded = True
 
     if not bot.cogs_loaded:
