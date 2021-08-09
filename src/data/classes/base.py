@@ -57,3 +57,9 @@ class Convertable(Base, metaclass=ABCMeta):
     @abstractclassmethod
     async def convert(self, ctx: Context, argument: str) -> Convertable:
         ...
+
+
+class Createable(Base, metaclass=ABCMeta):
+    @abstractclassmethod
+    async def create(self) -> Createable:
+        ...
