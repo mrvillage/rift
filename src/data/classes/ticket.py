@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Optional, Union
 
 import discord
 from discord.ext import commands
-from src.data.query.ticket import query_ticket_config
+from ..query import query_ticket_config
 
 from ..db import execute_query, execute_read_query
 from ..get import get_current_ticket_number, get_ticket
@@ -127,21 +127,38 @@ class TicketConfig(Createable, Fetchable, Initable, Saveable, Setable):
         )
         return self
 
-    async def create(self, user: discord.User) -> Ticket:
-        from ...errors import CategoryNotFoundError, GuildNotFoundError
+    async def create(self, user: discord.Member) -> Ticket:
+        from ...errors import GuildNotFoundError
         from ...ref import bot
 
         guild = bot.get_guild(self.guild_id)
         if guild is None:
             raise GuildNotFoundError(self.guild_id)
-        if self.category_id is None:
-            category = None
+        category = self.category_id and guild.get_channel(self.category_id)
+        if TYPE_CHECKING and category is not None:
+            assert isinstance(category, discord.CategoryChannel)
+        number = await get_current_ticket_number(self.config_id) + 1
+        if category is not None:
+            overwrites = {key: value for key, value in category.overwrites.items()}
+            overwrites[user] = discord.PermissionOverwrite(
+                read_messages=True, send_messages=True
+            )
         else:
-            category = self.category_id and guild.get_channel(self.category_id)
-            if category is None:
-                raise CategoryNotFoundError(self.category_id)
-        number = await get_current_ticket_number(self.config_id)
-        channel = await guild.create_text_channel(f"ticket-{number}")
+            default_permissions = discord.PermissionOverwrite(
+                **{
+                    i: getattr(guild.default_role.permissions, i)
+                    for i in dir(guild.default_role.permissions)
+                    if isinstance(getattr(guild.default_role.permissions, i), bool)
+                }
+            )
+            overwrites = {guild.default_role: default_permissions, user: discord.PermissionOverwrite(
+                read_messages=True, send_messages=True
+            )}
+        channel = await guild.create_text_channel(
+            f"ticket-{number}",
+            overwrites=overwrites,
+            category=category,
+        )
         data = {
             "ticket_id": channel.id,
             "ticket_number": number,
@@ -152,4 +169,9 @@ class TicketConfig(Createable, Fetchable, Initable, Saveable, Setable):
         }
         if TYPE_CHECKING:
             assert isinstance(data, TicketData)
-        return Ticket(data)
+        ticket = Ticket(data)
+        await ticket.save()
+        return ticket
+
+    def __int__(self) -> int:
+        return self.config_id
