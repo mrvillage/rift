@@ -111,7 +111,7 @@ class Button(discord.ui.Button):
                     ),
                 )
         elif self.action in {"CREATE_TICKET", "CREATE_TICKETS"}:
-            Ticket
+            ...
         elif self.action in {"CLOSE_TICKET", "CREATE_TICKETS"}:
             ...
         elif self.action in {"CREATE_EMBASSY", "CREATE_EMBASSIES"}:
