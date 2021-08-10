@@ -1,5 +1,5 @@
+import json
 from asyncio import TimeoutError
-from src.data.classes.menu import MenuItem
 from typing import TYPE_CHECKING
 
 import discord
@@ -7,7 +7,7 @@ from discord.ext import commands
 
 from ... import funcs
 from ...checks import has_manage_permissions
-from ...data.classes import Menu
+from ...data.classes import Menu, MenuItem
 from ...data.query import get_menus_user
 from ...flags import ButtonFlags, SelectFlags, SelectOptionFlags
 from ...ref import Rift
@@ -117,7 +117,7 @@ class Menus(commands.Cog):
                             "item_id": message.id,
                             "owner_id": ctx.author.id,
                             "type_": "button",
-                            "data_": flags,
+                            "data_": json.dumps(flags),
                         }
                     )
                     menu.add_item(item, row)
