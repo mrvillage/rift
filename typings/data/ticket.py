@@ -8,7 +8,6 @@ __all__ = ("TicketData", "TicketConfigData")
 class TicketData(TypedDict):
     ticket_id: int
     ticket_number: int
-    channel_id: int
     config_id: int
     guild_id: int
     user_id: int
