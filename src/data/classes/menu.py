@@ -47,8 +47,10 @@ class Button(discord.ui.Button):
     async def callback(self, interaction: discord.Interaction) -> None:
         # sourcery no-metrics
         from ...funcs import get_embed_author_member
-        from ...ref import bot
-        from .embassy import Embassy
+        from ..get import get_link_user
+        from .alliance import Alliance
+        from .embassy import EmbassyConfig
+        from .nation import Nation
         from .ticket import TicketConfig
 
         if TYPE_CHECKING:
@@ -137,7 +139,57 @@ class Button(discord.ui.Button):
         elif self.action in {"CLOSE_TICKET", "CREATE_TICKETS"}:
             ...
         elif self.action in {"CREATE_EMBASSY", "CREATE_EMBASSIES"}:
-            ...
+            await interaction.response.defer()
+            configs = [await EmbassyConfig.fetch(opt) for opt in self.options]
+            embassies = []
+            try:
+                nation = await get_link_user(interaction.user.id)
+                nation = await Nation.fetch(nation[1])
+                alliance = await Alliance.fetch(nation.alliance_id)
+                if nation.alliance_position not in {"Officer", "Heir", "Leader"}:
+                    raise KeyError
+            except IndexError:
+                return await interaction.followup.send(
+                    ephemeral=True,
+                    embed=get_embed_author_member(
+                        interaction.user,
+                        "You must be linked to create an embassy.",
+                        color=discord.Color.red(),
+                    ),
+                )
+            except KeyError:
+                return await interaction.followup.send(
+                    ephemeral=True,
+                    embed=get_embed_author_member(
+                        interaction.user,
+                        "You must be an Officer or higher to create an embassy.",
+                        color=discord.Color.red(),
+                    ),
+                )
+            for config in configs:
+                if config.guild_id != interaction.guild.id:
+                    continue
+                embassy, start = await config.create(interaction.user, alliance)
+                if start:
+                    await embassy.start(interaction.user, config)
+                embassies.append(embassy)
+            if len(embassies) > 1:
+                embassies = "\n".join(
+                    f"<#{embassy.embassy_id}" for embassy in embassies
+                )
+                await interaction.followup.send(
+                    ephemeral=True,
+                    embed=get_embed_author_member(
+                        interaction.user, f"Embassies:\n{embassies}"
+                    ),
+                )
+            else:
+                await interaction.followup.send(
+                    ephemeral=True,
+                    embed=get_embed_author_member(
+                        interaction.user, f"Embassy:\n<#{embassies[0].embassy_id}>"
+                    ),
+                )
         elif self.action in {"CLOSE_EMBASSY", "CLOSE_EMBASSIES"}:
             ...
 
@@ -372,8 +424,8 @@ class MenuItem(Fetchable, Initable, Saveable):
     @staticmethod
     async def format_flags(
         ctx: commands.Context, flags: Mapping[str, List[Any]]
-    ) -> MutableMapping[str, Any]:
-        from .embassy import Embassy
+    ) -> MutableMapping[str, Any]:  # sourcery no-metrics
+        from .embassy import Embassy, EmbassyConfig
         from .ticket import Ticket, TicketConfig
 
         formatted_flags = {}
@@ -408,8 +460,14 @@ class MenuItem(Fetchable, Initable, Saveable):
                         )
                     elif formatted_flags["action"] in {
                         "CREATE_EMBASSY",
-                        "CLOSE_EMBASSY",
                         "CREATE_EMBASSIES",
+                    }:
+                        if j.isdigit():
+                            formatted_flags["options"].add(
+                                int(await EmbassyConfig.fetch(int(j)))
+                            )
+                    elif formatted_flags["action"] in {
+                        "CLOSE_EMBASSY",
                         "CLOSE_EMBASSIES",
                     }:
                         formatted_flags["options"].add(
