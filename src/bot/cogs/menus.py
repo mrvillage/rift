@@ -32,7 +32,7 @@ class Menus(commands.Cog):
         if menu is None:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, "You didn't specify a menu!"
+                    ctx.author, "You didn't specify a menu!", color=discord.Color.red()
                 )
             )
         if TYPE_CHECKING:
@@ -55,7 +55,7 @@ class Menus(commands.Cog):
         else:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, "You don't have any menus!"
+                    ctx.author, "You don't have any menus!", color=discord.Color.red()
                 )
             )
 
@@ -67,7 +67,11 @@ class Menus(commands.Cog):
             assert isinstance(ctx.message, discord.Message)
         menu = Menu.default(ctx.message.id, ctx.author.id)
         main_message = await ctx.reply(
-            embed=funcs.get_embed_author_member(ctx.author, "Placeholder.")
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                "Waiting for followup messages to assemble a menu...",
+                color=discord.Color.blue(),
+            )
         )
         try:
             running = True
@@ -107,7 +111,7 @@ class Menus(commands.Cog):
                     if not MenuItem.validate_flags(flags):
                         await ctx.reply(
                             embed=funcs.get_embed_author_member(
-                                ctx.author, "Invalid item."
+                                ctx.author, "Invalid item.", color=discord.Color.red()
                             )
                         )
                         continue
@@ -149,7 +153,9 @@ class Menus(commands.Cog):
                 if not any(menu.items):
                     return await ctx.reply(
                         embed=funcs.get_embed_author_member(
-                            ctx.author, "You didn't add any items!"
+                            ctx.author,
+                            "You didn't add any items!",
+                            color=discord.Color.red(),
                         )
                     )
                 for row in menu.items:
@@ -157,7 +163,11 @@ class Menus(commands.Cog):
                         await item.save()
                 await menu.save()
                 await main_message.reply(
-                    embed=funcs.get_embed_author_member(ctx.author, "")
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "\n\n".join(str(j) for i in menu.items for j in i),
+                        color=discord.Color.green(),
+                    )
                 )
         except TimeoutError:
             pass
