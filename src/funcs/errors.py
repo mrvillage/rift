@@ -1,22 +1,24 @@
+from __future__ import annotations
+
 import sys
 import traceback
 
 import discord
 from discord.ext import commands
 
+from ..errors import AllianceNotFoundError, NationNotFoundError
 from .embeds import get_embed_author_member
 from .utils import get_command_signature
 
 
-async def print_handler(ctx, error):
+async def print_handler(ctx: commands.Context, error: Exception) -> None:
     if hasattr(ctx.command, "on_error"):
         return
-    cog = ctx.cog
     print("Ignoring exception in command {}:".format(ctx.command), file=sys.stderr)
     traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 
-async def handler(ctx, error):
+async def handler(ctx: commands.Context, error: Exception) -> None:
     try:
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
@@ -56,6 +58,22 @@ async def handler(ctx, error):
                 embed=get_embed_author_member(
                     ctx.author,
                     "You can't use that command in a server! Try it in DMs instead.",
+                )
+            )
+        elif isinstance(error, NationNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No nation found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                )
+            )
+        elif isinstance(error, AllianceNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No alliance found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
                 )
             )
         else:
