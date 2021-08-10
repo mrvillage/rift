@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, Union
 
 from src.data.query.ticket import (
+    query_current_ticket_number,
     query_ticket,
     query_ticket_config,
     query_ticket_config_by_category,
-    query_current_ticket_number,
 )
 
 from ..query import (
@@ -51,4 +51,7 @@ async def get_ticket_config(
 
 
 async def get_current_ticket_number(config_id: int) -> int:
-    return await query_current_ticket_number(config_id)
+    data = await query_current_ticket_number(config_id)
+    if data is None:
+        return 0
+    return data
