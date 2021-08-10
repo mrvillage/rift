@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from json import dumps, loads
 from typing import (
+    TYPE_CHECKING,
     Any,
     Dict,
     List,
     Mapping,
     MutableMapping,
     Sequence,
-    TYPE_CHECKING,
     Union,
 )
 
@@ -46,10 +46,10 @@ class Button(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction) -> None:
         # sourcery no-metrics
-        from .embassy import Embassy
-        from .ticket import Ticket
         from ...funcs import get_embed_author_member
         from ...ref import bot
+        from .embassy import Embassy
+        from .ticket import TicketConfig
 
         if TYPE_CHECKING:
             assert isinstance(interaction.user, discord.Member)
@@ -111,11 +111,33 @@ class Button(discord.ui.Button):
                     ),
                 )
         elif self.action in {"CREATE_TICKET", "CREATE_TICKETS"}:
-            ...
+            configs = [await TicketConfig.fetch(opt) for opt in self.options]
+            tickets = []
+            for config in configs:
+                if config.guild_id != interaction.guild.id:
+                    continue
+                ticket = await config.create(interaction.user)
+                await ticket.start(interaction.user, config)
+                tickets.append(ticket)
+            if len(tickets) > 1:
+                tickets = "\n".join(f"<#{ticket.ticket_id}" for ticket in tickets)
+                await interaction.followup.send(
+                    ephemeral=True,
+                    embed=get_embed_author_member(
+                        interaction.user, f"Tickets Created!\n{tickets}"
+                    ),
+                )
+            else:
+                await interaction.followup.send(
+                    ephemeral=True,
+                    embed=get_embed_author_member(
+                        interaction.user, f"Ticket Created!\n<#{tickets[0].ticket_id}>"
+                    ),
+                )
         elif self.action in {"CLOSE_TICKET", "CREATE_TICKETS"}:
             ...
         elif self.action in {"CREATE_EMBASSY", "CREATE_EMBASSIES"}:
-            Ticket
+            ...
         elif self.action in {"CLOSE_EMBASSY", "CLOSE_EMBASSIES"}:
             ...
 
@@ -351,14 +373,14 @@ class MenuItem(Fetchable, Initable, Saveable):
     async def format_flags(
         ctx: commands.Context, flags: Mapping[str, List[Any]]
     ) -> MutableMapping[str, Any]:
-        from .ticket import Ticket
         from .embassy import Embassy
+        from .ticket import Ticket, TicketConfig
 
         formatted_flags = {}
         if "action" in flags:
             formatted_flags["action"] = flags["action"][0].upper().replace(" ", "_")
         if "style" in flags:
-            formatted_flags["style"] = discord.ButtonStyle[flags["style"][0].lower()]
+            formatted_flags["style"] = flags["style"][0].lower()
         if "options" in flags:
             formatted_flags["options"] = set()
             for i in flags["options"]:
@@ -374,10 +396,13 @@ class MenuItem(Fetchable, Initable, Saveable):
                         )
                     elif formatted_flags["action"] in {
                         "CREATE_TICKET",
-                        "CLOSE_TICKET",
                         "CREATE_TICKETS",
-                        "CLOSE_TICKETS",
                     }:
+                        if j.isdigit():
+                            formatted_flags["options"].add(
+                                int(await TicketConfig.fetch(int(j)))
+                            )
+                    elif formatted_flags["action"] in {"CLOSE_TICKET", "CLOSE_TICKETS"}:
                         formatted_flags["options"].add(
                             int(await Ticket.convert(ctx, j))
                         )
