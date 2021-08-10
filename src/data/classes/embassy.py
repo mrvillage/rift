@@ -1,24 +1,214 @@
 from __future__ import annotations
+from src.data.query.embassy import query_embassy_by_guild
 
+from typing import TYPE_CHECKING, Optional, Tuple, Union
+
+import discord
 from discord.ext import commands
+from ..query import query_embassy_config
 
-from .base import Convertable, Fetchable, Initable, Saveable
+from ..db import execute_query, execute_read_query
+from ..get import get_embassy
+from .base import (
+    Convertable,
+    Createable,
+    Deleteable,
+    Fetchable,
+    Initable,
+    Saveable,
+    Setable,
+)
+
+__all__ = ("Embassy", "EmbassyConfig")
+
+if TYPE_CHECKING:
+    from .alliance import Alliance
+    from typings import EmbassyConfigData, EmbassyData
 
 
-class Embassy(Convertable, Fetchable, Initable, Saveable):
-    def __init__(self) -> None:
-        ...
+class Embassy(Convertable, Deleteable, Fetchable, Initable, Saveable):
+    embassy_id: int
+    alliance_id: int
+    config_id: int
+    guild_id: int
+    user_id: int
+    __slots__ = (
+        "embassy_id",
+        "alliance_id",
+        "config_id",
+        "guild_id",
+        "user_id",
+    )
+
+    def __init__(self, data: EmbassyData) -> None:
+        self.embassy_id = data["embassy_id"]
+        self.alliance_id = data["alliance_id"]
+        self.config_id = data["config_id"]
+        self.guild_id = data["guild_id"]
+        self.user_id = data["user_id"]
+        self.open = data["open"]
 
     @classmethod
-    async def fetch(cls, guild_id: int, alliance_id: int) -> Embassy:
-        ...
+    async def fetch(cls, embassy_id: int) -> Embassy:
+        return cls(await get_embassy(embassy_id=embassy_id))
 
     async def save(self) -> None:
-        ...
+        await execute_read_query(
+            """INSERT INTO embassies (embassy_id, alliance_id, config_id, guild_id, user_id, open) VALUES ($1, $2, $3, $4, $5, $6);""",
+            self.embassy_id,
+            self.alliance_id,
+            self.config_id,
+            self.guild_id,
+            self.user_id,
+            self.open,
+        )
 
     @classmethod
     async def convert(cls, ctx: commands.Context, argument: str) -> Embassy:
         ...
 
+    async def delete(self) -> None:
+        await execute_read_query(
+            """DELETE FROM embassies WHERE embassy_id = $1;""", self.embassy_id
+        )
+
     def __int__(self) -> int:
-        ...
+        return self.embassy_id
+
+    async def start(
+        self,
+        user: discord.Member,
+        config: EmbassyConfig,
+        *,
+        response: discord.InteractionResponse = None,
+    ) -> None:
+        from ...funcs import get_embed_author_member
+
+        channel = user.guild.get_channel(self.embassy_id)
+        if TYPE_CHECKING:
+            assert isinstance(channel, discord.TextChannel)
+        if response is not None:
+            await response.send_message(
+                ephemeral=True,
+                embed=get_embed_author_member(
+                    user, f"Check out your embassy here {channel.mention}!"
+                ),
+            )
+        await channel.send(
+            user.mention, embed=get_embed_author_member(user, config.start_message)
+        )
+
+
+class EmbassyConfig(Createable, Fetchable, Initable, Saveable, Setable):
+    config_id: int
+    category_id: Optional[int]
+    guild_id: int
+    start_message: str
+    __slots__ = (
+        "config_id",
+        "category_id",
+        "guild_id",
+        "start_message",
+    )
+
+    def __init__(self, data: EmbassyConfigData) -> None:
+        self.config_id = data["config_id"]
+        self.category_id = data["category_id"]
+        self.guild_id = data["guild_id"]
+        self.start_message = data["start_message"]
+
+    @classmethod
+    async def fetch(cls, config_id: int) -> EmbassyConfig:
+        return EmbassyConfig(await query_embassy_config(config_id=config_id))
+
+    async def save(self) -> None:
+        await execute_read_query(
+            """INSERT INTO embassy_configs (config_id, category_id, guild_id) VALUES ($1, $2, $3);""",
+            self.config_id,
+            self.category_id,
+            self.guild_id,
+        )
+
+    async def set_(self, **kwargs: Union[int, bool]) -> EmbassyConfig:
+        sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
+        sets = ", ".join(sets)
+        args = tuple(kwargs.values())
+        await execute_query(
+            f"""
+        UPDATE embassy_configs SET {sets} WHERE config_id = $1;
+        """,
+            self.config_id,
+            *args,
+        )
+        return self
+
+    async def create(
+        self, user: discord.Member, alliance: Alliance
+    ) -> Tuple[Embassy, bool]:
+        from ...errors import GuildNotFoundError
+        from ...ref import bot
+
+        embassies = await query_embassy_by_guild(self.guild_id)
+        valid = [
+            i
+            for i in embassies
+            if i["config_id"] == self.config_id and i["alliance_id"] == alliance.id
+        ]
+        if valid:
+            embassy = await Embassy.fetch(valid[0]["embassy_id"])
+            channel = bot.get_channel(embassy.embassy_id)
+            if channel is None:
+                await embassy.delete()
+            else:
+                if TYPE_CHECKING:
+                    assert isinstance(channel, discord.TextChannel)
+                await channel.set_permissions(
+                    user, read_messages=True, send_messages=True
+                )
+                return embassy, False
+        guild = bot.get_guild(self.guild_id)
+        if guild is None:
+            raise GuildNotFoundError(self.guild_id)
+        category = self.category_id and guild.get_channel(self.category_id)
+        if TYPE_CHECKING and category is not None:
+            assert isinstance(category, discord.CategoryChannel)
+        if category is not None:
+            overwrites = {key: value for key, value in category.overwrites.items()}
+            overwrites[user] = discord.PermissionOverwrite(
+                read_messages=True, send_messages=True
+            )
+        else:
+            default_permissions = discord.PermissionOverwrite(
+                **{
+                    i: getattr(guild.default_role.permissions, i)
+                    for i in dir(guild.default_role.permissions)
+                    if isinstance(getattr(guild.default_role.permissions, i), bool)
+                }
+            )
+            overwrites = {
+                guild.default_role: default_permissions,
+                user: discord.PermissionOverwrite(
+                    read_messages=True, send_messages=True
+                ),
+            }
+        channel = await guild.create_text_channel(
+            f"{alliance.id} {alliance.name}",
+            overwrites=overwrites,
+            category=category,
+        )
+        data = {
+            "embassy_id": channel.id,
+            "alliance_id": alliance.id,
+            "config_id": self.config_id,
+            "guild_id": self.guild_id,
+            "user_id": user.id,
+            "open": True,
+        }
+        if TYPE_CHECKING:
+            assert isinstance(data, EmbassyData)
+        embassy = Embassy(data)
+        await embassy.save()
+        return embassy, True
+
+    def __int__(self) -> int:
+        return self.config_id
