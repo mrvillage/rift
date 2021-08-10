@@ -19,11 +19,7 @@ if TYPE_CHECKING:
 
 
 async def get_ticket(
-    *,
-    ticket_id: int = None,
-    channel_id: int = None,
-    config_id: int = None,
-    guild_id: int = None
+    *, ticket_id: int = None, channel_id: int = None, config_id: int = None
 ) -> TicketData:
     if ticket_id is not None:
         return await query_ticket(ticket_id)
@@ -31,8 +27,6 @@ async def get_ticket(
         return await query_ticket_by_channel(channel_id)
     if config_id is not None:
         return await query_ticket_by_config(config_id)
-    if guild_id is not None:
-        return await query_ticket_by_guild(guild_id)
     raise ValueError("No arguments given")
 
 
