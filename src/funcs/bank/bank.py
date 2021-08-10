@@ -11,7 +11,7 @@ async def withdraw(*, transaction, receiver, note: str = None):
         transaction_data["token"] = bot.auth_token
     async with bot.pnw_session.request(
         "POST",
-        "https://politicsandwar.com/alliance/id=7719&display=bank",
+        "https://politicsandwar.com/alliance/id=3683&display=bank",
         data=transaction_data,
     ) as response:
         content = await response.text()

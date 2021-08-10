@@ -31,12 +31,13 @@ async def check_bank_perms(*, nation: Nation, author: Union[Member, User], actio
     try:
         perm = (
             await execute_read_query(
-                "SELECT * FROM bankpermissions WHERE allianceid = 7719;"
+                "SELECT * FROM bankpermissions WHERE allianceid = 3683;"
             )
         )[0]
         nation_position = get_alliance_position_id(nation.alliance_position)
         alliance_position = get_alliance_position_id(perm[f"{action}rank"])
-        if nation_position >= alliance_position and nation.alliance.id == 7719:
+        await nation.make_attrs("alliance")
+        if nation_position >= alliance_position and nation.alliance.id == 3683:
             return True
         if (
             author.id in json.loads(perm[f"{action}users"])
@@ -53,5 +54,5 @@ async def check_bank_perms(*, nation: Nation, author: Union[Member, User], actio
         if any(role in role_perms for role in roles):
             return True
         return False
-    except Exception:  # pylint: disable=broad-except
+    except Exception as error:  # pylint: disable=broad-except
         return False
