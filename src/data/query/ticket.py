@@ -10,6 +10,7 @@ __all__ = (
     "query_ticket_by_config",
     "query_ticket_by_guild",
     "query_ticket_config",
+    "query_ticket_config_by_category",
     "query_ticket_config_by_guild",
     "query_current_ticket_number",
 )

@@ -1,19 +1,15 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, Union
-
-from src.data.query.ticket import (
-    query_current_ticket_number,
-    query_ticket,
-    query_ticket_config,
-    query_ticket_config_by_category,
-)
+from typing import TYPE_CHECKING
 
 from ..query import (
+    query_current_ticket_number,
     query_ticket,
     query_ticket_by_channel,
     query_ticket_by_config,
     query_ticket_by_guild,
+    query_ticket_config,
+    query_ticket_config_by_category,
 )
 
 __all__ = ("get_ticket", "get_ticket_config", "get_current_ticket_number")
