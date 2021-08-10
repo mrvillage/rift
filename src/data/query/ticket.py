@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, Union, cast
+from typing import TYPE_CHECKING, Tuple
 
 from ..db import execute_read_query
 
@@ -96,17 +96,16 @@ async def query_ticket_config_by_category(category_id: int) -> TicketConfigData:
     return data
 
 
-async def query_ticket_config_by_guild(guild_id: int) -> TicketConfigData:
-    data = dict(
-        (
-            await execute_read_query(
-                "SELECT * FROM ticket_configs WHERE guild_id = $1;", guild_id
-            )
-        )
+async def query_ticket_config_by_guild(guild_id: int) -> Tuple[TicketConfigData, ...]:
+    raw = await execute_read_query(
+        "SELECT * FROM ticket_configs WHERE guild_id = $1;", guild_id
     )
-    if TYPE_CHECKING:
-        assert isinstance(data, TicketConfigData)
-    return data
+    data = []
+    for dat in raw:
+        if TYPE_CHECKING:
+            assert isinstance(data, TicketConfigData)
+        data.append(dat)
+    return tuple(data)
 
 
 async def query_current_ticket_number(config_id: int) -> int:
