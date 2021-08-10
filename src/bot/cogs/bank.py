@@ -193,7 +193,9 @@ class Bank(commands.Cog):
     async def bank_balance(self, ctx: commands.Context, *, search=None):
         search = str(ctx.author.id) if search is None else search
         try:
-            alliance = (await rift.search_nation(ctx, search)).alliance
+            nation = await rift.search_nation(ctx, search)
+            await nation.make_attrs("alliance")
+            alliance = nation.alliance
         except NationNotFoundError:
             try:
                 alliance = rift.search_alliance(ctx, search)
