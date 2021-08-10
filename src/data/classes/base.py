@@ -65,7 +65,13 @@ class Createable(Base, metaclass=ABCMeta):
         ...
 
 
-class ClassCreateable(Createable, metaclass=ABCMeta):
+class ClassCreateable(Base, metaclass=ABCMeta):
     @abstractclassmethod
-    async def create(self) -> Createable:
+    async def create(self) -> ClassCreateable:
+        ...
+
+
+class Deleteable(Base, metaclass=ABCMeta):
+    @abstractmethod
+    async def delete(self) -> None:
         ...
