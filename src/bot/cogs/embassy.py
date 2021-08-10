@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from typings import EmbassyConfigData
 
 
-class Embassy(commands.Cog):
+class Embassies(commands.Cog):
     def __init__(self, bot: Rift):
         self.bot = bot
 
@@ -91,4 +91,4 @@ class Embassy(commands.Cog):
 
 
 def setup(bot: Rift) -> None:
-    bot.add_cog(Embassy(bot))
+    bot.add_cog(Embassies(bot))
