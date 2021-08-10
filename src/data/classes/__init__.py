@@ -9,5 +9,6 @@ from .nation import *
 from .resources import *
 from .server import *
 from .settings import *
+from .ticket import *
 from .trade import *
 from .treaty import *
