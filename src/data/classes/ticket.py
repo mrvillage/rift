@@ -1,24 +1,155 @@
 from __future__ import annotations
 
-from discord.ext import commands
+from typing import TYPE_CHECKING, Optional, Union
 
-from .base import Convertable, Fetchable, Initable, Saveable
+import discord
+from discord.ext import commands
+from src.data.query.ticket import query_ticket_config
+
+from ..db import execute_query, execute_read_query
+from ..get import get_current_ticket_number, get_ticket
+from .base import Convertable, Createable, Fetchable, Initable, Saveable, Setable
+
+__all__ = ("Ticket", "TicketConfig")
+
+if TYPE_CHECKING:
+    from typings import TicketConfigData, TicketData
 
 
 class Ticket(Convertable, Fetchable, Initable, Saveable):
-    def __init__(self) -> None:
-        ...
+    ticket_id: int
+    ticket_number: int
+    config_id: int
+    guild_id: int
+    user_id: int
+    __slots__ = (
+        "ticket_id",
+        "ticket_number",
+        "config_id",
+        "guild_id",
+        "user_id",
+    )
+
+    def __init__(self, data: TicketData) -> None:
+        self.ticket_id = data["ticket_id"]
+        self.ticket_number = data["ticket_number"]
+        self.config_id = data["config_id"]
+        self.guild_id = data["guild_id"]
+        self.user_id = data["user_id"]
+        self.open = data["open"]
 
     @classmethod
-    async def fetch(cls, guild_id: int, alliance_id: int) -> Ticket:
-        ...
+    async def fetch(cls, ticket_id: int) -> Ticket:
+        return Ticket(await get_ticket(ticket_id=ticket_id))
 
     async def save(self) -> None:
-        ...
+        await execute_read_query(
+            """INSERT INTO tickets (ticket_id, ticket_number, config_id, guild_id, user_id, open) VALUES ($1, $2, $3, $4, $5, $6);""",
+            self.ticket_id,
+            self.ticket_number,
+            self.config_id,
+            self.guild_id,
+            self.user_id,
+            self.open,
+        )
 
     @classmethod
     async def convert(cls, ctx: commands.Context, argument: str) -> Ticket:
         ...
 
     def __int__(self) -> int:
-        ...
+        return self.ticket_id
+
+    async def start(
+        self,
+        user: discord.Member,
+        config: TicketConfig,
+        *,
+        response: discord.InteractionResponse = None,
+    ) -> None:
+        from ...funcs import get_embed_author_member
+
+        channel = user.guild.get_channel(self.ticket_id)
+        if TYPE_CHECKING:
+            assert isinstance(channel, discord.TextChannel)
+        if response is not None:
+            await response.send_message(
+                ephemeral=True,
+                embed=get_embed_author_member(
+                    user, f"Check out your ticket here {channel.mention}!"
+                ),
+            )
+        await channel.send(
+            user.mention, embed=get_embed_author_member(user, config.start_message)
+        )
+
+
+class TicketConfig(Createable, Fetchable, Initable, Saveable, Setable):
+    config_id: int
+    category_id: Optional[int]
+    guild_id: int
+    start_message: str
+    __slots__ = (
+        "config_id",
+        "category_id",
+        "guild_id",
+        "start_message",
+    )
+
+    def __init__(self, data: TicketConfigData) -> None:
+        self.config_id = data["config_id"]
+        self.category_id = data["category_id"]
+        self.guild_id = data["guild_id"]
+        self.start_message = data["start_message"]
+
+    @classmethod
+    async def fetch(cls, config_id: int) -> TicketConfig:
+        return TicketConfig(await query_ticket_config(config_id=config_id))
+
+    async def save(self) -> None:
+        await execute_read_query(
+            """INSERT INTO ticket_configs (config_id, category_id, guild_id) VALUES ($1, $2, $3);""",
+            self.config_id,
+            self.category_id,
+            self.guild_id,
+        )
+
+    async def set_(self, **kwargs: Union[int, bool]) -> TicketConfig:
+        sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
+        sets = ", ".join(sets)
+        args = tuple(kwargs.values())
+        await execute_query(
+            f"""
+        UPDATE ticket_configs SET {sets} WHERE config_id = $1;
+        """,
+            self.config_id,
+            *args,
+        )
+        return self
+
+    async def create(self, user: discord.User) -> Ticket:
+        from ...errors import CategoryNotFoundError, GuildNotFoundError
+        from ...ref import bot
+
+        guild = bot.get_guild(self.guild_id)
+        if guild is None:
+            raise GuildNotFoundError(self.guild_id)
+        if self.category_id is None:
+            category = None
+        else:
+            category = self.category_id and guild.get_channel(self.category_id)
+            if category is None:
+                raise CategoryNotFoundError(self.category_id)
+        number = await get_current_ticket_number(self.config_id)
+        channel = await guild.create_text_channel(f"ticket-{number}")
+        data = {
+            "ticket_id": channel.id,
+            "ticket_number": number,
+            "config_id": self.config_id,
+            "guild_id": self.guild_id,
+            "user_id": user.id,
+            "open": True,
+        }
+        if TYPE_CHECKING:
+            assert isinstance(data, TicketData)
+        return Ticket(data)
