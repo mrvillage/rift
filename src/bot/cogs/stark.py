@@ -1,18 +1,90 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
-from ... import funcs
+
+import datetime
+from src.data.classes.resources import Resources
+from src.funcs.bank.bank import withdraw
+from src.data.classes.bank.transaction import Transaction
+from typing import Optional, TYPE_CHECKING
 
 import discord
-from discord.ext import commands
 import pnwkit
+from discord.ext import commands, tasks
 
-from ...data.classes import Nation, TradePrices
+from ... import funcs
+from ...data.classes import Alliance, Nation, TradePrices
 from ...ref import Rift
+
+
+class Confirm(discord.ui.View):
+    """
+    self.interaction is available so the command can perform a result on it's own
+    """
+
+    value: Optional[bool]
+
+    def __init__(self):
+        super().__init__(timeout=None)
+        self.value = None
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        return 240113452616515584 in [role.id for role in interaction.user.roles]
+
+    @discord.ui.button(
+        custom_id="bVks6is6YFCGzORPwfmLJXrcIWBK9HzyWg8DpYJGrqyl2UKc4aWmrUTmbsNfwCgWOV3BkUXp087FOvEK",
+        label="Yes",
+        style=discord.ButtonStyle.green,
+    )
+    async def yes(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.interaction = interaction
+        self.value = True
+        await interaction.response.defer()
+        main = await Alliance.fetch(3683)
+        offshore = await Alliance.fetch(8139)
+        resources = await main.get_resources()
+        transaction = Transaction(resources=resources)
+        complete = await withdraw(
+            transaction=transaction,
+            receiver=offshore,
+            note=f"Automatic offshore deposit approved by {interaction.user.name}#{interaction.user.discriminator}",
+        )
+        if not complete:
+            complete = await withdraw(
+                transaction=transaction,
+                receiver=offshore,
+                note=f"Automatic offshore deposit approved by {interaction.user.name}#{interaction.user.discriminator}",
+            )
+        if TYPE_CHECKING:
+            assert isinstance(interaction.user, discord.Member)
+        if not complete:
+            return await interaction.followup.send(
+                embed=funcs.get_embed_author_member(
+                    interaction.user,
+                    "Something went wrong sending the alliance bank. Please try again later.",
+                )
+            )
+        await interaction.followup.send(
+            embed=funcs.get_embed_author_member(
+                interaction.user, f"Alliance bank transfer complete. Sent {resources}"
+            )
+        )
+        self.stop()
+
+    @discord.ui.button(
+        custom_id="r2eTyOp98ZMQ7MHdGkskhxK7QEVZKPfOmmZoYD5Ncj3IcKdOfVOzHA58O9zSWn9mL0SuXjxcZ6V5dQVW",
+        label="No",
+        style=discord.ButtonStyle.red,
+    )
+    async def no(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.interaction = interaction
+        self.value = False
+        await interaction.edit_original_message(view=None)
+        self.stop()
 
 
 class HouseStark(commands.Cog):
     def __init__(self, bot: Rift):
         self.bot = bot
+        self.bank_send_task.start()
 
     @commands.command(name="mmr")
     async def mmr(self, ctx: commands.Context, *, nation: Nation = None):
@@ -135,6 +207,32 @@ class HouseStark(commands.Cog):
                 color=discord.Color.orange(),
             )
         )
+
+    @tasks.loop(hours=24)
+    async def bank_send_task(self):
+        channel = self.bot.get_channel(239099900174925824)
+        if not channel:
+            return
+        if TYPE_CHECKING:
+            assert isinstance(channel, discord.TextChannel)
+        await channel.send(
+            embed=funcs.get_embed_author_guild(
+                channel.guild,
+                f"Please authorize sending the contents of the bank offshore.",
+            ),
+            view=Confirm(),
+        )
+
+    @bank_send_task.before_loop
+    async def before_bank_send_task(self):
+        await self.bot.wait_until_ready()
+        now = discord.utils.utcnow()
+        wait = now.replace(hour=22, minute=5, second=0)
+        while wait < now:
+            wait += datetime.timedelta(days=1)
+        print(f"Waiting until {wait} to send bank!")
+        await self.bot.update_pnw_session()
+        # await discord.utils.sleep_until(wait)
 
 
 def setup(bot: Rift) -> None:
