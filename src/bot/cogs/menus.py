@@ -116,8 +116,8 @@ class Menus(commands.Cog):
                         {
                             "item_id": message.id,
                             "owner_id": ctx.author.id,
-                            "type": "button",
-                            "data": flags,
+                            "type_": "button",
+                            "data_": flags,
                         }
                     )
                     menu.add_item(item, row)
