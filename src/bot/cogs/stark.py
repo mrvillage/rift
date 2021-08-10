@@ -27,6 +27,8 @@ class Confirm(discord.ui.View):
         self.value = None
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if TYPE_CHECKING:
+            assert isinstance(interaction.user, discord.Member)
         return 240113452616515584 in [role.id for role in interaction.user.roles]
 
     @discord.ui.button(
@@ -42,6 +44,8 @@ class Confirm(discord.ui.View):
         offshore = await Alliance.fetch(8139)
         resources = await main.get_resources()
         transaction = Transaction(resources=resources)
+        if TYPE_CHECKING:
+            assert isinstance(interaction.user, discord.Member)
         complete = await withdraw(
             transaction=transaction,
             receiver=offshore,
@@ -232,7 +236,7 @@ class HouseStark(commands.Cog):
             wait += datetime.timedelta(days=1)
         print(f"Waiting until {wait} to send bank!")
         await self.bot.update_pnw_session()
-        # await discord.utils.sleep_until(wait)
+        await discord.utils.sleep_until(wait)
 
 
 def setup(bot: Rift) -> None:
