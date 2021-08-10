@@ -45,17 +45,16 @@ async def query_ticket_by_channel(channel_id: int) -> TicketData:
     return data
 
 
-async def query_ticket_by_guild(guild_id: int) -> TicketData:
-    data = dict(
-        (
-            await execute_read_query(
-                "SELECT * FROM tickets WHERE guild_id = $1;", guild_id
-            )
-        )
+async def query_ticket_by_guild(guild_id: int) -> Tuple[TicketData, ...]:
+    raw = await execute_read_query(
+        "SELECT * FROM tickets WHERE guild_id = $1;", guild_id
     )
-    if TYPE_CHECKING:
-        assert isinstance(data, TicketData)
-    return data
+    data = []
+    for dat in raw:
+        if TYPE_CHECKING:
+            assert isinstance(data, TicketConfigData)
+        data.append(dat)
+    return tuple(data)
 
 
 async def query_ticket_by_config(config_id: int) -> TicketData:
