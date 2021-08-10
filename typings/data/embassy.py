@@ -8,10 +8,8 @@ __all__ = ("EmbassyData", "EmbassyConfigData")
 class EmbassyData(TypedDict):
     embassy_id: int
     alliance_id: int
-    channel_id: int
     config_id: int
     guild_id: int
-    user_id: int
     open: bool
 
 
