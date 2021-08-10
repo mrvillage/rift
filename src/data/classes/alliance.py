@@ -112,7 +112,7 @@ class Alliance(Embedable, Fetchable, Initable, Makeable):
 
     async def get_resources(self):
         async with bot.pnw_session.request(
-            "GET", "https://politicsandwar.com/alliance/id=7719&display=bank"
+            "GET", f"https://politicsandwar.com/alliance/id={self.id}&display=bank"
         ) as response:
             content = await response.text()
         await bot.parse_token(content)
