@@ -83,7 +83,11 @@ async def on_ready():
     print("Startup complete!")
 
 
-@bot.command(name="rift", aliases=["version", "about", "credits"])
+@bot.command(
+    name="rift",
+    aliases=["version", "about", "credits"],
+    help="Get the bot credits and version.",
+)
 async def rift_about(ctx: Context):
     await ctx.reply(
         embed=funcs.get_embed_author_member(

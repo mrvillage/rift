@@ -48,7 +48,7 @@ class Events(commands.Cog):
                 delay = backoff.delay()
                 await sleep(delay)
 
-    @commands.command(name="subscribe")
+    @commands.command(name="subscribe", help="Subscribe to an event stream.", enabled=False)
     async def subscribe(self, ctx: commands.Context, *, event: str):
         if event not in self.bot.subscribable_events:
             await ctx.send(f"{event} is not a valid event.")

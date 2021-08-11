@@ -19,18 +19,27 @@ class Embassies(commands.Cog):
     def __init__(self, bot: Rift):
         self.bot = bot
 
-    @commands.group(name="embassy")
+    @commands.group(
+        name="embassy",
+        case_insensitive=True,
+        help="A group of commands related to embassies.",
+    )
     @commands.guild_only()
     async def embassy(self, ctx: commands.Context):
         ...
 
-    @embassy.group(name="config")
+    @embassy.group(
+        name="config",
+        help="A group of commands related to embassy configuration.",
+        case_insensitive=True,
+        invoke_without_command=True,
+    )
     @commands.guild_only()
     @has_manage_permissions()
     async def embassy_config(self, ctx: commands.Context):
         ...
 
-    @embassy_config.command(name="create")
+    @embassy_config.command(name="create", help="Create an embassy configuration.")
     @commands.guild_only()
     @has_manage_permissions()
     async def embassy_config_create(
@@ -60,7 +69,9 @@ class Embassies(commands.Cog):
             )
         )
 
-    @embassy_config.command(name="list")
+    @embassy_config.command(
+        name="list", help="List the embassy configurations in the server."
+    )
     @commands.guild_only()
     @has_manage_permissions()
     async def embassy_config_list(self, ctx: commands.Context):
@@ -89,7 +100,10 @@ class Embassies(commands.Cog):
             )
         )
 
-    @embassy_config.command(name="claim")
+    @embassy_config.command(
+        name="claim",
+        help="Claim a channel for an alliance in an embassy configuration.",
+    )
     @commands.guild_only()
     @has_manage_permissions()
     async def embassy_config_claim(

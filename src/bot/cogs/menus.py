@@ -20,6 +20,8 @@ class Menus(commands.Cog):
     @commands.group(
         name="menu",
         aliases=["menus", "role-menu", "rolemenu", "reaction-menu", "reactionmenu"],
+        help="A group of commands related to menus.",
+        case_insensitive=True,
         invoke_without_command=True,
     )
     @has_manage_permissions()
@@ -42,7 +44,9 @@ class Menus(commands.Cog):
         message = await ctx.reply("View", view=view)
         await menu.new_interface(message)
 
-    @menu.command(name="list", aliases=["l", "li"])
+    @menu.command(
+        name="list", aliases=["l", "li"], help="List your menu configurations."
+    )
     async def menu_list(self, ctx: commands.Context):
         menus = await get_menus_user(user_id=ctx.author.id)
         menus = [Menu(data=i) for i in menus]
@@ -59,7 +63,9 @@ class Menus(commands.Cog):
                 )
             )
 
-    @menu.command(name="create", aliases=["new"])
+    @menu.command(
+        name="create", aliases=["new"], help="Create a new menu configuration."
+    )
     @has_manage_permissions()
     async def menu_create(
         self, ctx: commands.Context, *, description: str = None
@@ -184,7 +190,9 @@ class Menus(commands.Cog):
                 )
             )
 
-    @menu.command(name="send", aliases=["post"])
+    @menu.command(
+        name="send", aliases=["post"], help="Send a menu configuration to a channel."
+    )
     @has_manage_permissions()
     async def menu_send(
         self, ctx: commands.Context, menu: Menu, *, channel: discord.TextChannel
