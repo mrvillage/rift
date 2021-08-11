@@ -100,8 +100,8 @@ class GuildWelcomeSettings(BaseSettings):
 
         if self.welcome_message:
             message = self.welcome_message.format(
-                mention=member.author.mention,
-                member=f"{member.author.name}#{member.author.discriminator}",
+                mention=member.mention,
+                member=f"{member.name}#{member.discriminator}",
                 guild=member.guild.name,
                 server=member.guild.name,
             )
