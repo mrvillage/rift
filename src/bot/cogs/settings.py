@@ -44,7 +44,7 @@ class Settings(commands.Cog):
 
     @server_settings.command(name="welcome-message", aliases=["wm", "welcomemessage"])
     @has_manage_permissions()
-    async def server_settings_welcome_messge(
+    async def server_settings_welcome_message(
         self, ctx: commands.Context, message: str = None
     ):
         settings = await GuildSettings.fetch(str(ctx.guild.id), "welcome_settings")
