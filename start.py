@@ -1,3 +1,4 @@
+import asyncio
 import os
 from pathlib import Path
 
@@ -8,4 +9,5 @@ override()
 
 from src.bot.main import main
 
-main()
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())

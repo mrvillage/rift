@@ -19,9 +19,9 @@ from ..views import Margins, Prices
 
 @contextlib.contextmanager
 def setup_logging():
+    logging.getLogger("discord").setLevel(logging.INFO)
+    logger = logging.getLogger()
     try:
-        logger = logging.getLogger("discord")
-        logger.setLevel(logging.INFO)
         handler = logging.FileHandler(filename="rift.log", encoding="utf-8", mode="a")
         handler.setFormatter(
             logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
@@ -29,9 +29,9 @@ def setup_logging():
         logger.addHandler(handler)
         yield
     finally:
-        for handler in log.handlers[:]:
+        for handler in logger.handlers[:]:
             handler.close()
-            log.removeHandler(handler)
+            logger.removeHandler(handler)
 
 
 @bot.event
@@ -93,9 +93,11 @@ async def rift_about(ctx: Context):
     )
 
 
-def main() -> None:
-    bot.loop.create_task(bot.update_pnw_session())
-    bot.loop.create_task(bot.get_staff())
-    # bot.command_prefix = "!!"
+async def main() -> None:
     with setup_logging():
-        bot.run(TOKEN)
+        async with bot:
+            await bot.login(TOKEN)
+            bot.loop.create_task(bot.update_pnw_session())
+            bot.loop.create_task(bot.get_staff())
+            # bot.command_prefix = "!!"
+            await bot.connect(reconnect=True)
