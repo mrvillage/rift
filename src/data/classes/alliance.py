@@ -9,7 +9,6 @@ from src.data.query.alliance import get_applicants, get_members
 
 from ...errors import AllianceNotFoundError
 from ...find import search_alliance
-from ...funcs import parse_alliance_bank
 from ...ref import bot
 from ..query import get_alliance
 from .base import Embedable, Fetchable, Initable, Makeable
@@ -111,6 +110,8 @@ class Alliance(Embedable, Fetchable, Initable, Makeable):
         return len([i[0] for i in self.list_members(vm=False)])
 
     async def get_resources(self):
+        from ...funcs import parse_alliance_bank
+
         async with bot.pnw_session.request(
             "GET", f"https://politicsandwar.com/alliance/id={self.id}&display=bank"
         ) as response:
@@ -127,7 +128,7 @@ class Alliance(Embedable, Fetchable, Initable, Makeable):
         try:
             return cls(data=await get_alliance(alliance_id=alliance_id))
         except IndexError:
-            raise AllianceNotFoundError
+            raise AllianceNotFoundError(alliance_id)
 
     async def _make_members(self) -> None:
         from .nation import Nation
