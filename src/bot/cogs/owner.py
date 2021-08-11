@@ -34,7 +34,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             )
         )
 
-    @commands.command(name="force-link", aliases=["force-verify"])
+    @commands.command(
+        name="force-link", aliases=["forcelink", "force-verify", "forceverify"]
+    )
     async def force_link(
         self, ctx, nation, user: Union[discord.Member, discord.User] = None
     ):
