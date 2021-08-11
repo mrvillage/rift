@@ -45,7 +45,7 @@ class Settings(commands.Cog):
     @server_settings.command(name="welcome-message", aliases=["wm", "welcomemessage"])
     @has_manage_permissions()
     async def server_settings_welcome_message(
-        self, ctx: commands.Context, message: str = None
+        self, ctx: commands.Context, *, message: str = None
     ):
         settings = await GuildSettings.fetch(str(ctx.guild.id), "welcome_settings")
         message = message.strip("\n ")
@@ -62,7 +62,7 @@ class Settings(commands.Cog):
     )
     @has_manage_permissions()
     async def server_settings_verified_nickname(
-        self, ctx: commands.Context, nickname: str = None
+        self, ctx: commands.Context, *, nickname: str = None
     ):
         settings = await GuildSettings.fetch(str(ctx.guild.id), "welcome_settings")
         message = nickname.strip("\n ")
