@@ -126,7 +126,7 @@ class HouseStark(commands.Cog):
             )
             return
         amounts = "\n".join(
-            f"**{key.capitalize()}** - {getattr(nation, key)}/{mmr[key]} ({getattr(nation, key)/mmr[key]:.2%})"
+            f"**{key.capitalize()}** - {getattr(nation, key):,}/{mmr[key]:,} ({getattr(nation, key)/mmr[key]:.2%})"
             for key in mmr
             if getattr(nation, key) < mmr[key]
         )
@@ -197,12 +197,18 @@ class HouseStark(commands.Cog):
         for key, needs in stockpile.items():
             has = getattr(nat, key)
             if has < needs:
-                price = getattr(prices, key)
-                amount = (needs - has) * price.lowest_sell.price
+                if key != "money":
+                    price = getattr(prices, key)
+                    amount = (needs - has) * price.lowest_sell.price
+                    amounts.append(
+                        f"**{key.capitalize()}** - {has:,.2f}/{needs:,.2f} ({has/needs:.2%})\n${amount:,.2f} for {needs-has:,.2f}"
+                    )
+                else:
+                    amount = needs - has
+                    amounts.append(
+                        f"**{key.capitalize()}** - {has:,.2f}/{needs:,.2f} ({has/needs:.2%})\n${amount:,.2f}"
+                    )
                 cost += amount
-                amounts.append(
-                    f"**{key.capitalize()}** - {has}/{needs} ({has/needs:.2%})\n${amount:,.2f} for {needs-has:,.2f}"
-                )
         amounts = "\n".join(amounts)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
