@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import datetime
 import logging
 from pathlib import Path
@@ -15,13 +16,22 @@ from ..env import TOKEN, __version__
 from ..ref import bot
 from ..views import Margins, Prices
 
-logger = logging.getLogger("discord")
-logger.setLevel(logging.INFO)
-handler = logging.FileHandler(filename="rift.log", encoding="utf-8", mode="a")
-handler.setFormatter(
-    logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
-)
-logger.addHandler(handler)
+
+@contextlib.contextmanager
+def setup_logging():
+    try:
+        logger = logging.getLogger("discord")
+        logger.setLevel(logging.INFO)
+        handler = logging.FileHandler(filename="rift.log", encoding="utf-8", mode="a")
+        handler.setFormatter(
+            logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
+        )
+        logger.addHandler(handler)
+        yield
+    finally:
+        for handler in log.handlers[:]:
+            handler.close()
+            log.removeHandler(handler)
 
 
 @bot.event
@@ -87,4 +97,5 @@ def main() -> None:
     bot.loop.create_task(bot.update_pnw_session())
     bot.loop.create_task(bot.get_staff())
     # bot.command_prefix = "!!"
-    bot.run(TOKEN)
+    with setup_logging():
+        bot.run(TOKEN)
