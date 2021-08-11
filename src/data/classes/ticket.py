@@ -107,11 +107,12 @@ class TicketConfig(Createable, Fetchable, Initable, Saveable, Setable):
         return TicketConfig(await query_ticket_config(config_id=config_id))
 
     async def save(self) -> None:
-        await execute_read_query(
-            """INSERT INTO ticket_configs (config_id, category_id, guild_id) VALUES ($1, $2, $3);""",
+        await execute_query(
+            """INSERT INTO ticket_configs (config_id, category_id, guild_id, start_message) VALUES ($1, $2, $3, $4);""",
             self.config_id,
             self.category_id,
             self.guild_id,
+            self.start_message,
         )
 
     async def set_(self, **kwargs: Union[int, bool]) -> TicketConfig:
@@ -151,9 +152,12 @@ class TicketConfig(Createable, Fetchable, Initable, Saveable, Setable):
                     if isinstance(getattr(guild.default_role.permissions, i), bool)
                 }
             )
-            overwrites = {guild.default_role: default_permissions, user: discord.PermissionOverwrite(
-                read_messages=True, send_messages=True
-            )}
+            overwrites = {
+                guild.default_role: default_permissions,
+                user: discord.PermissionOverwrite(
+                    read_messages=True, send_messages=True
+                ),
+            }
         channel = await guild.create_text_channel(
             f"ticket-{number}",
             overwrites=overwrites,
