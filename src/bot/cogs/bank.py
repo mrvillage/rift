@@ -257,5 +257,5 @@ class Bank(commands.Cog):
         )
 
 
-def setup(bot: commands.Bot):
+def setup(bot: rift.Rift):
     bot.add_cog(Bank(bot))
