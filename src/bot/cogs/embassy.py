@@ -7,12 +7,12 @@ from discord.ext import commands
 
 from ... import funcs
 from ...checks import has_manage_permissions
-from ...data.classes import EmbassyConfig
+from ...data.classes import Alliance, Embassy, EmbassyConfig
 from ...data.query import query_embassy_config_by_guild
 from ...ref import Rift
 
 if TYPE_CHECKING:
-    from typings import EmbassyConfigData
+    from typings import EmbassyConfigData, EmbassyData
 
 
 class Embassies(commands.Cog):
@@ -86,6 +86,30 @@ class Embassies(commands.Cog):
                     for config in configs
                 ),
                 color=discord.Color.green(),
+            )
+        )
+
+    @embassy_config.command(name="claim")
+    @commands.guild_only()
+    @has_manage_permissions()
+    async def embassy_config_claim(
+        self, ctx: commands.Context, config: EmbassyConfig, *, alliance: Alliance
+    ):
+        data = {
+            "embassy_id": ctx.channel.id,
+            "alliance_id": alliance.id,
+            "config_id": config.config_id,
+            "guild_id": ctx.guild.id,
+            "open": True,
+        }
+        if TYPE_CHECKING:
+            assert isinstance(data, EmbassyData)
+        embassy = Embassy(data)
+        await embassy.save()
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"{ctx.channel.mention} claimed for {repr(alliance)} under embassy configuration {config.config_id}.",
             )
         )
 
