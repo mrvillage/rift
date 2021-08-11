@@ -17,7 +17,7 @@ class Link(commands.Cog):
         aliases=["verify", "validate"],
         help="Links your Politics and War nation to your Discord account.",
     )
-    async def link(self, ctx, nation, user: discord.User = None):
+    async def link(self, ctx, nation, user: Union[discord.Member, discord.User] = None):
         try:
             nation = await rift.search_nation(ctx, nation)
         except NationNotFoundError:
