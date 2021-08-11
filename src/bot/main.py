@@ -99,9 +99,11 @@ async def rift_about(ctx: Context):
 
 async def main() -> None:
     with setup_logging():
-        async with bot:
+        try:
             await bot.login(TOKEN)
             bot.loop.create_task(bot.update_pnw_session())
             bot.loop.create_task(bot.get_staff())
             # bot.command_prefix = "!!"
             await bot.connect(reconnect=True)
+        finally:
+            await bot.close()
