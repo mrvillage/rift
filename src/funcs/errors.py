@@ -22,6 +22,8 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
     try:
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
+        if isinstance(error, commands.ConversionError):
+            error = error.original
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.reply(
                 embed=get_embed_author_member(
