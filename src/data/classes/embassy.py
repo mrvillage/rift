@@ -31,13 +31,11 @@ class Embassy(Convertable, Deleteable, Fetchable, Initable, Saveable):
     alliance_id: int
     config_id: int
     guild_id: int
-    user_id: int
     __slots__ = (
         "embassy_id",
         "alliance_id",
         "config_id",
         "guild_id",
-        "user_id",
     )
 
     def __init__(self, data: EmbassyData) -> None:
@@ -45,7 +43,6 @@ class Embassy(Convertable, Deleteable, Fetchable, Initable, Saveable):
         self.alliance_id = data["alliance_id"]
         self.config_id = data["config_id"]
         self.guild_id = data["guild_id"]
-        self.user_id = data["user_id"]
         self.open = data["open"]
 
     @classmethod
@@ -53,13 +50,12 @@ class Embassy(Convertable, Deleteable, Fetchable, Initable, Saveable):
         return cls(await get_embassy(embassy_id=embassy_id))
 
     async def save(self) -> None:
-        await execute_read_query(
-            """INSERT INTO embassies (embassy_id, alliance_id, config_id, guild_id, user_id, open) VALUES ($1, $2, $3, $4, $5, $6);""",
+        await execute_query(
+            """INSERT INTO embassies (embassy_id, alliance_id, config_id, guild_id, open) VALUES ($1, $2, $3, $4, $5);""",
             self.embassy_id,
             self.alliance_id,
             self.config_id,
             self.guild_id,
-            self.user_id,
             self.open,
         )
 
@@ -99,7 +95,7 @@ class Embassy(Convertable, Deleteable, Fetchable, Initable, Saveable):
         )
 
 
-class EmbassyConfig(Createable, Fetchable, Initable, Saveable, Setable):
+class EmbassyConfig(Convertable, Createable, Fetchable, Initable, Saveable, Setable):
     config_id: int
     category_id: Optional[int]
     guild_id: int
@@ -123,10 +119,11 @@ class EmbassyConfig(Createable, Fetchable, Initable, Saveable, Setable):
 
     async def save(self) -> None:
         await execute_read_query(
-            """INSERT INTO embassy_configs (config_id, category_id, guild_id) VALUES ($1, $2, $3);""",
+            """INSERT INTO embassy_configs (config_id, category_id, guild_id, start_message) VALUES ($1, $2, $3,$4);""",
             self.config_id,
             self.category_id,
             self.guild_id,
+            self.start_message,
         )
 
     async def set_(self, **kwargs: Union[int, bool]) -> EmbassyConfig:
@@ -201,7 +198,6 @@ class EmbassyConfig(Createable, Fetchable, Initable, Saveable, Setable):
             "alliance_id": alliance.id,
             "config_id": self.config_id,
             "guild_id": self.guild_id,
-            "user_id": user.id,
             "open": True,
         }
         if TYPE_CHECKING:
@@ -212,3 +208,9 @@ class EmbassyConfig(Createable, Fetchable, Initable, Saveable, Setable):
 
     def __int__(self) -> int:
         return self.config_id
+
+    @classmethod
+    async def convert(cls, ctx: commands.Context, argument: str) -> EmbassyConfig:
+        if TYPE_CHECKING:
+            assert argument.isdigit()
+        return await cls.fetch(int(argument))
