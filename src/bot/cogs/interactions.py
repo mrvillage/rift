@@ -113,7 +113,7 @@ class Interactions(commands.Cog):
         except Exception as error:
             if command._max_concurrency is not None:
                 await command._max_concurrency.release(ctx)
-            await command.dispatch_error(ctx, error)
+            return await command.dispatch_error(ctx, error)
         try:
             await ctx.invoke(command, **ctx.kwargs)
         except Exception as error:
