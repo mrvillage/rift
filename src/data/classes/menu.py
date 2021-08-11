@@ -113,6 +113,7 @@ class Button(discord.ui.Button):
                     ),
                 )
         elif self.action in {"CREATE_TICKET", "CREATE_TICKETS"}:
+            await interaction.response.defer()
             configs = [await TicketConfig.fetch(opt) for opt in self.options]
             tickets = []
             for config in configs:
