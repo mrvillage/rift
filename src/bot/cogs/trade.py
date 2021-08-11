@@ -12,7 +12,11 @@ class Trade(commands.Cog):
         self.bot = bot
 
     @commands._slash  # type: ignore
-    @commands.command(name="price", aliases=["p", "resource", "prices"])
+    @commands.command(
+        name="price",
+        aliases=["p", "resource", "prices"],
+        help="Get the current prices of all resources.",
+    )
     async def price(self, ctx: commands.Context):
         prices: TradePrices = await rift.get_trade_prices()
         await ctx.reply(
@@ -137,6 +141,7 @@ class Trade(commands.Cog):
     @commands.command(
         name="trade-margins",
         aliases=["trade-margin", "trademargin", "margin", "tm", "margins"],
+        help="Get the current trade margins.",
     )
     async def trade_margins(self, ctx):
         prices: TradePrices = await rift.get_trade_prices()

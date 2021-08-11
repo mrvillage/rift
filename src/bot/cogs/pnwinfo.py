@@ -24,7 +24,7 @@ class PnWInfo(commands.Cog):
         await ctx.reply(embed=await nation.get_info_embed(ctx))
 
     @commands._slash  # type: ignore
-    @commands.command(name="me")
+    @commands.command(name="me", help="Get information about your nation.")
     async def me(self, ctx):
         await ctx.invoke(self.nation, nation=None)
 
@@ -40,7 +40,11 @@ class PnWInfo(commands.Cog):
         await ctx.reply(embed=await alliance.get_info_embed(ctx))
 
     @commands._slash  # type: ignore
-    @commands.command(name="who", alises=["w", "who-is", "whois"])
+    @commands.command(
+        name="who",
+        aliases=["w", "who-is", "whois"],
+        help="Get information about a nation or alliance.",
+    )
     async def who(self, ctx, *, search=None):
         try:
             await find.search_nation(ctx, search)
@@ -56,7 +60,7 @@ class PnWInfo(commands.Cog):
                 await ctx.reply(embed=embed)
 
     @commands._slash  # type: ignore
-    @commands.command(name="members")
+    @commands.command(name="members", help="Get a list of the members of an alliance.")
     async def members(self, ctx, *, search=None):
         search = str(ctx.author.id) if search is None else search
         try:
@@ -102,7 +106,7 @@ class PnWInfo(commands.Cog):
     @commands.command(
         name="treaties",
         aliases=["t", "treaty"],
-        description="Displays the treaties of the target alliance.",
+        description="Get the treaties of an alliance.",
     )
     async def treaties(self, ctx: commands.Context, *, alliance=None):
         alliance = await Alliance.convert(ctx, alliance)
@@ -112,7 +116,7 @@ class PnWInfo(commands.Cog):
         )
 
     @commands._slash  # type: ignore
-    @commands.command(name="spies")
+    @commands.command(name="spies", help="Get the spies of a nation.")
     async def spies(self, ctx, *, nation: Nation):
         message = await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -128,7 +132,7 @@ class PnWInfo(commands.Cog):
         )
 
     # @commands._slash  # type: ignore
-    @commands.command(name="revenue")
+    @commands.command(name="revenue", help="Get the revenue of a nation or alliance.")
     async def revenue(self, ctx, *, search: Union[Alliance, Nation] = None):
         search = search if search is not None else await Nation.convert(ctx, search)
         message = await ctx.reply(

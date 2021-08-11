@@ -90,7 +90,7 @@ class HouseStark(commands.Cog):
         self.bot = bot
         self.bank_send_task.start()
 
-    @commands.command(name="mmr")
+    @commands.command(name="mmr", help="Check to see if a nation meets MMR.")
     async def mmr(self, ctx: commands.Context, *, nation: Nation = None):
         nation = nation or await Nation.convert(ctx, nation)
         author_nation = await Nation.convert(ctx, None)
@@ -138,7 +138,11 @@ class HouseStark(commands.Cog):
             )
         )
 
-    @commands.command(name="stockpile", aliases=["stockpiles"])
+    @commands.command(
+        name="stockpile",
+        aliases=["stockpiles"],
+        help="Check to see if a nation meets stockpile requirements.",
+    )
     async def stockpile(self, ctx: commands.Context, *, nation: Nation = None):
         nation = nation or await Nation.convert(ctx, nation)
         nat = await pnwkit.async_nation_query(

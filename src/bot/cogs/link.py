@@ -15,7 +15,7 @@ class Link(commands.Cog):
     @commands.command(
         name="link",
         aliases=["verify", "validate"],
-        help="Links your Politics and War nation to your Discord account.",
+        help="Link a nation to a Discord account.",
     )
     async def link(self, ctx, nation, user: Union[discord.Member, discord.User] = None):
         try:

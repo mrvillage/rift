@@ -25,6 +25,7 @@ class Settings(commands.Cog):
         name="user-settings",
         aliases=["us", "usersettings", "my-settings", "mysettings"],
         invoke_without_command=True,
+        enabled=False,
     )
     async def user_settings(self, ctx: commands.Context):
         ...
@@ -32,17 +33,29 @@ class Settings(commands.Cog):
     @commands.group(
         name="server-settings",
         aliases=["ss", "serversettings", "settings"],
+        help="View of modify server settings.",
         invoke_without_command=True,
     )
     @commands.guild_only()
+    @has_manage_permissions()
     async def server_settings(self, ctx: commands.Context):
         ...
 
-    @server_settings.command(name="purpose", aliases=["p"])
+    @server_settings.command(
+        name="purpose",
+        aliases=["p"],
+        help="View or modify the server's purpose.",
+        enabled=False,
+    )
+    @has_manage_permissions()
     async def server_settings_purpose(self, ctx: commands.Context):
         ...
 
-    @server_settings.command(name="welcome-message", aliases=["wm", "welcomemessage"])
+    @server_settings.command(
+        name="welcome-message",
+        aliases=["wm", "welcomemessage"],
+        help="Modify the server's welcome message.",
+    )
     @has_manage_permissions()
     async def server_settings_welcome_message(
         self, ctx: commands.Context, *, message: str = None
@@ -58,7 +71,9 @@ class Settings(commands.Cog):
         )
 
     @server_settings.command(
-        name="verified-nickname", aliases=["vn", "verifiednickname"]
+        name="verified-nickname",
+        aliases=["vn", "verifiednickname"],
+        help="Modify the server's verified nickname format.",
     )
     @has_manage_permissions()
     async def server_settings_verified_nickname(

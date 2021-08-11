@@ -16,7 +16,7 @@ class Military(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(name="target", invoke_without_command=True)
+    @commands.group(name="target", invoke_without_command=True, enabled=False)
     async def target(self, ctx, target_id=None):
         if id == None:
             await ctx.reply(
@@ -67,7 +67,7 @@ class Military(commands.Cog):
             embed.add_field(name="Member Mentions", value="None", inline=True)
         await ctx.reply(embed=embed)
 
-    @target.command(name="add")
+    @target.command(name="add", enabled=False)
     async def target_add(self, ctx, search, *args):
         if "politicsandwar" in search:
             if "http" in search:
@@ -145,7 +145,7 @@ class Military(commands.Cog):
             embed.add_field(name="Member Mentions", value=f"None", inline=True)
         await ctx.reply(embed=embed)
 
-    @target.command(name="remove")
+    @target.command(name="remove", enabled=False)
     async def target_remove(self, ctx, target_id):
         try:
             target = await rift.get_target(int(target_id))
@@ -170,7 +170,7 @@ class Military(commands.Cog):
                 )
             )
 
-    @target.command(name="list")
+    @target.command(name="list", enabled=False)
     async def target_list(self, ctx):
         targets = await rift.get_targets_owner(ctx.author.id)
         await ctx.reply(
@@ -184,6 +184,7 @@ class Military(commands.Cog):
     @commands.group(
         name="militarization",
         aliases=["m", "mil", "military"],
+        help="A group of commands related to militarization, defaults to alliance.",
         case_insensitive=True,
         invoke_without_command=True,
     )
@@ -278,7 +279,11 @@ class Military(commands.Cog):
     async def mn_shortcut(self, ctx: commands.Context, *, search=None):
         await ctx.invoke(self.militarization_nation, search=search)
 
-    @militarization.command(name="nation", aliases=["n", "nat", "me"])
+    @militarization.command(
+        name="nation",
+        aliases=["n", "nat", "me"],
+        help="Get the militarization of a nation.",
+    )
     async def militarization_nation(self, ctx, *, search=None):
         try:
             author, nation = await find.search_nation_author(ctx, search)

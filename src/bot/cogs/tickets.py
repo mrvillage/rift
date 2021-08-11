@@ -19,18 +19,28 @@ class Tickets(commands.Cog):
     def __init__(self, bot: Rift):
         self.bot = bot
 
-    @commands.group(name="ticket")
+    @commands.group(
+        name="ticket",
+        help="A group of commands related to tickets.",
+        case_insensitive=True,
+        invoke_without_command=True,
+    )
     @commands.guild_only()
     async def ticket(self, ctx: commands.Context):
         ...
 
-    @ticket.group(name="config")
+    @ticket.group(
+        name="config",
+        help="A group of commands related to ticket configurations.",
+        case_insensitive=True,
+        invoke_without_command=True,
+    )
     @commands.guild_only()
     @has_manage_permissions()
     async def ticket_config(self, ctx: commands.Context):
         ...
 
-    @ticket_config.command(name="create")
+    @ticket_config.command(name="create", help="Create a new ticket configuration.")
     @commands.guild_only()
     @has_manage_permissions()
     async def ticket_config_create(
@@ -60,7 +70,9 @@ class Tickets(commands.Cog):
             )
         )
 
-    @ticket_config.command(name="list")
+    @ticket_config.command(
+        name="list", help="List the embassy configurations in the server."
+    )
     @commands.guild_only()
     @has_manage_permissions()
     async def ticket_config_list(self, ctx: commands.Context):

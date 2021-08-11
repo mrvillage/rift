@@ -26,11 +26,15 @@ class Bank(commands.Cog):
             )
         )
 
-    @commands.command(name="send")
+    @commands.command(
+        name="send", help="Send money from your alliance bank.", hidden=True
+    )
     async def send(self, ctx: commands.Context, recipient, *, transaction: Transaction):
         await ctx.invoke(self.bank_transfer, recipient, transaction=transaction)
 
-    @bank.command(name="transfer", aliases=["send"])
+    @bank.command(
+        name="transfer", aliases=["send"], help="Send money from your alliance bank."
+    )
     async def bank_transfer(
         self, ctx: commands.Context, recipient, *, transaction: Transaction
     ):
@@ -189,7 +193,9 @@ class Bank(commands.Cog):
             )
             await message.edit(embed=embed)
 
-    @bank.command(name="balance", aliases=["bal"])
+    @bank.command(
+        name="balance", aliases=["bal"], help="Send money from your alliance bank."
+    )
     async def bank_balance(self, ctx: commands.Context, *, search=None):
         search = str(ctx.author.id) if search is None else search
         try:
