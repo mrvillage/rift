@@ -16,7 +16,9 @@ class Military(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(name="target", invoke_without_command=True, enabled=False)
+    @commands.group(
+        name="target", invoke_without_command=True, hidden=True, enabled=False
+    )
     async def target(self, ctx, target_id=None):
         if id == None:
             await ctx.reply(
