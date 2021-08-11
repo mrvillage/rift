@@ -69,7 +69,7 @@ class Military(commands.Cog):
             embed.add_field(name="Member Mentions", value="None", inline=True)
         await ctx.reply(embed=embed)
 
-    @target.command(name="add", enabled=False)
+    @target.command(name="add", hidden=True, enabled=False)
     async def target_add(self, ctx, search, *args):
         if "politicsandwar" in search:
             if "http" in search:
@@ -147,7 +147,7 @@ class Military(commands.Cog):
             embed.add_field(name="Member Mentions", value=f"None", inline=True)
         await ctx.reply(embed=embed)
 
-    @target.command(name="remove", enabled=False)
+    @target.command(name="remove", hidden=True, enabled=False)
     async def target_remove(self, ctx, target_id):
         try:
             target = await rift.get_target(int(target_id))
@@ -172,7 +172,7 @@ class Military(commands.Cog):
                 )
             )
 
-    @target.command(name="list", enabled=False)
+    @target.command(name="list", hidden=True, enabled=False)
     async def target_list(self, ctx):
         targets = await rift.get_targets_owner(ctx.author.id)
         await ctx.reply(
