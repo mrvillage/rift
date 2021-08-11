@@ -61,11 +61,17 @@ class Menus(commands.Cog):
 
     @menu.command(name="create", aliases=["new"])
     @has_manage_permissions()
-    async def menu_create(self, ctx: commands.Context):  # sourcery no-metrics
+    async def menu_create(
+        self, ctx: commands.Context, *, description: str = None
+    ):  # sourcery no-metrics
         message: discord.Message
         if TYPE_CHECKING:
             assert isinstance(ctx.message, discord.Message)
         menu = Menu.default(ctx.message.id, ctx.author.id)
+        menu.description = (
+            description
+            or "This is a menu! Someone was lazy and didn't put a description. :)"
+        )
         main_message = await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
@@ -170,7 +176,13 @@ class Menus(commands.Cog):
                     )
                 )
         except TimeoutError:
-            pass
+            await main_message.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "Menu creation timed out. Please try again.",
+                    color=discord.Color.red(),
+                )
+            )
 
     @menu.command(name="send", aliases=["post"])
     @has_manage_permissions()
