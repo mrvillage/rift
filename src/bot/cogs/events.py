@@ -24,7 +24,7 @@ EVENTS = {
 class Events(commands.Cog):
     def __init__(self, bot: rift.Rift):
         self.bot = bot
-        self.bot.loop.create_task(self.socket())
+        # self.bot.loop.create_task(self.socket())
 
     async def socket(self):
         backoff = ExponentialBackoff()
@@ -47,6 +47,13 @@ class Events(commands.Cog):
                 print("rift-data socket connection error")
                 delay = backoff.delay()
                 await sleep(delay)
+
+    @commands.command(name="subscribe")
+    async def subscribe(self, ctx: commands.Context, *, event: str):
+        if event not in self.bot.subscribable_events:
+            await ctx.send(f"{event} is not a valid event.")
+            return
+        await ctx.send(f"{event} successfully subscribed.")
 
 
 def setup(bot: rift.Rift):
