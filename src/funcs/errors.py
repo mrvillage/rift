@@ -63,21 +63,39 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                 )
             )
         elif isinstance(error, NationNotFoundError):
-            await ctx.reply(
-                embed=get_embed_author_member(
-                    ctx.author,
-                    f"No nation found with argument `{error.args[0]}`.",
-                    color=discord.Color.red(),
+            if error.args[0] == str(ctx.author.id):
+                await ctx.reply(
+                    embed=get_embed_author_member(
+                        ctx.author,
+                        "You're not linked so I can't infer your alliance!",
+                        color=discord.Color.red(),
+                    )
                 )
-            )
+            else:
+                await ctx.reply(
+                    embed=get_embed_author_member(
+                        ctx.author,
+                        f"No nation found with argument `{error.args[0]}`.",
+                        color=discord.Color.red(),
+                    )
+                )
         elif isinstance(error, AllianceNotFoundError):
-            await ctx.reply(
-                embed=get_embed_author_member(
-                    ctx.author,
-                    f"No alliance found with argument `{error.args[0]}`.",
-                    color=discord.Color.red(),
+            if error.args[0] == str(ctx.author.id):
+                await ctx.reply(
+                    embed=get_embed_author_member(
+                        ctx.author,
+                        "You're not linked so I can't infer your alliance!",
+                        color=discord.Color.red(),
+                    )
                 )
-            )
+            else:
+                await ctx.reply(
+                    embed=get_embed_author_member(
+                        ctx.author,
+                        f"No alliance found with argument `{error.args[0]}`.",
+                        color=discord.Color.red(),
+                    )
+                )
         else:
             await ctx.reply(
                 embed=get_embed_author_member(
