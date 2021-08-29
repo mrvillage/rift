@@ -80,6 +80,13 @@ async def on_ready():
         bot.unload_extension("src.bot.cogs.database")
         bot.unload_extension("src.bot.cogs.server")
         bot.cogs_loaded = True
+        print("Loaded cogs")
+
+    for guild in bot.guilds:
+        if not guild.chunked:
+            await guild.chunk()
+    print("Chunked")
+
     print("Startup complete!")
 
 
