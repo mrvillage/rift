@@ -17,7 +17,7 @@ from discord.ext import commands
 
 from ..db import execute_query, execute_read_query
 from ..query import get_menu, get_menu_item, insert_interface
-from .base import Defaultable, Fetchable, Initable, Makeable, Saveable, Setable
+from .base import Makeable
 
 
 class View(discord.ui.View):
@@ -210,7 +210,7 @@ class SelectOption(discord.SelectOption):
         return f"Label: {self.label} - Description: {self.description} - Emoji: {self.emoji} - Default: {self.default} - Action: {self.action}"
 
 
-class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
+class Menu(Makeable):
     menu_id: int
     items: Sequence[List[MenuItem]]
     name: str
@@ -329,7 +329,7 @@ class Menu(Defaultable, Fetchable, Initable, Makeable, Saveable, Setable):
         return f"{self.menu_id} - {self.name}"
 
 
-class MenuItem(Fetchable, Initable, Saveable):
+class MenuItem:
     def __init__(self, data: Mapping[str, Any]) -> None:
         self.item_id = data["item_id"]
         self.owner_id = data["owner_id"]

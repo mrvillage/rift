@@ -1,10 +1,8 @@
 import json
 from datetime import datetime
 
-from .base import Base
 
-
-class TradeOffer(Base):
+class TradeOffer:
     def __init__(self, data: dict):
         self.data = data
         self.datetime = datetime.fromisoformat(data["date"])
@@ -14,7 +12,7 @@ class TradeOffer(Base):
         self.total_value = int(data["totalvalue"])
 
 
-class ResourcePrice(Base):
+class ResourcePrice:
     def __init__(self, data: dict):
         self.data = data
         self.name = data["resource"]
@@ -26,7 +24,7 @@ class ResourcePrice(Base):
         self.trade_margin = self.lowest_sell.price - self.highest_buy.price
 
 
-class TradePrices(Base):
+class TradePrices:
     def __init__(self, data):
         self.data = data
         self.credit = ResourcePrice(json.loads(data["credit"]))

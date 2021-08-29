@@ -8,7 +8,6 @@ from ..query import query_ticket_config
 
 from ..db import execute_query, execute_read_query
 from ..get import get_current_ticket_number, get_ticket
-from .base import Convertable, Createable, Fetchable, Initable, Saveable, Setable
 
 __all__ = ("Ticket", "TicketConfig")
 
@@ -16,7 +15,7 @@ if TYPE_CHECKING:
     from typings import TicketConfigData, TicketData
 
 
-class Ticket(Convertable, Fetchable, Initable, Saveable):
+class Ticket:
     ticket_id: int
     ticket_number: int
     config_id: int
@@ -84,7 +83,7 @@ class Ticket(Convertable, Fetchable, Initable, Saveable):
         )
 
 
-class TicketConfig(Createable, Fetchable, Initable, Saveable, Setable):
+class TicketConfig:
     config_id: int
     category_id: Optional[int]
     guild_id: int

@@ -1,11 +1,10 @@
 from __future__ import annotations
 from typing import Dict, TYPE_CHECKING, Union
 
-from .base import Fetchable
 from ..query import get_color
 
 
-class Color(Fetchable):
+class Color:
     data: Dict[str, Union[int, str]]
     color: str
     name: str
