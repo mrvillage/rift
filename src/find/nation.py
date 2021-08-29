@@ -20,6 +20,5 @@ async def search_nation_author(ctx, search):
 
 
 async def search_nation(ctx, search):
-    author = ctx.author if search is None else None
     search = str(ctx.author.id) if search is None else search
     return await rift.search_nation(ctx, search)
