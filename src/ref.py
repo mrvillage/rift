@@ -26,7 +26,9 @@ class Rift(Bot):
         self.auth_token = None
         self.cogs_loaded = False
         self.persistent_views_loaded = False
-        self.subscribable_events = {"war_declaration", }
+        self.subscribable_events = {
+            "war_declaration",
+        }
 
     async def update_pnw_session(self):
         login_data = {"email": EMAIL, "password": PASSWORD, "loginform": "Login"}
@@ -51,19 +53,6 @@ class Rift(Bot):
         data = BeautifulSoup(content, "html.parser")
         self.auth_token = data.find("input", {"name": "token"}).attrs["value"]  # type: ignore
 
-    async def get_guild_prefix(self, guild_id):
-        prefixes = [
-            i
-            for i in await execute_read_query(
-                "SELECT prefix FROM prefixes WHERE guild_id = $1;", guild_id
-            )
-        ]
-        if prefixes:
-            return prefixes
-        return default_prefixes
-
-    get_guild_prefixes = get_guild_prefix
-
     async def get_global_application_commands(self):
         self.application_id: int
         self.global_application_commands = await bot.http.get_global_commands(
@@ -71,16 +60,8 @@ class Rift(Bot):
         )
 
 
-default_prefixes = ["?"]
-
-
-async def get_prefix(rift: Rift, message):
-    prefixes = await rift.get_guild_prefixes(message.guild.id)
-    return when_mentioned_or(*prefixes)(rift, message)
-
-
 bot = Rift(
-    command_prefix=get_prefix,
+    command_prefix=when_mentioned_or("?"),
     intents=Intents.all(),
     case_insensitive=True,
     allowed_mentions=AllowedMentions(replied_user=False),
