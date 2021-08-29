@@ -12,6 +12,8 @@ class Color:
     bonus: int
     turn_bonus: int
 
+    __slots__ = ("data", "color", "name", "bloc_name", "bonus", "turn_bonus")
+
     def __init__(self, data: Dict[str, Union[int, str]]) -> None:
         if TYPE_CHECKING:
             assert (

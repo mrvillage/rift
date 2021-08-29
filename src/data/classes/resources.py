@@ -24,6 +24,22 @@ class Resources:
     steel: Union[float, int]
     aluminum: Union[float, int]
 
+    __slots__ = (
+        "credit",
+        "money",
+        "food",
+        "coal",
+        "oil",
+        "uranium",
+        "lead",
+        "iron",
+        "bauxite",
+        "gasoline",
+        "munitions",
+        "steel",
+        "aluminum",
+    )
+
     def __init__(
         self,
         *,

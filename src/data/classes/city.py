@@ -112,6 +112,50 @@ class FullCity(Makeable):
     nation: Nation
     projects: pnwkit.data.Nation  # type: ignore
 
+    __slots__ = (
+        "data",
+        "id",
+        "name",
+        "nation_id",
+        "capital",
+        "age",
+        "infrastructure",
+        "land",
+        "population",
+        "disease",
+        "crime",
+        "pollution",
+        "commerce",
+        "powered",
+        "coal_power",
+        "oil_power",
+        "nuclear_power",
+        "wind_power",
+        "coal_mines",
+        "lead_mines",
+        "bauxite_mines",
+        "oil_wells",
+        "uranium_mines",
+        "iron_mines",
+        "farms",
+        "oil_refineries",
+        "steel_mills",
+        "aluminum_refineries",
+        "missiles_factories",
+        "police_stations",
+        "hospitals",
+        "recycling_centers",
+        "subways",
+        "supermarkets",
+        "banks",
+        "shopping_malls",
+        "stadiums",
+        "barracks",
+        "factories",
+        "hangars",
+        "drydocks",
+    )
+
     def __init__(self, data: Dict[str, Any]) -> None:
         self.data = data
         self.id = data["city_id"]

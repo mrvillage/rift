@@ -5,6 +5,21 @@ from .. import Alliance, Nation, Resources
 
 
 class Transaction:
+    __slots__ = (
+        "money",
+        "food",
+        "coal",
+        "oil",
+        "uranium",
+        "lead",
+        "iron",
+        "bauxite",
+        "gasoline",
+        "munitions",
+        "steel",
+        "aluminum",
+    )
+
     def __init__(
         self,
         *,
