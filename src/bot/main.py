@@ -99,7 +99,7 @@ async def rift_about(ctx: Context):
     await ctx.reply(
         embed=funcs.get_embed_author_member(
             ctx.author,
-            f'**Welcome to Rift!**\n\nRift is a multi-purpose bot for Politics and War created by <@!258298021266063360>!\n\nIf you have any questions feel free to join the Ad Astra server [here](https://discord.gg/DegFNa3hs7 "https://discord.gg/86Hzkp2CWU"), the Database server [here](https://discord.gg/86Hzkp2CWU "https://discord.gg/86Hzkp2CWU"), or send a DM to <@!258298021266063360>!\n\nRift Current Version: {__version__}',
+            f'**Welcome to Rift!**\n\nRift is a multi-purpose bot for Politics and War created by <@!258298021266063360>!\n\nIf you have any questions feel free to join the House Stark server [here](https://discord.gg/AMse6jNen4 "https://discord.gg/AMse6jNen4") or send a DM to <@!258298021266063360>!\n\nRift Current Version: {__version__}',
         )
     )
 
