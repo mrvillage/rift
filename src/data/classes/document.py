@@ -5,6 +5,17 @@ from ..query import get_document
 
 
 class Document:
+    __slots__ = (
+        "data",
+        "id",
+        "name",
+        "url",
+        "categories",
+        "keywords",
+        "description",
+        "search_args",
+    )
+
     def __init__(self, *, data=None, document_id=None):
         if data is None:
             self.data = asyncio.run(get_document(document_id=document_id))

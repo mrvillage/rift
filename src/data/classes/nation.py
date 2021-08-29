@@ -24,6 +24,38 @@ if TYPE_CHECKING:
 
 
 class Nation(Makeable):
+    __slots__ = (
+        "data",
+        "id",
+        "name",
+        "leader",
+        "continent",
+        "war_policy",
+        "domestic_policy",
+        "color",
+        "alliance_id",
+        "alliance",
+        "alliance_position",
+        "cities",
+        "offensive_wars",
+        "defensive_wars",
+        "score",
+        "v_mode",
+        "v_mode_turns",
+        "beige_turns",
+        "last_active",
+        "founded",
+        "soldiers",
+        "tanks",
+        "aircraft",
+        "ships",
+        "missiles",
+        "nukes",
+        "alliance",
+        "user",
+        "partial_cities",
+    )
+
     def __init__(self, *, nation_id=None, nation_name=None, data=None):
         if data is None:
             self.data = get_nation(nation_id=nation_id, nation_name=nation_name)

@@ -4,6 +4,17 @@ from discord.ext.commands import BadInviteArgument
 
 
 class Server:
+    __slots__ = (
+        "data",
+        "id",
+        "name",
+        "invite",
+        "categories",
+        "keywords",
+        "description",
+        "search_args",
+    )
+
     def __init__(self, *, data=None):
         self.data = data
         self.id = int(self.data[0])

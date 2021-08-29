@@ -16,6 +16,31 @@ from .resources import Resources
 
 
 class Alliance(Makeable):
+    __slots__ = (
+        "data",
+        "id",
+        "founddate",
+        "name",
+        "acronym",
+        "color",
+        "rank",
+        "score",
+        "avgscore",
+        "flagurl",
+        "forumurl",
+        "ircchan",
+        "discord",
+        "members",
+        "vm_members",
+        "leaders",
+        "heirs",
+        "officers",
+        "applicants",
+        "calculated_score",
+        "member_count",
+        "treaties",
+    )
+
     def __init__(self, *, alliance_id=None, alliance_name=None, data=None):
         if data is None:
             self.data = get_alliance(
@@ -101,7 +126,10 @@ class Alliance(Makeable):
         return self.id
 
     def list_members(self, vm):
-        return self.__dict__.get("members", [])
+        try:
+            return self.members
+        except AttributeError:
+            return []
 
     def __float__(self):
         return sum(i[0] for i in self.list_members(vm=False))

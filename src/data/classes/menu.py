@@ -218,6 +218,16 @@ class Menu(Makeable):
     item_ids: Sequence[Sequence[int]]
     permissions: Mapping[str, Any]
 
+    __slots__ = (
+        "menu_id",
+        "owner_id",
+        "name",
+        "description",
+        "item_ids",
+        "permissions",
+        "items",
+    )
+
     def __init__(self, data: Dict[str, Any]) -> None:
         self.menu_id = data["menu_id"]
         self.owner_id = data["owner_id"]
@@ -330,6 +340,8 @@ class Menu(Makeable):
 
 
 class MenuItem:
+    __slots__ = ("item_id", "owner_id", "type", "data")
+
     def __init__(self, data: Mapping[str, Any]) -> None:
         self.item_id = data["item_id"]
         self.owner_id = data["owner_id"]

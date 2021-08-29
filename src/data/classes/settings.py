@@ -13,6 +13,8 @@ from .nation import Nation
 
 
 class BaseSettings(Makeable, ABC):
+    __slots__ = ()
+
     @abstractmethod
     def __init__(self, data: Union[list, tuple]) -> None:
         ...
@@ -31,6 +33,8 @@ class BaseSettings(Makeable, ABC):
 
 
 class UserSettings(BaseSettings):
+    __slots__ = ()
+
     def __init__(self) -> None:
         ...
 
@@ -44,8 +48,25 @@ class UserSettings(BaseSettings):
 
 
 class GuildWelcomeSettings(BaseSettings):
+    __slots__ = (
+        "welcome_data",
+        "guild_id",
+        "welcome_message",
+        "welcome_channels",
+        "join_roles",
+        "verified_roles",
+        "member_roles",
+        "global_city_roles",
+        "member_city_roles",
+        "diplomat_roles",
+        "alliance_roles",
+        "alliance_gov_roles",
+        "verified_nickname",
+        "defaulted",
+    )
+
     def __init__(self, data: Union[list, tuple]) -> None:
-        self.default = False
+        self.defaulted = False
         self.welcome_data = data
         self.guild_id: int = int(data[0])
         self.welcome_message: Union[str, None] = data[1]
@@ -85,7 +106,7 @@ class GuildWelcomeSettings(BaseSettings):
         settings = cls(
             (guild_id, None, "[]", "[]", "[]", "[]", "{}", "{}", "{}", "{}", "{}", None)
         )
-        settings.default = True
+        settings.defaulted = True
         return settings
 
     @classmethod
@@ -145,7 +166,7 @@ class GuildWelcomeSettings(BaseSettings):
         sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
         sets = ", ".join(sets)
         args = tuple(kwargs.values())
-        if self.default:
+        if self.defaulted:
             await execute_query(
                 f"""
             INSERT INTO guild_welcome_settings (guild_id, {', '.join(kwargs.keys())}) VALUES ({', '.join(f'${i}' for i in range(1, len(kwargs)+2))});
@@ -167,6 +188,8 @@ class GuildWelcomeSettings(BaseSettings):
 class GuildSettings(BaseSettings):
     welcome_settings: GuildWelcomeSettings
 
+    __slots__ = ("guild_id", "welcome_settings", "defaulted")
+
     def __init__(self, data: Union[list, tuple]) -> None:
         self.guild_id: int = data[0]
         ...
@@ -179,7 +202,7 @@ class GuildSettings(BaseSettings):
     @classmethod
     def default(cls, guild_id: int) -> GuildSettings:
         settings = cls((guild_id, ...))
-        settings.default = True
+        settings.defaulted = True
         return settings
 
     @classmethod

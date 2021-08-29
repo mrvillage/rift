@@ -3,6 +3,8 @@ from datetime import datetime
 
 
 class TradeOffer:
+    __slots__ = ("data", "datetime", "nation_id", "amount", "price", "total_value")
+
     def __init__(self, data: dict):
         self.data = data
         self.datetime = datetime.fromisoformat(data["date"])
@@ -13,6 +15,17 @@ class TradeOffer:
 
 
 class ResourcePrice:
+    __slots__ = (
+        "data",
+        "name",
+        "average_price",
+        "avg_price",
+        "market_index",
+        "highest_buy",
+        "lowest_sell",
+        "trade_margin",
+    )
+
     def __init__(self, data: dict):
         self.data = data
         self.name = data["resource"]
@@ -25,6 +38,23 @@ class ResourcePrice:
 
 
 class TradePrices:
+    __slots__ = (
+        "data",
+        "credit",
+        "coal",
+        "oil",
+        "uranium",
+        "lead",
+        "iron",
+        "bauxite",
+        "gasoline",
+        "munitions",
+        "steel",
+        "aluminum",
+        "food",
+        "market_index",
+    )
+
     def __init__(self, data):
         self.data = data
         self.credit = ResourcePrice(json.loads(data["credit"]))

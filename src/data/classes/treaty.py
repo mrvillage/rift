@@ -12,6 +12,8 @@ class Treaties:
     alliance: Alliance
     treaties: Sequence[Treaty]
 
+    __slots__ = ("alliance", "treaties")
+
     def __init__(self, alliance, treaties: Sequence[Treaty]) -> None:
         self.alliance = alliance
         self.treaties = treaties
@@ -45,6 +47,8 @@ class Treaty:
     from_: Alliance
     to_: Alliance
     treaty_type: str
+
+    __slots__ = ("started", "stopped", "from_", "to_", "treaty_type")
 
     def __init__(
         self, data: Sequence[str, Union[int, str]], alliances: Mapping[int, Alliance]
