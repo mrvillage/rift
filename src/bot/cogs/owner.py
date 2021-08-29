@@ -7,7 +7,7 @@ from discord.ext import commands
 from ... import funcs as rift
 from ...data.classes import Alliance
 from ...data.db import execute_query
-from ...data.query import get_alliances
+from ...data.query import query_alliances
 from ...errors import NationNotFoundError
 
 
@@ -213,7 +213,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             await ctx.channel.purge(limit=purge)
         message = await ctx.send("Fetching...")
         invites = []
-        alliances = [Alliance(tuple(i)) for i in await get_alliances()]
+        alliances = [Alliance(tuple(i)) for i in await query_alliances()]
         for alliance in alliances:
             try:
                 if alliance.discord is None:

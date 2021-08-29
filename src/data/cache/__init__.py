@@ -13,11 +13,11 @@ async def create_cache(
     document_data=None,
     server_data=None
 ):
-    nation_data = await query.get_nations()
-    alliance_data = await query.get_alliances()
-    city_data = await query.get_cities()
-    document_data = await query.get_documents()
-    server_data = await query.get_servers()
+    nation_data = await query.query_nations()
+    alliance_data = await query.query_alliances()
+    city_data = await query.query_cities()
+    document_data = await query.query_documents()
+    server_data = await query.query_servers()
     await create_cache_documents(document_data=document_data)
     await create_cache_servers(server_data=server_data)
     await create_cache_cities(city_data=city_data)

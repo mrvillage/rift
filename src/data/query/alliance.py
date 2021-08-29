@@ -1,7 +1,7 @@
 from ..db import execute_read_query
 
 
-async def get_applicants(*, alliance_id: int):
+async def query_applicants(*, alliance_id: int):
     return await execute_read_query(
         """
         SELECT * FROM nations
@@ -11,7 +11,7 @@ async def get_applicants(*, alliance_id: int):
     )
 
 
-async def get_members(*, alliance_id: int):
+async def query_members(*, alliance_id: int):
     return await execute_read_query(
         """
         SELECT * FROM nations
@@ -21,7 +21,7 @@ async def get_members(*, alliance_id: int):
     )
 
 
-async def get_alliance(*, alliance_id=None, alliance_name=None):
+async def query_alliance(*, alliance_id=None, alliance_name=None):
     if alliance_id is not None:
         return (
             await execute_read_query(
@@ -42,5 +42,5 @@ async def get_alliance(*, alliance_id=None, alliance_name=None):
         )[0]
 
 
-async def get_alliances():
+async def query_alliances():
     return await execute_read_query("SELECT * FROM alliances;")

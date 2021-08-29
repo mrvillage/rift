@@ -1,7 +1,7 @@
 import asyncio
 import json
 
-from ..query import get_document
+from ..query import query_document
 
 
 class Document:
@@ -18,7 +18,7 @@ class Document:
 
     def __init__(self, *, data=None, document_id=None):
         if data is None:
-            self.data = asyncio.run(get_document(document_id=document_id))
+            self.data = asyncio.run(query_document(document_id=document_id))
         else:
             self.data = data
         self.id = self.data[0]

@@ -5,12 +5,12 @@ from typing import Dict, Union
 
 from discord import Embed, Guild
 from discord.ext.commands.context import Context
-from src.data.query.alliance import get_applicants, get_members
+from src.data.query.alliance import query_applicants, query_members
 
 from ...errors import AllianceNotFoundError
 from ...find import search_alliance
 from ...ref import bot
-from ..query import get_alliance
+from ..query import query_alliance
 from .base import Makeable
 from .resources import Resources
 
@@ -43,7 +43,7 @@ class Alliance(Makeable):
 
     def __init__(self, *, alliance_id=None, alliance_name=None, data=None):
         if data is None:
-            self.data = get_alliance(
+            self.data = query_alliance(
                 alliance_id=alliance_id, alliance_name=alliance_name
             )
         else:
@@ -66,7 +66,7 @@ class Alliance(Makeable):
 
     def _update(self, *, alliance_id=None, alliance_name=None, data=None):
         if data is None:
-            self.data = get_alliance(
+            self.data = query_alliance(
                 alliance_id=alliance_id, alliance_name=alliance_name
             )
         else:
@@ -154,14 +154,14 @@ class Alliance(Makeable):
     @classmethod
     async def fetch(cls, alliance_id: Union[int, str] = None) -> Alliance:
         try:
-            return cls(data=await get_alliance(alliance_id=alliance_id))
+            return cls(data=await query_alliance(alliance_id=alliance_id))
         except IndexError:
             raise AllianceNotFoundError(alliance_id)
 
     async def _make_members(self) -> None:
         from .nation import Nation
 
-        members = await get_members(alliance_id=self.id)
+        members = await query_members(alliance_id=self.id)
         members = [tuple(i) for i in members]
         self.members = [Nation(data=i) for i in members]
 
@@ -180,7 +180,7 @@ class Alliance(Makeable):
     async def _make_applicants(self) -> None:
         from .nation import Nation
 
-        applicants = await get_applicants(alliance_id=self.id)
+        applicants = await query_applicants(alliance_id=self.id)
         applicants = [tuple(i) for i in applicants]
         self.applicants = [Nation(data=i) for i in applicants]
 

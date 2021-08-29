@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Mapping, Sequence, Union
 
-from ..query import get_alliances, get_treaties
+from ..query import query_alliances, query_treaties
 
 if TYPE_CHECKING:
     from .alliance import Alliance
@@ -22,9 +22,9 @@ class Treaties:
     async def fetch(cls, alliance: Alliance) -> Treaties:
         from .alliance import Alliance
 
-        alliances = await get_alliances()
+        alliances = await query_alliances()
         alliances = {i[0]: Alliance(data=i) for i in alliances}
-        treaties = await get_treaties(alliance.id)
+        treaties = await query_treaties(alliance.id)
         treaties = [i for i in treaties if i[1] is None]
         treaties = [
             Treaty(i, alliances)

@@ -4,10 +4,10 @@ from typing import Dict, Union
 
 from ..db import execute_read_query
 
-__all__ = ("get_color",)
+__all__ = ("query_color",)
 
 
-async def get_color(color: str) -> Dict[str, Union[int, str]]:
+async def query_color(color: str) -> Dict[str, Union[int, str]]:
     return dict(
         (await execute_read_query("SELECT * FROM colors WHERE color = $1;", color))[0]
     )

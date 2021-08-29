@@ -14,8 +14,8 @@ from ...data.get import get_link_nation
 from ...errors import NationNotFoundError, SentError
 from ...find import search_nation
 from ...funcs import utils
-from ..query import get_nation
-from ..query.city import get_nation_cities
+from ..query import query_nation
+from ..query.city import query_nation_cities
 from .base import Makeable
 
 if TYPE_CHECKING:
@@ -58,7 +58,7 @@ class Nation(Makeable):
 
     def __init__(self, *, nation_id=None, nation_name=None, data=None):
         if data is None:
-            self.data = get_nation(nation_id=nation_id, nation_name=nation_name)
+            self.data = query_nation(nation_id=nation_id, nation_name=nation_name)
         else:
             self.data = data
         self.id = self.data[0]
@@ -92,7 +92,7 @@ class Nation(Makeable):
 
     def _update(self, *, nation_id=None, nation_name=None, data=None):
         if data is None:
-            self.data = get_nation(nation_id=nation_id, nation_name=nation_name)
+            self.data = query_nation(nation_id=nation_id, nation_name=nation_name)
         else:
             self.data = data
         self.id = self.data[0]
@@ -186,7 +186,7 @@ class Nation(Makeable):
     @classmethod
     async def fetch(cls, nation_id: Union[int, str] = None) -> Nation:
         try:
-            return cls(data=await get_nation(nation_id=nation_id))
+            return cls(data=await query_nation(nation_id=nation_id))
         except IndexError:
             raise NationNotFoundError
 
@@ -207,7 +207,7 @@ class Nation(Makeable):
     async def _make_partial_cities(self):
         from .city import City
 
-        partial_cities = await get_nation_cities(self.id)
+        partial_cities = await query_nation_cities(self.id)
         partial_cities = [tuple(i) for i in partial_cities]
         self.partial_cities = [City(data=i) for i in partial_cities]
 

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
 
 import pnwkit
 
-from ..query import get_city
+from ..query import query_city
 from ..requests import get_city_build
 from .base import Makeable
 from .resources import Resources

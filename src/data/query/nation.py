@@ -1,7 +1,7 @@
 from ..db import execute_read_query
 
 
-async def get_nation(*, nation_id=None, nation_name=None):
+async def query_nation(*, nation_id=None, nation_name=None):
     if nation_id is not None:
         return (
             await execute_read_query(
@@ -24,5 +24,5 @@ async def get_nation(*, nation_id=None, nation_name=None):
         )[0]
 
 
-async def get_nations():
+async def query_nations():
     return await execute_read_query("SELECT * FROM nations;")
