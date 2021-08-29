@@ -9,15 +9,6 @@ from ..query import query_embassy_config
 
 from ..db import execute_query, execute_read_query
 from ..get import get_embassy
-from .base import (
-    Convertable,
-    Createable,
-    Deleteable,
-    Fetchable,
-    Initable,
-    Saveable,
-    Setable,
-)
 
 __all__ = ("Embassy", "EmbassyConfig")
 
@@ -26,7 +17,7 @@ if TYPE_CHECKING:
     from typings import EmbassyConfigData, EmbassyData
 
 
-class Embassy(Convertable, Deleteable, Fetchable, Initable, Saveable):
+class Embassy:
     embassy_id: int
     alliance_id: int
     config_id: int
@@ -36,6 +27,7 @@ class Embassy(Convertable, Deleteable, Fetchable, Initable, Saveable):
         "alliance_id",
         "config_id",
         "guild_id",
+        "open",
     )
 
     def __init__(self, data: EmbassyData) -> None:
@@ -95,7 +87,7 @@ class Embassy(Convertable, Deleteable, Fetchable, Initable, Saveable):
         )
 
 
-class EmbassyConfig(Convertable, Createable, Fetchable, Initable, Saveable, Setable):
+class EmbassyConfig:
     config_id: int
     category_id: Optional[int]
     guild_id: int

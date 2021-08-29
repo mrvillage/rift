@@ -2,10 +2,9 @@ import asyncio
 import json
 
 from ..query import get_document
-from .base import Base
 
 
-class Document(Base):
+class Document:
     def __init__(self, *, data=None, document_id=None):
         if data is None:
             self.data = asyncio.run(get_document(document_id=document_id))

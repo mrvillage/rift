@@ -5,12 +5,11 @@ from typing import Dict, Union
 from discord.ext.commands import Context
 
 from ...funcs.utils import check_resource, convert_number
-from .base import Base
 
 __all__ = ("Resources",)
 
 
-class Resources(Base):
+class Resources:
     credit: Union[float, int]
     money: Union[float, int]
     food: Union[float, int]

@@ -2,10 +2,8 @@ import json
 
 from discord.ext.commands import BadInviteArgument
 
-from .base import Base
 
-
-class Document(Base):
+class Document:
     def __init__(self, *, data=None):
         self.data = data
         self.id = self.data[0]
@@ -23,7 +21,7 @@ class Document(Base):
         return f"{self.name}"
 
 
-class Server(Base):
+class Server:
     def __init__(self, *, data=None):
         self.data = data
         self.id = int(self.data[0])

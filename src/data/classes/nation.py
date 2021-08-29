@@ -16,14 +16,14 @@ from ...find import search_nation
 from ...funcs import utils
 from ..query import get_nation
 from ..query.city import get_nation_cities
-from .base import Embedable, Fetchable, Initable, Makeable
+from .base import Makeable
 
 if TYPE_CHECKING:
     from .resources import Resources
     from .trade import TradePrices
 
 
-class Nation(Embedable, Fetchable, Initable, Makeable):
+class Nation(Makeable):
     def __init__(self, *, nation_id=None, nation_name=None, data=None):
         if data is None:
             self.data = get_nation(nation_id=nation_id, nation_name=nation_name)

@@ -3,13 +3,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Mapping, Sequence, Union
 
 from ..query import get_alliances, get_treaties
-from .base import Base, Fetchable
 
 if TYPE_CHECKING:
     from .alliance import Alliance
 
 
-class Treaties(Fetchable):
+class Treaties:
     alliance: Alliance
     treaties: Sequence[Treaty]
 
@@ -40,7 +39,7 @@ class Treaties(Fetchable):
         return self.treaties[index]
 
 
-class Treaty(Base):
+class Treaty:
     started: str
     stopped: str
     from_: Alliance

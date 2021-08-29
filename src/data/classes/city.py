@@ -6,14 +6,14 @@ import pnwkit
 
 from ..query import get_city
 from ..requests import get_city_build
-from .base import Base, Initable, Makeable
+from .base import Makeable
 from .resources import Resources
 
 if TYPE_CHECKING:
     from .nation import Nation
 
 
-class City(Base):
+class City:
     data: Tuple[int, int, str, bool, float, float, float]
     id: int
     nation_id: int
@@ -67,7 +67,7 @@ class City(Base):
         return self.infrastructure, self.land
 
 
-class FullCity(Initable, Makeable):
+class FullCity(Makeable):
     data: Dict[str, Any]
     id: int
     name: Optional[str]
@@ -235,7 +235,9 @@ class FullCity(Initable, Makeable):
             return 0.725 * self.population
         if self.nation.domestic_policy == "Open Markets":
             return (((self.commerce / 50) * 0.725) + 0.725) * self.population * 1.01
-        return (((self.commerce / 50) * 0.725) + 0.725) * self.population * income_modifier
+        return (
+            (((self.commerce / 50) * 0.725) + 0.725) * self.population * income_modifier
+        )
 
     def calculate_food_income(self) -> float:
         if not self.farms:

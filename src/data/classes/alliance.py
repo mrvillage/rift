@@ -11,11 +11,11 @@ from ...errors import AllianceNotFoundError
 from ...find import search_alliance
 from ...ref import bot
 from ..query import get_alliance
-from .base import Embedable, Fetchable, Initable, Makeable
+from .base import Makeable
 from .resources import Resources
 
 
-class Alliance(Embedable, Fetchable, Initable, Makeable):
+class Alliance(Makeable):
     def __init__(self, *, alliance_id=None, alliance_name=None, data=None):
         if data is None:
             self.data = get_alliance(
