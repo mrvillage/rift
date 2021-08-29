@@ -1,5 +1,2 @@
-from .base import BankBase
-
-
-class Bank(BankBase):
+class Bank:
     pass
