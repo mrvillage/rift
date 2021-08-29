@@ -2,10 +2,9 @@ from typing import Union
 
 from ....funcs.bank import withdraw
 from .. import Alliance, Nation, Resources
-from .base import BankBase
 
 
-class Transaction(BankBase):
+class Transaction:
     def __init__(
         self,
         *,
