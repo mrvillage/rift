@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Dict, TYPE_CHECKING, Union
 
-from ..query import get_color
+from ..query import query_color
 
 
 class Color:
@@ -30,4 +30,4 @@ class Color:
 
     @classmethod
     async def fetch(cls, name: str) -> Color:
-        return cls(await get_color(name))
+        return cls(await query_color(name))

@@ -5,7 +5,7 @@ from typing import Sequence, Tuple, Union
 from ..db import execute_read_query
 
 
-async def get_treaties(alliance_id: int) -> Sequence[Tuple[Union[int, str]]]:
+async def query_treaties(alliance_id: int) -> Sequence[Tuple[Union[int, str]]]:
     return [
         tuple(i)
         for i in await execute_read_query(

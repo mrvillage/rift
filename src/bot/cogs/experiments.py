@@ -6,7 +6,7 @@ from discord.ext import commands
 from discord.ext.commands.flags import FlagConverter
 
 from ...data.classes import FullCity, Nation
-from ...data.query import get_mmr
+from ...data.query import query_mmr
 from ... import funcs
 
 

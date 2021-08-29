@@ -16,7 +16,7 @@ import discord
 from discord.ext import commands
 
 from ..db import execute_query, execute_read_query
-from ..query import get_menu, get_menu_item, insert_interface
+from ..query import query_menu, query_menu_item, insert_interface
 from .base import Makeable
 
 
@@ -243,7 +243,7 @@ class Menu(Makeable):
     @classmethod
     async def fetch(cls, menu_id: int, owner_id: int) -> Menu:
         try:
-            return cls(data=await get_menu(menu_id=menu_id))
+            return cls(data=await query_menu(menu_id=menu_id))
         except IndexError:
             return cls.default(menu_id=menu_id, owner_id=owner_id)
 
@@ -350,7 +350,7 @@ class MenuItem:
 
     @classmethod
     async def fetch(cls, item_id: int) -> MenuItem:
-        return cls(data=await get_menu_item(item_id=item_id))
+        return cls(data=await query_menu_item(item_id=item_id))
 
     def get_item(self, menu_id: int, row: int) -> Union[Button, Select]:
         custom_id = f"{menu_id}-{self.item_id}"

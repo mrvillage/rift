@@ -8,7 +8,7 @@ from discord.ext import commands
 from ... import funcs
 from ...checks import has_manage_permissions
 from ...data.classes import Menu, MenuItem
-from ...data.query import get_menus_user
+from ...data.query import query_menus_user
 from ...flags import ButtonFlags, SelectFlags, SelectOptionFlags
 from ...ref import Rift
 
@@ -48,7 +48,7 @@ class Menus(commands.Cog):
         name="list", aliases=["l", "li"], help="List your menu configurations."
     )
     async def menu_list(self, ctx: commands.Context):
-        menus = await get_menus_user(user_id=ctx.author.id)
+        menus = await query_menus_user(user_id=ctx.author.id)
         menus = [Menu(data=i) for i in menus]
         if menus:
             await ctx.reply(
