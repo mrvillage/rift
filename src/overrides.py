@@ -83,12 +83,12 @@ def convert_slash_command_type(type_: type) -> int:
         return 4
     if type_ is bool:
         return 5
-    if type_ is discord.User:
+    if type_ == "discord.User":
         return 6
-    if (
-        type_ is discord.TextChannel
-        or type_ is discord.VoiceChannel
-        or type_ is discord.CategoryChannel
+    if type_ in (
+        "discord.TextChannel",
+        "discord.VoiceChannel",
+        "discord.CategoryChannel",
     ):
         return 7
     if type_ is discord.Role:
