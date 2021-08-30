@@ -130,6 +130,7 @@ class Transaction:
                     self.steel,
                     self.aluminum,
                 )
+                if i
             ]
         )
 
