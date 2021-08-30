@@ -60,9 +60,12 @@ class Rift(Bot):
         )
 
 
+intents = Intents(
+    dm_messages=True, guild_messages=True, guilds=True, members=True, reactions=True
+)
 bot = Rift(
     command_prefix=when_mentioned_or("?"),
-    intents=Intents.all(),
+    intents=intents,
     case_insensitive=True,
     allowed_mentions=AllowedMentions(replied_user=False),
     activity=Game(name=__version__),
