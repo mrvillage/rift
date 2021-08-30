@@ -145,7 +145,7 @@ class Button(discord.ui.Button):
             embassies = []
             try:
                 nation = await get_link_user(interaction.user.id)
-                nation = await Nation.fetch(nation[1])
+                nation = await Nation.fetch(nation["nation_id"])
                 alliance = await Alliance.fetch(nation.alliance_id)
                 if nation.alliance_position not in {"Officer", "Heir", "Leader"}:
                     raise KeyError
