@@ -139,7 +139,7 @@ class Bank(commands.Cog):
                 )
             )
             return
-        await message.edit(
+        message = await message.edit(
             embed=funcs.get_embed_author_guild(
                 author,
                 f"Sending {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**...",
