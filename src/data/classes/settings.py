@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from abc import ABC, abstractclassmethod, abstractmethod
 from json import loads
 from typing import Any, Mapping, Union
 
@@ -12,27 +11,7 @@ from .base import Makeable
 from .nation import Nation
 
 
-class BaseSettings(Makeable, ABC):
-    __slots__ = ()
-
-    @abstractmethod
-    def __init__(self, data: Union[list, tuple]) -> None:
-        ...
-
-    @abstractclassmethod
-    def default(cls) -> BaseSettings:
-        ...
-
-    @abstractclassmethod
-    async def fetch(cls) -> BaseSettings:
-        ...
-
-    @abstractmethod
-    async def set_(cls, **kwargs: Mapping[str, Any]) -> BaseSettings:
-        ...
-
-
-class UserSettings(BaseSettings):
+class UserSettings(Makeable):
     __slots__ = ()
 
     def __init__(self) -> None:
@@ -47,7 +26,7 @@ class UserSettings(BaseSettings):
         ...
 
 
-class GuildWelcomeSettings(BaseSettings):
+class GuildWelcomeSettings(Makeable):
     __slots__ = (
         "welcome_data",
         "guild_id",
@@ -134,8 +113,10 @@ class GuildWelcomeSettings(BaseSettings):
 
     async def set_verified_nickname(
         self, member: discord.Member, nation: Nation
-    ) -> str:
+    ) -> None:
         await nation.make_attrs("alliance")
+        if not self.verified_nickname:
+            return
         if nation.alliance:
             nickname = self.verified_nickname.format(
                 nation_name=nation.name,
@@ -162,7 +143,7 @@ class GuildWelcomeSettings(BaseSettings):
         nickname = nickname[:32]
         await member.edit(nick=nickname)
 
-    async def set_(self, **kwargs: Mapping[str, Any]) -> GuildWelcomeSettings:
+    async def set_(self, **kwargs: Any) -> GuildWelcomeSettings:
         sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
         sets = ", ".join(sets)
         args = tuple(kwargs.values())
@@ -185,7 +166,7 @@ class GuildWelcomeSettings(BaseSettings):
         return self
 
 
-class GuildSettings(BaseSettings):
+class GuildSettings(Makeable):
     welcome_settings: GuildWelcomeSettings
 
     __slots__ = ("guild_id", "welcome_settings", "defaulted")
