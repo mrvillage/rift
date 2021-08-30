@@ -36,7 +36,7 @@ async def search_nation(ctx: Context, search: str) -> Nation:
         if TYPE_CHECKING:
             assert isinstance(user, (discord.User, discord.Member))
         try:
-            return await Nation.fetch((await get_link_user(user.id))[1])
+            return await Nation.fetch((await get_link_user(user.id))["nation_id"])
         except IndexError:
             pass
     if search.isdigit():
