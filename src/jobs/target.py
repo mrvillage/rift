@@ -3,12 +3,12 @@ from src.data.classes.nation import Nation
 
 import discord
 
-from .. import funcs as rift
+from .. import funcs
 from ..funcs import bot
 
 
 async def target_check():
-    targets = await rift.get_targets()
+    targets = await funcs.get_targets()
     for target in targets:
         try:
             nation = await Nation.fetch(target[1])
@@ -30,6 +30,6 @@ async def target_check():
                         )
                     embed = await nation.get_info_embed(channel)
                     await channel.send(mentions, embed=embed)
-            await rift.update_target_color(nation.id, rift.get_color_id(nation.color))
+            await funcs.update_target_color(nation.id, funcs.get_color_id(nation.color))
         except Exception as e:
             print("ERROR IN TARGET CHECK", e)

@@ -6,7 +6,7 @@ from discord import backoff
 from discord.backoff import ExponentialBackoff
 from discord.ext import commands
 
-from ... import funcs as rift
+from ... import funcs
 from ...env import SOCKET_PORT, SOCKET_IP
 
 EVENTS = {
@@ -22,7 +22,7 @@ EVENTS = {
 
 
 class Events(commands.Cog):
-    def __init__(self, bot: rift.Rift):
+    def __init__(self, bot: funcs.Rift):
         self.bot = bot
         self.bot.loop.create_task(self.socket())
 
@@ -58,5 +58,5 @@ class Events(commands.Cog):
         await ctx.send(f"{event} successfully subscribed.")
 
 
-def setup(bot: rift.Rift):
+def setup(bot: funcs.Rift):
     bot.add_cog(Events(bot))
