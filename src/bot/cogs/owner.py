@@ -4,15 +4,14 @@ from typing import Union
 import discord
 from discord.ext import commands
 
-from ... import funcs as rift
-from ...data.classes import Alliance
-from ...data.db import execute_query
+from ... import funcs
+from ...data.classes import Alliance, Nation
 from ...data.query import query_alliances
-from ...errors import NationNotFoundError
+from ...ref import Rift
 
 
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):
-    def __init__(self, bot: rift.Rift):
+    def __init__(self, bot: Rift):
         self.bot = bot
 
     async def cog_check(self, ctx):  # pylint: disable=invalid-overridden-method
@@ -20,16 +19,17 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
     async def cog_command_error(self, ctx, error):
         if not isinstance(error, commands.CheckFailure):
-            await rift.handler(ctx, error)
+            await funcs.handler(ctx, error)
 
     @commands.command(name="unlink", aliases=["unverify", "remove-link", "removelink"])
-    async def unlink(self, ctx, arg):
-        nation = await rift.search_nation(ctx, arg)
-        link = await rift.get_link_nation(nation.id)
-        await rift.remove_link_nation(nation.id)
-        user = await commands.UserConverter().convert(ctx, str(link[0]))
+    async def unlink(self, ctx: commands.Context, nation: Nation):
+        link = await funcs.get_link_nation(nation.id)
+        await funcs.remove_link_nation(nation.id)
+        user = self.bot.get_user(link["user_id"])
+        if not user:
+            user = await self.bot.fetch_user(link["user_id"])
         await ctx.send(
-            embed=rift.get_embed_author_member(
+            embed=funcs.get_embed_author_member(
                 user, f"{user.mention} has been unlinked from nation `{nation.id}`."
             )
         )
@@ -38,45 +38,42 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         name="force-link", aliases=["forcelink", "force-verify", "forceverify"]
     )
     async def force_link(
-        self, ctx, nation, user: Union[discord.Member, discord.User] = None
+        self, ctx: commands.Context, nation: Nation, user: discord.User = None
     ):
+        member = user or ctx.author
         try:
-            nation = await rift.search_nation(ctx, nation)
-        except NationNotFoundError:
-            await ctx.reply(
-                embed=rift.get_embed_author_member(
-                    ctx.author, f"No nation found with argument `{nation}`."
+            await funcs.get_link_user(member.id)
+        except IndexError:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"{member.mention} is already linked!",
+                    color=discord.Color.red(),
                 )
             )
-            return
-        user = ctx.author if user is None else user
-        links = await rift.get_links()
-        if any(user.id in tuple(i) for i in links):
-            await ctx.reply(
-                embed=rift.get_embed_author_member(
-                    user, f"{user.mention} is already linked!"
+        try:
+            await funcs.get_link_nation(nation.id)
+        except IndexError:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"{repr(nation)} is already linked!",
+                    color=discord.Color.red(),
                 )
             )
-            return
-        if any(user.id in tuple(i) for i in links):
-            await ctx.reply(
-                embed=rift.get_embed_author_member(
-                    user, f"Nation `{nation.id}` is already linked!"
-                )
-            )
-            return
-        await rift.add_link(user.id, nation.id)
+        await funcs.add_link(member.id, nation.id)
         await ctx.reply(
-            embed=rift.get_embed_author_member(
-                user,
-                f"Success! {user.mention} is now linked to nation `{nation.id}`!",
+            embed=funcs.get_embed_author_member(
+                member,
+                f"Success! {member.mention} is now linked to {repr(nation)}!",
+                color=discord.Color.green(),
             )
         )
 
     @commands.group(name="extension", invoke_without_command=True)
     async def extension(self, ctx):
         await ctx.reply(
-            embed=rift.get_embed_author_member(
+            embed=funcs.get_embed_author_member(
                 ctx.author, "You forgot to give a subcommand!"
             )
         )
@@ -86,19 +83,19 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         try:
             self.bot.reload_extension(f"source.bot.cogs.{extension}")
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, f"Extension `{extension}` has been reloaded."
                 )
             )
         except commands.ExtensionNotLoaded:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, f"Extension `{extension}` is not loaded."
                 )
             )
         except commands.ExtensionNotFound:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, f"Extension `{extension}` does not exist."
                 )
             )
@@ -108,19 +105,19 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         try:
             self.bot.load_extension(f"source.bot.cogs.{extension}")
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, f"Extension `{extension}` has been loaded."
                 )
             )
         except commands.ExtensionAlreadyLoaded:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, f"Extension `{extension}` is already loaded."
                 )
             )
         except commands.ExtensionNotFound:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, f"Extension `{extension}` does not exist."
                 )
             )
@@ -130,19 +127,19 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         try:
             self.bot.unload_extension(f"source.bot.cogs.{extension}")
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, f"Extension `{extension}` has been unloaded."
                 )
             )
         except commands.ExtensionNotLoaded:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, f"Extension `{extension}` is not loaded."
                 )
             )
         except commands.ExtensionNotFound:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, f"Extension `{extension}` does not exist."
                 )
             )
@@ -150,7 +147,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.group(name="staff", invoke_without_command=True)
     async def staff(self, ctx):
         await ctx.reply(
-            embed=rift.get_embed_author_member(
+            embed=funcs.get_embed_author_member(
                 ctx.author, "You forgot to give a subcommand!"
             )
         )
@@ -160,7 +157,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         staff = await self.bot.get_staff()
         if member.id in staff:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, f"{member.mention} is already Staff."
                 )
             )
@@ -168,7 +165,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         await execute_query("INSERT INTO staff VALUES ($1);", member.id)
         self.bot.staff.append(member.id)
         await ctx.reply(
-            embed=rift.get_embed_author_member(
+            embed=funcs.get_embed_author_member(
                 ctx.author, f"{member.mention} is now Staff."
             )
         )
@@ -178,7 +175,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         staff = await self.bot.get_staff()
         if member.id not in staff:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, f"{member.mention} is not Staff."
                 )
             )
@@ -186,7 +183,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         await execute_query("DELETE FROM staff WHERE id = $1;", member.id)
         self.bot.staff.remove(member.id)
         await ctx.reply(
-            embed=rift.get_embed_author_member(
+            embed=funcs.get_embed_author_member(
                 ctx.author, f"{member.mention} has been removed from Staff."
             )
         )
@@ -198,7 +195,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         staff = [i for i in staff if i is not None]
         mentions = "\n".join(i.mention for i in staff)
         await ctx.reply(
-            embed=rift.get_embed_author_member(
+            embed=funcs.get_embed_author_member(
                 ctx.author, f"There are {len(staff):,} Staff:\n{mentions}"
             )
         )
@@ -254,5 +251,5 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         await ctx.send(", ".join(no_disc))
 
 
-def setup(bot: rift.Rift):
+def setup(bot: Rift):
     bot.add_cog(Owner(bot))

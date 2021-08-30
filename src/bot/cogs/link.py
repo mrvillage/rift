@@ -1,14 +1,15 @@
-from typing import Union
+from __future__ import annotations
 
 import discord
 from discord.ext import commands
 
-from ... import funcs as rift
-from ...errors import NationNotFoundError
+from ... import funcs
+from ...data.classes import Nation
+from ...ref import Rift
 
 
 class Link(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Rift):
         self.bot = bot
 
     @commands._slash  # type: ignore
@@ -17,66 +18,59 @@ class Link(commands.Cog):
         aliases=["verify", "validate"],
         help="Link a nation to a Discord account.",
     )
-    async def link(self, ctx, nation, user: discord.User = None):
+    async def link(
+        self, ctx: commands.Context, nation: Nation, user: discord.User = None
+    ):
+        member = user or ctx.author
         try:
-            nation = await rift.search_nation(ctx, nation)
-        except NationNotFoundError:
-            await ctx.reply(
-                embed=rift.get_embed_author_member(
-                    ctx.author, f"No nation found with argument `{nation}`."
+            await funcs.get_link_user(member.id)
+        except IndexError:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"{member.mention} is already linked!",
+                    color=discord.Color.red(),
                 )
             )
-            return
-        user = ctx.author if user is None else user
-        links = await rift.get_links()
-        if any(user.id in tuple(i) for i in links):
-            await ctx.reply(
-                embed=rift.get_embed_author_member(
-                    user, f"{user.mention} is already linked!"
+        try:
+            await funcs.get_link_nation(nation.id)
+        except IndexError:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"{repr(nation)} is already linked!",
+                    color=discord.Color.red(),
                 )
             )
-            return
-        if any(user.id in tuple(i) for i in links):
-            await ctx.reply(
-                embed=rift.get_embed_author_member(
-                    user, f"Nation `{nation.id}` is already linked!"
-                )
-            )
-            return
         message = await ctx.reply(
-            embed=rift.get_embed_author_member(user, "Fetching Discord username...")
+            embed=funcs.get_embed_author_member(
+                member, "Fetching Discord username...", color=discord.Color.orange()
+            )
         )
         try:
             name = await nation.get_discord_page_username()
-            if name == f"{user.name}#{user.discriminator}":
-                await rift.add_link(user.id, nation.id)
-                await message.edit(
-                    embed=rift.get_embed_author_member(
-                        user,
-                        f"Success! {user.mention} is now linked to nation `{nation.id}`!",
-                    )
+            if name != f"{member.name}#{member.discriminator}":
+                raise IndexError
+            await funcs.add_link(member.id, nation.id)
+            await message.edit(
+                embed=funcs.get_embed_author_member(
+                    member,
+                    f"Success! {member.mention} is now linked to {repr(nation)}!",
+                    color=discord.Color.green(),
                 )
-            else:
-                await message.edit(
-                    embed=rift.get_embed_author_member(
-                        user,
-                        f"""
-                    The Discord username on your nation page doesn't match the one on your account!
-                    Head down to https://politicsandwar.com/nation/edit/ and scroll to the very bottom where it says "Discord Username:" and put `{user.name}#{user.discriminator}` in the space, hit Save Changes and run the command again!
-                    """,
-                    )
-                )
+            )
         except IndexError:
             await message.edit(
-                embed=rift.get_embed_author_member(
-                    user,
+                embed=funcs.get_embed_author_member(
+                    member,
                     f"""
                 The Discord username on your nation page doesn't match the one on your account!
-                Head down to https://politicsandwar.com/nation/edit/ and scroll to the very bottom where it says "Discord Username:" and put `{user.name}#{user.discriminator}` in the space, hit Save Changes and run the command again!
+                Head down to https://politicsandwar.com/nation/edit/ and scroll to the very bottom where it says "Discord Username:" and put `{member.name}#{member.discriminator}` in the space, hit Save Changes and run the command again!
                 """,
+                    color=discord.Color.red(),
                 )
             )
 
 
-def setup(bot):
+def setup(bot: Rift):
     bot.add_cog(Link(bot))
