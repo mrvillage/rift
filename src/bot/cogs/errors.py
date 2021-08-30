@@ -1,6 +1,6 @@
 from discord.ext import commands
 
-from ... import funcs as rift
+from ... import funcs
 
 
 class Errors(commands.Cog):
@@ -19,7 +19,7 @@ class Errors(commands.Cog):
             and commands.Cog._get_overridden_method(cog.cog_command_error) is not None
         ):
             return
-        await rift.handler(ctx, error)
+        await funcs.handler(ctx, error)
 
 
 def setup(bot):

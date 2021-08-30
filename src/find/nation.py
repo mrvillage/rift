@@ -1,15 +1,15 @@
 from discord.ext.commands import UserConverter, UserNotFound
 
-from .. import funcs as rift
+from .. import funcs
 
 
 async def search_nation_author(ctx, search):
     author = ctx.author if search is None else None
     search = str(ctx.author.id) if search is None else search
-    nation = await rift.search_nation(ctx, search)
+    nation = await funcs.search_nation(ctx, search)
     if author is None:
         try:
-            author = await rift.get_link_nation(nation.id)
+            author = await funcs.get_link_nation(nation.id)
             try:
                 author = await UserConverter().convert(ctx, str(author[0]))
             except UserNotFound:
@@ -21,4 +21,4 @@ async def search_nation_author(ctx, search):
 
 async def search_nation(ctx, search):
     search = str(ctx.author.id) if search is None else search
-    return await rift.search_nation(ctx, search)
+    return await funcs.search_nation(ctx, search)

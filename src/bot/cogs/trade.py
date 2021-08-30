@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from discord.ext import commands
 
-from ... import funcs as rift
+from ... import funcs
 from ...data.classes import TradePrices
 from ...views import Margins, Prices
 
 
 class Trade(commands.Cog):
-    def __init__(self, bot: rift.Rift):
+    def __init__(self, bot: funcs.Rift):
         self.bot = bot
 
     @commands._slash  # type: ignore
@@ -18,10 +18,10 @@ class Trade(commands.Cog):
         help="Get the current prices of all resources.",
     )
     async def price(self, ctx: commands.Context):
-        prices: TradePrices = await rift.get_trade_prices()
+        prices: TradePrices = await funcs.get_trade_prices()
         await ctx.reply(
             view=Prices(),
-            embed=rift.get_embed_author_member(
+            embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"Market Index: ${prices.market_index:,}",
                 fields=[
@@ -144,10 +144,10 @@ class Trade(commands.Cog):
         help="Get the current trade margins.",
     )
     async def trade_margins(self, ctx):
-        prices: TradePrices = await rift.get_trade_prices()
+        prices: TradePrices = await funcs.get_trade_prices()
         await ctx.reply(
             view=Margins(),
-            embed=rift.get_embed_author_member(
+            embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"Market Index: ${prices.market_index:,}",
                 title="Trade Margins",
@@ -229,5 +229,5 @@ class Trade(commands.Cog):
         )
 
 
-def setup(bot: rift.Rift):
+def setup(bot: funcs.Rift):
     bot.add_cog(Trade(bot))

@@ -4,14 +4,14 @@ import discord
 from discord.ext import commands
 
 from ... import find
-from ... import funcs as rift
+from ... import funcs
 from ... import perms
 from ...data.classes.bank import Transaction
 from ...errors import AllianceNotFoundError, NationNotFoundError, RecipientNotFoundError
 
 
 class Bank(commands.Cog):
-    def __init__(self, bot: rift.Rift):
+    def __init__(self, bot: funcs.Rift):
         self.bot = bot
 
     @commands.group(
@@ -21,7 +21,7 @@ class Bank(commands.Cog):
     )
     async def bank(self, ctx: commands.Context):
         await ctx.reply(
-            embed=rift.get_embed_author_member(
+            embed=funcs.get_embed_author_member(
                 ctx.author, "You forgot to give an argument!"
             )
         )
@@ -42,21 +42,21 @@ class Bank(commands.Cog):
             author, recipient = await find.search_nation_author(ctx, recipient)
         except NationNotFoundError:
             try:
-                recipient = await rift.search_alliance(ctx, recipient)
+                recipient = await funcs.search_alliance(ctx, recipient)
                 author = ctx.guild
             except AllianceNotFoundError:
                 await ctx.reply(
-                    embed=rift.get_embed_author_member(
+                    embed=funcs.get_embed_author_member(
                         ctx.author,
                         f"I couldn't find a nation or alliance with argument `{recipient}`.",
                     )
                 )
                 return
         try:
-            sender = await rift.search_nation(ctx, str(ctx.author.id))
+            sender = await funcs.search_nation(ctx, str(ctx.author.id))
         except NationNotFoundError:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author,
                     "You're not linked so I couldn't verify your bank permissions!",
                 )
@@ -67,7 +67,7 @@ class Bank(commands.Cog):
                 nation=sender, author=ctx.author, action="send"
             ):
                 await ctx.reply(
-                    embed=rift.get_embed_author_member(
+                    embed=funcs.get_embed_author_member(
                         ctx.author,
                         "You don't have permission to send money from your alliance bank!",
                     )
@@ -75,32 +75,32 @@ class Bank(commands.Cog):
                 return
         except IndexError:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, "Your alliance hasn't configured this command!"
                 )
             )
             return
         except AttributeError:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, "You're not in an alliance so you can't send money!"
                 )
             )
             return
         if len(transaction) == 0:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, "You didn't give any valid resources!"
                 )
             )
             return
         embed = (
-            rift.get_embed_author_guild(
+            funcs.get_embed_author_guild(
                 author,
                 f"Are you sure you want to transfer {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**? To confirm please type the id of the **{type(recipient).__name__}**.",
             )
             if isinstance(author, discord.Guild)
-            else rift.get_embed_author_member(
+            else funcs.get_embed_author_member(
                 author,
                 f"Are you sure you want to transfer {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**? To confirm please type the id of the **{type(recipient).__name__}**.",
             )
@@ -121,31 +121,31 @@ class Bank(commands.Cog):
             msg = await self.bot.wait_for("message", check=check, timeout=60)
         except TimeoutError:
             await message.edit(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, "You didn't confirm your transaction in time!"
                 )
             )
             return
         if msg.content in ("c", "cancel"):
             await message.edit(
-                embed=rift.get_embed_author_guild(
+                embed=funcs.get_embed_author_guild(
                     author,
                     f"You have cancelled the transfer of {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
                 )
                 if isinstance(author, discord.Guild)
-                else rift.get_embed_author_member(
+                else funcs.get_embed_author_member(
                     author,
                     f"You have cancelled the transfer of {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
                 )
             )
             return
         await message.edit(
-            embed=rift.get_embed_author_guild(
+            embed=funcs.get_embed_author_guild(
                 author,
                 f"Sending {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**...",
             )
             if isinstance(author, discord.Guild)
-            else rift.get_embed_author_member(
+            else funcs.get_embed_author_member(
                 author,
                 f"Sending {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**...",
             )
@@ -155,12 +155,12 @@ class Bank(commands.Cog):
             complete = await transaction.complete(receiver=recipient, action="send")
             if not complete:
                 embed = (
-                    rift.get_embed_author_guild(
+                    funcs.get_embed_author_guild(
                         author,
                         f"Something went wrong with the transaction. Please try again.",
                     )
                     if isinstance(author, discord.Guild)
-                    else rift.get_embed_author_member(
+                    else funcs.get_embed_author_member(
                         author,
                         f"Something went wrong with the transaction. Please try again.",
                     )
@@ -168,12 +168,12 @@ class Bank(commands.Cog):
                 await message.edit(embed=embed)
             else:
                 embed = (
-                    rift.get_embed_author_guild(
+                    funcs.get_embed_author_guild(
                         author,
                         f"You successfully transferred {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
                     )
                     if isinstance(author, discord.Guild)
-                    else rift.get_embed_author_member(
+                    else funcs.get_embed_author_member(
                         author,
                         f"You successfully transferred {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
                     )
@@ -181,12 +181,12 @@ class Bank(commands.Cog):
                 await message.edit(embed=embed)
         else:
             embed = (
-                rift.get_embed_author_guild(
+                funcs.get_embed_author_guild(
                     author,
                     f"You successfully transferred {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
                 )
                 if isinstance(author, discord.Guild)
-                else rift.get_embed_author_member(
+                else funcs.get_embed_author_member(
                     author,
                     f"You successfully transferred {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
                 )
@@ -199,25 +199,25 @@ class Bank(commands.Cog):
     async def bank_balance(self, ctx: commands.Context, *, search=None):
         search = str(ctx.author.id) if search is None else search
         try:
-            nation = await rift.search_nation(ctx, search)
+            nation = await funcs.search_nation(ctx, search)
             await nation.make_attrs("alliance")
             alliance = nation.alliance
         except NationNotFoundError:
             try:
-                alliance = rift.search_alliance(ctx, search)
+                alliance = funcs.search_alliance(ctx, search)
             except AllianceNotFoundError:
                 await ctx.reply(
-                    embed=rift.get_embed_author_member(
+                    embed=funcs.get_embed_author_member(
                         ctx.author,
                         f"I couldn't find a nation or alliance with argument `{search}`.",
                     )
                 )
                 raise RecipientNotFoundError
         try:
-            viewer = await rift.search_nation(ctx, str(ctx.author.id))
+            viewer = await funcs.search_nation(ctx, str(ctx.author.id))
         except NationNotFoundError:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author,
                     "You're not linked so I couldn't verify your bank permissions!",
                 )
@@ -228,7 +228,7 @@ class Bank(commands.Cog):
                 nation=viewer, author=ctx.author, action="view"
             ):
                 await ctx.reply(
-                    embed=rift.get_embed_author_member(
+                    embed=funcs.get_embed_author_member(
                         ctx.author,
                         "You don't have permission to view your alliance bank!",
                     )
@@ -236,32 +236,32 @@ class Bank(commands.Cog):
                 return
         except IndexError:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author, "Your alliance hasn't configured this command!"
                 )
             )
             return
         except AttributeError:
             await ctx.reply(
-                embed=rift.get_embed_author_member(
+                embed=funcs.get_embed_author_member(
                     ctx.author,
                     "You're not in an alliance so you can't view a bank balance!",
                 )
             )
             return
         message = await ctx.reply(
-            embed=rift.get_embed_author_member(
+            embed=funcs.get_embed_author_member(
                 ctx.author, f"Fetching the current bank holdings of {repr(alliance)}..."
             )
         )
         resources = await alliance.get_resources()
         await message.edit(
-            embed=rift.get_embed_author_member(
+            embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"The current bank holdings of {repr(alliance)} is:\n{resources.newline()}",
             )
         )
 
 
-def setup(bot: rift.Rift):
+def setup(bot: funcs.Rift):
     bot.add_cog(Bank(bot))
