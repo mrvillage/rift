@@ -3,6 +3,7 @@ from .city import *
 from .color import *
 from .database import *
 from .embassy import *
+from .link import *
 from .menu import *
 from .mmr import *
 from .nation import *
