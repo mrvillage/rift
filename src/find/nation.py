@@ -11,7 +11,7 @@ async def search_nation_author(ctx, search):
         try:
             author = await funcs.get_link_nation(nation.id)
             try:
-                author = await UserConverter().convert(ctx, str(author[0]))
+                author = await UserConverter().convert(ctx, str(author))
             except UserNotFound:
                 author = ctx.author if ctx.guild is None else ctx.guild
         except IndexError:
