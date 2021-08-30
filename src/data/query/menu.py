@@ -40,10 +40,10 @@ async def query_menus() -> List[Dict[str, Any]]:
     return [dict(i) for i in await execute_read_query("SELECT * FROM menus;")]
 
 
-async def query_menus_user(*, user_id: int) -> List[Dict[str, Any]]:
+async def query_menus_guild(*, guild_id: int) -> List[Dict[str, Any]]:
     return [
         dict(i)
         for i in await execute_read_query(
-            "SELECT * FROM menus WHERE owner_id = $1;", user_id
+            "SELECT * FROM menus WHERE guild_id = $1;", guild_id
         )
     ]

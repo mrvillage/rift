@@ -8,7 +8,7 @@ from discord.ext import commands
 from ... import funcs
 from ...checks import has_manage_permissions
 from ...data.classes import Menu, MenuItem
-from ...data.query import query_menus_user
+from ...data.query import query_menus_guild
 from ...flags import ButtonFlags, SelectFlags, SelectOptionFlags
 from ...ref import Rift
 
@@ -45,10 +45,13 @@ class Menus(commands.Cog):
         await menu.new_interface(message)
 
     @menu.command(
-        name="list", aliases=["l", "li"], help="List your menu configurations."
+        name="list", aliases=["l", "li"], help="List the menu configurations for this guild."
     )
+    @has_manage_permissions()
     async def menu_list(self, ctx: commands.Context):
-        menus = await query_menus_user(user_id=ctx.author.id)
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        menus = await query_menus_guild(guild_id=ctx.guild.id)
         menus = [Menu(data=i) for i in menus]
         if menus:
             await ctx.reply(
@@ -73,7 +76,8 @@ class Menus(commands.Cog):
         message: discord.Message
         if TYPE_CHECKING:
             assert isinstance(ctx.message, discord.Message)
-        menu = Menu.default(ctx.message.id, ctx.author.id)
+            assert isinstance(ctx.guild, discord.Guild)
+        menu = Menu.default(ctx.message.id, ctx.guild.id)
         menu.description = (
             description
             or "This is a menu! Someone was lazy and didn't put a description. :)"
@@ -115,7 +119,7 @@ class Menus(commands.Cog):
                             if TYPE_CHECKING:
                                 assert isinstance(flags["id"], str)
                             item = await MenuItem.fetch(int(flags["id"]))
-                            if item.owner_id == ctx.author.id:
+                            if item.guild_id == ctx.author.id:
                                 menu.add_item(item, row)
                                 continue
                         except IndexError:
@@ -131,7 +135,7 @@ class Menus(commands.Cog):
                     item = MenuItem(
                         {
                             "item_id": message.id,
-                            "owner_id": ctx.author.id,
+                            "guild_id": ctx.guild.id,
                             "type_": "button",
                             "data_": json.dumps(flags),
                         }
