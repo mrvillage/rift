@@ -1,13 +1,15 @@
+from __future__ import annotations
+
 import json
-import ssl
-import aiohttp
 from asyncio import sleep
-from discord import backoff
+
+import aiohttp
 from discord.backoff import ExponentialBackoff
 from discord.ext import commands
 
 from ... import funcs
-from ...env import SOCKET_PORT, SOCKET_IP
+from ...env import SOCKET_IP, SOCKET_PORT
+from ...ref import Rift
 
 EVENTS = {
     "alliance_update": "raw_alliance_update",
@@ -22,7 +24,7 @@ EVENTS = {
 
 
 class Events(commands.Cog):
-    def __init__(self, bot: funcs.Rift):
+    def __init__(self, bot: Rift):
         self.bot = bot
         self.bot.loop.create_task(self.socket())
 
@@ -33,7 +35,6 @@ class Events(commands.Cog):
                 async with aiohttp.ClientSession() as session:
                     async with session.ws_connect(
                         f"ws://{SOCKET_IP}:{SOCKET_PORT}",
-                        # ssl=ssl.create_default_context(ssl.Purpose.CLIENT_AUTH),
                     ) as ws:
                         print("rift-data socket connected")
                         async for message in ws:
@@ -41,7 +42,6 @@ class Events(commands.Cog):
                             if "event" in data:
                                 event: str = data["event"]
                                 event = EVENTS.get(event, event)
-                                # print(event, data if "created" in event else None)
                                 self.bot.dispatch(event, **data["data"])
             except Exception:
                 print("rift-data socket connection error")
@@ -58,5 +58,5 @@ class Events(commands.Cog):
         await ctx.send(f"{event} successfully subscribed.")
 
 
-def setup(bot: funcs.Rift):
+def setup(bot: Rift):
     bot.add_cog(Events(bot))
