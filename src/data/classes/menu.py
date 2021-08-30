@@ -220,7 +220,7 @@ class Menu(Makeable):
 
     __slots__ = (
         "menu_id",
-        "owner_id",
+        "guild_id",
         "name",
         "description",
         "item_ids",
@@ -230,7 +230,7 @@ class Menu(Makeable):
 
     def __init__(self, data: Dict[str, Any]) -> None:
         self.menu_id = data["menu_id"]
-        self.owner_id = data["owner_id"]
+        self.guild_id = data["guild_id"]
         self.name = data["name"]
         self.description = data["description"]
         self.item_ids = loads(data["items"]) if data["items"] else []
@@ -241,18 +241,18 @@ class Menu(Makeable):
         return await cls.fetch(int(argument), ctx.author.id)
 
     @classmethod
-    async def fetch(cls, menu_id: int, owner_id: int) -> Menu:
+    async def fetch(cls, menu_id: int, guild_id: int) -> Menu:
         try:
             return cls(data=await query_menu(menu_id=menu_id))
         except IndexError:
-            return cls.default(menu_id=menu_id, owner_id=owner_id)
+            return cls.default(menu_id=menu_id, guild_id=guild_id)
 
     @classmethod
-    def default(cls, menu_id: int, owner_id: int) -> Menu:
+    def default(cls, menu_id: int, guild_id: int) -> Menu:
         menu = cls(
             data={
                 "menu_id": menu_id,
-                "owner_id": owner_id,
+                "guild_id": guild_id,
                 "name": None,
                 "description": None,
                 "items": [],
@@ -287,10 +287,10 @@ class Menu(Makeable):
     async def save(self) -> None:
         await execute_query(
             f"""
-        INSERT INTO menus (menu_id, owner_id, name, description, items, permissions) VALUES ($1, $2, $3, $4, $5, $6);
+        INSERT INTO menus (menu_id, guild_id, name, description, items, permissions) VALUES ($1, $2, $3, $4, $5, $6);
         """,
             self.menu_id,
-            self.owner_id,
+            self.guild_id,
             self.name,
             self.description,
             dumps([[i.item_id for i in row] for row in self.items])
@@ -340,11 +340,11 @@ class Menu(Makeable):
 
 
 class MenuItem:
-    __slots__ = ("item_id", "owner_id", "type", "data")
+    __slots__ = ("item_id", "guild_id", "type", "data")
 
     def __init__(self, data: Mapping[str, Any]) -> None:
         self.item_id = data["item_id"]
-        self.owner_id = data["owner_id"]
+        self.guild_id = data["guild_id"]
         self.type = data["type_"]
         self.data = loads(data["data_"]) if data["data_"] else {}
 
@@ -391,10 +391,10 @@ class MenuItem:
     async def save(self) -> None:
         await execute_query(
             f"""
-        INSERT INTO menu_items (item_id, owner_id, type_, data_) VALUES ($1, $2, $3, $4);
+        INSERT INTO menu_items (item_id, guild_id, type_, data_) VALUES ($1, $2, $3, $4);
         """,
             self.item_id,
-            self.owner_id,
+            self.guild_id,
             self.type,
             dumps(self.data),
         )
