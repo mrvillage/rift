@@ -1,12 +1,11 @@
 from __future__ import annotations
 from ...checks import has_manage_permissions
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import discord
 from discord import NotFound
 from discord.ext import commands
-from discord.guild import Guild
 
 from ... import funcs
 from ...data.classes import GuildSettings
@@ -95,13 +94,12 @@ class Settings(commands.Cog):
         if member.pending:
             return
         try:
-            nation = await funcs.get_link_user(member.id)
-            nation = int(nation[1])
-            nation: Nation = await Nation.fetch(nation)
+            nat = await funcs.get_link_user(member.id)
+            nation: Optional[Nation] = await Nation.fetch(nat["nation_id"])
             await nation.make_attrs("alliance")
         except IndexError:
             nation = None
-        settings = await GuildSettings.fetch(str(member.guild.id), "welcome_settings")
+        settings = await GuildSettings.fetch(member.guild.id, "welcome_settings")
         settings = settings.welcome_settings
         if settings.welcome_channels:
             for channel in settings.welcome_channels:
