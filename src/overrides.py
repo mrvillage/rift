@@ -115,7 +115,9 @@ def parse_slash_command_args(coro: FunctionType) -> List[Dict[str, Any]]:
             "name": param.name,
             "description": arg_descriptions.get(
                 f"{coro.__name__}-{param.name}",
-                coro.__annotations__.get(param.name, str).__name__,
+                s
+                if isinstance(s := coro.__annotations__.get(param.name, str), str)
+                else s.__name__,
             ),
             "type": convert_slash_command_type(
                 coro.__annotations__.get(param.name, str)
