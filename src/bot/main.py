@@ -76,7 +76,6 @@ async def on_ready():
         cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
         for cog in cogs:
             bot.load_extension(f"src.bot.cogs.{cog}")
-            print(f"Loaded {cog}!")
         bot.unload_extension("src.bot.cogs.database")
         bot.unload_extension("src.bot.cogs.server")
         bot.cogs_loaded = True
