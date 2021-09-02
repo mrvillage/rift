@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import discord
-from discord.ext.commands import Context, _slash  # type: ignore
+from discord.ext.commands import Context
 
 from .. import funcs
 from ..data.classes import Menu
@@ -70,8 +70,6 @@ async def on_ready():
         print("Loaded persistent views!")
 
     if not bot.cogs_loaded:
-        await bot.get_global_application_commands()
-        _slash(bot.get_command("rift"))
         cogPath = Path.cwd() / "src" / "bot" / "cogs"
         cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
         for cog in cogs:
