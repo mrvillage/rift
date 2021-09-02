@@ -59,6 +59,7 @@ async def on_raw_message_edit(payload: discord.RawMessageUpdateEvent):
 
 @bot.event
 async def on_ready():
+    bot.persistent_views_loaded = True
     if not bot.persistent_views_loaded:
         views = await query_menus()
         views = [Menu(data=i) for i in views]
@@ -76,6 +77,7 @@ async def on_ready():
             bot.load_extension(f"src.bot.cogs.{cog}")
         bot.unload_extension("src.bot.cogs.database")
         bot.unload_extension("src.bot.cogs.server")
+        bot.unload_extension("src.bot.cogs.logs")
         bot.cogs_loaded = True
         print("Loaded cogs!")
 
@@ -107,7 +109,6 @@ async def main() -> None:
             await bot.login(TOKEN)
             bot.loop.create_task(bot.update_pnw_session())
             bot.loop.create_task(bot.get_staff())
-            # bot.command_prefix = "!!"
             await bot.connect(reconnect=True)
         finally:
             await bot.close()
