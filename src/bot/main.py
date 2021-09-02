@@ -11,7 +11,7 @@ from discord.ext.commands import Context
 
 from .. import funcs
 from ..data.classes import Menu
-from ..data.query import get_menus
+from ..data.query import query_menus
 from ..env import TOKEN, __version__
 from ..ref import bot
 from ..views import Margins, Prices
