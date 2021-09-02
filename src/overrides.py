@@ -27,7 +27,7 @@ async def _actual_conversion(
 
     if converter is int or converter is float:
         try:
-            num = convert_number(argument)
+            return convert_number(argument)
         except Exception as exc:
             try:
                 name = converter.__name__
