@@ -72,7 +72,7 @@ bot = Rift(
     strip_after_prefix=True,
     help_command=EmbedHelpCommand(),
     application_id=APPLICATION_ID,
-    debug_command_prefix=when_mentioned_or("!!"),
+    debug_command_prefix="!!",
     debug_guild_id=654109011473596417,
     # debug=True,
 )
