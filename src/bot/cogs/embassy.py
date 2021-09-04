@@ -51,9 +51,8 @@ class Embassies(commands.Cog):
     async def embassy_config_create(
         self,
         ctx: commands.Context,
-        category: discord.CategoryChannel = None,
-        *,
         start: str,
+        category: discord.CategoryChannel = None,
     ):
         data = {
             "config_id": ctx.interaction.id,

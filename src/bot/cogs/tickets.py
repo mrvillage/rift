@@ -52,9 +52,8 @@ class Tickets(commands.Cog):
     async def ticket_config_create(
         self,
         ctx: commands.Context,
-        category: discord.CategoryChannel = None,
-        *,
         start: str,
+        category: discord.CategoryChannel = None,
     ):
         data = {
             "config_id": ctx.interaction.id,
