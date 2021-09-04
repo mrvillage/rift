@@ -79,7 +79,10 @@ class Ticket:
                 ),
             )
         await channel.send(
-            user.mention, embed=get_embed_author_member(user, config.start_message)
+            user.mention,
+            embed=get_embed_author_member(
+                user, config.start_message.replace("\\n", "\n")
+            ),
         )
 
 
