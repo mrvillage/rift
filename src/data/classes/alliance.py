@@ -195,7 +195,7 @@ class Alliance(Makeable):
 
         self.treaties = await Treaties.fetch(self)
 
-    async def get_info_embed(self, ctx: Context) -> Embed:
+    async def get_info_embed(self, ctx: Context, short: bool = False) -> Embed:
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
         await self.make_attrs(
@@ -236,7 +236,9 @@ class Alliance(Makeable):
                     f'[{repr(i)}](https://politicsandwar.com/nation/id={i.id} "https://politicsandwar.com/nation/id={i.id}")'
                     for i in self.leaders
                 )
-                if len(self.leaders) != 0
+                if self.leaders and not short
+                else ", ".join(str(i.id) for i in self.leaders)
+                if self.leaders and short
                 else "None",
             },
             {
@@ -245,7 +247,9 @@ class Alliance(Makeable):
                     f'[{repr(i)}](https://politicsandwar.com/nation/id={i.id} "https://politicsandwar.com/nation/id={i.id}")'
                     for i in self.heirs
                 )
-                if len(self.heirs) != 0
+                if self.heirs and not short
+                else ", ".join(str(i.id) for i in self.heirs)
+                if self.heirs and short
                 else "None",
             },
             {
@@ -254,7 +258,9 @@ class Alliance(Makeable):
                     f'[{repr(i)}](https://politicsandwar.com/nation/id={i.id} "https://politicsandwar.com/nation/id={i.id}")'
                     for i in self.officers
                 )
-                if len(self.officers) != 0
+                if self.officers and not short
+                else ", ".join(str(i.id) for i in self.officers)
+                if self.officers and short
                 else "None",
             },
             {
@@ -274,7 +280,7 @@ class Alliance(Makeable):
                 "value": f"{len(self.vm_members):,}",
             },
         ]
-        return (
+        embed = (
             get_embed_author_guild(
                 ctx,  # this is here if it ever gets passed as a Guild for some reason
                 f'[Alliance Page](https://politicsandwar.com/alliance/id={self.id} "https://politicsandwar.com/alliance/id={self.id}")\n[War Activity](https://politicsandwar.com/alliance/id={self.id}&display=war "https://politicsandwar.com/alliance/id={self.id}&display=war")',
@@ -291,6 +297,9 @@ class Alliance(Makeable):
                 fields=fields,
             ).set_thumbnail(url=self.flagurl)
         )
+        if any(len(fields[i]["value"] + fields[i]["name"]) > 1024 for i in {9, 10, 11}):
+            return await self.get_info_embed(ctx, short=True)
+        return embed
 
     async def calculate_revenue(
         self,
