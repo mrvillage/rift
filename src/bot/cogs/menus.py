@@ -23,6 +23,7 @@ class Menus(commands.Cog):
         help="A group of commands related to menus.",
         case_insensitive=True,
         invoke_without_command=True,
+        type=commands.CommandType.chat_input,
     )
     @has_manage_permissions()
     async def menu(self, ctx: commands.Context, menu: Menu = None):
@@ -45,7 +46,10 @@ class Menus(commands.Cog):
         await menu.new_interface(message)
 
     @menu.command(
-        name="list", aliases=["l", "li"], help="List the menu configurations for this guild."
+        name="list",
+        aliases=["l", "li"],
+        help="List the menu configurations for this guild.",
+        type=commands.CommandType.chat_input,
     )
     @has_manage_permissions()
     async def menu_list(self, ctx: commands.Context):
@@ -67,7 +71,10 @@ class Menus(commands.Cog):
             )
 
     @menu.command(
-        name="create", aliases=["new"], help="Create a new menu configuration."
+        name="create",
+        aliases=["new"],
+        help="Create a new menu configuration.",
+        type=commands.CommandType.chat_input,
     )
     @has_manage_permissions()
     async def menu_create(
@@ -75,9 +82,8 @@ class Menus(commands.Cog):
     ):  # sourcery no-metrics
         message: discord.Message
         if TYPE_CHECKING:
-            assert isinstance(ctx.message, discord.Message)
             assert isinstance(ctx.guild, discord.Guild)
-        menu = Menu.default(ctx.message.id, ctx.guild.id)
+        menu = Menu.default(ctx.interaction.id, ctx.guild.id)
         menu.description = (
             description
             or "This is a menu! Someone was lazy and didn't put a description. :)"
@@ -195,7 +201,10 @@ class Menus(commands.Cog):
             )
 
     @menu.command(
-        name="send", aliases=["post"], help="Send a menu configuration to a channel."
+        name="send",
+        aliases=["post"],
+        help="Send a menu configuration to a channel.",
+        type=commands.CommandType.chat_input,
     )
     @has_manage_permissions()
     async def menu_send(

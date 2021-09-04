@@ -5,17 +5,18 @@ from discord.ext import commands
 from ... import funcs
 from ...data.classes import TradePrices
 from ...views import Margins, Prices
+from ...ref import Rift
 
 
 class Trade(commands.Cog):
-    def __init__(self, bot: funcs.Rift):
+    def __init__(self, bot: Rift):
         self.bot = bot
 
-    @commands._slash  # type: ignore
     @commands.command(
         name="price",
         aliases=["p", "resource", "prices"],
         help="Get the current prices of all resources.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def price(self, ctx: commands.Context):
         prices: TradePrices = await funcs.get_trade_prices()
@@ -137,13 +138,13 @@ class Trade(commands.Cog):
             ),
         )
 
-    @commands._slash  # type: ignore
     @commands.command(
         name="trade-margins",
         aliases=["trade-margin", "trademargin", "margin", "tm", "margins"],
         help="Get the current trade margins.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
-    async def trade_margins(self, ctx):
+    async def trade_margins(self, ctx: commands.Context):
         prices: TradePrices = await funcs.get_trade_prices()
         await ctx.reply(
             view=Margins(),
@@ -229,5 +230,5 @@ class Trade(commands.Cog):
         )
 
 
-def setup(bot: funcs.Rift):
+def setup(bot: Rift):
     bot.add_cog(Trade(bot))

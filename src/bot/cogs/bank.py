@@ -8,16 +8,18 @@ from ... import funcs
 from ... import perms
 from ...data.classes.bank import Transaction
 from ...errors import AllianceNotFoundError, NationNotFoundError, RecipientNotFoundError
+from ...ref import Rift
 
 
 class Bank(commands.Cog):
-    def __init__(self, bot: funcs.Rift):
+    def __init__(self, bot: Rift):
         self.bot = bot
 
     @commands.group(
         name="bank",
         help="A group of commands related to your alliance bank.",
         invoke_without_command=True,
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def bank(self, ctx: commands.Context):
         await ctx.reply(
@@ -33,7 +35,10 @@ class Bank(commands.Cog):
         await ctx.invoke(self.bank_transfer, recipient, transaction=transaction)
 
     @bank.command(
-        name="transfer", aliases=["send"], help="Send money from your alliance bank."
+        name="transfer",
+        aliases=["send"],
+        help="Send money from your alliance bank.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def bank_transfer(
         self, ctx: commands.Context, recipient, *, transaction: Transaction
@@ -194,7 +199,10 @@ class Bank(commands.Cog):
             await message.edit(embed=embed)
 
     @bank.command(
-        name="balance", aliases=["bal"], help="Send money from your alliance bank."
+        name="balance",
+        aliases=["bal"],
+        help="Send money from your alliance bank.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def bank_balance(self, ctx: commands.Context, *, search=None):
         search = str(ctx.author.id) if search is None else search
@@ -263,5 +271,5 @@ class Bank(commands.Cog):
         )
 
 
-def setup(bot: funcs.Rift):
+def setup(bot: Rift):
     bot.add_cog(Bank(bot))

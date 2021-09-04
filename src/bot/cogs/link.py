@@ -12,11 +12,11 @@ class Link(commands.Cog):
     def __init__(self, bot: Rift):
         self.bot = bot
 
-    @commands._slash  # type: ignore
     @commands.command(
         name="link",
         aliases=["verify", "validate"],
         help="Link a nation to a Discord account.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def link(
         self, ctx: commands.Context, nation: Nation, user: discord.User = None
