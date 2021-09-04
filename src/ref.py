@@ -6,7 +6,7 @@ from discord import AllowedMentions, Game, Intents, Object
 from discord.ext.commands import Bot, when_mentioned_or
 
 from .data.db import execute_read_query
-from .env import APPLICATION_ID, EMAIL, PASSWORD, __version__
+from .env import APPLICATION_ID, PNW_EMAIL, PNW_PASSWORD, __version__
 from .errors import LoginError
 from .help import EmbedHelpCommand
 
@@ -31,7 +31,11 @@ class Rift(Bot):
         }
 
     async def update_pnw_session(self):
-        login_data = {"email": EMAIL, "password": PASSWORD, "loginform": "Login"}
+        login_data = {
+            "email": PNW_EMAIL,
+            "password": PNW_PASSWORD,
+            "loginform": "Login",
+        }
         try:
             async with self.pnw_session.request(
                 "POST", "https://politicsandwar.com/login/", data=login_data
