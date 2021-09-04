@@ -200,7 +200,7 @@ class Nation(Makeable):
         from ...ref import bot
 
         try:
-            self.user = await bot.fetch_user((await get_link_nation(self.id))[0])
+            self.user = await bot.fetch_user((await get_link_nation(self.id))["user_id"]])
         except (IndexError, NotFound):
             self.user = None
 
