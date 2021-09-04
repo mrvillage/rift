@@ -327,7 +327,9 @@ class Menu(Makeable):
     def get_description_embed(self, ctx: commands.Context) -> discord.Embed:
         from ...funcs import get_embed_author_guild
 
-        self.embed = get_embed_author_guild(ctx.guild, self.description)
+        self.embed = get_embed_author_guild(
+            ctx.guild, self.description.replace("\\n", "\n")
+        )
         return self.embed
 
     async def new_interface(self, message: discord.Message) -> None:
