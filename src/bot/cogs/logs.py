@@ -14,6 +14,18 @@ class Logs(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command(self, ctx: commands.Context):
+        if ctx.interaction:
+            return await logs.insert_log(
+                "Unknown",
+                ctx.interaction.id,
+                ctx.channel.id,
+                ctx.guild and ctx.guild.id,
+                ctx.author.id,
+                "",
+                ctx.command and ctx.command.qualified_name,
+                json.dumps([str(i) for i in ctx.args]),
+                json.dumps({i: str(ctx.kwargs[i]) for i in ctx.kwargs}),
+            )
         await logs.insert_log(
             str(ctx.message.edited_at or ctx.message.created_at),
             ctx.message.id,
@@ -28,6 +40,17 @@ class Logs(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx: commands.Context):
+        if ctx.interaction:
+            return await logs.edit_log(
+                "Unknown",
+                ctx.interaction.id,
+                ctx.channel.id,
+                ctx.guild and ctx.guild.id,
+                ctx.author.id,
+                "",
+                ctx.command and ctx.command.qualified_name,
+                True,
+            )
         await logs.edit_log(
             str(ctx.message.edited_at or ctx.message.created_at),
             ctx.message.id,
@@ -43,6 +66,18 @@ class Logs(commands.Cog):
     async def on_command_error(
         self, ctx: commands.Context, error: commands.CommandError
     ):
+        if ctx.interaction:
+            return await logs.edit_log(
+                "Unknown",
+                ctx.interaction.id,
+                ctx.channel.id,
+                ctx.guild and ctx.guild.id,
+                ctx.author.id,
+                "",
+                ctx.command and ctx.command.qualified_name,
+                False,
+                str(error),
+            )
         await logs.edit_log(
             str(ctx.message.edited_at or ctx.message.created_at),
             ctx.message.id,
