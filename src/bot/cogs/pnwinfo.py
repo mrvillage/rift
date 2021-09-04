@@ -124,16 +124,12 @@ class PnWInfo(commands.Cog):
     @commands.command(
         name="spies",
         help="Get the spies of a nation.",
-        type=(commands.CommandType.default, commands.CommandType.chat_input),
+        type=commands.CommandType.chat_input,
     )
     async def spies(self, ctx, *, nation: Nation):
-        message = await ctx.reply(
-            embed=funcs.get_embed_author_member(
-                ctx.author, f"Fetching spies for {repr(nation)}..."
-            )
-        )
+        await ctx.interaction.response.defer()
         num = await funcs.calculate_spies(nation)
-        await message.edit(
+        await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"{repr(nation)} has **{num}** spies.",
