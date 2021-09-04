@@ -24,6 +24,7 @@ class Tickets(commands.Cog):
         help="A group of commands related to tickets.",
         case_insensitive=True,
         invoke_without_command=True,
+        type=commands.CommandType.chat_input,
     )
     @commands.guild_only()
     async def ticket(self, ctx: commands.Context):
@@ -34,26 +35,29 @@ class Tickets(commands.Cog):
         help="A group of commands related to ticket configurations.",
         case_insensitive=True,
         invoke_without_command=True,
+        type=commands.CommandType.chat_input,
     )
     @commands.guild_only()
     @has_manage_permissions()
     async def ticket_config(self, ctx: commands.Context):
         ...
 
-    @ticket_config.command(name="create", help="Create a new ticket configuration.")
+    @ticket_config.command(
+        name="create",
+        help="Create a new ticket configuration.",
+        type=commands.CommandType.chat_input,
+    )
     @commands.guild_only()
     @has_manage_permissions()
     async def ticket_config_create(
-        self, ctx: commands.Context, category, *, start: str
+        self,
+        ctx: commands.Context,
+        category: discord.CategoryChannel = None,
+        *,
+        start: str,
     ):
-        if category.lower() == "none":
-            category = None
-        else:
-            category = await commands.CategoryChannelConverter().convert(ctx, category)
-        if TYPE_CHECKING:
-            assert isinstance(ctx.message, discord.Message)
         data = {
-            "config_id": ctx.message.id,
+            "config_id": ctx.interaction.id,
             "category_id": category and category.id,
             "guild_id": ctx.guild.id,
             "start_message": start,
@@ -71,13 +75,13 @@ class Tickets(commands.Cog):
         )
 
     @ticket_config.command(
-        name="list", help="List the embassy configurations in the server."
+        name="list",
+        help="List the embassy configurations in the server.",
+        type=commands.CommandType.chat_input,
     )
     @commands.guild_only()
     @has_manage_permissions()
     async def ticket_config_list(self, ctx: commands.Context):
-        if TYPE_CHECKING:
-            assert isinstance(ctx.message, discord.Message)
         configs = [
             TicketConfig(config)
             for config in await query_ticket_config_by_guild(ctx.guild.id)
@@ -94,7 +98,7 @@ class Tickets(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 "\n".join(
-                    f"{config.config_id} - {ctx.guild.get_channel(config.category_id).name}"
+                    f"{config.config_id} - {ctx.guild.get_channel(config.category_id).name if config.category_id else None}"
                     for config in configs
                 ),
                 color=discord.Color.green(),

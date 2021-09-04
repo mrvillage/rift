@@ -182,13 +182,13 @@ class Military(commands.Cog):
             )
         )
 
-    @commands._slash  # type: ignore
     @commands.group(
         name="militarization",
         aliases=["m", "mil", "military"],
         help="A group of commands related to militarization, defaults to alliance.",
         case_insensitive=True,
         invoke_without_command=True,
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def militarization(self, ctx, *, search=None):
         search = str(ctx.author.id) if search is None else search
@@ -276,15 +276,24 @@ class Military(commands.Cog):
         )
         await ctx.reply(file=image, embed=embed)
 
-    @commands._slash  # type: ignore
     @commands.command(name="militarization-nation", aliases=["mn"], hidden=True)
     async def mn_shortcut(self, ctx: commands.Context, *, search=None):
         await ctx.invoke(self.militarization_nation, search=search)
 
     @militarization.command(
+        name="alliance",
+        aliases=["m", "aa"],
+        help="Get the militarization of an alliance.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
+    )
+    async def militarization_alliance(self, ctx: commands.Context, *, search=None):
+        await ctx.invoke(self.militarization, search=search)
+
+    @militarization.command(
         name="nation",
         aliases=["n", "nat", "me"],
         help="Get the militarization of a nation.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def militarization_nation(self, ctx, *, search=None):
         try:

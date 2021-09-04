@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import discord
-from discord.ext.commands import Context
+from discord.ext import commands
 
 from .. import funcs
 from ..data.classes import Menu
@@ -86,15 +86,19 @@ async def on_ready():
             await guild.chunk()
     print("Guilds chunked!")
 
+    await bot.register_application_commands()
+    print("Application commands registered!")
+
     print("Startup complete!")
 
 
 @bot.command(
-    name="rift",
-    aliases=["version", "about", "credits"],
+    name="about",
+    aliases=["version", "rift", "credits"],
     help="Get the bot credits and version.",
+    type=(commands.CommandType.default, commands.CommandType.chat_input),
 )
-async def rift_about(ctx: Context):
+async def about(ctx: commands.Context):
     await ctx.reply(
         embed=funcs.get_embed_author_member(
             ctx.author,

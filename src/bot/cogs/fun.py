@@ -9,7 +9,10 @@ class Fun(commands.Cog):
     def __init__(self, bot: Rift):
         self.bot = bot
 
-    @commands.command(name="toot")
+    @commands.command(
+        name="toot",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
+    )
     async def toot(self, ctx: commands.Context):
         await ctx.send("Toot tooooooot!")
 

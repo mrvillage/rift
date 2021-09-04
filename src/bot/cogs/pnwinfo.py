@@ -13,37 +13,40 @@ class PnWInfo(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands._slash  # type: ignore
     @commands.command(
         name="nation",
         aliases=["n", "check-link", "checklink", "nat"],
         help="Get information about a nation.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def nation(self, ctx, *, nation=None):
         nation = await Nation.convert(ctx, nation)
         await ctx.reply(embed=await nation.get_info_embed(ctx))
 
-    @commands._slash  # type: ignore
-    @commands.command(name="me", help="Get information about your nation.")
+    @commands.command(
+        name="me",
+        help="Get information about your nation.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
+    )
     async def me(self, ctx):
         await ctx.invoke(self.nation, nation=None)
 
-    @commands._slash  # type: ignore
     @commands.command(
         name="alliance",
         aliases=["a"],
         help="Get information about an alliance.",
         case_insensitive=True,
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def alliance(self, ctx, *, alliance=None):
         alliance = await Alliance.convert(ctx, alliance)
         await ctx.reply(embed=await alliance.get_info_embed(ctx))
 
-    @commands._slash  # type: ignore
     @commands.command(
         name="who",
         aliases=["w", "who-is", "whois"],
         help="Get information about a nation or alliance.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def who(self, ctx, *, search=None):
         try:
@@ -59,8 +62,11 @@ class PnWInfo(commands.Cog):
                 )
                 await ctx.reply(embed=embed)
 
-    @commands._slash  # type: ignore
-    @commands.command(name="members", help="Get a list of the members of an alliance.")
+    @commands.command(
+        name="members",
+        help="Get a list of the members of an alliance.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
+    )
     async def members(self, ctx, *, search=None):
         search = str(ctx.author.id) if search is None else search
         try:
@@ -102,11 +108,11 @@ class PnWInfo(commands.Cog):
         )
         await ctx.reply(embed=embed)
 
-    @commands._slash  # type: ignore
     @commands.command(
         name="treaties",
         aliases=["t", "treaty"],
         description="Get the treaties of an alliance.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def treaties(self, ctx: commands.Context, *, alliance=None):
         alliance = await Alliance.convert(ctx, alliance)
@@ -115,8 +121,11 @@ class PnWInfo(commands.Cog):
             embed=funcs.get_embed_author_member(ctx.author, str(alliance.treaties))
         )
 
-    @commands._slash  # type: ignore
-    @commands.command(name="spies", help="Get the spies of a nation.")
+    @commands.command(
+        name="spies",
+        help="Get the spies of a nation.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
+    )
     async def spies(self, ctx, *, nation: Nation):
         message = await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -131,8 +140,11 @@ class PnWInfo(commands.Cog):
             )
         )
 
-    # @commands._slash  # type: ignore
-    @commands.command(name="revenue", help="Get the revenue of a nation or alliance.")
+    @commands.command(
+        name="revenue",
+        help="Get the revenue of a nation or alliance.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
+    )
     async def revenue(self, ctx, *, search: Union[Alliance, Nation] = None):
         search = search if search is not None else await Nation.convert(ctx, search)
         message = await ctx.reply(
