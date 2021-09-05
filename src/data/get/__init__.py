@@ -1,5 +1,6 @@
 from .alliance import *
 from .city import *
+from .color import *
 from .document import *
 from .embassy import *
 from .link import *
