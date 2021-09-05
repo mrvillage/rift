@@ -209,14 +209,19 @@ class PnWInfo(commands.Cog):
         name="alliances",
         aliases=["as"],
         help="Get a list of alliances",
-        type=(commands.CommandType.default, commands.CommandType.chat_input),
+        type=commands.CommandType.chat_input,
     )
     async def alliances(self, ctx: commands.Context, page: int = 1):
         max_page = await get_max_alliances_page()
-        if page < 0:
-            page = 1
-        elif page > max_page:
-            page = max_page + 1
+        if page > max_page or page < 0:
+            return await ctx.interaction.response.send_message(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"Page {page} does not exist.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
         offset = (page - 1) * 50
         alliances = await get_alliances_offset(offset=offset)
         await asyncio.gather(*(i._make_members() for i in alliances))
