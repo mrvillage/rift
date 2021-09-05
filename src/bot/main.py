@@ -12,7 +12,7 @@ from discord.ext import commands
 from .. import funcs
 from ..data.classes import Menu
 from ..data.query import query_menus
-from ..env import TOKEN, __version__
+from ..env import DEBUG_TOKEN, TOKEN, __version__
 from ..ref import bot
 from ..views import Margins, Prices
 
@@ -110,7 +110,10 @@ async def about(ctx: commands.Context):
 async def main() -> None:
     with setup_logging():
         try:
-            await bot.login(TOKEN)
+            if bot.debug:
+                await bot.login(DEBUG_TOKEN)
+            else:
+                await bot.login(TOKEN)
             bot.loop.create_task(bot.update_pnw_session())
             bot.loop.create_task(bot.get_staff())
             await bot.connect(reconnect=True)
