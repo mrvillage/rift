@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Any, Dict, List
+
 from ..db import execute_read_query
 
 
@@ -25,22 +29,35 @@ async def query_alliance(*, alliance_id=None, alliance_name=None):
     if alliance_id is not None:
         return (
             await execute_read_query(
-                f"""
+                """
             SELECT * FROM alliances
-            WHERE id = {alliance_id};
-        """
+            WHERE id = $1;
+        """,
+                alliance_id,
             )
         )[0]
     elif alliance_name is not None:
         return (
             await execute_read_query(
-                f"""
+                """
             SELECT * FROM alliances
-            WHERE LOWER(alliance) = LOWER({alliance_name});
-        """
+            WHERE LOWER(alliance) = LOWER($1);
+        """,
+                alliance_name,
             )
         )[0]
 
 
 async def query_alliances():
     return await execute_read_query("SELECT * FROM alliances;")
+
+
+async def query_alliances_offset(
+    *, limit: int = 50, offset: int = 0
+) -> List[Dict[str, Any]]:
+    return [
+        dict(i)
+        for i in await execute_read_query(
+            "SELECT * FROM alliances order by rank LIMIT $1 OFFSET $2;", limit, offset
+        )
+    ]
