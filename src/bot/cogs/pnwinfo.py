@@ -1,16 +1,21 @@
+from __future__ import annotations
+
+import asyncio
 from typing import TYPE_CHECKING, Union
-from src.errors.spies import SpiesNotFoundError
+
 import discord
 from discord.ext import commands
 
-from ... import find
-from ... import funcs
+from ... import find, funcs
 from ...data.classes import Alliance, Nation
+from ...data.get import get_alliances_offset, get_max_alliances_page
 from ...errors import AllianceNotFoundError, NationNotFoundError
+from ...ref import Rift
+from ...views import AlliancesPaginator
 
 
 class PnWInfo(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Rift):
         self.bot = bot
 
     @commands.command(
@@ -200,6 +205,35 @@ class PnWInfo(commands.Cog):
             )
         )
 
+    @commands.command(
+        name="alliances",
+        aliases=["as"],
+        help="Get a list of alliances",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
+    )
+    async def alliances(self, ctx: commands.Context, page: int = 1):
+        max_page = await get_max_alliances_page()
+        if page < 0:
+            page = 1
+        elif page > max_page:
+            page = max_page + 1
+        offset = (page - 1) * 50
+        alliances = await get_alliances_offset(offset=offset)
+        await asyncio.gather(*(i._make_members() for i in alliances))
+        await asyncio.gather(*(i._make_calculated_score() for i in alliances))
+        await asyncio.gather(*(i._make_member_count() for i in alliances))
+        embed = funcs.get_embed_author_member(
+            ctx.author,
+            f"Page: **{page}** of **{max_page}**\n"
+            + "Rank: ID, Name, Score, Members\n"
+            + "\n".join(
+                f"**#{i.rank}**: {i.id}, {i.name}, {i.calculated_score:,.2f}, {i.member_count}"
+                for i in alliances
+            ),
+            color=discord.Color.green(),
+        )
+        await ctx.reply(embed=embed, view=AlliancesPaginator(max_page, page))
 
-def setup(bot):
+
+def setup(bot: Rift):
     bot.add_cog(PnWInfo(bot))
