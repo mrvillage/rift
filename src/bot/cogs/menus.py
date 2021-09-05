@@ -93,7 +93,8 @@ class Menus(commands.Cog):
                 ctx.author,
                 "Waiting for followup messages to assemble a menu...",
                 color=discord.Color.blue(),
-            )
+            ),
+            return_message=True,
         )
         try:
             running = True
@@ -150,7 +151,7 @@ class Menus(commands.Cog):
                 elif lower.startswith("select "):
                     flags = SelectFlags.parse_flags(message.content[7:])
                     row = await funcs.utils.get_row(
-                        message, "button", flags, menu.items
+                        message, "select", flags, menu.items
                     )
                     if row == -1:
                         continue
@@ -162,11 +163,8 @@ class Menus(commands.Cog):
                             timeout=300,
                         )
                         lower = message.content.lower()
-                        if (
-                            lower.startswith("finish")
-                            or lower.startswith("cancel")
-                            or lower.startswith("complete")
-                            or lower.startswith("done")
+                        if lower.startswith(
+                            ("finish", "cancel", "complete", "done", "save")
                         ):
                             break
                         if lower.startswith("option "):
