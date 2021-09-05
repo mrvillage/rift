@@ -114,7 +114,7 @@ async def convert_bool(value):
 
 
 async def get_command_signature(ctx):
-    return f"{(await ctx.bot.get_guild_prefixes(ctx.guild.id))[0]}{ctx.command.qualified_name} {ctx.command.signature}"
+    return f"?{ctx.command.qualified_name} {ctx.command.signature}"
 
 
 get_command_help = get_command_signature
