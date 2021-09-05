@@ -20,11 +20,11 @@ async def _actual_conversion(
     from .funcs.utils import convert_bool, convert_number
 
     if converter is bool:
-        return convert_bool(argument)
+        return await convert_bool(argument)
 
     if converter is int or converter is float:
         try:
-            return convert_number(argument)
+            return await convert_number(argument)
         except Exception as exc:
             try:
                 name = converter.__name__
