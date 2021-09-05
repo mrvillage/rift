@@ -19,7 +19,7 @@ class Bank(commands.Cog):
         name="bank",
         help="A group of commands related to your alliance bank.",
         invoke_without_command=True,
-        type=(commands.CommandType.default, commands.CommandType.chat_input),
+        type=commands.CommandType.chat_input,
     )
     async def bank(self, ctx: commands.Context):
         await ctx.reply(
@@ -38,7 +38,7 @@ class Bank(commands.Cog):
         name="transfer",
         aliases=["send"],
         help="Send money from your alliance bank.",
-        type=(commands.CommandType.default, commands.CommandType.chat_input),
+        type=commands.CommandType.chat_input,
     )
     async def bank_transfer(
         self, ctx: commands.Context, recipient, *, transaction: Transaction
@@ -202,7 +202,7 @@ class Bank(commands.Cog):
         name="balance",
         aliases=["bal"],
         help="Send money from your alliance bank.",
-        type=(commands.CommandType.default, commands.CommandType.chat_input),
+        type=commands.CommandType.chat_input,
     )
     async def bank_balance(self, ctx: commands.Context, *, search=None):
         search = str(ctx.author.id) if search is None else search
