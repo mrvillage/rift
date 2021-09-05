@@ -61,3 +61,7 @@ async def query_alliances_offset(
             "SELECT * FROM alliances order by rank LIMIT $1 OFFSET $2;", limit, offset
         )
     ]
+
+
+async def query_max_alliances_page() -> int:
+    return (await execute_read_query("SELECT MAX(rank) FROM alliances;"))[0]["max"]
