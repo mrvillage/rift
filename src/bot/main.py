@@ -41,6 +41,12 @@ async def on_message(message: discord.Message):
 
 
 @bot.event
+async def on_interaction(interaction: discord.Interaction):
+    if interaction.guild is None or interaction.guild.id != 654109011473596417:
+        await bot.process_commands(interaction)
+
+
+@bot.event
 async def on_raw_message_edit(payload: discord.RawMessageUpdateEvent):
     channel = bot.get_channel(payload.channel_id)
     if TYPE_CHECKING:
