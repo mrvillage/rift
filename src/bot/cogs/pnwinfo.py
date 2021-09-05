@@ -24,8 +24,8 @@ class PnWInfo(commands.Cog):
         help="Get information about a nation.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
-    async def nation(self, ctx, *, nation=None):
-        nation = await Nation.convert(ctx, nation)
+    async def nation(self, ctx: commands.Context, *, nation: Nation = None):
+        nation = nation or await Nation.convert(ctx, nation)
         await ctx.reply(embed=await nation.get_info_embed(ctx))
 
     @commands.command(
@@ -33,7 +33,7 @@ class PnWInfo(commands.Cog):
         help="Get information about your nation.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
-    async def me(self, ctx):
+    async def me(self, ctx: commands.Context):
         await ctx.invoke(self.nation, nation=None)
 
     @commands.command(
@@ -43,8 +43,8 @@ class PnWInfo(commands.Cog):
         case_insensitive=True,
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
-    async def alliance(self, ctx, *, alliance=None):
-        alliance = await Alliance.convert(ctx, alliance)
+    async def alliance(self, ctx: commands.Context, *, alliance: Alliance = None):
+        alliance = alliance or await Alliance.convert(ctx, alliance)
         await ctx.reply(embed=await alliance.get_info_embed(ctx))
 
     @commands.command(
@@ -53,7 +53,7 @@ class PnWInfo(commands.Cog):
         help="Get information about a nation or alliance.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
-    async def who(self, ctx, *, search=None):
+    async def who(self, ctx: commands.Context, *, search=None):
         try:
             await find.search_nation(ctx, search)
             await ctx.invoke(self.nation, nation=search)
@@ -72,17 +72,8 @@ class PnWInfo(commands.Cog):
         help="Get a list of the members of an alliance.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
-    async def members(self, ctx, *, search=None):
-        search = str(ctx.author.id) if search is None else search
-        try:
-            alliance = await funcs.search_alliance(ctx, search)
-        except AllianceNotFoundError:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author, f"No alliance found with argument `{search}`."
-                )
-            )
-            raise AllianceNotFoundError
+    async def members(self, ctx: commands.Context, *, alliance: Alliance = None):
+        alliance = alliance or await Alliance.convert(ctx, alliance)
         await alliance.make_attrs("members")
         full = (
             "\n".join(
@@ -119,8 +110,8 @@ class PnWInfo(commands.Cog):
         description="Get the treaties of an alliance.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
-    async def treaties(self, ctx: commands.Context, *, alliance=None):
-        alliance = await Alliance.convert(ctx, alliance)
+    async def treaties(self, ctx: commands.Context, *, alliance: Alliance = None):
+        alliance = alliance or await Alliance.convert(ctx, alliance)
         await alliance.make_attrs("treaties")
         await ctx.reply(
             embed=funcs.get_embed_author_member(ctx.author, str(alliance.treaties))
@@ -131,7 +122,7 @@ class PnWInfo(commands.Cog):
         help="Get the spies of a nation.",
         type=commands.CommandType.chat_input,
     )
-    async def spies(self, ctx, *, nation: Nation):
+    async def spies(self, ctx: commands.Context, *, nation: Nation):
         await ctx.interaction.response.defer()
         num = await funcs.calculate_spies(nation)
         await ctx.reply(
@@ -146,8 +137,10 @@ class PnWInfo(commands.Cog):
         help="Get the revenue of a nation or alliance.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
-    async def revenue(self, ctx, *, search: Union[Alliance, Nation] = None):
-        search = search if search is not None else await Nation.convert(ctx, search)
+    async def revenue(
+        self, ctx: commands.Context, *, search: Union[Alliance, Nation] = None
+    ):
+        search = search or await Nation.convert(ctx, search)
         message = await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author, f"Fetching revenue for {repr(search)}..."
