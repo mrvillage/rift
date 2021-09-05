@@ -59,7 +59,6 @@ async def on_raw_message_edit(payload: discord.RawMessageUpdateEvent):
 
 @bot.event
 async def on_ready():
-    bot.persistent_views_loaded = True
     if not bot.persistent_views_loaded:
         views = await query_menus()
         views = [Menu(data=i) for i in views]
