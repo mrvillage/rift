@@ -8,7 +8,12 @@ from discord.ext import commands
 
 from ... import find, funcs
 from ...data.classes import Alliance, Nation
-from ...data.get import get_alliances_offset, get_max_alliances_page
+from ...data.get import (
+    get_alliances_offset,
+    get_max_alliances_page,
+    get_colors,
+    get_nation_color_counts,
+)
 from ...errors import AllianceNotFoundError, NationNotFoundError
 from ...ref import Rift
 from ...views import AlliancesPaginator
@@ -231,6 +236,31 @@ class PnWInfo(commands.Cog):
             color=discord.Color.green(),
         )
         await ctx.reply(embed=embed, view=AlliancesPaginator(max_page, page))
+
+    @commands.command(
+        name="colors",
+        help="Get a list of color bloc information.",
+        type=commands.CommandType.chat_input,
+    )
+    async def colors(self, ctx: commands.Context):
+        colors = await get_colors()
+        nations = await get_nation_color_counts()
+        average_bonus = (
+            sum(i.bonus for i in colors.values() if i.color not in {"beige", "gray"})
+            / len(colors)
+        ) - 2
+        fields = [
+            {
+                "name": i.color.capitalize(),
+                "value": f"Name: {i.name}\nTurn Bonus: ${i.bonus:,.0f}\nNations on Color: {nations[i.color.capitalize()]:,}",
+            }
+            for i in colors.values()
+        ]
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author, f"Average Bonus: ${average_bonus:,.2f}", fields=fields
+            )
+        )
 
 
 def setup(bot: Rift):
