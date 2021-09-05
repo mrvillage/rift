@@ -1,14 +1,14 @@
+import inspect
 import json
 from io import BytesIO
 from typing import TYPE_CHECKING
 
 import aiohttp
 import discord
-from discord.ext import commands
 import pnwkit
+from discord.ext import commands
 
-from ... import find
-from ... import funcs
+from ... import find, funcs
 from ...errors import AllianceNotFoundError, NationNotFoundError
 
 
@@ -250,13 +250,15 @@ class Military(commands.Cog):
         }
         embed = funcs.get_embed_author_member(
             ctx.author,
-            f"""
+            inspect.cleandoc(
+                f"""
             Total Militarization: {militarization['total']*100:.2f}%
             Soldier Militarization: {militarization['soldiers']*100:.2f}% ({improvements['barracks']:,.3f} Barracks)
             Tank Militarization: {militarization['tanks']*100:.2f}% ({improvements['factories']:,.3f} factories)
             Aircraft Militarization: {militarization['aircraft']*100:.2f}% ({improvements['hangars']:,.3f} Hangars)
             Ship Militarization: {militarization['ships']*100:.2f}% ({improvements['drydocks']:,.3f} Drydocks)
-            """,
+            """
+            ),
             title=f"Militarization Graph for {alliance.name} (`{alliance.id}`)",
             image_url=f"attachment://militarization_{alliance.id}.png",
             fields=[
@@ -325,7 +327,9 @@ class Military(commands.Cog):
         if isinstance(author, discord.Guild):
             embed = funcs.get_embed_author_guild(
                 author,
-                f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}% ({improvements['barracks']:,.2f} Barracks)\nTank Militarization: {militarization['tanks']*100:.2f}% ({improvements['factories']:,.2f} Factories)\nAircraft Militarization: {militarization['aircraft']*100:.2f}% ({improvements['hangars']:,.2f} Hangars)\nShip Militarization: {militarization['ships']*100:.2f}% ({improvements['drydocks']:,.2f} Drydocks)",
+                inspect.cleandoc(
+                    f"Total Militarization: {militarization['total']*100:.2f}%\nSoldier Militarization: {militarization['soldiers']*100:.2f}% ({improvements['barracks']:,.2f} Barracks)\nTank Militarization: {militarization['tanks']*100:.2f}% ({improvements['factories']:,.2f} Factories)\nAircraft Militarization: {militarization['aircraft']*100:.2f}% ({improvements['hangars']:,.2f} Hangars)\nShip Militarization: {militarization['ships']*100:.2f}% ({improvements['drydocks']:,.2f} Drydocks)"
+                ),
                 title=f"Militarization for {nation.name} (`{nation.id}`)",
                 fields=[
                     {
