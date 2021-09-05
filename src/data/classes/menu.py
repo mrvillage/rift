@@ -16,7 +16,7 @@ import discord
 from discord.ext import commands
 
 from ..db import execute_query, execute_read_query
-from ..query import query_menu, query_menu_item, insert_interface
+from ..query import insert_interface, query_menu, query_menu_item
 from .base import Makeable
 
 
@@ -440,6 +440,7 @@ class MenuItem:
     async def format_flags(
         ctx: commands.Context, flags: Mapping[str, List[Any]]
     ) -> MutableMapping[str, Any]:  # sourcery no-metrics
+        from ...funcs import get_embed_author_member
         from .embassy import Embassy, EmbassyConfig
         from .ticket import Ticket, TicketConfig
 
@@ -458,9 +459,18 @@ class MenuItem:
                         "ADD_ROLES",
                         "REMOVE_ROLES",
                     }:
-                        formatted_flags["options"].add(
-                            (await commands.RoleConverter().convert(ctx, j)).id
-                        )
+                        try:
+                            formatted_flags["options"].add(
+                                (await commands.RoleConverter().convert(ctx, j)).id
+                            )
+                        except commands.RoleNotFound as error:
+                            if error.argument:
+                                await ctx.send(
+                                    embed=get_embed_author_member(
+                                        ctx.author,
+                                        f"No role found with argument `{error.argument}`.\nPlease continue with further input, to correct please restart.",
+                                    )
+                                )
                     elif formatted_flags["action"] in {
                         "CREATE_TICKET",
                         "CREATE_TICKETS",
