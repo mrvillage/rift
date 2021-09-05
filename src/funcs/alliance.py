@@ -37,7 +37,9 @@ async def search_alliance(ctx: Context, search: str) -> Alliance:
             assert isinstance(user, (discord.User, discord.Member))
         try:
             return await Alliance.fetch(
-                (await Nation.fetch((await get_link_user(user.id))[1])).alliance_id
+                (
+                    await Nation.fetch((await get_link_user(user.id))["nation_id"])
+                ).alliance_id
             )
         except IndexError:
             pass
