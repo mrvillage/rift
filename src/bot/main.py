@@ -4,6 +4,7 @@ import contextlib
 import datetime
 import logging
 from pathlib import Path
+from src.views.alliances import AlliancesPaginator
 from typing import TYPE_CHECKING
 
 import discord
@@ -66,6 +67,7 @@ async def on_ready():
             bot.add_view(await view.get_view())
         bot.add_view(Margins())
         bot.add_view(Prices())
+        bot.add_view(AlliancesPaginator(1, 10))
         bot.persistent_views_loaded = True
         print("Loaded persistent views!")
 
@@ -110,7 +112,7 @@ async def main() -> None:
     with setup_logging():
         try:
             if bot.debug:
-                await bot.login(DEBUG_TOKEN)
+                await bot.login(TOKEN)
             else:
                 await bot.login(TOKEN)
             bot.loop.create_task(bot.update_pnw_session())
