@@ -110,7 +110,7 @@ class Bank(commands.Cog):
                 f"Are you sure you want to transfer {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**? To confirm please type the id of the **{type(recipient).__name__}**.",
             )
         )
-        message = await ctx.reply(embed=embed)
+        message = await ctx.reply(embed=embed, return_message=True)
 
         def check(msg: discord.Message):
             return (
@@ -153,7 +153,7 @@ class Bank(commands.Cog):
             else funcs.get_embed_author_member(
                 author,
                 f"Sending {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**...",
-            )
+            ),
         )
         complete = await transaction.complete(receiver=recipient, action="send")
         if not complete:
