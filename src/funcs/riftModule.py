@@ -1,3 +1,4 @@
+from src.data.query import alliance
 from ..data.db.sql import *  # pylint: disable=unused-wildcard-import
 from .core import *  # pylint: disable=unused-wildcard-import
 
@@ -46,10 +47,11 @@ nation_columns = [
 async def get_nation(nation_id):
     return (
         await execute_read_query(
-            f"""
+            """
         SELECT * FROM nations
-        WHERE nation_id = {nation_id};
-    """
+        WHERE nation_id = $1;
+    """,
+            nation_id,
         )
     )[0]
 
@@ -57,17 +59,18 @@ async def get_nation(nation_id):
 async def get_nation_name(nation):
     return (
         await execute_read_query(
-            f"""
+            """
         SELECT * FROM nations
-        WHERE LOWER(nation) = LOWER('{nation}');
-    """
+        WHERE LOWER(nation) = LOWER($1);
+    """,
+            nation,
         )
     )[0]
 
 
 async def get_nations():
     return await execute_read_query(
-        f"""
+        """
         SELECT last_active,v_mode FROM nations;
     """
     )
@@ -76,10 +79,11 @@ async def get_nations():
 async def get_alliance(alliance_id):
     return (
         await execute_read_query(
-            f"""
+            """
         SELECT * FROM alliances
-        WHERE id = {alliance_id};
-    """
+        WHERE id = $1;
+    """,
+            alliance_id,
         )
     )[0]
 
@@ -87,74 +91,86 @@ async def get_alliance(alliance_id):
 async def get_alliance_name(alliance):
     return (
         await execute_read_query(
-            f"""
+            """
         SELECT * FROM alliances
-        WHERE LOWER(name) = LOWER('{alliance}');
-    """
+        WHERE LOWER(name) = LOWER($1);
+    """,
+            alliance,
         )
     )[0]
 
 
 async def get_alliance_members(alliance_id):
     return await execute_read_query(
-        f"""
+        """
         SELECT * FROM nations
-        WHERE alliance_id = {alliance_id} AND alliance_position != 1 AND v_mode = 'False';
-    """
+        WHERE alliance_id = $1 AND alliance_position != 1 AND v_mode = 'False';
+    """,
+        alliance_id,
     )
 
 
 async def calculate_alliance_members(alliance_id):
     return await execute_read_query(
-        f"""
+        """
         SELECT score FROM nations
-        WHERE alliance_id = {alliance_id} AND alliance_position != 1 AND v_mode = 'False';
-    """
+        WHERE alliance_id = $1 AND alliance_position != 1 AND v_mode = 'False';
+    """,
+        alliance_id,
     )
 
 
 async def calculate_vm_alliance_members(alliance_id):
     return await execute_read_query(
-        f"""
+        """
         SELECT score FROM nations
-        WHERE alliance_id = {alliance_id} AND alliance_position != 1 AND v_mode = 'True';
-    """
+        WHERE alliance_id = $1 AND alliance_position != 1 AND v_mode = 'True';
+    """,
+        alliance_id,
     )
 
 
 async def add_target(nation_id, old_color, owner, channels, roles, members):
     await execute_query(
-        f"""
+        """
         INSERT INTO targets
         (id,oldcolor,owner,channels,roles,members)
-        VALUES ({nation_id},{old_color},'{str(owner)}','{str(channels)}','{str(roles)}','{str(members)}');
-    """
+        VALUES ($1, $2, $3, $4, $5, $6);
+    """,
+        nation_id,
+        old_color,
+        str(owner),
+        str(channels),
+        str(roles),
+        str(members),
     )
 
 
 async def remove_target(target_id):
     await execute_query(
-        f"""
+        """
         DELETE FROM targets
-        WHERE targetid = {target_id};
-    """
+        WHERE targetid = $1;
+    """,
+        target_id,
     )
 
 
 async def get_target(target_id):
     return (
         await execute_read_query(
-            f"""
+            """
         SELECT * FROM targets
-        WHERE targetid = {target_id};
-    """
+        WHERE targetid = $1;
+    """,
+            target_id,
         )
     )[0]
 
 
 async def get_targets():
     return await execute_read_query(
-        f"""
+        """
         SELECT * FROM targets;
     """
     )
@@ -162,20 +178,23 @@ async def get_targets():
 
 async def get_targets_owner(owner):
     return await execute_read_query(
-        f"""
+        """
         SELECT * FROM targets
-        WHERE owner = {owner};
-    """
+        WHERE owner = $1;
+    """,
+        owner,
     )
 
 
 async def update_target_color(nation_id, color):
     await execute_query(
-        f"""
+        """
         UPDATE targets
-        SET oldcolor = {color}
-        WHERE id = {nation_id};
-    """
+        SET oldcolor = $1
+        WHERE id = $2;
+    """,
+        color,
+        nation_id,
     )
 
 
