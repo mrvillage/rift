@@ -15,6 +15,7 @@ from typing import (
 import discord
 from discord.ext import commands
 
+from ...errors import MenuNotFoundError
 from ..db import execute_query, execute_read_query
 from ..query import insert_interface, query_menu, query_menu_item
 from .base import Makeable
@@ -237,8 +238,10 @@ class Menu(Makeable):
         self.permissions = loads(data["permissions"]) if data["permissions"] else {}
 
     @classmethod
-    async def convert(cls, ctx: commands.Context, argument):
-        return await cls.fetch(int(argument), ctx.author.id)
+    async def convert(cls, ctx: commands.Context, argument: str) -> Menu:
+        menu = await cls.fetch(int(argument), ctx.guild.id)
+        if menu.guild_id != ctx.guild.id:
+            raise MenuNotFoundError(argument)
 
     @classmethod
     async def fetch(cls, menu_id: int, guild_id: int) -> Menu:
