@@ -3,6 +3,7 @@ from .bank import *
 from .base import *
 from .data import *
 from .database import *
+from .menu import *
 from .message import *
 from .nation import *
 from .notfound import *
