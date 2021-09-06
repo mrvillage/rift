@@ -42,14 +42,14 @@ async def on_message(message: discord.Message):
 
 @bot.event
 async def on_interaction(interaction: discord.Interaction):
-    if (
-        interaction.guild is not None
-        and bot.debug
-        and interaction.guild.id == bot.debug_guild_id
-        or interaction.guild is None
-        or not bot.debug
-    ):
-        await bot.process_commands(interaction)
+    # if (
+    #     interaction.guild is not None
+    #     and bot.debug
+    #     and interaction.guild.id == bot.debug_guild_id
+    #     or interaction.guild is None
+    #     or not bot.debug
+    # ):
+    await bot.process_commands(interaction)
 
 
 @bot.event
