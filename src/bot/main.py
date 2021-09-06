@@ -4,7 +4,6 @@ import contextlib
 import datetime
 import logging
 from pathlib import Path
-from src.views.alliances import AlliancesPaginator
 from typing import TYPE_CHECKING
 
 import discord
@@ -15,7 +14,7 @@ from ..data.classes import Menu
 from ..data.query import query_menus
 from ..env import DEBUG_TOKEN, TOKEN, __version__
 from ..ref import bot
-from ..views import Margins, Prices
+from ..views import AlliancesPaginator, Margins, Prices
 
 
 @contextlib.contextmanager
@@ -79,7 +78,7 @@ async def on_ready():
             bot.add_view(await view.get_view())
         bot.add_view(Margins())
         bot.add_view(Prices())
-        bot.add_view(AlliancesPaginator(1, 10))
+        bot.add_view(AlliancesPaginator(1, 50))
         bot.persistent_views_loaded = True
         print("Loaded persistent views!")
 
