@@ -3,6 +3,8 @@ from typing import Dict, TYPE_CHECKING, Union
 
 from ..query import query_color
 
+__all__ = ("Color",)
+
 
 class Color:
     data: Dict[str, Union[int, str]]

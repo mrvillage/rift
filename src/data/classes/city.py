@@ -12,6 +12,8 @@ from .resources import Resources
 if TYPE_CHECKING:
     from .nation import Nation
 
+__all__ = ("City", "FullCity")
+
 
 class City:
     data: Tuple[int, int, str, bool, float, float, float]

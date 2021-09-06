@@ -4,7 +4,6 @@ from .color import *
 from .document import *
 from .embassy import *
 from .menu import *
-from .militarization import *
 from .mmr import *
 from .nation import *
 from .resources import *

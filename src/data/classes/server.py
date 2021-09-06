@@ -2,6 +2,8 @@ import json
 
 from discord.ext.commands import BadInviteArgument
 
+__all__ = ("Server",)
+
 
 class Server:
     __slots__ = (

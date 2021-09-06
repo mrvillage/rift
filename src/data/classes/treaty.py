@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING, Mapping, Sequence, Union
 
 from ..query import query_alliances, query_treaties
 
+__all__ = ("Treaties", "Treaty")
+
 if TYPE_CHECKING:
     from .alliance import Alliance
 

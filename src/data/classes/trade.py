@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
 
+__all__ = ("TradePrices",)
+
 
 class TradeOffer:
     __slots__ = ("data", "datetime", "nation_id", "amount", "price", "total_value")

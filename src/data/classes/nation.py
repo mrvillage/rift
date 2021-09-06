@@ -18,6 +18,8 @@ from ..query import query_nation
 from ..query.city import query_nation_cities
 from .base import Makeable
 
+__all__ = ("Nation",)
+
 if TYPE_CHECKING:
     from .resources import Resources
     from .trade import TradePrices

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ("Makeable",)
+
 
 class Makeable:
     async def make_attrs(self, *attrs: str) -> None:

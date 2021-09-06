@@ -14,6 +14,8 @@ from ..query import query_alliance
 from .base import Makeable
 from .resources import Resources
 
+__all__ = ("Alliance",)
+
 
 class Alliance(Makeable):
     __slots__ = (
