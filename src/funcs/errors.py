@@ -1,4 +1,5 @@
 from __future__ import annotations
+from src.errors.menu import MenuNotFoundError
 
 import sys
 import traceback
@@ -19,6 +20,7 @@ async def print_handler(ctx: commands.Context, error: Exception) -> None:
 
 
 async def handler(ctx: commands.Context, error: Exception) -> None:
+    # sourcery no-metrics
     try:
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
@@ -96,6 +98,14 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                         color=discord.Color.red(),
                     )
                 )
+        elif isinstance(error, MenuNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No menu found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                )
+            )
         else:
             await ctx.reply(
                 embed=get_embed_author_member(
