@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import sys
+import traceback
 from asyncio import sleep
 
 import aiohttp
@@ -43,8 +45,11 @@ class Events(commands.Cog):
                                 event: str = data["event"]
                                 event = EVENTS.get(event, event)
                                 self.bot.dispatch(event, **data["data"])
-            except Exception:
+            except Exception as error:
                 print("rift-data socket connection error")
+                traceback.print_exception(
+                    type(error), error, error.__traceback__, file=sys.stderr
+                )
                 delay = backoff.delay()
                 await sleep(delay)
 
