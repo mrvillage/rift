@@ -25,6 +25,7 @@ class Menus(commands.Cog):
         invoke_without_command=True,
         type=commands.CommandType.chat_input,
     )
+    @commands.guild_only()
     @has_manage_permissions()
     async def menu(self, ctx: commands.Context, menu: Menu = None):
         # sourcery skip: merge-nested-ifs
@@ -51,6 +52,7 @@ class Menus(commands.Cog):
         help="List the menu configurations for this guild.",
         type=commands.CommandType.chat_input,
     )
+    @commands.guild_only()
     @has_manage_permissions()
     async def menu_list(self, ctx: commands.Context):
         if TYPE_CHECKING:
@@ -76,6 +78,7 @@ class Menus(commands.Cog):
         help="Create a new menu configuration.",
         type=commands.CommandType.chat_input,
     )
+    @commands.guild_only()
     @has_manage_permissions()
     async def menu_create(
         self, ctx: commands.Context, *, description: str = None
@@ -204,6 +207,7 @@ class Menus(commands.Cog):
         help="Send a menu configuration to a channel.",
         type=commands.CommandType.chat_input,
     )
+    @commands.guild_only()
     @has_manage_permissions()
     async def menu_send(
         self, ctx: commands.Context, menu: Menu, *, channel: discord.TextChannel
@@ -212,6 +216,24 @@ class Menus(commands.Cog):
         embed = menu.get_description_embed(ctx)
         message = await channel.send(embed=embed, view=view)
         await menu.new_interface(message)
+
+    @menu.command(
+        name="info",
+        aliases=["details"],
+        help="Get information about a menu configuration.",
+        type=commands.CommandType.chat_input,
+    )
+    @commands.guild_only()
+    @has_manage_permissions()
+    async def menu_info(self, ctx: commands.Context, *, menu: Menu):
+        await menu._make_items()
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                "\n\n".join(str(j) for i in menu.items for j in i),
+                color=discord.Color.green(),
+            )
+        )
 
 
 def setup(bot: Rift):
