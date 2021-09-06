@@ -41,7 +41,7 @@ class Confirm(discord.ui.View):
         self.value = True
         await interaction.response.defer()
         main = await Alliance.fetch(3683)
-        offshore = await Alliance.fetch(8139)
+        offshore = await Alliance.fetch(9014)
         resources = await main.get_resources()
         transaction = Transaction(resources=resources)
         if TYPE_CHECKING:
