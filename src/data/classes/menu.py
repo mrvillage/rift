@@ -15,9 +15,10 @@ from typing import (
 import discord
 from discord.ext import commands
 
-from ...errors import MenuNotFoundError
+from ...errors import MenuItemNotFoundError, MenuNotFoundError
 from ..db import execute_query, execute_read_query
-from ..query import insert_interface, query_menu, query_menu_item
+from ..query import insert_interface
+from ..get import get_menu, get_menu_item
 from .base import Makeable
 
 
@@ -239,17 +240,19 @@ class Menu(Makeable):
 
     @classmethod
     async def convert(cls, ctx: commands.Context, argument: str) -> Menu:
-        menu = await cls.fetch(int(argument), ctx.guild.id)
-        if menu.guild_id != ctx.guild.id:
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        try:
+            return await cls.fetch(int(argument), ctx.guild.id)
+        except ValueError:
             raise MenuNotFoundError(argument)
-        return menu
 
     @classmethod
     async def fetch(cls, menu_id: int, guild_id: int) -> Menu:
         try:
-            return cls(data=await query_menu(menu_id=menu_id))
+            return cls(data=await get_menu(menu_id, guild_id))
         except IndexError:
-            return cls.default(menu_id=menu_id, guild_id=guild_id)
+            raise MenuNotFoundError(menu_id)
 
     @classmethod
     def default(cls, menu_id: int, guild_id: int) -> Menu:
@@ -270,7 +273,7 @@ class Menu(Makeable):
         items = []
         for i in self.item_ids:
             if i:
-                items.append([(await MenuItem.fetch(j)) for j in i])
+                items.append([(await MenuItem.fetch(j, self.guild_id)) for j in i])
             else:
                 items.append([])
         self.items = items
@@ -290,7 +293,7 @@ class Menu(Makeable):
 
     async def save(self) -> None:
         await execute_query(
-            f"""
+            """
         INSERT INTO menus (menu_id, guild_id, name, description, items, permissions) VALUES ($1, $2, $3, $4, $5, $6);
         """,
             self.menu_id,
@@ -331,6 +334,8 @@ class Menu(Makeable):
     def get_description_embed(self, ctx: commands.Context) -> discord.Embed:
         from ...funcs import get_embed_author_guild
 
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
         self.embed = get_embed_author_guild(
             ctx.guild, self.description.replace("\\n", "\n")
         )
@@ -355,14 +360,17 @@ class MenuItem:
         self.data = loads(data["data_"]) if data["data_"] else {}
 
     @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str) -> Menu:
-        menu = await cls.fetch(int(argument), ctx.guild.id)
-        if menu.guild_id != ctx.guild.id:
-            raise MenuNotFoundError(argument)
+    async def convert(cls, ctx: commands.Context, argument: str) -> MenuItem:
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        try:
+            return await cls.fetch(int(argument), ctx.guild.id)
+        except ValueError:
+            raise MenuItemNotFoundError(argument)
 
     @classmethod
-    async def fetch(cls, item_id: int) -> MenuItem:
-        return cls(data=await query_menu_item(item_id=item_id))
+    async def fetch(cls, item_id: int, guild_id: int) -> MenuItem:
+        return cls(data=await get_menu_item(item_id, guild_id))
 
     def get_item(self, menu_id: int, row: int) -> Union[Button, Select]:
         custom_id = f"{menu_id}-{self.item_id}"
@@ -402,7 +410,7 @@ class MenuItem:
 
     async def save(self) -> None:
         await execute_query(
-            f"""
+            """
         INSERT INTO menu_items (item_id, guild_id, type_, data_) VALUES ($1, $2, $3, $4);
         """,
             self.item_id,
