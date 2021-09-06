@@ -242,6 +242,7 @@ class Menu(Makeable):
         menu = await cls.fetch(int(argument), ctx.guild.id)
         if menu.guild_id != ctx.guild.id:
             raise MenuNotFoundError(argument)
+        return menu
 
     @classmethod
     async def fetch(cls, menu_id: int, guild_id: int) -> Menu:
@@ -352,6 +353,12 @@ class MenuItem:
         self.guild_id = data["guild_id"]
         self.type = data["type_"]
         self.data = loads(data["data_"]) if data["data_"] else {}
+
+    @classmethod
+    async def convert(cls, ctx: commands.Context, argument: str) -> Menu:
+        menu = await cls.fetch(int(argument), ctx.guild.id)
+        if menu.guild_id != ctx.guild.id:
+            raise MenuNotFoundError(argument)
 
     @classmethod
     async def fetch(cls, item_id: int) -> MenuItem:
