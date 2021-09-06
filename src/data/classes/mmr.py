@@ -1,5 +1,7 @@
 from ..query import query_mmr
 
+__all__ = ("MMR",)
+
 
 class MMR:
     __slots__ = ("data",)

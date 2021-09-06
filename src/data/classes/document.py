@@ -3,6 +3,8 @@ import json
 
 from ..query import query_document
 
+__all__ = ("Document",)
+
 
 class Document:
     __slots__ = (

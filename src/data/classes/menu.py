@@ -21,6 +21,8 @@ from ..query import insert_interface
 from ..get import get_menu, get_menu_item
 from .base import Makeable
 
+__all__ = ("Menu", "MenuItem")
+
 
 class View(discord.ui.View):
     def __init__(self, *args, **kwargs) -> None:
