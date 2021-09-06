@@ -1,18 +1,21 @@
 from __future__ import annotations
 
 import datetime
-from src.data.classes.resources import Resources
-from src.funcs.bank.bank import withdraw
-from src.data.classes.bank.transaction import Transaction
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import discord
 import pnwkit
 from discord.ext import commands, tasks
+from src.data.classes.bank.transaction import Transaction
+from src.data.classes.resources import Resources
+from src.funcs.bank.bank import withdraw
 
 from ... import funcs
 from ...data.classes import Alliance, Nation, TradePrices
 from ...ref import Rift
+from ...errors import AllianceNotFoundError
+
+OFFSHORE_ID = 9014
 
 
 class Confirm(discord.ui.View):
@@ -41,7 +44,7 @@ class Confirm(discord.ui.View):
         self.value = True
         await interaction.response.defer()
         main = await Alliance.fetch(3683)
-        offshore = await Alliance.fetch(9014)
+        offshore = await Alliance.fetch(OFFSHORE_ID)
         resources = await main.get_resources()
         transaction = Transaction(resources=resources)
         if TYPE_CHECKING:
@@ -227,12 +230,16 @@ class HouseStark(commands.Cog):
         channel = self.bot.get_channel(239099900174925824)
         if not channel:
             return
+        try:
+            offshore = await Alliance.fetch(OFFSHORE_ID)
+        except AllianceNotFoundError:
+            return
         if TYPE_CHECKING:
             assert isinstance(channel, discord.TextChannel)
         await channel.send(
             embed=funcs.get_embed_author_guild(
                 channel.guild,
-                f"Please authorize sending the contents of the bank offshore.",
+                f"Please authorize sending the contents of the to {repr(offshore)}.",
             ),
             view=Confirm(),
         )
