@@ -8,19 +8,25 @@ from discord import Message
 from ..db import execute_query, execute_read_query
 
 
-async def query_menu(*, menu_id: int) -> Dict[str, Any]:
-    return dict(
-        (await execute_read_query("SELECT * FROM menus WHERE menu_id = $1;", menu_id))[
-            0
-        ]
-    )
-
-
-async def query_menu_item(*, item_id: int) -> Dict[str, Any]:
+async def query_menu(menu_id: int, guild_id: int) -> Dict[str, Any]:
     return dict(
         (
             await execute_read_query(
-                "SELECT * FROM menu_items WHERE item_id = $1;", item_id
+                "SELECT * FROM menus WHERE menu_id = $1 AND guild_id = $2;",
+                menu_id,
+                guild_id,
+            )
+        )[0]
+    )
+
+
+async def query_menu_item(item_id: int, guild_id: int) -> Dict[str, Any]:
+    return dict(
+        (
+            await execute_read_query(
+                "SELECT * FROM menu_items WHERE item_id = $1 AND guild_id = $2;",
+                item_id,
+                guild_id,
             )
         )[0]
     )
