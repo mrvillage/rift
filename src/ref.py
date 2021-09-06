@@ -6,7 +6,13 @@ from discord import AllowedMentions, Game, Intents, Object
 from discord.ext.commands import Bot, when_mentioned_or
 
 from .data.db import execute_read_query
-from .env import APPLICATION_ID, PNW_EMAIL, PNW_PASSWORD, __version__
+from .env import (
+    APPLICATION_ID,
+    DEBUG_APPLICATION_ID,
+    PNW_EMAIL,
+    PNW_PASSWORD,
+    __version__,
+)
 from .errors import LoginError
 from .help import EmbedHelpCommand
 
@@ -67,6 +73,9 @@ class Rift(Bot):
 intents = Intents(
     dm_messages=True, guild_messages=True, guilds=True, members=True, reactions=True
 )
+debug = False
+
+ID = DEBUG_APPLICATION_ID if debug else APPLICATION_ID
 bot = Rift(
     command_prefix=when_mentioned_or("?"),
     intents=intents,
@@ -75,8 +84,8 @@ bot = Rift(
     activity=Game(name=__version__),
     strip_after_prefix=True,
     help_command=EmbedHelpCommand(),
-    application_id=APPLICATION_ID,
+    application_id=ID,
     debug_command_prefix="!!",
     debug_guild_id=654109011473596417,
-    # debug=True,
+    debug=debug,
 )
