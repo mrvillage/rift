@@ -124,7 +124,7 @@ async def main() -> None:
     with setup_logging():
         try:
             if bot.debug:
-                await bot.login(TOKEN)
+                await bot.login(DEBUG_TOKEN)
             else:
                 await bot.login(TOKEN)
             bot.loop.create_task(bot.update_pnw_session())
