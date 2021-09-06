@@ -36,11 +36,11 @@ class Events(commands.Cog):
             try:
                 async with aiohttp.ClientSession() as session:
                     async with session.ws_connect(
-                        f"ws://{SOCKET_IP}:{SOCKET_PORT}",
+                        f"ws://{SOCKET_IP}:{SOCKET_PORT}", max_msg_size=0
                     ) as ws:
                         print("rift-data socket connected")
                         async for message in ws:
-                            data = json.loads(message.data)
+                            data = message.json()
                             if "event" in data:
                                 event: str = data["event"]
                                 event = EVENTS.get(event, event)
