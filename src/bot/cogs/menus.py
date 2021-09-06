@@ -216,6 +216,11 @@ class Menus(commands.Cog):
         embed = menu.get_description_embed(ctx)
         message = await channel.send(embed=embed, view=view)
         await menu.new_interface(message)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author, f"Menu {menu.menu_id} sent to {channel.mention}!"
+            )
+        )
 
     @menu.command(
         name="info",
