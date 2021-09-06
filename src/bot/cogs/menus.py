@@ -235,6 +235,23 @@ class Menus(commands.Cog):
             )
         )
 
+    @menu.command(
+        name="item",
+        aliases=["items"],
+        help="Get information about a menu item.",
+        type=commands.CommandType.chat_input,
+    )
+    @commands.guild_only()
+    @has_manage_permissions()
+    async def menu_item(self, ctx: commands.Context, *, item: MenuItem):
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                str(item) + f"\nOptions: {None if (o := item.data.get('options', None)) is not None else ', '.join(r.mention for i in o if(r := ctx.guild.get_role(i))) if item.data.get('action') in {'ADD_ROLE', 'REMOVE_ROLE', 'ADD_ROLES', 'REMOVE_ROLES'} else ', '.join(str(i) for i in o)}",  # type: ignore
+                color=discord.Color.green(),
+            )
+        )
+
 
 def setup(bot: Rift):
     bot.add_cog(Menus(bot))
