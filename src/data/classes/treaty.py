@@ -42,6 +42,9 @@ class Treaties:
     def __getitem__(self, index: int) -> Treaty:
         return self.treaties[index]
 
+    def _update(self, data, /) -> Treaties:
+        ...
+
 
 class Treaty:
     started: str
@@ -65,3 +68,6 @@ class Treaty:
         if self.treaty_type == "Protectorate":
             return f"**{self.treaty_type}:** {self.from_} --> {self.to_}"
         return f"**{self.treaty_type}:** {self.from_} <--> {self.to_}"
+
+    def _update(self, data, /) -> Treaty:
+        ...

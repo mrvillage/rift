@@ -43,7 +43,7 @@ class Alliance(Makeable):
         "treaties",
     )
 
-    def __init__(self, *, alliance_id=None, alliance_name=None, data=None):
+    def __init__(self, data=None, *, alliance_id=None, alliance_name=None):
         if data is None:
             self.data = query_alliance(
                 alliance_id=alliance_id, alliance_name=alliance_name
@@ -308,3 +308,6 @@ class Alliance(Makeable):
                 (i["net_total"] for i in revenues[1:]), revenues[0]["net_total"]
             ),
         }
+
+    def _update(self, data, /) -> Alliance:
+        ...

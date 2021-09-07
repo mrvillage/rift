@@ -58,7 +58,7 @@ class Nation(Makeable):
         "partial_cities",
     )
 
-    def __init__(self, *, nation_id=None, nation_name=None, data=None):
+    def __init__(self, data=None, *, nation_id=None, nation_name=None):
         if data is None:
             self.data = query_nation(nation_id=nation_id, nation_name=nation_name)
         else:
@@ -422,3 +422,6 @@ class Nation(Makeable):
         )
         revenue["trade_bonus"] = bonus
         return revenue
+
+    def _update(self, data, /) -> Nation:
+        ...
