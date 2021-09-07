@@ -92,6 +92,7 @@ class HouseStark(commands.Cog):
     def __init__(self, bot: Rift):
         self.bot = bot
         self.bank_send_task.start()
+        self.bot.add_view(Confirm())
 
     @commands.command(name="mmr", help="Check to see if a nation meets MMR.")
     async def mmr(self, ctx: commands.Context, *, nation: Nation = None):
