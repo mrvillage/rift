@@ -24,7 +24,6 @@ class Link(commands.Cog):
         member = user or ctx.author
         try:
             await funcs.get_link_user(member.id)
-        except IndexError:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -32,9 +31,10 @@ class Link(commands.Cog):
                     color=discord.Color.red(),
                 )
             )
+        except IndexError:
+            pass
         try:
             await funcs.get_link_nation(nation.id)
-        except IndexError:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -42,6 +42,8 @@ class Link(commands.Cog):
                     color=discord.Color.red(),
                 )
             )
+        except IndexError:
+            pass
         message = await ctx.reply(
             embed=funcs.get_embed_author_member(
                 member, "Fetching Discord username...", color=discord.Color.orange()
