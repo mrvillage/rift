@@ -60,12 +60,12 @@ class PnWInfo(commands.Cog):
     )
     async def who(self, ctx: commands.Context, *, search=None):
         try:
-            await find.search_nation(ctx, search)
-            await ctx.invoke(self.nation, nation=search)
+            nation = await Nation.convert(ctx, search)
+            await ctx.invoke(self.nation, nation=nation)
         except NationNotFoundError:
             try:
-                await find.search_alliance(ctx, search)
-                await ctx.invoke(self.alliance, alliance=search)
+                alliance = await Alliance.convert(ctx, search)
+                await ctx.invoke(self.alliance, alliance=alliance)
             except AllianceNotFoundError:
                 embed = funcs.get_embed_author_member(
                     ctx.author, f"No nation or alliance found with argument `{search}`."
