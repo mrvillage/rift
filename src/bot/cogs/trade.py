@@ -13,12 +13,12 @@ class Trade(commands.Cog):
         self.bot = bot
 
     @commands.command(
-        name="price",
-        aliases=["p", "resource", "prices"],
+        name="prices",
+        aliases=["p", "resource", "price"],
         help="Get the current prices of all resources.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
-    async def price(self, ctx: commands.Context):
+    async def prices(self, ctx: commands.Context):
         prices: TradePrices = await funcs.get_trade_prices()
         await ctx.reply(
             view=Prices(),
