@@ -72,3 +72,6 @@ class TradePrices:
         self.aluminum = ResourcePrice(json.loads(data["aluminum"]))
         self.food = ResourcePrice(json.loads(data["food"]))
         self.market_index = self.credit.market_index
+
+    def _update(self, data, /) -> TradeOffer:
+        ...

@@ -25,7 +25,7 @@ class City:
     maxinfra: float
     land: float
 
-    def __init__(self, *, city_id=None, city_name=None, data) -> None:
+    def __init__(self, data, *, city_id=None, city_name=None) -> None:
         self.data = data
         self.id = self.data[0]
         self.nation_id = self.data[1]
@@ -67,6 +67,9 @@ class City:
 
     def __float__(self) -> Tuple[float, float]:
         return self.infrastructure, self.land
+
+    def _update(self, data, /) -> City:
+        ...
 
 
 class FullCity(Makeable):

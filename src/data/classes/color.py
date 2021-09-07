@@ -33,3 +33,6 @@ class Color:
     @classmethod
     async def fetch(cls, name: str) -> Color:
         return cls(await query_color(name))
+
+    def _update(self, data, /) -> Color:
+        ...
