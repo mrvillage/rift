@@ -164,6 +164,9 @@ class Nation(Makeable):
     def __len__(self):
         return self.cities
 
+    def __bool__(self):
+        return True
+
     def get_average_infrastructure(self):
         return sum(i.infrastructure for i in self.partial_cities) / self.cities
 

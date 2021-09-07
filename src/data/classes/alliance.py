@@ -139,6 +139,9 @@ class Alliance(Makeable):
     def __len__(self):
         return len([i[0] for i in self.list_members(vm=False)])
 
+    def __bool__(self):
+        return True
+
     async def get_resources(self):
         from ...funcs import parse_alliance_bank
 
