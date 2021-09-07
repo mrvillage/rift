@@ -66,26 +66,6 @@ class Alliance(Makeable):
     def __repr__(self):
         return f"{self.id} - {self.name}"
 
-    def _update(self, *, alliance_id=None, alliance_name=None, data=None):
-        if data is None:
-            self.data = query_alliance(
-                alliance_id=alliance_id, alliance_name=alliance_name
-            )
-        else:
-            self.data = data
-        self.id = self.data[0]
-        self.founddate = self.data[1]
-        self.name = self.data[2]
-        self.acronym = self.data[3]
-        self.color = self.data[4].capitalize()
-        self.rank = self.data[5]
-        self.score = self.data[7]
-        self.avgscore = self.data[11]
-        self.flagurl = self.data[12] if self.data[12] is not None else None
-        self.forumurl = self.data[13] if self.data[13] is not None else None
-        self.ircchan = self.data[14] if self.data[14] is not None else None
-        return self
-
     def get_militarization(self, vm=None):
         cities = sum(i.cities for i in self.members if not i.v_mode)
         militarization = {
