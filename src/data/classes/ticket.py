@@ -21,12 +21,15 @@ class Ticket:
     config_id: int
     guild_id: int
     user_id: int
+    open: bool
+
     __slots__ = (
         "ticket_id",
         "ticket_number",
         "config_id",
         "guild_id",
         "user_id",
+        "open",
     )
 
     def __init__(self, data: TicketData) -> None:
