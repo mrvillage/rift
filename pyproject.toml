@@ -16,4 +16,4 @@ exclude = '''
 '''
 
 [tool.isort]
-profile = "black" 
+profile = "black"
