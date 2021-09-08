@@ -190,7 +190,7 @@ class Military(commands.Cog):
         invoke_without_command=True,
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
-    async def militarization(self, ctx, *, search=None):
+    async def militarization(self, ctx: commands.Context, *, search=None):
         search = str(ctx.author.id) if search is None else search
         try:
             alliance = await funcs.search_alliance(ctx, search)
@@ -204,11 +204,19 @@ class Military(commands.Cog):
             )
             return
         await alliance.make_attrs("members", "member_count")
-        async with ctx.typing():
+        if ctx.interaction:
+            await ctx.interaction.response.defer()
             async with aiohttp.request(
                 "GET", f"https://checkapi.bsnk.dev/getChart?allianceID={alliance.id}"
             ) as req:
                 byte = await req.read()
+        else:
+            async with ctx.typing():
+                async with aiohttp.request(
+                    "GET",
+                    f"https://checkapi.bsnk.dev/getChart?allianceID={alliance.id}",
+                ) as req:
+                    byte = await req.read()
         militarization = alliance.get_militarization(vm=False)
         image = discord.File(BytesIO(byte), f"militarization_{alliance.id}.png")
         cities = alliance.get_cities()
