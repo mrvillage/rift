@@ -15,7 +15,11 @@ from .utils import get_command_signature
 async def print_handler(ctx: commands.Context, error: Exception) -> None:
     if hasattr(ctx.command, "on_error"):
         return
-    print("Ignoring exception in command {}:".format(ctx.command), file=sys.stderr)
+    print(
+        "Ignoring exception in command {}:".format(ctx.command),
+        file=sys.stderr,
+        flush=True,
+    )
     traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 

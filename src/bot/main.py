@@ -80,7 +80,7 @@ async def on_ready():
         bot.add_view(Prices())
         bot.add_view(AlliancesPaginator(1, 50))
         bot.persistent_views_loaded = True
-        print("Loaded persistent views!")
+        print("Loaded persistent views!", flush=True)
 
     if not bot.cogs_loaded:
         cogPath = Path.cwd() / "src" / "bot" / "cogs"
@@ -91,17 +91,17 @@ async def on_ready():
         bot.unload_extension("src.bot.cogs.server")
         bot.unload_extension("src.bot.cogs.logs")
         bot.cogs_loaded = True
-        print("Loaded cogs!")
+        print("Loaded cogs!", flush=True)
 
     for guild in bot.guilds:
         if not guild.chunked:
             await guild.chunk()
-    print("Guilds chunked!")
+    print("Guilds chunked!", flush=True)
 
     await bot.register_application_commands()
-    print("Application commands registered!")
+    print("Application commands registered!", flush=True)
 
-    print("Startup complete!")
+    print("Startup complete!", flush=True)
 
 
 @bot.command(
