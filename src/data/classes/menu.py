@@ -485,7 +485,7 @@ class MenuItem:
                             )
                         except commands.RoleNotFound as error:
                             if error.argument:
-                                await ctx.send(
+                                await ctx.reply(
                                     embed=get_embed_author_member(
                                         ctx.author,
                                         f"No role found with argument `{error.argument}`.\nPlease continue with further input, to correct please restart.",
@@ -496,9 +496,17 @@ class MenuItem:
                         "CREATE_TICKETS",
                     }:
                         if j.isdigit():
-                            formatted_flags["options"].add(
-                                int(await TicketConfig.fetch(int(j)))
-                            )
+                            try:
+                                formatted_flags["options"].add(
+                                    int(await TicketConfig.fetch(int(j)))
+                                )
+                            except IndexError:
+                                await ctx.reply(
+                                    embed=get_embed_author_member(
+                                        ctx.author,
+                                        f"No ticket found with ID `{j}`.\nPlease continue with further input, to correct please restart.",
+                                    )
+                                )
                     elif formatted_flags["action"] in {"CLOSE_TICKET", "CLOSE_TICKETS"}:
                         formatted_flags["options"].add(
                             int(await Ticket.convert(ctx, j))
@@ -508,9 +516,17 @@ class MenuItem:
                         "CREATE_EMBASSIES",
                     }:
                         if j.isdigit():
-                            formatted_flags["options"].add(
-                                int(await EmbassyConfig.fetch(int(j)))
-                            )
+                            try:
+                                formatted_flags["options"].add(
+                                    int(await EmbassyConfig.fetch(int(j)))
+                                )
+                            except IndexError:
+                                await ctx.reply(
+                                    embed=get_embed_author_member(
+                                        ctx.author,
+                                        f"No embassy found with ID `{j}`.\nPlease continue with further input, to correct please restart.",
+                                    )
+                                )
                     elif formatted_flags["action"] in {
                         "CLOSE_EMBASSY",
                         "CLOSE_EMBASSIES",
