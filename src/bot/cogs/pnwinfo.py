@@ -10,8 +10,8 @@ from ... import find, funcs
 from ...data.classes import Alliance, Nation
 from ...data.get import (
     get_alliances_offset,
-    get_max_alliances_page,
     get_colors,
+    get_max_alliances_page,
     get_nation_color_counts,
 )
 from ...errors import AllianceNotFoundError, NationNotFoundError
@@ -248,7 +248,7 @@ class PnWInfo(commands.Cog):
             f"Page: **{page}** of **{max_page}**\n"
             + "Rank: ID, Name, Score, Members\n"
             + "\n".join(
-                f"**#{i.rank}**: {i.id}, {i.name}, {i.calculated_score:,.2f}, {i.member_count}"
+                f"**#{i.raw_rank}**: {i.id}, {i.name}, {i.calculated_score:,.2f}, {i.member_count}"
                 for i in alliances
             ),
             color=discord.Color.blue(),
