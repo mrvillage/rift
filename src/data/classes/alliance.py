@@ -44,23 +44,17 @@ class Alliance(Makeable):
     )
 
     def __init__(self, data=None, *, alliance_id=None, alliance_name=None):
-        if data is None:
-            self.data = query_alliance(
-                alliance_id=alliance_id, alliance_name=alliance_name
-            )
-        else:
-            self.data = data
-        self.id = self.data[0]
-        self.founddate = self.data[1]
-        self.name = self.data[2]
-        self.acronym = self.data[3]
-        self.color = self.data[4].capitalize()
-        self.rank = self.data[5]
-        self.score = self.data[7]
-        self.avgscore = self.data[11]
-        self.flagurl = self.data[12] if self.data[12] is not None else None
-        self.forumurl = self.data[13] if self.data[13] is not None else None
-        self.ircchan = self.data[14] if self.data[14] is not None else None
+        self.id = data[0]
+        self.founddate = data[1]
+        self.name = data[2]
+        self.acronym = data[3]
+        self.color = data[4].capitalize()
+        self.rank = data[5]
+        self.score = data[7]
+        self.avgscore = data[11]
+        self.flagurl = data[12] if data[12] is not None else None
+        self.forumurl = data[13] if data[13] is not None else None
+        self.ircchan = data[14] if data[14] is not None else None
         self.discord = self.ircchan
 
     def __repr__(self):

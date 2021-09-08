@@ -59,69 +59,61 @@ class Nation(Makeable):
     )
 
     def __init__(self, data=None, *, nation_id=None, nation_name=None):
-        if data is None:
-            self.data = query_nation(nation_id=nation_id, nation_name=nation_name)
-        else:
-            self.data = data
-        self.id = self.data[0]
-        self.name = self.data[1]
-        self.leader = self.data[2]
-        self.continent = utils.get_continent(self.data[3])
-        self.war_policy = utils.get_war_policy(self.data[4])
-        self.domestic_policy = utils.get_domestic_policy(self.data[5])
-        self.color = utils.get_color(self.data[6])
-        self.alliance_id = self.data[7]
-        self.alliance = self.data[8] if self.data[8] != "None" else None
-        self.alliance_position = utils.get_alliance_position(self.data[9])
-        self.cities = self.data[10]
-        self.offensive_wars = self.data[11]
-        self.defensive_wars = self.data[12]
-        self.score = self.data[13]
-        self.v_mode = self.data[14]
-        self.v_mode_turns = self.data[15]
-        self.beige_turns = self.data[16]
-        self.last_active = self.data[17]
-        self.founded = self.data[18]
-        self.soldiers = self.data[19]
-        self.tanks = self.data[20]
-        self.aircraft = self.data[21]
-        self.ships = self.data[22]
-        self.missiles = self.data[23]
-        self.nukes = self.data[24]
+        self.id = data[0]
+        self.name = data[1]
+        self.leader = data[2]
+        self.continent = utils.get_continent(data[3])
+        self.war_policy = utils.get_war_policy(data[4])
+        self.domestic_policy = utils.get_domestic_policy(data[5])
+        self.color = utils.get_color(data[6])
+        self.alliance_id = data[7]
+        self.alliance = data[8] if data[8] != "None" else None
+        self.alliance_position = utils.get_alliance_position(data[9])
+        self.cities = data[10]
+        self.offensive_wars = data[11]
+        self.defensive_wars = data[12]
+        self.score = data[13]
+        self.v_mode = data[14]
+        self.v_mode_turns = data[15]
+        self.beige_turns = data[16]
+        self.last_active = data[17]
+        self.founded = data[18]
+        self.soldiers = data[19]
+        self.tanks = data[20]
+        self.aircraft = data[21]
+        self.ships = data[22]
+        self.missiles = data[23]
+        self.nukes = data[24]
 
     def __repr__(self):
         return f"{self.id} - {self.name}"
 
     def _update(self, *, nation_id=None, nation_name=None, data=None):
-        if data is None:
-            self.data = query_nation(nation_id=nation_id, nation_name=nation_name)
-        else:
-            self.data = data
-        self.id = self.data[0]
-        self.name = self.data[1]
-        self.leader = self.data[2]
-        self.continent = utils.get_continent(self.data[3])
-        self.war_policy = utils.get_war_policy(self.data[4])
-        self.domestic_policy = utils.get_domestic_policy(self.data[5])
-        self.color = utils.get_color(self.data[6])
-        self.alliance_id = self.data[7]
-        self.alliance = self.data[8] if self.data[8] != "None" else None
-        self.alliance_position = utils.get_alliance_position(self.data[9])
-        self.cities = self.data[10]
-        self.offensive_wars = self.data[11]
-        self.defensive_wars = self.data[12]
-        self.score = self.data[13]
-        self.v_mode = self.data[14]
-        self.v_mode_turns = self.data[15]
-        self.beige_turns = self.data[16]
-        self.last_active = self.data[17]
-        self.founded = self.data[18]
-        self.soldiers = self.data[19]
-        self.tanks = self.data[20]
-        self.aircraft = self.data[21]
-        self.ships = self.data[22]
-        self.missiles = self.data[23]
-        self.nukes = self.data[24]
+        self.id = data[0]
+        self.name = data[1]
+        self.leader = data[2]
+        self.continent = utils.get_continent(data[3])
+        self.war_policy = utils.get_war_policy(data[4])
+        self.domestic_policy = utils.get_domestic_policy(data[5])
+        self.color = utils.get_color(data[6])
+        self.alliance_id = data[7]
+        self.alliance = data[8] if data[8] != "None" else None
+        self.alliance_position = utils.get_alliance_position(data[9])
+        self.cities = data[10]
+        self.offensive_wars = data[11]
+        self.defensive_wars = data[12]
+        self.score = data[13]
+        self.v_mode = data[14]
+        self.v_mode_turns = data[15]
+        self.beige_turns = data[16]
+        self.last_active = data[17]
+        self.founded = data[18]
+        self.soldiers = data[19]
+        self.tanks = data[20]
+        self.aircraft = data[21]
+        self.ships = data[22]
+        self.missiles = data[23]
+        self.nukes = data[24]
         return self
 
     async def send_message(self, *, subject=None, content=None):

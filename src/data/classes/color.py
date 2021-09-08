@@ -23,7 +23,6 @@ class Color:
                 and isinstance(data["bloc_name"], str)
                 and isinstance(data["turn_bonus"], int)
             )
-        self.data = data
         self.color = data["color"]
         self.name = data["bloc_name"]
         self.bloc_name = self.name
