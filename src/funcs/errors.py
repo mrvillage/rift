@@ -31,6 +31,7 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                 embed=get_embed_author_member(
                     ctx.author,
                     f"You forgot an argument!\n\n`{await get_command_signature(ctx)}`",
+                    color=discord.Color.red(),
                 )
             )
         elif isinstance(error, discord.Forbidden):
@@ -40,7 +41,9 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
         elif isinstance(error, commands.MemberNotFound):
             await ctx.reply(
                 embed=get_embed_author_member(
-                    ctx.author, "I couldn't find that member!"
+                    ctx.author,
+                    "I couldn't find that member!",
+                    color=discord.Color.red(),
                 )
             )
         elif isinstance(error, commands.BadArgument):
@@ -48,6 +51,7 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                 embed=get_embed_author_member(
                     ctx.author,
                     f"You gave an invalid argument!\n\n`{await get_command_signature(ctx)}`",
+                    color=discord.Color.red(),
                 )
             )
         elif isinstance(error, commands.NoPrivateMessage):
@@ -55,6 +59,7 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                 embed=get_embed_author_member(
                     ctx.author,
                     "You can't use that command in DMs! Try it in a server instead.",
+                    color=discord.Color.red(),
                 )
             )
         elif isinstance(error, commands.PrivateMessageOnly):
@@ -62,6 +67,7 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                 embed=get_embed_author_member(
                     ctx.author,
                     "You can't use that command in a server! Try it in DMs instead.",
+                    color=discord.Color.red(),
                 )
             )
         elif isinstance(error, NationNotFoundError):
@@ -111,6 +117,7 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                 embed=get_embed_author_member(
                     ctx.author,
                     "Unknown Fatal Error. Please try again. If this problem persists please contact <@!258298021266063360> for assistance.\nPlease remember the bot is still in Alpha, there is a good chance new features may result in new bugs to older features. To report an issue please send a message to <@!258298021266063360> so it can be addressed as soon as possible.",
+                    color=discord.Color.red(),
                 )
             )
             await print_handler(ctx, error)
