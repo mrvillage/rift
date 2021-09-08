@@ -197,7 +197,9 @@ class Military(commands.Cog):
         except AllianceNotFoundError:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, f"No alliance found with argument `{search}`."
+                    ctx.author,
+                    f"No alliance found with argument `{search}`.",
+                    color=discord.Color.red(),
                 )
             )
             return
@@ -275,6 +277,7 @@ class Military(commands.Cog):
                 {"name": "Missiles", "value": f"{alliance.get_missiles():,}"},
                 {"name": "Nukes", "value": f"{alliance.get_nukes():,}"},
             ],
+            color=discord.Color.blue(),
         )
         await ctx.reply(file=image, embed=embed)
 
@@ -303,7 +306,9 @@ class Military(commands.Cog):
         except NationNotFoundError:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, f"No nation found with argument `{search}`."
+                    ctx.author,
+                    f"No nation found with argument `{search}`.",
+                    color=discord.Color.red(),
                 )
             )
             return
@@ -351,6 +356,7 @@ class Military(commands.Cog):
                     {"name": "Missiles", "value": f"{nation.missiles:,}"},
                     {"name": "Nukes", "value": f"{nation.nukes:,}"},
                 ],
+                color=discord.Color.blue(),
             )
         else:
             embed = funcs.get_embed_author_member(
@@ -377,6 +383,7 @@ class Military(commands.Cog):
                     {"name": "Missiles", "value": f"{nation.missiles:,}"},
                     {"name": "Nukes", "value": f"{nation.nukes:,}"},
                 ],
+                color=discord.Color.blue(),
             )
         await ctx.reply(embed=embed)
 

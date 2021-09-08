@@ -28,9 +28,11 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         user = self.bot.get_user(link["user_id"])
         if not user:
             user = await self.bot.fetch_user(link["user_id"])
-        await ctx.send(
+        await ctx.reply(
             embed=funcs.get_embed_author_member(
-                user, f"{user.mention} has been unlinked from nation `{nation.id}`."
+                user,
+                f"{user.mention} has been unlinked from nation `{nation.id}`.",
+                color=discord.Color.green(),
             )
         )
 
@@ -74,7 +76,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     async def extension(self, ctx):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
-                ctx.author, "You forgot to give a subcommand!"
+                ctx.author,
+                "You forgot to give a subcommand!",
+                color=discord.Color.red(),
             )
         )
 
@@ -84,19 +88,25 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             self.bot.reload_extension(f"source.bot.cogs.{extension}")
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, f"Extension `{extension}` has been reloaded."
+                    ctx.author,
+                    f"Extension `{extension}` has been reloaded.",
+                    color=discord.Color.green(),
                 )
             )
         except commands.ExtensionNotLoaded:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, f"Extension `{extension}` is not loaded."
+                    ctx.author,
+                    f"Extension `{extension}` is not loaded.",
+                    color=discord.Color.red(),
                 )
             )
         except commands.ExtensionNotFound:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, f"Extension `{extension}` does not exist."
+                    ctx.author,
+                    f"Extension `{extension}` does not exist.",
+                    color=discord.Color.red(),
                 )
             )
 
@@ -106,19 +116,25 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             self.bot.load_extension(f"source.bot.cogs.{extension}")
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, f"Extension `{extension}` has been loaded."
+                    ctx.author,
+                    f"Extension `{extension}` has been loaded.",
+                    color=discord.Color.green(),
                 )
             )
         except commands.ExtensionAlreadyLoaded:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, f"Extension `{extension}` is already loaded."
+                    ctx.author,
+                    f"Extension `{extension}` is already loaded.",
+                    color=discord.Color.red(),
                 )
             )
         except commands.ExtensionNotFound:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, f"Extension `{extension}` does not exist."
+                    ctx.author,
+                    f"Extension `{extension}` does not exist.",
+                    color=discord.Color.red(),
                 )
             )
 
@@ -128,19 +144,25 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             self.bot.unload_extension(f"source.bot.cogs.{extension}")
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, f"Extension `{extension}` has been unloaded."
+                    ctx.author,
+                    f"Extension `{extension}` has been unloaded.",
+                    color=discord.Color.green(),
                 )
             )
         except commands.ExtensionNotLoaded:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, f"Extension `{extension}` is not loaded."
+                    ctx.author,
+                    f"Extension `{extension}` is not loaded.",
+                    color=discord.Color.red(),
                 )
             )
         except commands.ExtensionNotFound:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, f"Extension `{extension}` does not exist."
+                    ctx.author,
+                    f"Extension `{extension}` does not exist.",
+                    color=discord.Color.red(),
                 )
             )
 
@@ -148,7 +170,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     async def staff(self, ctx):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
-                ctx.author, "You forgot to give a subcommand!"
+                ctx.author,
+                "You forgot to give a subcommand!",
+                color=discord.Color.red(),
             )
         )
 
@@ -158,7 +182,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         if member.id in staff:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, f"{member.mention} is already Staff."
+                    ctx.author,
+                    f"{member.mention} is already Staff.",
+                    color=discord.Color.red(),
                 )
             )
             return
@@ -166,7 +192,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         self.bot.staff.append(member.id)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
-                ctx.author, f"{member.mention} is now Staff."
+                ctx.author,
+                f"{member.mention} is now Staff.",
+                color=discord.Color.green(),
             )
         )
 
@@ -176,7 +204,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         if member.id not in staff:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, f"{member.mention} is not Staff."
+                    ctx.author,
+                    f"{member.mention} is not Staff.",
+                    color=discord.Color.red(),
                 )
             )
             return
@@ -184,7 +214,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         self.bot.staff.remove(member.id)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
-                ctx.author, f"{member.mention} has been removed from Staff."
+                ctx.author,
+                f"{member.mention} has been removed from Staff.",
+                color=discord.Color.green(),
             )
         )
 
@@ -196,7 +228,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         mentions = "\n".join(i.mention for i in staff)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
-                ctx.author, f"There are {len(staff):,} Staff:\n{mentions}"
+                ctx.author,
+                f"There are {len(staff):,} Staff:\n{mentions}",
+                color=discord.Color.blue(),
             )
         )
 

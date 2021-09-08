@@ -1,4 +1,5 @@
 from asyncio import TimeoutError
+from typing import TYPE_CHECKING, Union
 
 import discord
 from discord.ext import commands
@@ -7,6 +8,7 @@ from ... import find
 from ... import funcs
 from ... import perms
 from ...data.classes.bank import Transaction
+from ...data.classes import Alliance, Nation
 from ...errors import AllianceNotFoundError, NationNotFoundError, RecipientNotFoundError
 from ...ref import Rift
 
@@ -24,7 +26,7 @@ class Bank(commands.Cog):
     async def bank(self, ctx: commands.Context):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
-                ctx.author, "You forgot to give an argument!"
+                ctx.author, "You forgot to give an argument!", color=discord.Color.red()
             )
         )
 
@@ -41,22 +43,19 @@ class Bank(commands.Cog):
         type=commands.CommandType.chat_input,
     )
     async def bank_transfer(
-        self, ctx: commands.Context, recipient, *, transaction: Transaction
+        self,
+        ctx: commands.Context,
+        recipient: Union[Alliance, Nation],
+        *,
+        transaction: Transaction,
     ):
-        try:
-            author, recipient = await find.search_nation_author(ctx, recipient)
-        except NationNotFoundError:
-            try:
-                recipient = await funcs.search_alliance(ctx, recipient)
-                author = ctx.guild
-            except AllianceNotFoundError:
-                await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        f"I couldn't find a nation or alliance with argument `{recipient}`.",
-                    )
-                )
-                return
+        if isinstance(recipient, Alliance):
+            author = ctx.guild
+        else:
+            await recipient.make_attrs("user")
+            author = recipient.user
+        if TYPE_CHECKING:
+            assert author is not None
         try:
             sender = await funcs.search_nation(ctx, str(ctx.author.id))
         except NationNotFoundError:
@@ -64,6 +63,7 @@ class Bank(commands.Cog):
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     "You're not linked so I couldn't verify your bank permissions!",
+                    color=discord.Color.red(),
                 )
             )
             return
@@ -75,27 +75,34 @@ class Bank(commands.Cog):
                     embed=funcs.get_embed_author_member(
                         ctx.author,
                         "You don't have permission to send money from your alliance bank!",
+                        color=discord.Color.red(),
                     )
                 )
                 return
         except IndexError:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, "Your alliance hasn't configured this command!"
+                    ctx.author,
+                    "Your alliance hasn't configured this command!",
+                    color=discord.Color.red(),
                 )
             )
             return
         except AttributeError:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, "You're not in an alliance so you can't send money!"
+                    ctx.author,
+                    "You're not in an alliance so you can't send money!",
+                    color=discord.Color.red(),
                 )
             )
             return
         if len(transaction) == 0:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, "You didn't give any valid resources!"
+                    ctx.author,
+                    "You didn't give any valid resources!",
+                    color=discord.Color.red(),
                 )
             )
             return
@@ -103,11 +110,13 @@ class Bank(commands.Cog):
             funcs.get_embed_author_guild(
                 author,
                 f"Are you sure you want to transfer {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**? To confirm please type the id of the **{type(recipient).__name__}**.",
+                color=discord.Color.orange(),
             )
             if isinstance(author, discord.Guild)
             else funcs.get_embed_author_member(
                 author,
                 f"Are you sure you want to transfer {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**? To confirm please type the id of the **{type(recipient).__name__}**.",
+                color=discord.Color.orange(),
             )
         )
         message = await ctx.reply(embed=embed, return_message=True)
@@ -127,7 +136,9 @@ class Bank(commands.Cog):
         except TimeoutError:
             await message.edit(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, "You didn't confirm your transaction in time!"
+                    ctx.author,
+                    "You didn't confirm your transaction in time!",
+                    color=discord.Color.red(),
                 )
             )
             return
@@ -136,11 +147,13 @@ class Bank(commands.Cog):
                 embed=funcs.get_embed_author_guild(
                     author,
                     f"You have cancelled the transfer of {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                    color=discord.Color.red(),
                 )
                 if isinstance(author, discord.Guild)
                 else funcs.get_embed_author_member(
                     author,
                     f"You have cancelled the transfer of {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                    color=discord.Color.red(),
                 )
             )
             return
@@ -148,11 +161,13 @@ class Bank(commands.Cog):
             embed=funcs.get_embed_author_guild(
                 author,
                 f"Sending {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**...",
+                color=discord.Color.orange(),
             )
             if isinstance(author, discord.Guild)
             else funcs.get_embed_author_member(
                 author,
                 f"Sending {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**...",
+                color=discord.Color.orange(),
             ),
         )
         complete = await transaction.complete(receiver=recipient, action="send")
@@ -163,11 +178,13 @@ class Bank(commands.Cog):
                     funcs.get_embed_author_guild(
                         author,
                         f"Something went wrong with the transaction. Please try again.",
+                        color=discord.Color.red(),
                     )
                     if isinstance(author, discord.Guild)
                     else funcs.get_embed_author_member(
                         author,
                         f"Something went wrong with the transaction. Please try again.",
+                        color=discord.Color.red(),
                     )
                 )
                 await message.edit(embed=embed)
@@ -176,11 +193,13 @@ class Bank(commands.Cog):
                     funcs.get_embed_author_guild(
                         author,
                         f"You successfully transferred {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                        color=discord.Color.green(),
                     )
                     if isinstance(author, discord.Guild)
                     else funcs.get_embed_author_member(
                         author,
                         f"You successfully transferred {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                        color=discord.Color.green(),
                     )
                 )
                 await message.edit(embed=embed)
@@ -218,6 +237,7 @@ class Bank(commands.Cog):
                     embed=funcs.get_embed_author_member(
                         ctx.author,
                         f"I couldn't find a nation or alliance with argument `{search}`.",
+                        color=discord.Color.red(),
                     )
                 )
                 raise RecipientNotFoundError
@@ -228,6 +248,7 @@ class Bank(commands.Cog):
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     "You're not linked so I couldn't verify your bank permissions!",
+                    color=discord.Color.red(),
                 )
             )
             return
@@ -239,13 +260,16 @@ class Bank(commands.Cog):
                     embed=funcs.get_embed_author_member(
                         ctx.author,
                         "You don't have permission to view your alliance bank!",
+                        color=discord.Color.red(),
                     )
                 )
                 return
         except IndexError:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, "Your alliance hasn't configured this command!"
+                    ctx.author,
+                    "Your alliance hasn't configured this command!",
+                    color=discord.Color.red(),
                 )
             )
             return
@@ -254,12 +278,15 @@ class Bank(commands.Cog):
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     "You're not in an alliance so you can't view a bank balance!",
+                    color=discord.Color.red(),
                 )
             )
             return
         message = await ctx.reply(
             embed=funcs.get_embed_author_member(
-                ctx.author, f"Fetching the current bank holdings of {repr(alliance)}..."
+                ctx.author,
+                f"Fetching the current bank holdings of {repr(alliance)}...",
+                color=discord.Color.orange(),
             )
         )
         resources = await alliance.get_resources()
@@ -267,6 +294,7 @@ class Bank(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"The current bank holdings of {repr(alliance)} is:\n{resources.newline()}",
+                color=discord.Color.green(),
             )
         )
 

@@ -68,7 +68,9 @@ class PnWInfo(commands.Cog):
                 await ctx.invoke(self.alliance, alliance=alliance)
             except AllianceNotFoundError:
                 embed = funcs.get_embed_author_member(
-                    ctx.author, f"No nation or alliance found with argument `{search}`."
+                    ctx.author,
+                    f"No nation or alliance found with argument `{search}`.",
+                    color=discord.Color.red(),
                 )
                 await ctx.reply(embed=embed)
 
@@ -94,6 +96,7 @@ class PnWInfo(commands.Cog):
                     ctx.author,
                     f"There's too many members to display! You can find the full list [here](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\").",
                     title=alliance.name,
+                    color=discord.Color.orange(),
                 )
             )
             return
@@ -106,6 +109,7 @@ class PnWInfo(commands.Cog):
             f"You can find the full list [here](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\").",
             fields=fields,
             title=alliance.name,
+            color=discord.Color.blue(),
         )
         await ctx.reply(embed=embed)
 
@@ -119,7 +123,11 @@ class PnWInfo(commands.Cog):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         await alliance.make_attrs("treaties")
         await ctx.reply(
-            embed=funcs.get_embed_author_member(ctx.author, str(alliance.treaties))
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                str(alliance.treaties),
+                color=discord.Color.blue(),
+            )
         )
 
     @commands.command(
@@ -134,6 +142,7 @@ class PnWInfo(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"{repr(nation)} has **{num}** spies.",
+                color=discord.Color.blue(),
             )
         )
 
@@ -148,14 +157,20 @@ class PnWInfo(commands.Cog):
         search = search or await Nation.convert(ctx, search)
         message = await ctx.reply(
             embed=funcs.get_embed_author_member(
-                ctx.author, f"Fetching revenue for {repr(search)}..."
+                ctx.author,
+                f"Fetching revenue for {repr(search)}...",
+                color=discord.Color.orange(),
             )
         )
         try:
             rev = await search.calculate_revenue()
         except IndexError:
             return await message.edit(
-                content=f"Something went wrong calculating {repr(search)}'s revenue. It's probably a turn, try again in a few minutes!"
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"Something went wrong calculating {repr(search)}'s revenue. It's probably a turn, try again in a few minutes!",
+                    color=discord.Color.red(),
+                )
             )
         if TYPE_CHECKING:
             from ...data.classes import Resources
@@ -199,7 +214,10 @@ class PnWInfo(commands.Cog):
         )
         await message.edit(
             embed=funcs.get_embed_author_member(
-                ctx.author, f"Revenue for {repr(search)}", fields=fields
+                ctx.author,
+                f"Revenue for {repr(search)}",
+                fields=fields,
+                color=discord.Color.green(),
             )
         )
 
@@ -233,7 +251,7 @@ class PnWInfo(commands.Cog):
                 f"**#{i.rank}**: {i.id}, {i.name}, {i.calculated_score:,.2f}, {i.member_count}"
                 for i in alliances
             ),
-            color=discord.Color.green(),
+            color=discord.Color.blue(),
         )
         await ctx.reply(embed=embed, view=AlliancesPaginator(max_page, page))
 
@@ -258,7 +276,10 @@ class PnWInfo(commands.Cog):
         ]
         await ctx.reply(
             embed=funcs.get_embed_author_member(
-                ctx.author, f"Average Bonus: ${average_bonus:,.2f}", fields=fields
+                ctx.author,
+                f"Average Bonus: ${average_bonus:,.2f}",
+                fields=fields,
+                color=discord.Color.blue(),
             )
         )
 

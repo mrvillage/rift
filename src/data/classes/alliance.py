@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Dict, Union
 
-from discord import Embed, Guild
+import discord
 from discord.ext.commands.context import Context
 from src.data.query.alliance import query_applicants, query_members
 
@@ -180,7 +180,7 @@ class Alliance(Makeable):
 
         self.treaties = await Treaties.fetch(self)
 
-    async def get_info_embed(self, ctx: Context, short: bool = False) -> Embed:
+    async def get_info_embed(self, ctx: Context, short: bool = False) -> discord.Embed:
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
         await self.make_attrs(
@@ -272,14 +272,16 @@ class Alliance(Makeable):
                 timestamp=datetime.fromisoformat(self.founddate),
                 footer="Alliance created",
                 fields=fields,
+                color=discord.Color.blue(),
             ).set_thumbnail(url=self.flagurl)
-            if isinstance(ctx, Guild)
+            if isinstance(ctx, discord.Guild)
             else get_embed_author_member(
                 ctx.author,
                 f'[Alliance Page](https://politicsandwar.com/alliance/id={self.id} "https://politicsandwar.com/alliance/id={self.id}")\n[War Activity](https://politicsandwar.com/alliance/id={self.id}&display=war "https://politicsandwar.com/alliance/id={self.id}&display=war")',
                 timestamp=datetime.fromisoformat(self.founddate),
                 footer="Alliance created",
                 fields=fields,
+                color=discord.Color.blue(),
             ).set_thumbnail(url=self.flagurl)
         )
         if any(len(fields[i]["value"] + fields[i]["name"]) > 1024 for i in {9, 10, 11}):

@@ -62,7 +62,9 @@ class Menus(commands.Cog):
         if menus:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, "\n".join(str(i) for i in menus)
+                    ctx.author,
+                    "\n".join(str(i) for i in menus),
+                    color=discord.Color.blue(),
                 )
             )
         else:
@@ -218,7 +220,9 @@ class Menus(commands.Cog):
         await menu.new_interface(message)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
-                ctx.author, f"Menu {menu.menu_id} sent to {channel.mention}!"
+                ctx.author,
+                f"Menu {menu.menu_id} sent to {channel.mention}!",
+                color=discord.Color.green(),
             )
         )
 

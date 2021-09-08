@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import discord
 from discord.ext import commands
 
 from ... import funcs
@@ -135,6 +136,7 @@ class Trade(commands.Cog):
                 """,
                     },
                 ],
+                color=discord.Color.blue(),
             ),
         )
 
@@ -226,6 +228,7 @@ class Trade(commands.Cog):
                 """,
                     },
                 ],
+                color=discord.Color.blue(),
             ),
         )
 

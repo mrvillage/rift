@@ -74,6 +74,7 @@ class Settings(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 description=f"The welcome message has been set to:\n\n{message}",
+                color=discord.Color.green(),
             )
         )
 
@@ -98,6 +99,7 @@ class Settings(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 description=f"The verified nickname format has been set to:\n\n`{nickname}`",
+                color=discord.Color.green(),
             )
         )
 
