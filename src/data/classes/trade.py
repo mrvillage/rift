@@ -56,18 +56,18 @@ class TradePrices:
     )
 
     def __init__(self, data):
-        self.credit = ResourcePrice(json.loads(data["credit"]))
-        self.coal = ResourcePrice(json.loads(data["coal"]))
-        self.oil = ResourcePrice(json.loads(data["oil"]))
-        self.uranium = ResourcePrice(json.loads(data["uranium"]))
-        self.lead = ResourcePrice(json.loads(data["lead"]))
-        self.iron = ResourcePrice(json.loads(data["iron"]))
-        self.bauxite = ResourcePrice(json.loads(data["bauxite"]))
-        self.gasoline = ResourcePrice(json.loads(data["gasoline"]))
-        self.munitions = ResourcePrice(json.loads(data["munitions"]))
-        self.steel = ResourcePrice(json.loads(data["steel"]))
-        self.aluminum = ResourcePrice(json.loads(data["aluminum"]))
-        self.food = ResourcePrice(json.loads(data["food"]))
+        self.credit = ResourcePrice(data["credit"])
+        self.coal = ResourcePrice(data["coal"])
+        self.oil = ResourcePrice(data["oil"])
+        self.uranium = ResourcePrice(data["uranium"])
+        self.lead = ResourcePrice(data["lead"])
+        self.iron = ResourcePrice(data["iron"])
+        self.bauxite = ResourcePrice(data["bauxite"])
+        self.gasoline = ResourcePrice(data["gasoline"])
+        self.munitions = ResourcePrice(data["munitions"])
+        self.steel = ResourcePrice(data["steel"])
+        self.aluminum = ResourcePrice(data["aluminum"])
+        self.food = ResourcePrice(data["food"])
         self.market_index = self.credit.market_index
 
     def _update(self, data, /) -> TradeOffer:

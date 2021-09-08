@@ -40,16 +40,14 @@ async def check_bank_perms(*, nation: Nation, author: Union[Member, User], actio
         if nation_position >= alliance_position and nation.alliance.id == 3683:
             return True
         if (
-            author.id in json.loads(perm[f"{action}users"])
+            author.id in perm[f"{action}users"]
             if perm[f"{action}users"] is not None
             else []
         ):
             return True
         roles = [role.id for role in author.roles]
         role_perms = (
-            json.loads(perm[f"{action}roles"])
-            if perm[f"{action}roles"] is not None
-            else []
+            perm[f"{action}roles"] if perm[f"{action}roles"] is not None else []
         )
         if any(role in role_perms for role in roles):
             return True
