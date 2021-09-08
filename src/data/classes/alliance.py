@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Dict, Union
+from typing import TYPE_CHECKING, Dict, Optional, Union
 
 import discord
 from discord.ext.commands.context import Context
+
 from src.data.query.alliance import query_applicants, query_members
 
 from ...errors import AllianceNotFoundError
@@ -15,6 +16,9 @@ from .base import Makeable
 from .resources import Resources
 
 __all__ = ("Alliance",)
+
+if TYPE_CHECKING:
+    from typings import AllianceData
 
 
 class Alliance(Makeable):
@@ -43,19 +47,19 @@ class Alliance(Makeable):
         "treaties",
     )
 
-    def __init__(self, data=None, *, alliance_id=None, alliance_name=None):
-        self.id = data[0]
-        self.founddate = data[1]
-        self.name = data[2]
-        self.acronym = data[3]
-        self.color = data[4].capitalize()
-        self.rank = data[5]
-        self.score = data[7]
-        self.avgscore = data[11]
-        self.flagurl = data[12] if data[12] is not None else None
-        self.forumurl = data[13] if data[13] is not None else None
-        self.ircchan = data[14] if data[14] is not None else None
-        self.discord = self.ircchan
+    def __init__(self, data: AllianceData):
+        self.id: int = data["id"]
+        self.found_date: str = data["found_date"]
+        self.name: str = data["name"]
+        self.acronym: str = data["acronym"]
+        self.color: str = data["color"].capitalize()
+        self.raw_rank: int = data["rank"]
+        self.raw_score: float = data["score"]
+        self.raw_avg_score: float = data["avg_score"]
+        self.flag_url: Optional[str] = data["flag_url"]
+        self.forum_url: Optional[str] = data["forum_url"]
+        self.ircchan: Optional[str] = data["ircchan"]
+        self.discord: Optional[str] = self.ircchan
 
     def __repr__(self):
         return f"{self.id} - {self.name}"
@@ -195,7 +199,7 @@ class Alliance(Makeable):
                 "value": self.acronym if self.acronym != "" else "None",
             },
             {"name": "Color", "value": self.color},
-            {"name": "Rank", "value": f"#{self.rank}"},
+            {"name": "Rank", "value": f"#{self.raw_rank}"},
             {
                 "name": "Members",
                 "value": f"[{self.member_count:,}](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\")",
@@ -244,8 +248,8 @@ class Alliance(Makeable):
             },
             {
                 "name": "Forum Link",
-                "value": f'[Click Here]({self.forumurl} "{self.forumurl}")'
-                if self.forumurl is not None
+                "value": f'[Click Here]({self.forum_url} "{self.forum_url}")'
+                if self.forum_url is not None
                 else "None",
             },
             {
@@ -263,20 +267,20 @@ class Alliance(Makeable):
             get_embed_author_guild(
                 ctx,  # this is here if it ever gets passed as a Guild for some reason
                 f'[Alliance Page](https://politicsandwar.com/alliance/id={self.id} "https://politicsandwar.com/alliance/id={self.id}")\n[War Activity](https://politicsandwar.com/alliance/id={self.id}&display=war "https://politicsandwar.com/alliance/id={self.id}&display=war")',
-                timestamp=datetime.fromisoformat(self.founddate),
+                timestamp=datetime.fromisoformat(self.found_date),
                 footer="Alliance created",
                 fields=fields,
                 color=discord.Color.blue(),
-            ).set_thumbnail(url=self.flagurl)
+            ).set_thumbnail(url=self.flag_url)
             if isinstance(ctx, discord.Guild)
             else get_embed_author_member(
                 ctx.author,
                 f'[Alliance Page](https://politicsandwar.com/alliance/id={self.id} "https://politicsandwar.com/alliance/id={self.id}")\n[War Activity](https://politicsandwar.com/alliance/id={self.id}&display=war "https://politicsandwar.com/alliance/id={self.id}&display=war")',
-                timestamp=datetime.fromisoformat(self.founddate),
+                timestamp=datetime.fromisoformat(self.found_date),
                 footer="Alliance created",
                 fields=fields,
                 color=discord.Color.blue(),
-            ).set_thumbnail(url=self.flagurl)
+            ).set_thumbnail(url=self.flag_url)
         )
         if any(len(fields[i]["value"] + fields[i]["name"]) > 1024 for i in {9, 10, 11}):
             return await self.get_info_embed(ctx, short=True)
