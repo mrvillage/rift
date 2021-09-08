@@ -309,5 +309,16 @@ class Alliance(Makeable):
             ),
         }
 
-    def _update(self, data, /) -> Alliance:
-        ...
+    def _update(self, data: AllianceData, /) -> None:
+        self.id = data["id"]
+        self.found_date = data["found_date"]
+        self.name = data["name"]
+        self.acronym = data["acronym"]
+        self.color = data["color"].capitalize()
+        self.raw_rank = data["rank"]
+        self.raw_score = data["score"]
+        self.raw_avg_score = data["avg_score"]
+        self.flag_url = data["flag_url"]
+        self.forum_url = data["forum_url"]
+        self.ircchan = data["ircchan"]
+        self.discord = self.ircchan
