@@ -38,7 +38,7 @@ class Events(commands.Cog):
                     async with session.ws_connect(
                         f"ws://{SOCKET_IP}:{SOCKET_PORT}", max_msg_size=0
                     ) as ws:
-                        print("rift-data socket connected")
+                        print("rift-data socket connected", flush=True)
                         async for message in ws:
                             data = message.json()
                             if "event" in data:
@@ -46,7 +46,7 @@ class Events(commands.Cog):
                                 event = EVENTS.get(event, event)
                                 self.bot.dispatch(event, **data["data"])
             except Exception as error:
-                print("rift-data socket connection error")
+                print("rift-data socket connection error", file=sys.stderr, flush=True)
                 traceback.print_exception(
                     type(error), error, error.__traceback__, file=sys.stderr
                 )

@@ -252,7 +252,7 @@ class HouseStark(commands.Cog):
         wait = now.replace(hour=22, minute=5, second=0)
         while wait < now:
             wait += datetime.timedelta(days=1)
-        print(f"Waiting until {wait} to send bank!")
+        print(f"Waiting until {wait} to send bank!", flush=True)
         await self.bot.update_pnw_session()
         await discord.utils.sleep_until(wait)
 
