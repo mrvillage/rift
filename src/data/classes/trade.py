@@ -8,7 +8,6 @@ class TradeOffer:
     __slots__ = ("data", "datetime", "nation_id", "amount", "price", "total_value")
 
     def __init__(self, data: dict):
-        self.data = data
         self.datetime = datetime.fromisoformat(data["date"])
         self.nation_id = int(data["nationid"])
         self.amount = int(data["amount"])
@@ -29,7 +28,6 @@ class ResourcePrice:
     )
 
     def __init__(self, data: dict):
-        self.data = data
         self.name = data["resource"]
         self.average_price = int(data["avgprice"])
         self.avg_price = self.average_price
@@ -58,7 +56,6 @@ class TradePrices:
     )
 
     def __init__(self, data):
-        self.data = data
         self.credit = ResourcePrice(json.loads(data["credit"]))
         self.coal = ResourcePrice(json.loads(data["coal"]))
         self.oil = ResourcePrice(json.loads(data["oil"]))

@@ -16,7 +16,6 @@ __all__ = ("City", "FullCity")
 
 
 class City:
-    data: Tuple[int, int, str, bool, float, float, float]
     id: int
     nation_id: int
     name: str
@@ -25,27 +24,35 @@ class City:
     maxinfra: float
     land: float
 
+    __slots__ = (
+        "id",
+        "nation_id",
+        "name",
+        "capital",
+        "infrastructure",
+        "maxinfra",
+        "land",
+    )
+
     def __init__(self, data, *, city_id=None, city_name=None) -> None:
-        self.data = data
-        self.id = self.data[0]
-        self.nation_id = self.data[1]
-        self.name = self.data[2]
-        self.capital = self.data[3]
-        self.infrastructure = self.data[4]
-        self.maxinfra = self.data[5]
-        self.land = self.data[6]
+        self.id = data[0]
+        self.nation_id = data[1]
+        self.name = data[2]
+        self.capital = data[3]
+        self.infrastructure = data[4]
+        self.maxinfra = data[5]
+        self.land = data[6]
 
     def __repr__(self) -> str:
         return f"{self.id} - {self.name}"
 
     def _update(self, *, city_id=None, city_name=None, data) -> City:
-        self.data = data
-        self.id = self.data[0]
-        self.name = self.data[2]
-        self.capital = self.data[3]
-        self.infrastructure = self.data[4]
-        self.maxinfra = self.data[5]
-        self.land = self.data[6]
+        self.id = data[0]
+        self.name = data[2]
+        self.capital = data[3]
+        self.infrastructure = data[4]
+        self.maxinfra = data[5]
+        self.land = data[6]
         return self
 
     async def _make_nation(self) -> None:
@@ -162,7 +169,7 @@ class FullCity(Makeable):
     )
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        self.data = data
+        data = data
         self.id = data["city_id"]
         self.name = data.get("name")
         self.nation_id = data["nation_id"]
