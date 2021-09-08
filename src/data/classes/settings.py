@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from json import loads
 from typing import Any, Mapping, Union
 
 import discord
@@ -52,31 +51,31 @@ class GuildWelcomeSettings(Makeable):
         self.guild_id: int = int(data[0])
         self.welcome_message: Union[str, None] = data[1]
         self.welcome_channels: Union[list[int], None] = (
-            loads(data[2]) if data[2] is not None else None
+            (data[2]) if data[2] is not None else None
         )
         self.join_roles: Union[list[int], None] = (
-            loads(data[3]) if data[3] is not None else None
+            data[3] if data[3] is not None else None
         )
         self.verified_roles: Union[list[int], None] = (
-            loads(data[4]) if data[4] is not None else None
+            data[4] if data[4] is not None else None
         )
         self.member_roles: Union[list[int], None] = (
-            loads(data[5]) if data[5] is not None else None
+            data[5] if data[5] is not None else None
         )
         self.global_city_roles: Union[dict, None] = (
-            loads(data[6]) if data[6] is not None else None
+            data[6] if data[6] is not None else None
         )
         self.member_city_roles: Union[dict, None] = (
-            loads(data[7]) if data[7] is not None else None
+            data[7] if data[7] is not None else None
         )
         self.diplomat_roles: Union[dict, None] = (
-            loads(data[8]) if data[8] is not None else None
+            data[8] if data[8] is not None else None
         )
         self.alliance_roles: Union[dict, None] = (
-            loads(data[9]) if data[9] is not None else None
+            data[9] if data[9] is not None else None
         )
         self.alliance_gov_roles: Union[dict, None] = (
-            loads(data[10]) if data[10] is not None else None
+            data[10] if data[10] is not None else None
         )
         self.verified_nickname: Union[str, None] = (
             data[11] if data[11] is not None else None

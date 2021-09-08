@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from json import dumps, loads
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -237,8 +236,8 @@ class Menu(Makeable):
         self.guild_id = data["guild_id"]
         self.name = data["name"]
         self.description = data["description"]
-        self.item_ids = loads(data["items"]) if data["items"] else []
-        self.permissions = loads(data["permissions"]) if data["permissions"] else {}
+        self.item_ids = data["items"] or []
+        self.permissions = data["permissions"] or {}
 
     @classmethod
     async def convert(cls, ctx: commands.Context, argument: str) -> Menu:
@@ -359,7 +358,7 @@ class MenuItem:
         self.item_id = data["item_id"]
         self.guild_id = data["guild_id"]
         self.type = data["type_"]
-        self.data = loads(data["data_"]) if data["data_"] else {}
+        self.data = data["data_"] or {}
 
     @classmethod
     async def convert(cls, ctx: commands.Context, argument: str) -> MenuItem:

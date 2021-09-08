@@ -13,15 +13,13 @@ async def query_color(color: str) -> Dict[str, Union[int, str]]:
 
 
 async def query_colors() -> List[Dict[str, Union[int, str]]]:
-    return json.loads(
-        dict(
-            (
-                await execute_read_query(
-                    "SELECT colors FROM colors ORDER BY datetime DESC LIMIT 1;"
-                )
-            )[0]
-        )["colors"]
-    )
+    return dict(
+        (
+            await execute_read_query(
+                "SELECT colors FROM colors ORDER BY datetime DESC LIMIT 1;"
+            )
+        )[0]
+    )["colors"]
 
 
 async def query_nation_color_counts() -> List[Dict[str, Union[int, str]]]:
