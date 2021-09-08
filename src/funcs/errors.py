@@ -21,6 +21,7 @@ async def print_handler(ctx: commands.Context, error: Exception) -> None:
         flush=True,
     )
     traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+    sys.stderr.flush()
 
 
 async def handler(ctx: commands.Context, error: Exception) -> None:
