@@ -93,11 +93,6 @@ async def on_ready():
         bot.cogs_loaded = True
         print("Loaded cogs!", flush=True)
 
-    for guild in bot.guilds:
-        if not guild.chunked:
-            await guild.chunk()
-    print("Guilds chunked!", flush=True)
-
     await bot.register_application_commands()
     print("Application commands registered!", flush=True)
 
