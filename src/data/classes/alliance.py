@@ -35,7 +35,6 @@ class Alliance(Makeable):
         "flagurl",
         "forumurl",
         "ircchan",
-        "discord",
         "members",
         "vm_members",
         "leaders",
@@ -59,7 +58,6 @@ class Alliance(Makeable):
         self.flag_url: Optional[str] = data["flag_url"]
         self.forum_url: Optional[str] = data["forum_url"]
         self.ircchan: Optional[str] = data["ircchan"]
-        self.discord: Optional[str] = self.ircchan
 
     def __repr__(self):
         return f"{self.id} - {self.name}"
@@ -179,6 +177,7 @@ class Alliance(Makeable):
         self.treaties = await Treaties.fetch(self)
 
     async def get_info_embed(self, ctx: Context, short: bool = False) -> discord.Embed:
+        # sourcery no-metrics
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
         await self.make_attrs(
@@ -254,8 +253,8 @@ class Alliance(Makeable):
             },
             {
                 "name": "Discord Link",
-                "value": f'[Click Here]({self.discord} "{self.discord}")'
-                if self.discord is not None
+                "value": f'[Click Here]({self.ircchan} "{self.ircchan}")'
+                if self.ircchan is not None
                 else "None",
             },
             {
@@ -321,4 +320,4 @@ class Alliance(Makeable):
         self.flag_url = data["flag_url"]
         self.forum_url = data["forum_url"]
         self.ircchan = data["ircchan"]
-        self.discord = self.ircchan
+        self.ircchan = self.ircchan
