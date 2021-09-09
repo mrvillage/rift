@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Mapping, Sequence, Union
+from typing import TYPE_CHECKING, Mapping, Optional, Sequence, Union
 
 from ..query import query_alliances, query_treaties
 
@@ -50,7 +50,7 @@ class Treaties:
 
 class Treaty:
     started: str
-    stopped: str
+    stopped: Optional[str]
     from_: Alliance
     to_: Alliance
     treaty_type: str
@@ -58,11 +58,11 @@ class Treaty:
     __slots__ = ("started", "stopped", "from_", "to_", "treaty_type")
 
     def __init__(self, data: TreatyData, alliances: Mapping[int, Alliance]) -> None:
-        self.started = data[0]
-        self.stopped = data[1]
-        self.from_ = alliances[data[2]]
-        self.to_ = alliances[data[3]]
-        self.treaty_type = data[4]
+        self.started = data["started"]
+        self.stopped = data["stopped"]
+        self.from_ = alliances[data["from_"]]
+        self.to_ = alliances[data["to_"]]
+        self.treaty_type = data["treaty_type"]
 
     def __str__(self) -> str:
         if self.treaty_type == "Protectorate":
