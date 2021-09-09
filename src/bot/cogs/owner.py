@@ -244,7 +244,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             await ctx.channel.purge(limit=purge)
         message = await ctx.send("Fetching...")
         invites = []
-        alliances = [Alliance(tuple(i)) for i in await query_alliances()]
+        alliances = [Alliance(dict(i)) for i in await query_alliances()]
         for alliance in alliances:
             try:
                 if alliance.ircchan is None:

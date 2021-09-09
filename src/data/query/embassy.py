@@ -52,7 +52,7 @@ async def query_embassy_by_guild(guild_id: int) -> Tuple[EmbassyData, ...]:
     for dat in raw:
         if TYPE_CHECKING:
             assert isinstance(data, EmbassyData)
-        data.append(dat)
+        data.append(dict(dat))
     return tuple(data)
 
 
@@ -103,5 +103,5 @@ async def query_embassy_config_by_guild(guild_id: int) -> Tuple[EmbassyConfigDat
     for dat in raw:
         if TYPE_CHECKING:
             assert isinstance(data, EmbassyConfigData)
-        data.append(dat)
+        data.append(dict(dat))
     return tuple(data)

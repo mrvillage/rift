@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Mapping, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Union
 
 import discord
 
@@ -12,7 +12,7 @@ from .nation import Nation
 __all__ = ("UserSettings", "GuildWelcomeSettings", "GuildSettings")
 
 if TYPE_CHECKING:
-    from typings import GuildWelcomeSettingsData
+    from typings import GuildSettingsData, GuildWelcomeSettingsData
 
 
 class UserSettings(Makeable):
@@ -50,22 +50,41 @@ class GuildWelcomeSettings(Makeable):
     def __init__(self, data: GuildWelcomeSettingsData) -> None:
         self.defaulted = False
         self.guild_id: int = int(data["guild_id"])
-        self.welcome_message: Union[str, None] = data["welcome_message"]
-        self.welcome_channels: Union[list[int], None] = data["welcome_channels"]
-        self.join_roles: Union[list[int], None] = data["join_roles"]
-        self.verified_roles: Union[list[int], None] = data["verified_roles"]
-        self.member_roles: Union[list[int], None] = data["member_roles"]
-        self.global_city_roles: Union[dict, None] = data["global_city_roles"]
-        self.member_city_roles: Union[dict, None] = data["member_city_roles"]
-        self.diplomat_roles: Union[dict, None] = data["diplomat_roles"]
-        self.alliance_roles: Union[dict, None] = data["alliance_roles"]
-        self.alliance_gov_roles: Union[dict, None] = data["alliance_gov_roles"]
-        self.verified_nickname: Union[str, None] = data["verified_nickname"]
+        self.welcome_message: Optional[str] = data["welcome_message"]
+        self.welcome_channels: Optional[List[int]] = data["welcome_channels"]
+        self.join_roles: Optional[List[int]] = data["join_roles"]
+        self.verified_roles: Optional[List[int]] = data["verified_roles"]
+        self.member_roles: Optional[List[int]] = data["member_roles"]
+        self.global_city_roles: Optional[Dict[str, List[int]]] = data[
+            "global_city_roles"
+        ]
+        self.member_city_roles: Optional[Dict[str, List[int]]] = data[
+            "member_city_roles"
+        ]
+        self.diplomat_roles: Optional[Dict[str, List[int]]] = data["diplomat_roles"]
+        self.alliance_roles: Optional[Dict[str, List[int]]] = data["alliance_roles"]
+        self.alliance_gov_roles: Optional[Dict[str, List[int]]] = data[
+            "alliance_gov_roles"
+        ]
+        self.verified_nickname: Optional[str] = data["verified_nickname"]
 
     @classmethod
     def default(cls, guild_id: int) -> GuildWelcomeSettings:
         settings = cls(
-            (guild_id, None, "[]", "[]", "[]", "[]", "{}", "{}", "{}", "{}", "{}", None)
+            {
+                "guild_id": guild_id,
+                "welcome_message": None,
+                "welcome_channels": None,
+                "join_roles": None,
+                "verified_roles": None,
+                "member_roles": None,
+                "global_city_roles": None,
+                "member_city_roles": None,
+                "diplomat_roles": None,
+                "alliance_roles": None,
+                "alliance_gov_roles": None,
+                "verified_nickname": None,
+            }
         )
         settings.defaulted = True
         return settings

@@ -141,7 +141,7 @@ class Alliance(Makeable):
         from .nation import Nation
 
         members = await query_members(alliance_id=self.id)
-        members = [tuple(i) for i in members]
+        members = [dict(i) for i in members]
         self.members = [Nation(data=i) for i in members]
 
     async def _make_vm_members(self) -> None:
@@ -160,7 +160,7 @@ class Alliance(Makeable):
         from .nation import Nation
 
         applicants = await query_applicants(alliance_id=self.id)
-        applicants = [tuple(i) for i in applicants]
+        applicants = [dict(i) for i in applicants]
         self.applicants = [Nation(data=i) for i in applicants]
 
     async def _make_calculated_score(self) -> None:
