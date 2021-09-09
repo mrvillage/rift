@@ -7,5 +7,5 @@ class TreatyData(TypedDict):
     started: str
     stopped: Optional[str]
     from_: int
-    to: int
+    to_: int
     treaty_type: str
