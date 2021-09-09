@@ -11,7 +11,7 @@ class GuildSettingsData(TypedDict):
 
 class GuildWelcomeSettingsData(TypedDict):
     guild_id: int
-    welcome_message: str
+    welcome_message: Optional[str]
     welcome_channels: Optional[List[int]]
     join_roles: Optional[List[int]]
     verified_roles: Optional[List[int]]
