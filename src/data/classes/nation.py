@@ -38,7 +38,6 @@ class Nation(Makeable):
         "domestic_policy",
         "color",
         "alliance_id",
-        "alliance",
         "alliance_position",
         "cities",
         "offensive_wars",
@@ -61,31 +60,32 @@ class Nation(Makeable):
     )
 
     def __init__(self, data: NationData):
-        self.id = data["id"]
-        self.name = data["name"]
-        self.leader = data["leader"]
-        self.continent = utils.get_continent(data["continent"])
-        self.war_policy = utils.get_war_policy(data["war_policy"])
-        self.domestic_policy = utils.get_domestic_policy(data["domestic_policy"])
-        self.color = utils.get_color(data["color"])
-        self.alliance_id = data["alliance_id"]
-        self.alliance = data["alliance"] if data["alliance"] != "None" else None
-        self.alliance_position = utils.get_alliance_position(data["alliance_position"])
-        self.cities = data["cities"]
-        self.offensive_wars = data["offensive_wars"]
-        self.defensive_wars = data["defensive_wars"]
-        self.score = data["score"]
-        self.v_mode = data["v_mode"]
-        self.v_mode_turns = data["v_mode_turns"]
-        self.beige_turns = data["beige_turns"]
-        self.last_active = data["last_active"]
-        self.founded = data["founded"]
-        self.soldiers = data["soldiers"]
-        self.tanks = data["tanks"]
-        self.aircraft = data["aircraft"]
-        self.ships = data["ships"]
-        self.missiles = data["missiles"]
-        self.nukes = data["nukes"]
+        self.id: int = data["id"]
+        self.name: str = data["name"]
+        self.leader: str = data["leader"]
+        self.continent: str = utils.get_continent(data["continent"])
+        self.war_policy: str = utils.get_war_policy(data["war_policy"])
+        self.domestic_policy: str = utils.get_domestic_policy(data["domestic_policy"])
+        self.color: str = utils.get_color(data["color"])
+        self.alliance_id: int = data["alliance_id"]
+        self.alliance_position: str = utils.get_alliance_position(
+            data["alliance_position"]
+        )
+        self.cities: int = data["cities"]
+        self.offensive_wars: int = data["offensive_wars"]
+        self.defensive_wars: int = data["defensive_wars"]
+        self.score: float = data["score"]
+        self.v_mode: bool = data["v_mode"]
+        self.v_mode_turns: int = data["v_mode_turns"]
+        self.beige_turns: int = data["beige_turns"]
+        self.last_active: str = data["last_active"]
+        self.founded: str = data["founded"]
+        self.soldiers: int = data["soldiers"]
+        self.tanks: int = data["tanks"]
+        self.aircraft: int = data["aircraft"]
+        self.ships: int = data["ships"]
+        self.missiles: int = data["missiles"]
+        self.nukes: int = data["nukes"]
 
     def __repr__(self):
         return f"{self.id} - {self.name}"
