@@ -40,6 +40,15 @@ class ResourcePrice:
         self.lowest_sell: TradeOffer = TradeOffer(data["lowestbuy"])
         self.trade_margin: int = self.lowest_sell.price - self.highest_buy.price
 
+    def _update(self, data: ResourcePriceData):
+        self.name: str = data["resource"]
+        self.average_price: int = int(data["avgprice"])
+        self.avg_price: int = self.average_price
+        self.market_index: int = int(data["marketindex"].replace(",", ""))
+        self.highest_buy: TradeOffer = TradeOffer(data["highestbuy"])
+        self.lowest_sell: TradeOffer = TradeOffer(data["lowestbuy"])
+        self.trade_margin: int = self.lowest_sell.price - self.highest_buy.price
+
 
 class TradePrices:
     __slots__ = (
@@ -74,5 +83,17 @@ class TradePrices:
         self.food: ResourcePrice = ResourcePrice(data["food"])
         self.market_index: int = self.credit.market_index
 
-    def _update(self, data, /) -> TradeOffer:
-        ...
+    def _update(self, data: TradePriceData):
+        self.credit: ResourcePrice = ResourcePrice._update(data["credit"])
+        self.coal: ResourcePrice = ResourcePrice._update(data["coal"])
+        self.oil: ResourcePrice = ResourcePrice._update(data["oil"])
+        self.uranium: ResourcePrice = ResourcePrice._update(data["uranium"])
+        self.lead: ResourcePrice = ResourcePrice._update(data["lead"])
+        self.iron: ResourcePrice = ResourcePrice._update(data["iron"])
+        self.bauxite: ResourcePrice = ResourcePrice._update(data["bauxite"])
+        self.gasoline: ResourcePrice = ResourcePrice._update(data["gasoline"])
+        self.munitions: ResourcePrice = ResourcePrice._update(data["munitions"])
+        self.steel: ResourcePrice = ResourcePrice._update(data["steel"])
+        self.aluminum: ResourcePrice = ResourcePrice._update(data["aluminum"])
+        self.food: ResourcePrice = ResourcePrice._update(data["food"])
+        self.market_index: int = self.credit.market_index
