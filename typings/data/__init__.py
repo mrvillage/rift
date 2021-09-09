@@ -5,5 +5,6 @@ from .embassy import *
 from .link import *
 from .menu import *
 from .nation import *
+from .prices import *
 from .settings import *
 from .ticket import *
