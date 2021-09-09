@@ -47,7 +47,8 @@ class Link(commands.Cog):
         message = await ctx.reply(
             embed=funcs.get_embed_author_member(
                 member, "Fetching Discord username...", color=discord.Color.orange()
-            )
+            ),
+            return_message=True,
         )
         try:
             name = await nation.get_discord_page_username()
