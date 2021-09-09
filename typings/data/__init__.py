@@ -8,3 +8,4 @@ from .nation import *
 from .prices import *
 from .settings import *
 from .ticket import *
+from .treaty import *
