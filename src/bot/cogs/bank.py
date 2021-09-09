@@ -206,11 +206,13 @@ class Bank(commands.Cog):
                 funcs.get_embed_author_guild(
                     author,
                     f"You successfully transferred {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                    color=discord.Color.green(),
                 )
                 if isinstance(author, discord.Guild)
                 else funcs.get_embed_author_member(
                     author,
                     f"You successfully transferred {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                    color=discord.Color.green(),
                 )
             )
             await message.edit(embed=embed)
