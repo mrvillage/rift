@@ -21,6 +21,6 @@ class MenuInterfaceData(TypedDict):
 
 class MenuItemData(TypedDict):
     item_id: int
-    menu_id: int
+    guild_id: int
     type_: str
     data_: Dict[str, Any]  # fully type this
