@@ -5,9 +5,9 @@ from typing import TYPE_CHECKING, Any, Dict, Sequence, Union
 from urllib.parse import quote
 
 import aiohttp
+import discord
 from aiohttp import request
 from bs4 import BeautifulSoup
-from discord import Embed, NotFound, User
 from discord.ext.commands import Context
 
 from ...data.get import get_link_nation
@@ -167,14 +167,14 @@ class Nation(Makeable):
         if self.alliance_id != 0:
             self.alliance = await Alliance.fetch(self.alliance_id)
 
-    async def _make_user(self) -> User:
+    async def _make_user(self) -> None:
         from ...ref import bot
 
         try:
             self.user = await bot.fetch_user(
                 (await get_link_nation(self.id))["user_id"]
             )
-        except (IndexError, NotFound):
+        except (IndexError, discord.NotFound):
             self.user = None
 
     async def _make_partial_cities(self):
@@ -184,7 +184,7 @@ class Nation(Makeable):
         partial_cities = [dict(i) for i in partial_cities]
         self.partial_cities = [City(data=i) for i in partial_cities]
 
-    async def get_info_embed(self, ctx: Context) -> Embed:
+    async def get_info_embed(self, ctx: Context) -> discord.Embed:
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
         await self.make_attrs("alliance", "user", "partial_cities")
@@ -250,6 +250,7 @@ class Nation(Makeable):
                 timestamp=datetime.fromisoformat(self.founded),
                 footer="Nation created",
                 fields=fields,
+                color=discord.Color.blue(),
             )
             if self.user is None
             else get_embed_author_member(
@@ -258,6 +259,7 @@ class Nation(Makeable):
                 timestamp=datetime.fromisoformat(self.founded),
                 footer="Nation created",
                 fields=fields,
+                color=discord.Color.blue(),
             )
         )
 
