@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from _typeshed import ReadableBuffer
-
 __all__ = ("CityData",)
 
 
