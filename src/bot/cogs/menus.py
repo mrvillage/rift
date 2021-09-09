@@ -149,7 +149,7 @@ class Menus(commands.Cog):
                             "item_id": message.id,
                             "guild_id": ctx.guild.id,
                             "type_": "button",
-                            "data_": json.dumps(flags),
+                            "data_": flags,
                         }
                     )
                     menu.add_item(item, row)

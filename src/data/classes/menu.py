@@ -16,8 +16,8 @@ from discord.ext import commands
 
 from ...errors import MenuItemNotFoundError, MenuNotFoundError
 from ..db import execute_query, execute_read_query
-from ..query import insert_interface
 from ..get import get_menu, get_menu_item
+from ..query import insert_interface
 from .base import Makeable
 
 __all__ = ("Menu", "MenuItem")
@@ -301,7 +301,7 @@ class Menu(Makeable):
             self.guild_id,
             self.name,
             self.description,
-            dumps([[i.item_id for i in row] for row in self.items])
+            [[i.item_id for i in row] for row in self.items]
             if self.items
             else [
                 [],
@@ -310,7 +310,7 @@ class Menu(Makeable):
                 [],
                 [],
             ],
-            dumps(self.permissions) if self.permissions else None,
+            self.permissions or None,
         )
 
     def add_item(self, item: MenuItem, row: int) -> None:
@@ -417,7 +417,7 @@ class MenuItem:
             self.item_id,
             self.guild_id,
             self.type,
-            dumps(self.data),
+            self.data,
         )
 
     @staticmethod
