@@ -67,7 +67,7 @@ class Cache(commands.Cog):
     @commands.Cog.listener()
     async def on_bulk_nation_created(self, data):
         for i in data:
-            cache.hook_nation("create", i["nation"])
+            cache.hook_nation("create", i)
 
     @commands.Cog.listener()
     async def on_bulk_nation_update(self, data):
