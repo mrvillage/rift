@@ -119,7 +119,8 @@ async def about(ctx: commands.Context):
     )
 
 
-async def main() -> None:
+async def main(debug: bool = False) -> None:
+    bot.debug = debug
     with setup_logging():
         try:
             if bot.debug:
