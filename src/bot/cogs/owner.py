@@ -247,9 +247,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         alliances = [Alliance(tuple(i)) for i in await query_alliances()]
         for alliance in alliances:
             try:
-                if alliance.discord is None:
+                if alliance.ircchan is None:
                     continue
-                await self.bot.fetch_invite(alliance.discord)
+                await self.bot.fetch_invite(alliance.ircchan)
                 invites.append(alliance)
             except discord.NotFound:
                 pass
