@@ -17,14 +17,6 @@ __all__ = ("City", "FullCity")
 
 
 class City:
-    id: int
-    nation_id: int
-    name: str
-    capital: bool
-    infrastructure: float
-    max_infra: float
-    land: float
-
     __slots__ = (
         "id",
         "nation_id",
