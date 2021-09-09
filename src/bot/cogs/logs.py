@@ -23,8 +23,8 @@ class Logs(commands.Cog):
                 ctx.author.id,
                 "",
                 ctx.command and ctx.command.qualified_name,
-                json.dumps([str(i) for i in ctx.args]),
-                json.dumps({i: str(ctx.kwargs[i]) for i in ctx.kwargs}),
+                [str(i) for i in ctx.args],
+                {i: str(ctx.kwargs[i]) for i in ctx.kwargs},
             )
         await logs.insert_log(
             str(ctx.message.edited_at or ctx.message.created_at),
@@ -34,8 +34,8 @@ class Logs(commands.Cog):
             ctx.author.id,
             ctx.message.content,
             ctx.command and ctx.command.qualified_name,
-            json.dumps([str(i) for i in ctx.args]),
-            json.dumps({i: str(ctx.kwargs[i]) for i in ctx.kwargs}),
+            [str(i) for i in ctx.args],
+            {i: str(ctx.kwargs[i]) for i in ctx.kwargs},
         )
 
     @commands.Cog.listener()
