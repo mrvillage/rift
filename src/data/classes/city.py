@@ -27,7 +27,7 @@ class City:
         "land",
     )
 
-    def __init__(self, data: CityData, /) -> None:
+    def __init__(self, data: CityData) -> None:
         self.id: int = data["id"]
         self.nation_id: int = data["nation_id"]
         self.name: str = data["name"]
