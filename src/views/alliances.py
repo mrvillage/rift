@@ -46,7 +46,7 @@ class AlliancesPaginator(discord.ui.View):
                 f"**#{i.raw_rank}**: {i.id}, {i.name}, {i.calculated_score:,.2f}, {i.member_count}"
                 for i in alliances
             ),
-            color=discord.Color.green(),
+            color=discord.Color.blue(),
         )
         await interaction.response.edit_message(embed=embed, view=self)
 
@@ -81,7 +81,7 @@ class AlliancesPaginator(discord.ui.View):
                 f"**#{i.raw_rank}**: {i.id}, {i.name}, {i.calculated_score:,.2f}, {i.member_count}"
                 for i in alliances
             ),
-            color=discord.Color.green(),
+            color=discord.Color.blue(),
         )
         await interaction.response.edit_message(embed=embed, view=self)
 
@@ -123,6 +123,6 @@ class AlliancesPaginator(discord.ui.View):
                 f"**#{i.raw_rank}**: {i.id}, {i.name}, {i.calculated_score:,.2f}, {i.member_count}"
                 for i in alliances
             ),
-            color=discord.Color.green(),
+            color=discord.Color.blue(),
         )
         await interaction.response.edit_message(embed=embed, view=self)
