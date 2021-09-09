@@ -21,6 +21,8 @@ from .base import Makeable
 __all__ = ("Nation",)
 
 if TYPE_CHECKING:
+    from typings import NationData
+
     from .resources import Resources
     from .trade import TradePrices
 
@@ -58,32 +60,32 @@ class Nation(Makeable):
         "partial_cities",
     )
 
-    def __init__(self, data=None, *, nation_id=None, nation_name=None):
-        self.id = data[0]
-        self.name = data[1]
-        self.leader = data[2]
-        self.continent = utils.get_continent(data[3])
-        self.war_policy = utils.get_war_policy(data[4])
-        self.domestic_policy = utils.get_domestic_policy(data[5])
-        self.color = utils.get_color(data[6])
-        self.alliance_id = data[7]
-        self.alliance = data[8] if data[8] != "None" else None
-        self.alliance_position = utils.get_alliance_position(data[9])
-        self.cities = data[10]
-        self.offensive_wars = data[11]
-        self.defensive_wars = data[12]
-        self.score = data[13]
-        self.v_mode = data[14]
-        self.v_mode_turns = data[15]
-        self.beige_turns = data[16]
-        self.last_active = data[17]
-        self.founded = data[18]
-        self.soldiers = data[19]
-        self.tanks = data[20]
-        self.aircraft = data[21]
-        self.ships = data[22]
-        self.missiles = data[23]
-        self.nukes = data[24]
+    def __init__(self, data: NationData):
+        self.id = data["id"]
+        self.name = data["name"]
+        self.leader = data["leader"]
+        self.continent = utils.get_continent(data["continent"])
+        self.war_policy = utils.get_war_policy(data["war_policy"])
+        self.domestic_policy = utils.get_domestic_policy(data["domestic_policy"])
+        self.color = utils.get_color(data["color"])
+        self.alliance_id = data["alliance_id"]
+        self.alliance = data["alliance"] if data["alliance"] != "None" else None
+        self.alliance_position = utils.get_alliance_position(data["alliance_position"])
+        self.cities = data["cities"]
+        self.offensive_wars = data["offensive_wars"]
+        self.defensive_wars = data["defensive_wars"]
+        self.score = data["score"]
+        self.v_mode = data["v_mode"]
+        self.v_mode_turns = data["v_mode_turns"]
+        self.beige_turns = data["beige_turns"]
+        self.last_active = data["last_active"]
+        self.founded = data["founded"]
+        self.soldiers = data["soldiers"]
+        self.tanks = data["tanks"]
+        self.aircraft = data["aircraft"]
+        self.ships = data["ships"]
+        self.missiles = data["missiles"]
+        self.nukes = data["nukes"]
 
     def __repr__(self):
         return f"{self.id} - {self.name}"

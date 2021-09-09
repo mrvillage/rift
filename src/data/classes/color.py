@@ -1,28 +1,25 @@
 from __future__ import annotations
-from typing import Dict, TYPE_CHECKING, Union
+
+from typing import TYPE_CHECKING, Dict, Union
 
 from ..query import query_color
 
 __all__ = ("Color",)
 
+if TYPE_CHECKING:
+    from typings import ColorData
+
 
 class Color:
-    data: Dict[str, Union[int, str]]
     color: str
     name: str
     bloc_name: str
     bonus: int
     turn_bonus: int
 
-    __slots__ = ("data", "color", "name", "bloc_name", "bonus", "turn_bonus")
+    __slots__ = ("color", "name", "bloc_name", "bonus", "turn_bonus")
 
-    def __init__(self, data: Dict[str, Union[int, str]]) -> None:
-        if TYPE_CHECKING:
-            assert (
-                isinstance(data["color"], str)
-                and isinstance(data["bloc_name"], str)
-                and isinstance(data["turn_bonus"], int)
-            )
+    def __init__(self, data: ColorData) -> None:
         self.color = data["color"]
         self.name = data["bloc_name"]
         self.bloc_name = self.name

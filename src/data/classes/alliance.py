@@ -6,12 +6,10 @@ from typing import TYPE_CHECKING, Dict, Optional, Union
 import discord
 from discord.ext.commands.context import Context
 
-from src.data.query.alliance import query_applicants, query_members
-
 from ...errors import AllianceNotFoundError
 from ...find import search_alliance
 from ...ref import bot
-from ..query import query_alliance
+from ..query import query_alliance, query_applicants, query_members
 from .base import Makeable
 from .resources import Resources
 

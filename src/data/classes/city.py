@@ -4,12 +4,13 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
 
 import pnwkit
 
-from ..query import query_city
 from ..requests import get_city_build
 from .base import Makeable
 from .resources import Resources
 
 if TYPE_CHECKING:
+    from typings import CityData
+
     from .nation import Nation
 
 __all__ = ("City", "FullCity")
@@ -21,7 +22,7 @@ class City:
     name: str
     capital: bool
     infrastructure: float
-    maxinfra: float
+    max_infra: float
     land: float
 
     __slots__ = (
@@ -30,18 +31,18 @@ class City:
         "name",
         "capital",
         "infrastructure",
-        "maxinfra",
+        "max_infra",
         "land",
     )
 
-    def __init__(self, data, *, city_id=None, city_name=None) -> None:
-        self.id = data[0]
-        self.nation_id = data[1]
-        self.name = data[2]
-        self.capital = data[3]
-        self.infrastructure = data[4]
-        self.maxinfra = data[5]
-        self.land = data[6]
+    def __init__(self, data: CityData, /) -> None:
+        self.id: int = data["id"]
+        self.nation_id: int = data["nation_id"]
+        self.name: str = data["name"]
+        self.capital: bool = data["capital"]
+        self.infrastructure: float = data["infrastructure"]
+        self.max_infra: float = data["max_infra"]
+        self.land: float = data["land"]
 
     def __repr__(self) -> str:
         return f"{self.id} - {self.name}"
@@ -51,7 +52,7 @@ class City:
         self.name = data[2]
         self.capital = data[3]
         self.infrastructure = data[4]
-        self.maxinfra = data[5]
+        self.max_infra = data[5]
         self.land = data[6]
         return self
 
