@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import TYPE_CHECKING, Mapping, Sequence, Union
 
 import discord
-from typing import Sequence, Mapping, TYPE_CHECKING, Union, cast
 
 from ..env import COLOR, FOOTER
 
@@ -44,7 +44,7 @@ def get_embed_author_member(
         .set_footer(text=footer)
         .set_author(
             name=f"{member.name}#{member.discriminator}",
-            icon_url=str(member.avatar.url),
+            icon_url=str(member.display_avatar.url),
         )
         .set_image(url=image_url),
         fields,
