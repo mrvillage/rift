@@ -31,7 +31,9 @@ class Treaties:
         treaties = await query_treaties(alliance.id)
         treaties = [i for i in treaties if i[1] is None]
         treaties = [
-            Treaty(i, alliances) if i[2] == alliance.id else Treaty(dict(i), alliances)
+            Treaty(dict(i), alliances)
+            if i[2] == alliance.id
+            else Treaty(dict(i), alliances)
             for i in treaties
         ]
         return cls(alliance, treaties)
