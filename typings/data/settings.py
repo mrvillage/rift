@@ -21,4 +21,4 @@ class GuildWelcomeSettingsData(TypedDict):
     diplomat_roles: Optional[Dict[str, List[int]]]
     alliance_roles: Optional[Dict[str, List[int]]]
     alliance_gov_roles: Optional[Dict[str, List[int]]]
-    verified_nickname: str
+    verified_nickname: Optional[str]
