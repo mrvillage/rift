@@ -44,9 +44,6 @@ class Treaties:
     def __getitem__(self, index: int) -> Treaty:
         return self.treaties[index]
 
-    def _update(self, data, /) -> Treaties:
-        ...
-
 
 class Treaty:
     started: str
@@ -69,5 +66,9 @@ class Treaty:
             return f"**{self.treaty_type}:** {self.from_} --> {self.to_}"
         return f"**{self.treaty_type}:** {self.from_} <--> {self.to_}"
 
-    def _update(self, data, /) -> Treaty:
-        ...
+    def _update(self, data: TreatyData, alliances: Mapping[int, Alliance]) -> None:
+        self.started = data["started"]
+        self.stopped = data["stopped"]
+        self.from_ = alliances[data["from_"]]
+        self.to_ = alliances[data["to_"]]
+        self.treaty_type = data["treaty_type"]

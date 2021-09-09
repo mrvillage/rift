@@ -39,15 +39,6 @@ class City:
     def __repr__(self) -> str:
         return f"{self.id} - {self.name}"
 
-    def _update(self, *, city_id=None, city_name=None, data) -> City:
-        self.id = data[0]
-        self.name = data[2]
-        self.capital = data[3]
-        self.infrastructure = data[4]
-        self.max_infra = data[5]
-        self.land = data[6]
-        return self
-
     async def _make_nation(self) -> None:
         from .nation import Nation
 
@@ -68,8 +59,14 @@ class City:
     def __float__(self) -> Tuple[float, float]:
         return self.infrastructure, self.land
 
-    def _update(self, data, /) -> City:
-        ...
+    def _update(self, data: CityData, /) -> None:
+        self.id: int = data["id"]
+        self.nation_id: int = data["nation_id"]
+        self.name: str = data["name"]
+        self.capital: bool = data["capital"]
+        self.infrastructure: float = data["infrastructure"]
+        self.max_infra: float = data["max_infra"]
+        self.land: float = data["land"]
 
 
 class FullCity(Makeable):

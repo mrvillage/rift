@@ -90,34 +90,6 @@ class Nation(Makeable):
     def __repr__(self):
         return f"{self.id} - {self.name}"
 
-    def _update(self, *, nation_id=None, nation_name=None, data=None):
-        self.id = data[0]
-        self.name = data[1]
-        self.leader = data[2]
-        self.continent = utils.get_continent(data[3])
-        self.war_policy = utils.get_war_policy(data[4])
-        self.domestic_policy = utils.get_domestic_policy(data[5])
-        self.color = utils.get_color(data[6])
-        self.alliance_id = data[7]
-        self.alliance = data[8] if data[8] != "None" else None
-        self.alliance_position = utils.get_alliance_position(data[9])
-        self.cities = data[10]
-        self.offensive_wars = data[11]
-        self.defensive_wars = data[12]
-        self.score = data[13]
-        self.v_mode = data[14]
-        self.v_mode_turns = data[15]
-        self.beige_turns = data[16]
-        self.last_active = data[17]
-        self.founded = data[18]
-        self.soldiers = data[19]
-        self.tanks = data[20]
-        self.aircraft = data[21]
-        self.ships = data[22]
-        self.missiles = data[23]
-        self.nukes = data[24]
-        return self
-
     async def send_message(self, *, subject=None, content=None):
         from ...ref import bot
 
@@ -417,5 +389,30 @@ class Nation(Makeable):
         revenue["trade_bonus"] = bonus
         return revenue
 
-    def _update(self, data, /) -> Nation:
-        ...
+    def _update(self, data: NationData):
+        self.id: int = data["id"]
+        self.name: str = data["name"]
+        self.leader: str = data["leader"]
+        self.continent: str = utils.get_continent(data["continent"])
+        self.war_policy: str = utils.get_war_policy(data["war_policy"])
+        self.domestic_policy: str = utils.get_domestic_policy(data["domestic_policy"])
+        self.color: str = utils.get_color(data["color"])
+        self.alliance_id: int = data["alliance_id"]
+        self.alliance_position: str = utils.get_alliance_position(
+            data["alliance_position"]
+        )
+        self.cities: int = data["cities"]
+        self.offensive_wars: int = data["offensive_wars"]
+        self.defensive_wars: int = data["defensive_wars"]
+        self.score: float = data["score"]
+        self.v_mode: bool = data["v_mode"]
+        self.v_mode_turns: int = data["v_mode_turns"]
+        self.beige_turns: int = data["beige_turns"]
+        self.last_active: str = data["last_active"]
+        self.founded: str = data["founded"]
+        self.soldiers: int = data["soldiers"]
+        self.tanks: int = data["tanks"]
+        self.aircraft: int = data["aircraft"]
+        self.ships: int = data["ships"]
+        self.missiles: int = data["missiles"]
+        self.nukes: int = data["nukes"]

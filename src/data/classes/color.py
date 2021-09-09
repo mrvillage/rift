@@ -24,5 +24,9 @@ class Color:
     async def fetch(cls, name: str) -> Color:
         return cls(await query_color(name))
 
-    def _update(self, data, /) -> Color:
-        ...
+    def _update(self, data: ColorData) -> None:
+        self.color = data["color"]
+        self.name = data["bloc_name"]
+        self.bloc_name = self.name
+        self.bonus = data["turn_bonus"]
+        self.turn_bonus = self.bonus
