@@ -130,7 +130,7 @@ class Menus(commands.Cog):
                         try:
                             if TYPE_CHECKING:
                                 assert isinstance(flags["id"], str)
-                            item = await MenuItem.fetch(int(flags["id"]))
+                            item = await MenuItem.fetch(int(flags["id"]), ctx.guild.id)
                             if item.guild_id == ctx.author.id:
                                 menu.add_item(item, row)
                                 continue
@@ -190,7 +190,8 @@ class Menus(commands.Cog):
                 await main_message.reply(
                     embed=funcs.get_embed_author_member(
                         ctx.author,
-                        "\n\n".join(str(j) for i in menu.items for j in i),
+                        f"Menu ID: {menu.menu_id}\n\n"
+                        + "\n\n".join(str(j) for i in menu.items for j in i),
                         color=discord.Color.green(),
                     )
                 )
@@ -239,6 +240,7 @@ class Menus(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
+                f"Menu ID: {menu.menu_id}\n\n"
                 "\n\n".join(str(j) for i in menu.items for j in i),
                 color=discord.Color.green(),
             )
