@@ -28,7 +28,7 @@ async def get_alliances_offset(*, limit: int = 50, offset: int = 0) -> List[Alli
     from ..classes import Alliance
 
     return [
-        Alliance(data=list(i.values()))
+        Alliance(data=dict(i))
         for i in await query_alliances_offset(limit=limit, offset=offset)
     ]
 
