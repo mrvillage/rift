@@ -11,12 +11,6 @@ if TYPE_CHECKING:
 
 
 class Color:
-    color: str
-    name: str
-    bloc_name: str
-    bonus: int
-    turn_bonus: int
-
     __slots__ = ("color", "name", "bloc_name", "bonus", "turn_bonus")
 
     def __init__(self, data: ColorData) -> None:
