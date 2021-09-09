@@ -181,7 +181,7 @@ class Nation(Makeable):
         from .city import City
 
         partial_cities = await query_nation_cities(self.id)
-        partial_cities = [tuple(i) for i in partial_cities]
+        partial_cities = [dict(i) for i in partial_cities]
         self.partial_cities = [City(data=i) for i in partial_cities]
 
     async def get_info_embed(self, ctx: Context) -> Embed:

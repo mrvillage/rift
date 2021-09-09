@@ -53,7 +53,7 @@ async def query_ticket_by_guild(guild_id: int) -> Tuple[TicketData, ...]:
     for dat in raw:
         if TYPE_CHECKING:
             assert isinstance(data, TicketConfigData)
-        data.append(dat)
+        data.append(dict(dat))
     return tuple(data)
 
 
@@ -104,7 +104,7 @@ async def query_ticket_config_by_guild(guild_id: int) -> Tuple[TicketConfigData,
     for dat in raw:
         if TYPE_CHECKING:
             assert isinstance(data, TicketConfigData)
-        data.append(dat)
+        data.append(dict(dat))
     return tuple(data)
 
 
