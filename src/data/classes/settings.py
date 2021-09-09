@@ -153,8 +153,8 @@ class GuildSettings(Makeable):
 
     __slots__ = ("guild_id", "welcome_settings", "defaulted")
 
-    def __init__(self, data: Union[list, tuple]) -> None:
-        self.guild_id: int = data[0]
+    def __init__(self, data: GuildSettingsData) -> None:
+        self.guild_id: int = data["guild_id"]
         ...
 
     async def _make_welcome_settings(self) -> None:
