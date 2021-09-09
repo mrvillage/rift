@@ -7,6 +7,8 @@ from ..query import query_alliances, query_treaties
 __all__ = ("Treaties", "Treaty")
 
 if TYPE_CHECKING:
+    from typings import TreatyData
+
     from .alliance import Alliance
 
 
@@ -16,7 +18,7 @@ class Treaties:
 
     __slots__ = ("alliance", "treaties")
 
-    def __init__(self, alliance, treaties: Sequence[Treaty]) -> None:
+    def __init__(self, alliance: Alliance, treaties: Sequence[Treaty]) -> None:
         self.alliance = alliance
         self.treaties = treaties
 
@@ -29,9 +31,7 @@ class Treaties:
         treaties = await query_treaties(alliance.id)
         treaties = [i for i in treaties if i[1] is None]
         treaties = [
-            Treaty(i, alliances)
-            if i[2] == alliance.id
-            else Treaty((i[0], i[1], i[3], i[2], i[4]), alliances)
+            Treaty(i, alliances) if i[2] == alliance.id else Treaty(dict(i), alliances)
             for i in treaties
         ]
         return cls(alliance, treaties)
@@ -55,9 +55,7 @@ class Treaty:
 
     __slots__ = ("started", "stopped", "from_", "to_", "treaty_type")
 
-    def __init__(
-        self, data: Sequence[str, Union[int, str]], alliances: Mapping[int, Alliance]
-    ) -> None:
+    def __init__(self, data: TreatyData, alliances: Mapping[int, Alliance]) -> None:
         self.started = data[0]
         self.stopped = data[1]
         self.from_ = alliances[data[2]]

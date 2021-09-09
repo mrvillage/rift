@@ -22,6 +22,9 @@ from .base import Makeable
 
 __all__ = ("Menu", "MenuItem")
 
+if TYPE_CHECKING:
+    from typings import MenuData, MenuItemData
+
 
 class View(discord.ui.View):
     def __init__(self, *args, **kwargs) -> None:
@@ -231,7 +234,7 @@ class Menu(Makeable):
         "items",
     )
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: MenuData) -> None:
         self.menu_id = data["menu_id"]
         self.guild_id = data["guild_id"]
         self.name = data["name"]
@@ -354,7 +357,7 @@ class Menu(Makeable):
 class MenuItem:
     __slots__ = ("item_id", "guild_id", "type", "data")
 
-    def __init__(self, data: Mapping[str, Any]) -> None:
+    def __init__(self, data: MenuItemData) -> None:
         self.item_id = data["item_id"]
         self.guild_id = data["guild_id"]
         self.type = data["type_"]

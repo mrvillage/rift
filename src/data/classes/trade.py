@@ -1,13 +1,17 @@
 import json
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 __all__ = ("TradePrices",)
+
+if TYPE_CHECKING:
+    from typings import ResourcePriceData, TradeOfferData, TradePriceData
 
 
 class TradeOffer:
     __slots__ = ("data", "datetime", "nation_id", "amount", "price", "total_value")
 
-    def __init__(self, data: dict):
+    def __init__(self, data: TradeOfferData):
         self.datetime = datetime.fromisoformat(data["date"])
         self.nation_id = int(data["nationid"])
         self.amount = int(data["amount"])
@@ -27,7 +31,7 @@ class ResourcePrice:
         "trade_margin",
     )
 
-    def __init__(self, data: dict):
+    def __init__(self, data: ResourcePriceData):
         self.name = data["resource"]
         self.average_price = int(data["avgprice"])
         self.avg_price = self.average_price
@@ -55,7 +59,7 @@ class TradePrices:
         "market_index",
     )
 
-    def __init__(self, data):
+    def __init__(self, data: TradePriceData):
         self.credit = ResourcePrice(data["credit"])
         self.coal = ResourcePrice(data["coal"])
         self.oil = ResourcePrice(data["oil"])
