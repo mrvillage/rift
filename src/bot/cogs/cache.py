@@ -67,7 +67,7 @@ class Cache(commands.Cog):
     @commands.Cog.listener()
     async def on_bulk_nation_created(self, data):
         for i in data:
-            cache.hook_nation("create", i)
+            cache.hook_nation("create", i["nation"])
 
     @commands.Cog.listener()
     async def on_bulk_nation_update(self, data):
@@ -109,7 +109,6 @@ class Cache(commands.Cog):
 
     @tasks.loop(hours=1)
     async def verify_cache_integrity(self):
-        await self.bot.wait_until_ready()
         if not self.bot.is_ready():
             return
         for key in cache.validate.__dict__.keys():
