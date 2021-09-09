@@ -10,6 +10,7 @@ import discord
 from discord.ext import commands
 
 from .. import funcs
+from ..cache import cache
 from ..data.classes import Menu
 from ..data.query import query_menus
 from ..env import DEBUG_TOKEN, TOKEN, __version__
@@ -95,6 +96,10 @@ async def on_ready():
 
     await bot.register_application_commands()
     print("Application commands registered!", flush=True)
+
+    if not cache.init:
+        await cache.initialize()
+        print("Cache initialized!", flush=True)
 
     print("Startup complete!", flush=True)
 
