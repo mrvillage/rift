@@ -88,4 +88,5 @@ bot = Rift(
     debug_command_prefix="!!",
     debug_guild_id=654109011473596417,
     debug=debug,
+    chunk_guilds_at_startup=True,
 )
