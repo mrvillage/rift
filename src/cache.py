@@ -13,13 +13,14 @@ __all__ = ("cache",)
 
 
 class Validate:
-    alliances: bool = False
-    cities: bool = False
-    colors: bool = False
-    nations: bool = False
-    prices: bool = False
-    treasures: bool = False
-    treaties: bool = False
+    def __init__(self) -> None:
+        self.alliances: bool = False
+        self.cities: bool = False
+        self.colors: bool = False
+        self.nations: bool = False
+        self.prices: bool = False
+        self.treasures: bool = False
+        self.treaties: bool = False
 
 
 class Cache:
@@ -72,7 +73,7 @@ class Cache:
         self._war_attacks = {}  # NO CLASS YET
         self._wars = {}  # NO CLASS YET
         self.init: bool = False
-        self.validate: Type[Validate] = Validate
+        self.validate: Validate = Validate()
 
     async def initialize(self):
         queries = [
