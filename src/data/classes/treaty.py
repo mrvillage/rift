@@ -29,13 +29,8 @@ class Treaties:
         alliances = await query_alliances()
         alliances = {i[0]: Alliance(data=i) for i in alliances}
         treaties = await query_treaties(alliance.id)
-        treaties = [i for i in treaties if i[1] is None]
-        treaties = [
-            Treaty(dict(i), alliances)
-            if i[2] == alliance.id
-            else Treaty(dict(i), alliances)
-            for i in treaties
-        ]
+        treaties = [i for i in treaties if i["stopped"] is None]
+        treaties = [Treaty(dict(i), alliances) for i in treaties]
         return cls(alliance, treaties)
 
     def __str__(self) -> str:
