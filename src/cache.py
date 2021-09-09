@@ -149,7 +149,7 @@ class Cache:
             self._nations[i.id] = i
         # for some reason is the only JSON type to give string, so did compatible with proper loading fix here
         self._prices = TradePrices(
-            {
+            {  # type: ignore
                 key: json.loads(value)
                 if key != "datetime" and isinstance(value, str)
                 else value
