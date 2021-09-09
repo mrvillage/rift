@@ -4,11 +4,9 @@ from typing import TYPE_CHECKING, Union
 import discord
 from discord.ext import commands
 
-from ... import find
-from ... import funcs
-from ... import perms
-from ...data.classes.bank import Transaction
+from ... import find, funcs, perms
 from ...data.classes import Alliance, Nation
+from ...data.classes.bank import Transaction
 from ...errors import AllianceNotFoundError, NationNotFoundError, RecipientNotFoundError
 from ...ref import Rift
 
@@ -287,7 +285,8 @@ class Bank(commands.Cog):
                 ctx.author,
                 f"Fetching the current bank holdings of {repr(alliance)}...",
                 color=discord.Color.orange(),
-            )
+            ),
+            return_message=True,
         )
         resources = await alliance.get_resources()
         await message.edit(
