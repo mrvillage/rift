@@ -109,8 +109,6 @@ class Cache(commands.Cog):
 
     @tasks.loop(hours=1)
     async def verify_cache_integrity(self):
-        if not self.bot.is_ready():
-            return
         for key in cache.validate.__dict__.keys():
             setattr(cache.validate, key, True)
 
@@ -118,7 +116,7 @@ class Cache(commands.Cog):
     async def before_verify_cache_integrity(self):
         await self.bot.wait_until_ready()
         now = datetime.datetime.utcnow()
-        wait = now.replace(minute=59, second=0)
+        wait = now.replace(minute=59, second=45)
         while wait < now:
             wait += datetime.timedelta(hours=1)
         await discord.utils.sleep_until(wait)
