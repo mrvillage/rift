@@ -1,20 +1,20 @@
 from __future__ import annotations
-from src.data.query.embassy import query_embassy_by_guild
 
 from typing import TYPE_CHECKING, Optional, Tuple, Union
 
 import discord
 from discord.ext import commands
-from ..query import query_embassy_config
 
 from ..db import execute_query, execute_read_query
 from ..get import get_embassy
+from ..query import query_embassy_by_guild, query_embassy_config
 
 __all__ = ("Embassy", "EmbassyConfig")
 
 if TYPE_CHECKING:
-    from .alliance import Alliance
     from typings import EmbassyConfigData, EmbassyData
+
+    from .alliance import Alliance
 
 
 class Embassy:
