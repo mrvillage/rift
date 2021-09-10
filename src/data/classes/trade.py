@@ -86,16 +86,16 @@ class TradePrices:
         self.market_index: int = self.credit.market_index
 
     def _update(self, data: TradePriceData):
-        self.credit: ResourcePrice = ResourcePrice._update(data["credit"])
-        self.coal: ResourcePrice = ResourcePrice._update(data["coal"])
-        self.oil: ResourcePrice = ResourcePrice._update(data["oil"])
-        self.uranium: ResourcePrice = ResourcePrice._update(data["uranium"])
-        self.lead: ResourcePrice = ResourcePrice._update(data["lead"])
-        self.iron: ResourcePrice = ResourcePrice._update(data["iron"])
-        self.bauxite: ResourcePrice = ResourcePrice._update(data["bauxite"])
-        self.gasoline: ResourcePrice = ResourcePrice._update(data["gasoline"])
-        self.munitions: ResourcePrice = ResourcePrice._update(data["munitions"])
-        self.steel: ResourcePrice = ResourcePrice._update(data["steel"])
-        self.aluminum: ResourcePrice = ResourcePrice._update(data["aluminum"])
-        self.food: ResourcePrice = ResourcePrice._update(data["food"])
+        self.credit._update(data["credit"])
+        self.coal._update(data["coal"])
+        self.oil._update(data["oil"])
+        self.uranium._update(data["uranium"])
+        self.lead._update(data["lead"])
+        self.iron._update(data["iron"])
+        self.bauxite._update(data["bauxite"])
+        self.gasoline._update(data["gasoline"])
+        self.munitions._update(data["munitions"])
+        self.steel._update(data["steel"])
+        self.aluminum._update(data["aluminum"])
+        self.food._update(data["food"])
         self.market_index: int = self.credit.market_index
