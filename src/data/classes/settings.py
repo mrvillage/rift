@@ -183,7 +183,7 @@ class GuildSettings(Makeable):
 
     @classmethod
     def default(cls, guild_id: int) -> GuildSettings:
-        settings = cls((guild_id, ...))
+        settings = cls({"guild_id": guild_id})
         settings.defaulted = True
         return settings
 
