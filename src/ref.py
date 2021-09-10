@@ -2,7 +2,7 @@ import datetime
 
 import aiohttp
 from bs4 import BeautifulSoup
-from discord import AllowedMentions, Game, Intents, Object
+from discord import AllowedMentions, Game, Intents
 from discord.ext.commands import Bot, when_mentioned_or
 
 from .data.db import execute_read_query
