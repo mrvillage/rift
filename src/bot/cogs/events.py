@@ -45,6 +45,10 @@ class Events(commands.Cog):
                                 event: str = data["event"]
                                 event = EVENTS.get(event, event)
                                 self.bot.dispatch(event, **data["data"])
+            except ConnectionRefusedError:
+                print("rift-data socket refused", flush=True)
+                delay = backoff.delay()
+                await sleep(delay)
             except Exception as error:
                 print("rift-data socket connection error", file=sys.stderr, flush=True)
                 traceback.print_exception(
