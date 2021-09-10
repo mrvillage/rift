@@ -153,7 +153,7 @@ class GuildWelcomeSettings(Makeable):
                 f"""
             INSERT INTO guild_welcome_settings (guild_id, {', '.join(kwargs.keys())}) VALUES ({', '.join(f'${i}' for i in range(1, len(kwargs)+2))});
             """,
-                str(self.guild_id),
+                self.guild_id,
                 *tuple(kwargs.values()),
             )
         else:
@@ -161,7 +161,7 @@ class GuildWelcomeSettings(Makeable):
                 f"""
             UPDATE guild_welcome_settings SET {sets} WHERE guild_id = $1;
             """,
-                str(self.guild_id),
+                self.guild_id,
                 *args,
             )
         return self
