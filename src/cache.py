@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import json
-from typing import Any, Dict, List, Literal, Optional, Set
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Set
 
-from data.treaty import TreatyData
 from typings import (
     AllianceData,
     CityData,
@@ -15,10 +14,28 @@ from typings import (
     TreatyData,
 )
 
-from .data.classes import *
 from .data.db import execute_read_query
 
 __all__ = ("cache",)
+
+if TYPE_CHECKING:
+    from .data.classes import (
+        Alliance,
+        City,
+        Color,
+        Embassy,
+        EmbassyConfig,
+        GuildSettings,
+        GuildWelcomeSettings,
+        Menu,
+        MenuItem,
+        Nation,
+        Ticket,
+        TicketConfig,
+        TradePrices,
+        Treaty,
+        UserSettings,
+    )
 
 
 class Validate:
@@ -85,8 +102,22 @@ class Cache:
         self.validate: Validate = Validate()
 
     async def initialize(self):
-        global classes
-        from .data import classes
+        from .data.classes import (
+            Alliance,
+            City,
+            Color,
+            Embassy,
+            EmbassyConfig,
+            GuildSettings,
+            GuildWelcomeSettings,
+            Menu,
+            MenuItem,
+            Nation,
+            Ticket,
+            TicketConfig,
+            TradePrices,
+            Treaty,
+        )
 
         queries = [
             "SELECT * FROM alliances;",
@@ -273,6 +304,8 @@ class Cache:
     def hook_alliance(
         self, action: Literal["update", "create", "delete"], data: AllianceData
     ) -> None:
+        from .data.classes import Alliance
+
         if action == "delete":
             del self._alliances[data["id"]]
             return
@@ -284,6 +317,8 @@ class Cache:
     def hook_city(
         self, action: Literal["update", "create", "delete"], data: CityData
     ) -> None:
+        from .data.classes import City
+
         if action == "delete":
             del self._cities[data["id"]]
             return
@@ -293,6 +328,8 @@ class Cache:
             self._cities[data["id"]] = City(data)
 
     def hook_color(self, action: Literal["update"], data: ColorData) -> None:
+        from .data.classes import Color
+
         try:
             self._colors[data["color"]]._update(data)
         except KeyError:
@@ -301,6 +338,8 @@ class Cache:
     def hook_nation(
         self, action: Literal["update", "create", "delete"], data: NationData
     ) -> None:
+        from .data.classes import Nation
+
         if action == "delete":
             del self._nations[data["id"]]
             return
