@@ -2,9 +2,18 @@ from __future__ import annotations
 
 import asyncio
 import json
-from typing import Any, Dict, List, Literal, Optional, Set, Type
+from typing import Any, Dict, List, Literal, Optional, Set
 
-from typings import AllianceData, Link
+from data.treaty import TreatyData
+from typings import (
+    AllianceData,
+    CityData,
+    ColorData,
+    Link,
+    NationData,
+    TradePriceData,
+    TreatyData,
+)
 
 from .data.classes import *
 from .data.db import execute_read_query
@@ -76,6 +85,9 @@ class Cache:
         self.validate: Validate = Validate()
 
     async def initialize(self):
+        global classes
+        from .data import classes
+
         queries = [
             "SELECT * FROM alliances;",
             "SELECT * FROM cities;",
@@ -270,7 +282,7 @@ class Cache:
             self._alliances[data["id"]] = Alliance(data)
 
     def hook_city(
-        self, action: Literal["update", "create", "delete"], data: Dict[Any, Any]
+        self, action: Literal["update", "create", "delete"], data: CityData
     ) -> None:
         if action == "delete":
             del self._cities[data["id"]]
@@ -280,14 +292,14 @@ class Cache:
         except KeyError:
             self._cities[data["id"]] = City(data)
 
-    def hook_color(self, action: Literal["update"], data: Dict[Any, Any]) -> None:
+    def hook_color(self, action: Literal["update"], data: ColorData) -> None:
         try:
             self._colors[data["color"]]._update(data)
         except KeyError:
             self._colors[data["color"]] = Color(data)
 
     def hook_nation(
-        self, action: Literal["update", "create", "delete"], data: Dict[Any, Any]
+        self, action: Literal["update", "create", "delete"], data: NationData
     ) -> None:
         if action == "delete":
             del self._nations[data["id"]]
@@ -297,7 +309,7 @@ class Cache:
         except KeyError:
             self._nations[data["id"]] = Nation(data)
 
-    def hook_price(self, action: Literal["update"], data: Dict[Any, Any]) -> None:
+    def hook_price(self, action: Literal["update"], data: TradePriceData) -> None:
         try:
             self._prices._update(data)
         except KeyError:
@@ -308,7 +320,7 @@ class Cache:
             next(i._update(new) for i in self._treasures if i.name == new["name"])
 
     def hook_treaty(
-        self, action: Literal["create", "delete"], data: Dict[Any, Any]
+        self, action: Literal["create", "delete"], data: TreatyData
     ) -> None:
         if action == "delete":
             treaty = next(
