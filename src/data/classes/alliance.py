@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Dict, Optional, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 import discord
 from discord.ext.commands.context import Context
 
+from ...cache import cache
 from ...errors import AllianceNotFoundError
 from ...find import search_alliance
 from ...ref import bot
-from ..query import query_alliance, query_applicants, query_members
 from .base import Makeable
 from .resources import Resources
 
@@ -18,105 +18,154 @@ __all__ = ("Alliance",)
 if TYPE_CHECKING:
     from typings import AllianceData
 
+    from .nation import Nation
+    from .treaty import Treaty
+
 
 class Alliance(Makeable):
     __slots__ = (
-        "data",
         "id",
-        "founddate",
+        "found_date",
         "name",
         "acronym",
         "color",
         "rank",
-        "score",
-        "avgscore",
-        "flagurl",
-        "forumurl",
+        "flag_url",
+        "forum_url",
         "ircchan",
-        "members",
-        "vm_members",
-        "leaders",
-        "heirs",
-        "officers",
-        "applicants",
-        "calculated_score",
-        "member_count",
-        "treaties",
     )
 
-    def __init__(self, data: AllianceData):
+    def __init__(self, data: AllianceData) -> None:
         self.id: int = data["id"]
         self.found_date: str = data["found_date"]
         self.name: str = data["name"]
         self.acronym: str = data["acronym"]
         self.color: str = data["color"].capitalize()
-        self.raw_rank: int = data["rank"]
-        self.raw_score: float = data["score"]
-        self.raw_avg_score: float = data["avg_score"]
+        self.rank: int = data["rank"]
         self.flag_url: Optional[str] = data["flag_url"]
         self.forum_url: Optional[str] = data["forum_url"]
         self.ircchan: Optional[str] = data["ircchan"]
 
-    def __repr__(self):
+    @classmethod
+    async def convert(cls, ctx, search) -> Alliance:
+        return await search_alliance(ctx, search)
+
+    @classmethod
+    async def fetch(cls, alliance_id: int) -> Alliance:
+        alliance = cache.get_alliance(alliance_id)
+        if alliance:
+            return alliance
+        raise AllianceNotFoundError(alliance_id)
+
+    def _update(self, data: AllianceData, /) -> None:
+        self.id: int = data["id"]
+        self.found_date: str = data["found_date"]
+        self.name: str = data["name"]
+        self.acronym: str = data["acronym"]
+        self.color: str = data["color"].capitalize()
+        self.rank: int = data["rank"]
+        self.flag_url: Optional[str] = data["flag_url"]
+        self.forum_url: Optional[str] = data["forum_url"]
+        self.ircchan: Optional[str] = data["ircchan"]
+
+    def __repr__(self) -> str:
         return f"{self.id} - {self.name}"
 
-    def get_militarization(self, vm=None):
-        cities = sum(i.cities for i in self.members if not i.v_mode)
+    def __str__(self) -> str:
+        return self.name
+
+    def __int__(self) -> int:
+        return self.id
+
+    def __float__(self) -> float:
+        return sum(i.score for i in self.members)
+
+    def __len__(self) -> int:
+        return len(self.members)
+
+    def __bool__(self) -> bool:
+        return True
+
+    @property
+    def members(self) -> List[Nation]:
+        return [i for i in cache.nations if i.alliance_id == self.id]
+
+    @property
+    def vm_members(self) -> List[Nation]:
+        return [i for i in cache.nations if i.alliance_id == self.id and i.v_mode]
+
+    @property
+    def leaders(self) -> List[Nation]:
+        return [i for i in self.members if i.alliance_position == "Leader"]
+
+    @property
+    def heirs(self) -> List[Nation]:
+        return [i for i in self.members if i.alliance_position == "Heir"]
+
+    @property
+    def officers(self) -> List[Nation]:
+        return [i for i in self.members if i.alliance_position == "Officer"]
+
+    @property
+    def applicants(self) -> List[Nation]:
+        return [
+            i
+            for i in cache.nations
+            if i.alliance_id == self.id and i.alliance_position == "Applicant"
+        ]
+
+    @property
+    def score(self) -> float:
+        return sum(i.score for i in self.members)
+
+    @property
+    def member_count(self) -> int:
+        return len(self.members)
+
+    @property
+    def treaties(self) -> List[Treaty]:
+        return [i for i in cache.treaties if i.from_ == self.id or i.to_ == self.id]
+
+    @property
+    def soldiers(self) -> int:
+        return sum(i.soldiers for i in self.members)
+
+    @property
+    def tanks(self) -> int:
+        return sum(i.tanks for i in self.members)
+
+    @property
+    def aircraft(self) -> int:
+        return sum(i.aircraft for i in self.members)
+
+    @property
+    def ships(self) -> int:
+        return sum(i.ships for i in self.members)
+
+    @property
+    def missiles(self) -> int:
+        return sum(i.missiles for i in self.members)
+
+    @property
+    def nukes(self) -> int:
+        return sum(i.nukes for i in self.members)
+
+    @property
+    def cities(self) -> int:
+        return sum(i.cities for i in self.members)
+
+    @property
+    def militarization(self) -> Dict[str, float]:
         militarization = {
-            "soldiers": sum(i.soldiers for i in self.members if not i.v_mode)
-            / (cities * 15000),
-            "tanks": sum(i.tanks for i in self.members if not i.v_mode)
-            / (cities * 1250),
-            "aircraft": sum(i.aircraft for i in self.members if not i.v_mode)
-            / (cities * 75),
-            "ships": sum(i.ships for i in self.members if not i.v_mode) / (cities * 15),
+            "soldiers": self.soldiers / (self.cities * 15000),
+            "tanks": self.tanks / (self.cities * 1250),
+            "aircraft": self.aircraft / (self.cities * 75),
+            "ships": self.ships / (self.cities * 15),
         }
         militarization["total"] = sum(militarization.values()) / 4
         return militarization
 
-    def get_soldiers(self, vm=None):
-        return sum(i.soldiers for i in self.members if not i.v_mode)
-
-    def get_tanks(self, vm=None):
-        return sum(i.tanks for i in self.members if not i.v_mode)
-
-    def get_aircraft(self, vm=None):
-        return sum(i.aircraft for i in self.members if not i.v_mode)
-
-    def get_ships(self, vm=None):
-        return sum(i.ships for i in self.members if not i.v_mode)
-
-    def get_missiles(self, vm=None):
-        return sum(i.missiles for i in self.members if not i.v_mode)
-
-    def get_nukes(self, vm=None):
-        return sum(i.nukes for i in self.members if not i.v_mode)
-
-    def get_cities(self, vm=None):
-        return sum(i.cities for i in self.members if not i.v_mode)
-
-    def __str__(self):
-        return self.name
-
-    def __int__(self):
-        return self.id
-
-    def list_members(self, vm):
-        try:
-            return self.members
-        except AttributeError:
-            return []
-
-    def __float__(self):
-        return sum(i[0] for i in self.list_members(vm=False))
-
-    def __len__(self):
-        return len([i[0] for i in self.list_members(vm=False)])
-
-    def __bool__(self):
-        return True
-
-    async def get_resources(self):
+    async def get_resources(self) -> Resources:
         from ...funcs import parse_alliance_bank
 
         async with bot.pnw_session.request(
@@ -126,68 +175,10 @@ class Alliance(Makeable):
         await bot.parse_token(content)
         return await Resources.from_dict(await parse_alliance_bank(content))
 
-    @classmethod
-    async def convert(cls, ctx, search):
-        return await search_alliance(ctx, search)
-
-    @classmethod
-    async def fetch(cls, alliance_id: Union[int, str] = None) -> Alliance:
-        try:
-            return cls(data=await query_alliance(alliance_id=alliance_id))
-        except IndexError:
-            raise AllianceNotFoundError(alliance_id)
-
-    async def _make_members(self) -> None:
-        from .nation import Nation
-
-        members = await query_members(alliance_id=self.id)
-        members = [dict(i) for i in members]
-        self.members = [Nation(data=i) for i in members]
-
-    async def _make_vm_members(self) -> None:
-        self.vm_members = [i for i in self.members if i.v_mode]
-
-    async def _make_leaders(self) -> None:
-        self.leaders = [i for i in self.members if i.alliance_position == "Leader"]
-
-    async def _make_heirs(self) -> None:
-        self.heirs = [i for i in self.members if i.alliance_position == "Heir"]
-
-    async def _make_officers(self) -> None:
-        self.officers = [i for i in self.members if i.alliance_position == "Officer"]
-
-    async def _make_applicants(self) -> None:
-        from .nation import Nation
-
-        applicants = await query_applicants(alliance_id=self.id)
-        applicants = [dict(i) for i in applicants]
-        self.applicants = [Nation(data=i) for i in applicants]
-
-    async def _make_calculated_score(self) -> None:
-        self.calculated_score = sum(i.score for i in self.members if not i.v_mode)
-
-    async def _make_member_count(self) -> None:
-        self.member_count = len([i for i in self.members if not i.v_mode])
-
-    async def _make_treaties(self) -> None:
-        from .treaty import Treaties
-
-        self.treaties = await Treaties.fetch(self)
-
     async def get_info_embed(self, ctx: Context, short: bool = False) -> discord.Embed:
         # sourcery no-metrics
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
-        await self.make_attrs(
-            "members",
-            "vm_members",
-            "leaders",
-            "heirs",
-            "officers",
-            "applicants",
-            "calculated_score",
-            "member_count",
-        )
         fields = [
             {"name": "Alliance ID", "value": self.id},
             {"name": "Alliance Name", "value": self.name},
@@ -196,15 +187,15 @@ class Alliance(Makeable):
                 "value": self.acronym if self.acronym != "" else "None",
             },
             {"name": "Color", "value": self.color},
-            {"name": "Rank", "value": f"#{self.raw_rank}"},
+            {"name": "Rank", "value": f"#{self.rank}"},
             {
                 "name": "Members",
                 "value": f"[{self.member_count:,}](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\")",
             },
-            {"name": "Score", "value": f"{self.calculated_score:,.2f}"},
+            {"name": "Score", "value": f"{self.score:,.2f}"},
             {
                 "name": "Average Score",
-                "value": f"{self.calculated_score/self.member_count if self.member_count != 0 else 0:,.2f}",
+                "value": f"{self.score/self.member_count if self.member_count != 0 else 0:,.2f}",
             },
             {
                 "name": "Applicants",
@@ -306,16 +297,54 @@ class Alliance(Makeable):
             ),
         }
 
-    def _update(self, data: AllianceData, /) -> None:
-        self.id = data["id"]
-        self.found_date = data["found_date"]
-        self.name = data["name"]
-        self.acronym = data["acronym"]
-        self.color = data["color"].capitalize()
-        self.raw_rank = data["rank"]
-        self.raw_score = data["score"]
-        self.raw_avg_score = data["avg_score"]
-        self.flag_url = data["flag_url"]
-        self.forum_url = data["forum_url"]
-        self.ircchan = data["ircchan"]
-        self.ircchan = self.ircchan
+    # PHASE OUT
+    def get_militarization(self, vm=None):
+        return self.militarization
+
+    def get_soldiers(self, vm=None):
+        return self.soldiers
+
+    def get_tanks(self, vm=None):
+        return self.tanks
+
+    def get_aircraft(self, vm=None):
+        return self.aircraft
+
+    def get_ships(self, vm=None):
+        return self.ships
+
+    def get_missiles(self, vm=None):
+        return self.missiles
+
+    def get_nukes(self, vm=None):
+        return self.nukes
+
+    def get_cities(self, vm=None):
+        return self.cities
+
+    async def _make_members(self) -> None:
+        pass
+
+    async def _make_vm_members(self) -> None:
+        pass
+
+    async def _make_leaders(self) -> None:
+        pass
+
+    async def _make_heirs(self) -> None:
+        pass
+
+    async def _make_officers(self) -> None:
+        pass
+
+    async def _make_applicants(self) -> None:
+        pass
+
+    async def _make_calculated_score(self) -> None:
+        pass
+
+    async def _make_member_count(self) -> None:
+        pass
+
+    async def _make_treaties(self) -> None:
+        pass
