@@ -55,6 +55,19 @@ class Ticket:
             self.open,
         )
 
+    async def set_(self, **kwargs: Union[int, bool]) -> Ticket:
+        sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
+        sets = ", ".join(sets)
+        args = tuple(kwargs.values())
+        await execute_query(
+            f"""
+        UPDATE tickets SET {sets} WHERE config_id = $1;
+        """,
+            self.config_id,
+            *args,
+        )
+        return self
+
     @classmethod
     async def convert(cls, ctx: commands.Context, argument: str) -> Ticket:
         ...
