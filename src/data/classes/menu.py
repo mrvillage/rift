@@ -381,7 +381,9 @@ class MenuItem:
         if self.type == "button":
             return Button(
                 style=discord.ButtonStyle[self.data.get("style", "blurple")],
-                label=self.data.get("label", None),
+                label=l
+                if (l := self.data.get("label", None)) or self.data.get("emoji", None)
+                else "None",
                 disabled=self.data.get("disabled", False),
                 custom_id=custom_id,
                 url=self.data.get("url", None),
