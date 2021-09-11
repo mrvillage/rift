@@ -19,3 +19,4 @@ class TicketConfigData(TypedDict):
     category_id: Optional[int]
     guild_id: int
     start_message: str
+    archive_category_id: Optional[int]
