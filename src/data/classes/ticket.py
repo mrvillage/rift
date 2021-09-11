@@ -4,10 +4,10 @@ from typing import TYPE_CHECKING, Optional, Union
 
 import discord
 from discord.ext import commands
-from ..query import query_ticket_config
 
 from ..db import execute_query, execute_read_query
 from ..get import get_current_ticket_number, get_ticket
+from ..query import query_ticket_config
 
 __all__ = ("Ticket", "TicketConfig")
 
@@ -112,6 +112,7 @@ class TicketConfig:
         "category_id",
         "guild_id",
         "start_message",
+        "archive_category_id",
     )
 
     def __init__(self, data: TicketConfigData) -> None:
@@ -119,6 +120,7 @@ class TicketConfig:
         self.category_id = data["category_id"]
         self.guild_id = data["guild_id"]
         self.start_message = data["start_message"]
+        self.archive_category_id = data["archive_category_id"]
 
     @classmethod
     async def fetch(cls, config_id: int) -> TicketConfig:
@@ -126,11 +128,12 @@ class TicketConfig:
 
     async def save(self) -> None:
         await execute_query(
-            """INSERT INTO ticket_configs (config_id, category_id, guild_id, start_message) VALUES ($1, $2, $3, $4);""",
+            """INSERT INTO ticket_configs (config_id, category_id, guild_id, start_message, archive_category_id) VALUES ($1, $2, $3, $4, $5);""",
             self.config_id,
             self.category_id,
             self.guild_id,
             self.start_message,
+            self.archive_category_id,
         )
 
     async def set_(self, **kwargs: Union[int, bool]) -> TicketConfig:
