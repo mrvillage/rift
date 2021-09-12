@@ -54,6 +54,8 @@ class Embassies(commands.Cog):
         start: str,
         category: discord.CategoryChannel = None,
     ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
         data = {
             "config_id": ctx.interaction.id,
             "category_id": category and category.id,
@@ -69,7 +71,8 @@ class Embassies(commands.Cog):
                 ctx.author,
                 f"Embassy Configuration {config.config_id} created.",
                 color=discord.Color.green(),
-            )
+            ),
+            ephemeral=True,
         )
 
     @embassy_config.command(
@@ -80,6 +83,8 @@ class Embassies(commands.Cog):
     @commands.guild_only()
     @has_manage_permissions()
     async def embassy_config_list(self, ctx: commands.Context):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
         configs = [
             EmbassyConfig(config)
             for config in await query_embassy_config_by_guild(ctx.guild.id)
@@ -96,8 +101,10 @@ class Embassies(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 "\n".join(
-                    f"{config.config_id} - {ctx.guild.get_channel(config.category_id).name}"
+                    f"{config.config_id} - {category}"
                     for config in configs
+                    if config.category_id
+                    and (category := ctx.guild.get_channel(config.category_id))
                 ),
                 color=discord.Color.green(),
             )
@@ -113,6 +120,10 @@ class Embassies(commands.Cog):
     async def embassy_config_claim(
         self, ctx: commands.Context, config: EmbassyConfig, *, alliance: Alliance
     ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild) and isinstance(
+                ctx.channel, discord.TextChannel
+            )
         data = {
             "embassy_id": ctx.channel.id,
             "alliance_id": alliance.id,
@@ -128,7 +139,8 @@ class Embassies(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"{ctx.channel.mention} claimed for {repr(alliance)} under embassy configuration {config.config_id}.",
-            )
+            ),
+            ephemeral=True,
         )
 
 
