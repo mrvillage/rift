@@ -7,6 +7,8 @@ __all__ = ("GuildSettingsData", "GuildWelcomeSettingsData")
 
 class GuildSettingsData(TypedDict):
     guild_id: int
+    purpose: Optional[str]
+    purpose_argument: Optional[str]
 
 
 class GuildWelcomeSettingsData(TypedDict):
