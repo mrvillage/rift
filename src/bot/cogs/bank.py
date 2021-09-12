@@ -9,6 +9,7 @@ from ...data.classes import Alliance, Nation
 from ...data.classes.bank import Transaction
 from ...errors import AllianceNotFoundError, NationNotFoundError, RecipientNotFoundError
 from ...ref import Rift
+from ...views import Confirm
 
 
 class Bank(commands.Cog):
@@ -117,31 +118,23 @@ class Bank(commands.Cog):
                 color=discord.Color.orange(),
             )
         )
-        message = await ctx.reply(embed=embed, return_message=True)
+        view = Confirm(defer=True)
+        message = await ctx.reply(
+            embed=embed, view=view, ephemeral=True, return_message=True
+        )
 
-        def check(msg: discord.Message):
-            return (
-                (
-                    msg.content == str(recipient.id)
-                    or msg.content.lower() in ("c", "cancel")
-                )
-                and ctx.author.id == msg.author.id
-                and ctx.channel.id == msg.channel.id
-            )
-
-        try:
-            msg = await self.bot.wait_for("message", check=check, timeout=60)
-        except TimeoutError:
-            await message.edit(
+        r = await view.wait()
+        if r:
+            return await message.edit(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    "You didn't confirm your transaction in time!",
+                    "You didn't confirm the transaction in time!",
                     color=discord.Color.red(),
-                )
+                ),
+                view=None,
             )
-            return
-        if msg.content in ("c", "cancel"):
-            await message.edit(
+        if not view.value:
+            return await message.edit(
                 embed=funcs.get_embed_author_guild(
                     author,
                     f"You have cancelled the transfer of {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
@@ -152,9 +145,9 @@ class Bank(commands.Cog):
                     author,
                     f"You have cancelled the transfer of {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
                     color=discord.Color.red(),
-                )
+                ),
+                view=None,
             )
-            return
         message = await message.edit(
             embed=funcs.get_embed_author_guild(
                 author,
@@ -167,6 +160,7 @@ class Bank(commands.Cog):
                 f"Sending {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**...",
                 color=discord.Color.orange(),
             ),
+            view=None,
         )
         complete = await transaction.complete(receiver=recipient, action="send")
         if not complete:
@@ -185,7 +179,6 @@ class Bank(commands.Cog):
                         color=discord.Color.red(),
                     )
                 )
-                await message.edit(embed=embed)
             else:
                 embed = (
                     funcs.get_embed_author_guild(
@@ -200,7 +193,6 @@ class Bank(commands.Cog):
                         color=discord.Color.green(),
                     )
                 )
-                await message.edit(embed=embed)
         else:
             embed = (
                 funcs.get_embed_author_guild(
@@ -215,7 +207,8 @@ class Bank(commands.Cog):
                     color=discord.Color.green(),
                 )
             )
-            await message.edit(embed=embed)
+
+        await message.edit(embed=embed)
 
     @bank.command(
         name="balance",
@@ -231,7 +224,7 @@ class Bank(commands.Cog):
             alliance = nation.alliance
         except NationNotFoundError:
             try:
-                alliance = funcs.search_alliance(ctx, search)
+                alliance = await funcs.search_alliance(ctx, search)
             except AllianceNotFoundError:
                 await ctx.reply(
                     embed=funcs.get_embed_author_member(
@@ -244,44 +237,40 @@ class Bank(commands.Cog):
         try:
             viewer = await funcs.search_nation(ctx, str(ctx.author.id))
         except NationNotFoundError:
-            await ctx.reply(
+            return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     "You're not linked so I couldn't verify your bank permissions!",
                     color=discord.Color.red(),
                 )
             )
-            return
         try:
             if not await perms.check_bank_perms(
                 nation=viewer, author=ctx.author, action="view"
             ):
-                await ctx.reply(
+                return await ctx.reply(
                     embed=funcs.get_embed_author_member(
                         ctx.author,
                         "You don't have permission to view your alliance bank!",
                         color=discord.Color.red(),
                     )
                 )
-                return
         except IndexError:
-            await ctx.reply(
+            return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     "Your alliance hasn't configured this command!",
                     color=discord.Color.red(),
                 )
             )
-            return
         except AttributeError:
-            await ctx.reply(
+            return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     "You're not in an alliance so you can't view a bank balance!",
                     color=discord.Color.red(),
                 )
             )
-            return
         message = await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
