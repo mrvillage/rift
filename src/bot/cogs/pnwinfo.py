@@ -77,7 +77,7 @@ class PnWInfo(commands.Cog):
     @commands.command(
         name="members",
         help="Get a list of the members of an alliance.",
-        type=(commands.CommandType.default, commands.CommandType.chat_input),
+        type=commands.CommandType.chat_input,
     )
     async def members(self, ctx: commands.Context, *, alliance: Alliance = None):
         alliance = alliance or await Alliance.convert(ctx, alliance)
@@ -149,7 +149,7 @@ class PnWInfo(commands.Cog):
     @commands.command(
         name="revenue",
         help="Get the revenue of a nation or alliance.",
-        type=(commands.CommandType.default, commands.CommandType.chat_input),
+        type=commands.CommandType.chat_input,
     )
     async def revenue(
         self, ctx: commands.Context, *, search: Union[Alliance, Nation] = None
