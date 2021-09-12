@@ -66,7 +66,6 @@ class PnWInfo(commands.Cog):
             try:
                 alliance = await Alliance.convert(ctx, search)
                 await ctx.invoke(self.alliance, alliance=alliance)
-            except AllianceNotFoundError:
                 embed = funcs.get_embed_author_member(
                     ctx.author,
                     f"No nation or alliance found with argument `{search}`.",
