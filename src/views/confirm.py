@@ -14,24 +14,27 @@ class Confirm(ui.View):
     """
 
     value: Optional[bool]
+    defer: bool
 
-    def __init__(self, timeout: Optional[float] = 180):
+    def __init__(self, timeout: Optional[float] = 180, defer: bool = False):
         super().__init__(timeout=timeout)
         self.value = None
+        self.defer = defer
 
     async def hook(self, interaction: Interaction):
-        pass
+        if self.defer:
+            await interaction.response.defer()
 
     @ui.button(label="Yes", style=ButtonStyle.green)
     async def yes(self, button: ui.Button, interaction: Interaction):
         self.interaction = interaction
         self.value = True
-        self.stop()
         await self.hook(interaction)
+        self.stop()
 
     @ui.button(label="No", style=ButtonStyle.red)
     async def no(self, button: ui.Button, interaction: Interaction):
         self.interaction = interaction
         self.value = False
-        self.stop()
         await self.hook(interaction)
+        self.stop()
