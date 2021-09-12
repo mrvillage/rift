@@ -76,9 +76,10 @@ class Settings(commands.Cog):
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    description=f"The server purpose has been set to: `{purpose}`",
+                    description=f"The server has been set to have no purpose.",
                     color=discord.Color.green(),
-                )
+                ),
+                ephemeral=True,
             )
         if purpose == "PERSONAL":
             if settings.purpose == "PERSONAL":
@@ -87,7 +88,8 @@ class Settings(commands.Cog):
                         ctx.author,
                         description="The server purpose is already set to `PERSONAL`!",
                         color=discord.Color.red(),
-                    )
+                    ),
+                    ephemeral=True,
                 )
             await settings.set_(purpose=purpose, purpose_argument=None)
             await ctx.reply(
@@ -95,7 +97,8 @@ class Settings(commands.Cog):
                     ctx.author,
                     description=f"The server purpose has been set to: `{purpose}`",
                     color=discord.Color.green(),
-                )
+                ),
+                ephemeral=True,
             )
         elif purpose.startswith("ALLIANCE"):
             message = await ctx.reply(
@@ -190,6 +193,7 @@ class Settings(commands.Cog):
                     "Waiting for a followup message with the community or business name...",
                     color=discord.Color.orange(),
                 ),
+                ephemeral=True,
                 return_message=True,
             )
             try:
@@ -245,7 +249,8 @@ class Settings(commands.Cog):
                 ctx.author,
                 description=f"The welcome message has been set to:\n\n{message}",
                 color=discord.Color.green(),
-            )
+            ),
+            ephemeral=True,
         )
 
     @server_settings.command(
@@ -270,7 +275,8 @@ class Settings(commands.Cog):
                 ctx.author,
                 description=f"The verified nickname format has been set to:\n\n`{nickname}`",
                 color=discord.Color.green(),
-            )
+            ),
+            ephemeral=True,
         )
 
     @commands.Cog.listener()
