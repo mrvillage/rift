@@ -58,20 +58,14 @@ class PnWInfo(commands.Cog):
         help="Get information about a nation or alliance.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
-    async def who(self, ctx: commands.Context, *, search=None):
-        try:
-            nation = await Nation.convert(ctx, search)
-            await ctx.invoke(self.nation, nation=nation)
-        except NationNotFoundError:
-            try:
-                alliance = await Alliance.convert(ctx, search)
-                await ctx.invoke(self.alliance, alliance=alliance)
-                embed = funcs.get_embed_author_member(
-                    ctx.author,
-                    f"No nation or alliance found with argument `{search}`.",
-                    color=discord.Color.red(),
-                )
-                await ctx.reply(embed=embed)
+    async def who(
+        self, ctx: commands.Context, *, search: Union[Nation, Alliance] = None
+    ):
+        return (
+            await ctx.invoke(self.nation, nation=search)
+            if isinstance(search, Nation)
+            else await ctx.invoke(self.alliance, alliance=search)
+        )
 
     @commands.command(
         name="members",
@@ -149,22 +143,25 @@ class PnWInfo(commands.Cog):
         name="revenue",
         help="Get the revenue of a nation or alliance.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "fetch_spies": "Fetches spies for every nation being calculated. Incredibly slow, need to be whitelisted."
+        },
     )
     async def revenue(
-        self, ctx: commands.Context, *, search: Union[Alliance, Nation] = None
+        self,
+        ctx: commands.Context,
+        *,
+        search: Union[Alliance, Nation] = None,
+        fetch_spies: bool = False,
     ):
         search = search or await Nation.convert(ctx, search)
-        message = await ctx.reply(
-            embed=funcs.get_embed_author_member(
-                ctx.author,
-                f"Fetching revenue for {repr(search)}...",
-                color=discord.Color.orange(),
-            )
-        )
+        if fetch_spies and ctx.author.id != 258298021266063360:
+            fetch_spies = False
+        await ctx.interaction.response.defer()
         try:
-            rev = await search.calculate_revenue()
+            rev = await search.calculate_revenue(fetch_spies=fetch_spies)
         except IndexError:
-            return await message.edit(
+            return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     f"Something went wrong calculating {repr(search)}'s revenue. It's probably a turn, try again in a few minutes!",
@@ -208,10 +205,11 @@ class PnWInfo(commands.Cog):
         fields.append(
             {
                 "name": "Total",
-                "value": f"Gross: ${sum(rev['gross_total'].__dict__.values())+rev['gross_income'].money:,.2f}\nNet: ${sum(rev['net_total'].__dict__.values())+rev['net_income'].money:,.2f}",
+                "value": f"Gross: ${sum(rev['gross_total'].__dict__.values())+rev['gross_income'].money:,.2f}\nNet: ${sum(rev['net_total'].__dict__.values())+rev['net_income'].money:,.2f}"
+                + ("" if fetch_spies else "\nNote: Spies not included"),
             }
         )
-        await message.edit(
+        await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"Revenue for {repr(search)}",
