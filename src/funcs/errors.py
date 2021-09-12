@@ -1,5 +1,4 @@
 from __future__ import annotations
-from src.errors.menu import MenuNotFoundError
 
 import sys
 import traceback
@@ -7,7 +6,7 @@ import traceback
 import discord
 from discord.ext import commands
 
-from ..errors import AllianceNotFoundError, NationNotFoundError
+from ..errors import AllianceNotFoundError, MenuNotFoundError, NationNotFoundError
 from .embeds import get_embed_author_member
 from .utils import get_command_signature
 
@@ -130,3 +129,12 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
         await ctx.reply(
             'I don\'t have permission to do that! Please make sure I have the "Embed Links" permission.'
         )
+    except Exception as e:
+        await ctx.reply(
+            embed=get_embed_author_member(
+                ctx.author,
+                "Unknown Fatal Error. Please try again. If this problem persists please contact <@!258298021266063360> for assistance.\nPlease remember the bot is still in Alpha, there is a good chance new features may result in new bugs to older features. To report an issue please send a message to <@!258298021266063360> so it can be addressed as soon as possible.",
+                color=discord.Color.red(),
+            )
+        )
+        await print_handler(ctx, e)
