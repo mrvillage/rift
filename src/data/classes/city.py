@@ -1,19 +1,25 @@
 from __future__ import annotations
 
+import math
+from datetime import datetime
+from functools import cached_property
 from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
 
 import pnwkit
 
+from ...cache import cache
 from ..requests import get_city_build
 from .base import Makeable
 from .resources import Resources
 
+__all__ = ("City", "FullCity")
+
 if TYPE_CHECKING:
+    from pnwkit.data import Nation as PnWKitNation
+
     from typings import CityData
 
     from .nation import Nation
-
-__all__ = ("City", "FullCity")
 
 
 class City:
@@ -25,6 +31,7 @@ class City:
         "infrastructure",
         "max_infra",
         "land",
+        "nation",
     )
 
     def __init__(self, data: CityData) -> None:
@@ -70,64 +77,14 @@ class City:
 
 
 class FullCity(Makeable):
-    data: Dict[str, Any]
-    id: int
-    name: Optional[str]
-    nation_id: int
-    capital: Optional[bool]
-    age: Optional[int]
-    infrastructure: float
-    land: float
-    population: int
-    disease: float
-    crime: float
-    pollution: int
-    commerce: float
-    powered: bool
-    coal_power: int
-    oil_power: int
-    nuclear_power: int
-    wind_power: int
-    coal_mines: int
-    lead_mines: int
-    bauxite_mines: int
-    oil_wells: int
-    uranium_mines: int
-    iron_mines: int
-    farms: int
-    oil_refineries: int
-    steel_mills: int
-    aluminum_refineries: int
-    munitions_factories: int
-    police_stations: int
-    hospitals: int
-    recycling_centers: int
-    subways: int
-    supermarkets: int
-    banks: int
-    shopping_malls: int
-    stadiums: int
-    barracks: int
-    factories: int
-    hangars: int
-    drydocks: int
-    nation: Nation
-    projects: pnwkit.data.Nation  # type: ignore
-
     __slots__ = (
         "data",
         "id",
         "name",
         "nation_id",
-        "capital",
         "age",
         "infrastructure",
         "land",
-        "population",
-        "disease",
-        "crime",
-        "pollution",
-        "commerce",
         "powered",
         "coal_power",
         "oil_power",
@@ -158,90 +115,123 @@ class FullCity(Makeable):
         "drydocks",
     )
 
-    def __init__(self, data: Dict[str, Any]) -> None:
-        data = data
-        self.id = data["city_id"]
-        self.name = data.get("name")
-        self.nation_id = data["nation_id"]
-        self.capital = data.get("capital")
-        self.age = data.get("age")
-        self.infrastructure = data["infrastructure"]
-        self.land = data["land"]
-        self.population = data["population"]
-        self.disease = data["disease"]
-        self.crime = data["crime"]
-        self.pollution = data["pollution"]
-        self.commerce = data["commerce"]
-        self.powered = data["powered"]
-        self.coal_power = data.get("coal_power", 0)
-        self.oil_power = data.get("oil_power", 0)
-        self.nuclear_power = data.get("nuclear_power", 0)
-        self.wind_power = data.get("wind_power", 0)
-        self.coal_mines = data.get("coal_mines", 0)
-        self.lead_mines = data.get("lead_mines", 0)
-        self.bauxite_mines = data.get("bauxite_mines", 0)
-        self.oil_wells = data.get("oil_wells", 0)
-        self.uranium_mines = data.get("uranium_mines", 0)
-        self.iron_mines = data.get("iron_mines", 0)
-        self.farms = data.get("farms", 0)
-        self.oil_refineries = data.get("oil_refineries", 0)
-        self.steel_mills = data.get("steel_mills", 0)
-        self.aluminum_refineries = data.get("aluminum_refineries", 0)
-        self.munitions_factories = data.get("materials_factories", 0)
-        self.police_stations = data.get("police_stations", 0)
-        self.hospitals = data.get("hospitals", 0)
-        self.recycling_centers = data.get("recycling_centers", 0)
-        self.subways = data.get("subways", 0)
-        self.supermarkets = data.get("supermarkets", 0)
-        self.banks = data.get("banks", 0)
-        self.shopping_malls = data.get("shopping_malls", 0)
-        self.stadiums = data.get("stadiums", 0)
-        self.barracks = data.get("barracks", 0)
-        self.factories = data.get("factories", 0)
-        self.hangars = data.get("hangars", 0)
-        self.drydocks = data.get("drydocks", 0)
+    def __init__(self, data: Dict[str, Any], nation: PnWKitNation) -> None:
+        self.id: int = data.get("city_id") or data["id"]
+        self.name: Optional[str] = data.get("name")
+        self.nation_id: int = int(nation.id)
+        self.age: int = (datetime.utcnow() - datetime.fromisoformat(data["date"])).days
+        self.infrastructure: float = data["infrastructure"]
+        self.land: float = data["land"]
+        self.powered: bool = data["powered"]
+        self.coal_power: int = data.get("coalpower", 0)
+        self.oil_power: int = data.get("oilpower", 0)
+        self.nuclear_power: int = data.get("nuclearpower", 0)
+        self.wind_power: int = data.get("windpower", 0)
+        self.coal_mines: int = data.get("coalmine", 0)
+        self.lead_mines: int = data.get("leadmine", 0)
+        self.bauxite_mines: int = data.get("bauxitemine", 0)
+        self.oil_wells: int = data.get("oilwell", 0)
+        self.uranium_mines: int = data.get("uramine", 0)
+        self.iron_mines: int = data.get("ironmine", 0)
+        self.farms: int = data.get("farm", 0)
+        self.oil_refineries: int = data.get("gasrefinery", 0)
+        self.steel_mills: int = data.get("steelmill", 0)
+        self.aluminum_refineries: int = data.get("aluminumrefinery", 0)
+        self.munitions_factories: int = data.get("munitionsfactory", 0)
+        self.police_stations: int = data.get("policestation", 0)
+        self.hospitals: int = data.get("hospital", 0)
+        self.recycling_centers: int = data.get("recyclingcenter", 0)
+        self.subways: int = data.get("subway", 0)
+        self.supermarkets: int = data.get("supermarket", 0)
+        self.banks: int = data.get("bank", 0)
+        self.shopping_malls: int = data.get("mall", 0)
+        self.stadiums: int = data.get("stadium", 0)
+        self.barracks: int = data.get("barracks", 0)
+        self.factories: int = data.get("factory", 0)
+        self.hangars: int = data.get("airforcebase", 0)
+        self.drydocks: int = data.get("drydock", 0)
+        self.nation: Nation = cache.get_nation(self.nation_id)  # type: ignore
+        self.projects: PnWKitNation = nation
 
-    async def _make_projects(self) -> None:
-        data = await pnwkit.async_nation_query(
-            {"id": self.nation_id},
-            "ironw",
-            "bauxitew",
-            "armss",
-            "egr",
-            "massirr",
-            "itc",
-            "mlp",
-            "nrf",
-            "irond",
-            "vds",
-            "cia",
-            "cfce",
-            "propb",
-            "uap",
-            "city_planning",
-            "adv_city_planning",
-            "space_program",
-            "spy_satellite",
-            "moon_landing",
-            "pirate_economy",
-            "recycling_initiative",
-            "telecom_satellite",
-            "green_tech",
-            "arable_land_agency",
-            "clinical_research_center",
-            "specialized_police_training",
-            "adv_engineering_corps",
+    @cached_property
+    def population(self) -> float:
+        return (
+            (
+                (self.infrastructure * 100)
+                - ((self.disease * 100 * self.infrastructure) / 10)
+            )
+            - max((self.crime / 10) * (100 * self.infrastructure) - 25, 0)
+        ) * (1 + math.log(self.age) / 15)
+
+    @cached_property
+    def disease(self) -> float:
+        disease = (
+            (((((self.infrastructure * 100 / self.land) ** 2) * 0.01) - 25) / 100)
+            + (self.infrastructure * 100 / 100000)
+            + (self.pollution * 0.05)
+            - (self.hospitals * 2.5)
+            - (self.hospitals * self.projects.clinical_research_center)
         )
-        if TYPE_CHECKING:
-            assert isinstance(data, tuple)
-        self.projects = data[0]
+        if disease < 0:
+            return 0
+        if disease > 100:
+            return 100
+        return disease
 
-    async def _make_nation(self) -> None:
-        from .nation import Nation
+    @cached_property
+    def crime(self) -> float:
+        crime = (
+            ((103 - self.commerce) ** 2 + (self.infrastructure * 100)) / (111111)
+            - (self.police_stations * 2.5)
+            - (self.police_stations * self.projects.specialized_police_training)
+        )
+        if crime < 0:
+            return 0
+        if crime > 100:
+            return 100
+        return crime
 
-        self.nation = await Nation.fetch(self.nation_id)
+    @cached_property
+    def pollution(self) -> float:
+        return (
+            self.coal_power * 8
+            + self.oil_power * 6
+            + self.coal_mines * 12
+            + self.iron_mines * 12
+            + self.bauxite_mines * 12
+            + self.lead_mines * 12
+            + self.uranium_mines * 20
+            + self.farms * 2 * (1 - int(self.projects.green_tech) * 0.5)
+            + self.oil_refineries * 32 * (1 - int(self.projects.green_tech) * 0.25)
+            + self.steel_mills * 40 * (1 - int(self.projects.green_tech) * 0.25)
+            + self.aluminum_refineries * 40 * (1 - int(self.projects.green_tech) * 0.25)
+            + self.munitions_factories * 32 * (1 - int(self.projects.green_tech) * 0.25)
+            + self.police_stations
+            + self.hospitals * 4
+            - self.recycling_centers * 70
+            - self.recycling_centers * 5 * self.projects.recycling_initiative
+            - self.subways * 45
+            - self.subways * 25 * self.projects.green_tech
+            + self.shopping_malls * 2
+            + self.stadiums * 5
+        )
 
-    async def calculate_income(self) -> Dict[str, Resources]:
+    @cached_property
+    def commerce(self) -> float:
+        commerce = (
+            self.supermarkets * 3
+            + self.banks * 5
+            + self.shopping_malls * 9
+            + self.stadiums * 12
+            + self.projects.telecom_satellite * 2
+        )
+        if self.projects.telecom_satellite:
+            return commerce
+        if self.projects.itc:
+            return min(commerce, 115)
+        return min(commerce, 100)
+
+    def calculate_income(self) -> Dict[str, Resources]:
         """
         Income is per day.
         """
@@ -464,14 +454,7 @@ class FullCity(Makeable):
             * (1 + (0.36 * int(self.projects.bauxitew)))
         )
 
-    def calculate_net_gasoline_income(self) -> float:
-        return self.calculate_gasoline_income()
-
-    def calculate_net_munitions_income(self) -> float:
-        return self.calculate_munitions_income()
-
-    def calculate_net_steel_income(self) -> float:
-        return self.calculate_steel_income()
-
-    def calculate_net_aluminum_income(self) -> float:
-        return self.calculate_aluminum_income()
+    calculate_net_gasoline_income = calculate_gasoline_income
+    calculate_net_munitions_income = calculate_munitions_income
+    calculate_net_steel_income = calculate_steel_income
+    calculate_net_aluminum_income = calculate_aluminum_income
