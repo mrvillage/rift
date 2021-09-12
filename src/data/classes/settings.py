@@ -109,7 +109,7 @@ class GuildWelcomeSettings(Makeable):
         else:
             message = f"Welcome to {member.guild.name}!"
         if not verified:
-            message += "\n\nIt doesn't look like you're verified! Be sure to run `?verify <nation>` to verify."
+            message += "\n\nIt doesn't look like you're verified! Be sure to run `/verify` and provide your nation to verify."
         return get_embed_author_member(member, message)
 
     async def set_verified_nickname(
