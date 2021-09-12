@@ -75,7 +75,7 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                 )
             )
         elif isinstance(error, NationNotFoundError):
-            if error.args[0] == str(ctx.author.id):
+            if str(error.args[0]) == str(ctx.author.id):
                 await ctx.reply(
                     embed=get_embed_author_member(
                         ctx.author,
@@ -92,7 +92,7 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                     )
                 )
         elif isinstance(error, AllianceNotFoundError):
-            if error.args[0] == str(ctx.author.id):
+            if str(error.args[0]) == str(ctx.author.id):
                 await ctx.reply(
                     embed=get_embed_author_member(
                         ctx.author,
