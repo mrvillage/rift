@@ -224,7 +224,8 @@ class Menus(commands.Cog):
                 ctx.author,
                 f"Menu {menu.menu_id} sent to {channel.mention}!",
                 color=discord.Color.green(),
-            )
+            ),
+            ephemeral=True,
         )
 
     @menu.command(
