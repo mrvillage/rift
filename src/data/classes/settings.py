@@ -48,7 +48,7 @@ class GuildWelcomeSettings(Makeable):
     )
 
     def __init__(self, data: GuildWelcomeSettingsData) -> None:
-        self.defaulted = False
+        self.defaulted: bool = False
         self.guild_id: int = int(data["guild_id"])
         self.welcome_message: Optional[str] = data["welcome_message"]
         self.welcome_channels: Optional[List[int]] = data["welcome_channels"]
@@ -145,6 +145,8 @@ class GuildWelcomeSettings(Makeable):
         await member.edit(nick=nickname)
 
     async def set_(self, **kwargs: Any) -> GuildWelcomeSettings:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
         sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
         sets = ", ".join(sets)
         args = tuple(kwargs.values())
@@ -170,11 +172,19 @@ class GuildWelcomeSettings(Makeable):
 class GuildSettings(Makeable):
     welcome_settings: GuildWelcomeSettings
 
-    __slots__ = ("guild_id", "welcome_settings", "defaulted")
+    __slots__ = (
+        "guild_id",
+        "welcome_settings",
+        "defaulted",
+        "purpose",
+        "purpose_argument",
+    )
 
     def __init__(self, data: GuildSettingsData) -> None:
+        self.defaulted: bool = False
         self.guild_id: int = data["guild_id"]
-        ...
+        self.purpose: Optional[str] = data["purpose"]
+        self.purpose_argument: Optional[str] = data["purpose_argument"]
 
     async def _make_welcome_settings(self) -> None:
         self.welcome_settings: GuildWelcomeSettings = await GuildWelcomeSettings.fetch(
@@ -183,7 +193,9 @@ class GuildSettings(Makeable):
 
     @classmethod
     def default(cls, guild_id: int) -> GuildSettings:
-        settings = cls({"guild_id": guild_id})
+        settings = cls(
+            {"guild_id": guild_id, "purpose": None, "purpose_argument": None}
+        )
         settings.defaulted = True
         return settings
 
@@ -197,5 +209,26 @@ class GuildSettings(Makeable):
         await settings.make_attrs(*attrs)
         return settings
 
-    async def set_(self, **kwargs: Mapping[str, Any]) -> GuildSettings:
-        ...
+    async def set_(self, **kwargs: Any) -> GuildSettings:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+        sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
+        sets = ", ".join(sets)
+        args = tuple(kwargs.values())
+        if self.defaulted:
+            await execute_query(
+                f"""
+            INSERT INTO guild_settings (guild_id, {', '.join(kwargs.keys())}) VALUES ({', '.join(f'${i}' for i in range(1, len(kwargs)+2))});
+            """,
+                self.guild_id,
+                *tuple(kwargs.values()),
+            )
+        else:
+            await execute_query(
+                f"""
+            UPDATE guild_settings SET {sets} WHERE guild_id = $1;
+            """,
+                self.guild_id,
+                *args,
+            )
+        return self
