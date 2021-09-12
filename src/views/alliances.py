@@ -43,7 +43,7 @@ class AlliancesPaginator(discord.ui.View):
             f"Page: **{page}** of **{max_page}**\n"
             + "Rank: ID, Name, Score, Members\n"
             + "\n".join(
-                f"**#{i.raw_rank}**: {i.id}, {i.name}, {i.calculated_score:,.2f}, {i.member_count}"
+                f"**#{i.rank}**: {i.id}, {i.name}, {i.score:,.2f}, {i.member_count}"
                 for i in alliances
             ),
             color=discord.Color.blue(),
@@ -78,7 +78,7 @@ class AlliancesPaginator(discord.ui.View):
             f"Page: **{page}** of **{max_page}**\n"
             + "Rank: ID, Name, Score, Members\n"
             + "\n".join(
-                f"**#{i.raw_rank}**: {i.id}, {i.name}, {i.calculated_score:,.2f}, {i.member_count}"
+                f"**#{i.rank}**: {i.id}, {i.name}, {i.score:,.2f}, {i.member_count}"
                 for i in alliances
             ),
             color=discord.Color.blue(),
@@ -120,7 +120,7 @@ class AlliancesPaginator(discord.ui.View):
             f"Page: **{page}** of **{max_page}**\n"
             + "Rank: ID, Name, Score, Members\n"
             + "\n".join(
-                f"**#{i.raw_rank}**: {i.id}, {i.name}, {i.calculated_score:,.2f}, {i.member_count}"
+                f"**#{i.rank}**: {i.id}, {i.name}, {i.score:,.2f}, {i.member_count}"
                 for i in alliances
             ),
             color=discord.Color.blue(),
