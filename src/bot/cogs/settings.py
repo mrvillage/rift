@@ -36,7 +36,7 @@ class Settings(commands.Cog):
         aliases=["ss", "serversettings", "settings"],
         help="View of modify server settings.",
         invoke_without_command=True,
-        type=(commands.CommandType.default, commands.CommandType.chat_input),
+        type=commands.CommandType.chat_input,
     )
     @has_manage_permissions()
     @commands.guild_only()
@@ -227,7 +227,7 @@ class Settings(commands.Cog):
         name="welcome-message",
         aliases=["wm", "welcomemessage"],
         help="Modify the server's welcome message.",
-        type=(commands.CommandType.default, commands.CommandType.chat_input),
+        type=commands.CommandType.chat_input,
     )
     @has_manage_permissions()
     @commands.guild_only()
@@ -252,7 +252,7 @@ class Settings(commands.Cog):
         name="verified-nickname",
         aliases=["vn", "verifiednickname"],
         help="Modify the server's verified nickname format.",
-        type=(commands.CommandType.default, commands.CommandType.chat_input),
+        type=commands.CommandType.chat_input,
     )
     @has_manage_permissions()
     @commands.guild_only()
