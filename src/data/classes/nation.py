@@ -6,6 +6,7 @@ from urllib.parse import quote
 
 import aiohttp
 import discord
+import pnwkit
 from aiohttp import request
 from bs4 import BeautifulSoup
 from discord.ext.commands import Context
@@ -21,6 +22,8 @@ from .base import Makeable
 __all__ = ("Nation",)
 
 if TYPE_CHECKING:
+    from pnwkit.data import Nation as PnWKitNation
+
     from typings import NationData
 
     from .resources import Resources
@@ -272,7 +275,7 @@ class Nation(Makeable):
         ) as response:
             soup = BeautifulSoup(await response.text(), "html.parser")
         table = soup.find_all(class_="nationtable")[1]
-        rows = table.find_all("tr")
+        rows = table.find_all("tr")  # type: ignore
         ids = [
             int(await convert_link(i.contents[0].attrs["href"]))
             for i in rows[0].contents[2:]
@@ -310,24 +313,94 @@ class Nation(Makeable):
         return cities
 
     async def calculate_revenue(
-        self, prices: TradePrices = None
+        self,
+        prices: TradePrices = None,
+        data: PnWKitNation = None,
+        fetch_spies: bool = False,
     ) -> Dict[str, Union[Resources, Dict[str, float], int, float]]:
+        # sourcery no-metrics
         from ...funcs import calculate_spies, get_trade_prices
         from .city import FullCity
         from .color import Color
         from .resources import Resources
 
         revenue: Dict[str, Union[Resources, Dict[str, float], int, float]]
-
-        spies = await calculate_spies(self)
+        spies = await calculate_spies(self) if fetch_spies else 0
         prices = prices or await get_trade_prices()
-        city_manager = await self.scrape_city_manager()
-        cities = [FullCity(i) for i in city_manager]
-        await cities[0].make_attrs("nation", "projects")
-        for city in cities:
-            city.nation = cities[0].nation
-            city.projects = cities[0].projects
-        revenues = [await i.calculate_income() for i in cities]
+        if not data:
+            raw_data = await pnwkit.async_nation_query(
+                {"id": self.id},
+                "id",
+                "ironw",
+                "bauxitew",
+                "armss",
+                "egr",
+                "massirr",
+                "itc",
+                "mlp",
+                "nrf",
+                "irond",
+                "vds",
+                "cia",
+                "cfce",
+                "propb",
+                "uap",
+                "city_planning",
+                "adv_city_planning",
+                "space_program",
+                "spy_satellite",
+                "moon_landing",
+                "pirate_economy",
+                "recycling_initiative",
+                "telecom_satellite",
+                "green_tech",
+                "arable_land_agency",
+                "clinical_research_center",
+                "specialized_police_training",
+                "adv_engineering_corps",
+                {
+                    "cities": (
+                        "id",
+                        "name",
+                        "date",
+                        "infrastructure",
+                        "land",
+                        "powered",
+                        "oilpower",
+                        "windpower",
+                        "coalpower",
+                        "nuclearpower",
+                        "coalmine",
+                        "oilwell",
+                        "uramine",
+                        "barracks",
+                        "farm",
+                        "policestation",
+                        "hospital",
+                        "recyclingcenter",
+                        "subway",
+                        "supermarket",
+                        "bank",
+                        "mall",
+                        "stadium",
+                        "leadmine",
+                        "ironmine",
+                        "bauxitemine",
+                        "gasrefinery",
+                        "aluminumrefinery",
+                        "steelmill",
+                        "munitionsfactory",
+                        "factory",
+                        "airforcebase",
+                        "drydock",
+                    )
+                },
+            )
+            if TYPE_CHECKING:
+                assert isinstance(raw_data, tuple)
+            data = raw_data[0]
+        cities = [FullCity(i, data) for i in data.cities]  # type: ignore
+        revenues = [i.calculate_income() for i in cities]
         revenue = {
             "gross_income": sum(
                 (i["gross_income"] for i in revenues[1:]), revenues[0]["gross_income"]
