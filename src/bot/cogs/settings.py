@@ -288,9 +288,8 @@ class Settings(commands.Cog):
         settings = settings.welcome_settings
         if settings.welcome_channels:
             for channel in settings.welcome_channels:
-                try:
-                    channel = await self.bot.fetch_channel(channel)
-                except NotFound:
+                channel = self.bot.get_channel(channel)
+                if not channel:
                     continue
                 try:
                     embed = settings.format_welcome_embed(member, bool(nation))
