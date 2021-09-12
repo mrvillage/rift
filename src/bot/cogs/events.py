@@ -4,6 +4,7 @@ import json
 import sys
 import traceback
 from asyncio import sleep
+from typing import Literal
 
 import aiohttp
 from discord.backoff import ExponentialBackoff
@@ -58,13 +59,18 @@ class Events(commands.Cog):
                 await sleep(delay)
 
     @commands.command(
-        name="subscribe", help="Subscribe to an event stream.", enabled=False
+        name="subscribe",
+        help="Subscribe to an event stream. Note: Not all types are valid for every event.",
+        type=commands.CommandType.chat_input,
     )
-    async def subscribe(self, ctx: commands.Context, *, event: str):
-        if event not in self.bot.subscribable_events:
-            await ctx.send(f"{event} is not a valid event.")
-            return
-        await ctx.send(f"{event} successfully subscribed.")
+    async def subscribe(
+        self,
+        ctx: commands.Context,
+        *,
+        event: Literal["ALLIANCE", "COLOR", "PRICE", "NATION"],  # TRADE, TREASURE, WAR
+        type: Literal["CREATE", "DELETE", "UPDATE"],  # ACCEPT, VICTORY
+    ):
+        ...
 
 
 def setup(bot: Rift):
