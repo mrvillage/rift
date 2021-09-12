@@ -159,7 +159,7 @@ class Nation(Makeable):
         try:
             return cls(data=await query_nation(nation_id=nation_id))
         except IndexError:
-            raise NationNotFoundError
+            raise NationNotFoundError(nation_id)
 
     async def _make_alliance(self) -> None:
         from .alliance import Alliance
