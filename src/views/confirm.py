@@ -15,8 +15,8 @@ class Confirm(ui.View):
 
     value: Optional[bool]
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, timeout: Optional[float] = 180):
+        super().__init__(timeout=timeout)
         self.value = None
 
     async def hook(self, interaction: Interaction):
