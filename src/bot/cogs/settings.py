@@ -1,16 +1,18 @@
 from __future__ import annotations
-from ...checks import has_manage_permissions
 
-from typing import TYPE_CHECKING, Optional
+import asyncio
+from typing import TYPE_CHECKING, Literal, Optional
 
 import discord
 from discord import NotFound
 from discord.ext import commands
 
-from ... import funcs
-from ...data.classes import GuildSettings
-from ...data.classes import Nation
+from src.views.settings import AlliancePurposeConfirm
 
+from ... import funcs
+from ...checks import has_manage_permissions
+from ...data.classes import Alliance, GuildSettings, Nation
+from ...errors import AllianceNotFoundError
 
 if TYPE_CHECKING:
     from ...ref import Rift
@@ -45,13 +47,181 @@ class Settings(commands.Cog):
         name="purpose",
         aliases=["p"],
         help="View or modify the server's purpose.",
-        enabled=False,
-        type=(commands.CommandType.default, commands.CommandType.chat_input),
+        type=commands.CommandType.chat_input,
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def server_settings_purpose(self, ctx: commands.Context):
-        ...
+    async def server_settings_purpose(
+        self,
+        ctx: commands.Context,
+        *,
+        purpose: Literal[
+            "ALLIANCE",
+            "ALLIANCE_GOVERNMENT",
+            "ALLIANCE_MILITARY_AFFAIRS",
+            "ALLIANCE_INTERNAL_AFFAIRS",
+            "ALLIANCE_MILITARY_AFFAIRS",
+            "ALLIANCE_FOREIGN_AFFAIRS",
+            "ALLIANCE_ECONOMIC_AFFAIRS",
+            "BUSINESS",
+            "COMMUNITY",
+            "PERSONAL",
+        ] = None,
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id)
+        if not purpose:
+            await settings.set_(purpose=purpose, purpose_argument=None)
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The server purpose has been set to: `{purpose}`",
+                    color=discord.Color.green(),
+                )
+            )
+        if purpose == "PERSONAL":
+            if settings.purpose == "PERSONAL":
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="The server purpose is already set to `PERSONAL`!",
+                        color=discord.Color.red(),
+                    )
+                )
+            await settings.set_(purpose=purpose, purpose_argument=None)
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The server purpose has been set to: `{purpose}`",
+                    color=discord.Color.green(),
+                )
+            )
+        elif purpose.startswith("ALLIANCE"):
+            message = await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "Waiting for a followup message with the alliance...",
+                    color=discord.Color.orange(),
+                ),
+                return_message=True,
+            )
+            try:
+                m = await self.bot.wait_for(
+                    "message",
+                    check=lambda m: m.author == ctx.author and m.channel == ctx.channel,
+                    timeout=60,
+                )
+            except asyncio.TimeoutError:
+                return await message.edit(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="You didn't provide an alliance in time!",
+                        color=discord.Color.red(),
+                    )
+                )
+            try:
+                alliance = await Alliance.convert(ctx, m.content)
+            except AllianceNotFoundError:
+                return await message.edit(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"No alliance found with argument `{message.content}`",
+                        color=discord.Color.red(),
+                    )
+                )
+            if settings.purpose == purpose and settings.purpose_argument == str(
+                alliance.id
+            ):
+                return await message.edit(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The server purpose is already set to `{purpose}` and is linked to {repr(alliance)}!",
+                        color=discord.Color.green(),
+                    )
+                )
+            for i in alliance.leaders:
+                await i.make_attrs("user")
+            if all(not i.user for i in alliance.leaders):
+                return await message.edit(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"{repr(alliance)} has no linked leaders! Have at least one link themselves to provide confirmation then try again.",
+                        color=discord.Color.red(),
+                    )
+                )
+            await message.edit(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"Sending messages to the leaders of {repr(alliance)}...",
+                    color=discord.Color.orange(),
+                )
+            )
+            sent = []
+            for i in alliance.leaders:
+                if not i.user:
+                    continue
+                view = AlliancePurposeConfirm(purpose, alliance, i.user, settings)
+                try:
+                    await view.start()
+                    sent.append(i.user)
+                except discord.Forbidden:
+                    continue
+            if sent:
+                await message.edit(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"Waiting for confirmation from a linked alliance leader before setting the purpose to `{purpose}` and link to {repr(alliance)}.",
+                        color=discord.Color.green(),
+                    )
+                )
+            else:
+                await message.edit(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="I couldn't send a message to any alliance leaders!.",
+                        color=discord.Color.red(),
+                    )
+                )
+        else:
+            message = await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "Waiting for a followup message with the community or business name...",
+                    color=discord.Color.orange(),
+                ),
+                return_message=True,
+            )
+            try:
+                m = await self.bot.wait_for(
+                    "message",
+                    check=lambda m: m.author == ctx.author and m.channel == ctx.channel,
+                    timeout=60,
+                )
+            except asyncio.TimeoutError:
+                return await message.edit(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="You didn't provide a name in time!",
+                        color=discord.Color.red(),
+                    )
+                )
+            if settings.purpose == purpose and settings.purpose_argument == m.content:
+                return await message.edit(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The server purpose is already set to `{purpose}` with the name `{m.content}`!",
+                        color=discord.Color.red(),
+                    )
+                )
+            await settings.set_(purpose=purpose, purpose_argument=m.content)
+            await message.edit(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The server purpose has been set to `{purpose}` with the name `{m.content}`.",
+                    color=discord.Color.green(),
+                )
+            )
 
     @server_settings.command(
         name="welcome-message",
