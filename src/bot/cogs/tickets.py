@@ -57,7 +57,8 @@ class Tickets(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author, f"Ticket `{ctx.channel.id}` has been archived."
-            )
+            ),
+            ephemeral=True,
         )
 
     @ticket.group(
@@ -104,7 +105,8 @@ class Tickets(commands.Cog):
                 ctx.author,
                 f"Ticket Configuration {config.config_id} created.",
                 color=discord.Color.green(),
-            )
+            ),
+            ephemeral=True,
         )
 
     @ticket_config.command(
