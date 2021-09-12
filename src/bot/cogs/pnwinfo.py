@@ -50,7 +50,7 @@ class PnWInfo(commands.Cog):
     )
     async def alliance(self, ctx: commands.Context, *, alliance: Alliance = None):
         alliance = alliance or await Alliance.convert(ctx, alliance)
-        await ctx.reply(embed=await alliance.get_info_embed(ctx))
+        await ctx.reply(embed=alliance.get_info_embed(ctx))
 
     @commands.command(
         name="who",

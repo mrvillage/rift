@@ -175,7 +175,7 @@ class Alliance(Makeable):
         await bot.parse_token(content)
         return await Resources.from_dict(await parse_alliance_bank(content))
 
-    async def get_info_embed(self, ctx: Context, short: bool = False) -> discord.Embed:
+    def get_info_embed(self, ctx: Context, short: bool = False) -> discord.Embed:
         # sourcery no-metrics
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
@@ -271,7 +271,7 @@ class Alliance(Makeable):
             ).set_thumbnail(url=self.flag_url)
         )
         if any(len(fields[i]["value"] + fields[i]["name"]) > 1024 for i in {9, 10, 11}):
-            return await self.get_info_embed(ctx, short=True)
+            return self.get_info_embed(ctx, short=True)
         return embed
 
     async def calculate_revenue(
