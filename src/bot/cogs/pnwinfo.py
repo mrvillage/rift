@@ -117,7 +117,7 @@ class PnWInfo(commands.Cog):
         name="treaties",
         aliases=["t", "treaty"],
         description="Get the treaties of an alliance.",
-        type=(commands.CommandType.default, commands.CommandType.chat_input),
+        type=commands.CommandType.chat_input,
     )
     async def treaties(self, ctx: commands.Context, *, alliance: Alliance = None):
         alliance = alliance or await Alliance.convert(ctx, alliance)
