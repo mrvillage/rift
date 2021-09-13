@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, Union
+from typing import TYPE_CHECKING
 
-from ..query import query_color
+from ...cache import cache
+from ...errors import ColorNotFoundError
 
 __all__ = ("Color",)
 
@@ -11,22 +12,21 @@ if TYPE_CHECKING:
 
 
 class Color:
-    __slots__ = ("color", "name", "bloc_name", "bonus", "turn_bonus")
+    __slots__ = ("color", "name", "bonus")
 
     def __init__(self, data: ColorData) -> None:
-        self.color = data["color"]
-        self.name = data["bloc_name"]
-        self.bloc_name = self.name
-        self.bonus = data["turn_bonus"]
-        self.turn_bonus = self.bonus
+        self.color: str = data["color"]
+        self.name: str = data["bloc_name"]
+        self.bonus: int = data["turn_bonus"]
 
     @classmethod
-    async def fetch(cls, name: str) -> Color:
-        return cls(await query_color(name))
+    async def fetch(cls, name: str, /) -> Color:
+        color = cache.get_color(name)
+        if color:
+            return color
+        raise ColorNotFoundError(name)
 
     def _update(self, data: ColorData) -> None:
         self.color = data["color"]
         self.name = data["bloc_name"]
-        self.bloc_name = self.name
         self.bonus = data["turn_bonus"]
-        self.turn_bonus = self.bonus
