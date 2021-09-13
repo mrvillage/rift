@@ -6,6 +6,8 @@ __all__ = (
     "CityNotFoundError",
     "ColorNotFoundError",
     "DocumentNotFoundError",
+    "EmbassyConfigNotFoundError",
+    "EmbassyNotFoundError",
     "GuildNotFoundError",
     "MenuItemNotFoundError",
     "MenuNotFoundError",
@@ -36,6 +38,14 @@ class ColorNotFoundError(NotFoundError):
 
 
 class DocumentNotFoundError(NotFoundError):
+    ...
+
+
+class EmbassyConfigNotFoundError(NotFoundError):
+    ...
+
+
+class EmbassyNotFoundError(NotFoundError):
     ...
 
 
