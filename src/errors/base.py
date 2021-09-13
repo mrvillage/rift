@@ -1,10 +1,13 @@
+__all__ = ("BaseError", "SearchError", "ConvertError")
+
+
 class BaseError(Exception):
-    pass
+    ...
 
 
 class SearchError(BaseError):
-    pass
+    ...
 
 
 class ConvertError(BaseError):
-    pass
+    ...

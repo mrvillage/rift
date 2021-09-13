@@ -1,13 +1,15 @@
 from .base import BaseError
 
+__all__ = ("MessageError", "LoginError", "SentError")
+
 
 class MessageError(BaseError):
-    pass
+    ...
 
 
 class LoginError(MessageError):
-    pass
+    ...
 
 
 class SentError(MessageError):
-    pass
+    ...

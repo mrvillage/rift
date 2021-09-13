@@ -1,21 +1,23 @@
 from .base import BaseError
 
+__all__ = ("NoBankPermsError", "NoSendBankPermsError", "NoViewBankPermsError")
+
 
 class BasePermsError(BaseError):
-    pass
+    ...
 
 
 class BaseBankPermsError(BasePermsError):
-    pass
+    ...
 
 
 class NoBankPermsError(BaseBankPermsError):
-    pass
+    ...
 
 
 class NoSendBankPermsError(NoBankPermsError):
-    pass
+    ...
 
 
 class NoViewBankPermsError(NoBankPermsError):
-    pass
+    ...

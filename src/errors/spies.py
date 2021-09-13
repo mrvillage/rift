@@ -1,5 +1,11 @@
 from .base import BaseError
 
+__all__ = (
+    "InvalidSpyResponseError",
+    "InvalidReferenceSpyRequestError",
+    "SpiesNotFoundError",
+)
+
 
 class BaseSpiesError(BaseError):
     pass
