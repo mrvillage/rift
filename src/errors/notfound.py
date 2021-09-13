@@ -4,6 +4,7 @@ __all__ = (
     "AllianceNotFoundError",
     "CategoryNotFoundError",
     "CityNotFoundError",
+    "ColorNotFoundError",
     "DocumentNotFoundError",
     "GuildNotFoundError",
     "MenuItemNotFoundError",
@@ -27,6 +28,10 @@ class CategoryNotFoundError(NotFoundError):
 
 
 class CityNotFoundError(NotFoundError):
+    ...
+
+
+class ColorNotFoundError(NotFoundError):
     ...
 
 
