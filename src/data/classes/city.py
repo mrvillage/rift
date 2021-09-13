@@ -5,9 +5,10 @@ from datetime import datetime
 from functools import cached_property
 from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
 
-import pnwkit
+from src.errors.notfound import CityNotFoundError
 
 from ...cache import cache
+from ...errors import CityNotFoundError
 from ..requests import get_city_build
 from .base import Makeable
 from .resources import Resources
@@ -31,7 +32,6 @@ class City:
         "infrastructure",
         "max_infra",
         "land",
-        "nation",
     )
 
     def __init__(self, data: CityData) -> None:
@@ -43,19 +43,24 @@ class City:
         self.max_infra: float = data["max_infra"]
         self.land: float = data["land"]
 
+    @classmethod
+    async def fetch(cls, city_id: int, /) -> City:
+        city = cache.get_city(city_id)
+        if city:
+            return city
+        raise CityNotFoundError(city_id)
+
+    def _update(self, data: CityData, /) -> None:
+        self.id: int = data["id"]
+        self.nation_id: int = data["nation_id"]
+        self.name: str = data["name"]
+        self.capital: bool = data["capital"]
+        self.infrastructure: float = data["infrastructure"]
+        self.max_infra: float = data["max_infra"]
+        self.land: float = data["land"]
+
     def __repr__(self) -> str:
         return f"{self.id} - {self.name}"
-
-    async def _make_nation(self) -> None:
-        from .nation import Nation
-
-        try:
-            self.nation = await Nation.fetch(self.nation_id)
-        except IndexError:
-            self.nation = None
-
-    async def get_build(self) -> Dict[str, Any]:
-        return await get_city_build(city_id=self.id)
 
     def __str__(self) -> str:
         return self.name
@@ -66,14 +71,15 @@ class City:
     def __float__(self) -> Tuple[float, float]:
         return self.infrastructure, self.land
 
-    def _update(self, data: CityData, /) -> None:
-        self.id: int = data["id"]
-        self.nation_id: int = data["nation_id"]
-        self.name: str = data["name"]
-        self.capital: bool = data["capital"]
-        self.infrastructure: float = data["infrastructure"]
-        self.max_infra: float = data["max_infra"]
-        self.land: float = data["land"]
+    @cached_property
+    def nation(self) -> Nation:
+        return cache.get_nation(self.nation_id)  # type: ignore
+
+    async def _make_nation(self) -> None:
+        pass
+
+    async def get_build(self) -> Dict[str, Any]:
+        return await get_city_build(city_id=self.id)
 
 
 class FullCity(Makeable):
