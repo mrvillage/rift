@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING, Optional, Tuple, Union
 import discord
 from discord.ext import commands
 
+from ...cache import cache
+from ...errors import EmbassyConfigNotFoundError, EmbassyNotFoundError
 from ..db import execute_query, execute_read_query
 from ..get import get_embassy
 from ..query import query_embassy_by_guild, query_embassy_config
@@ -18,10 +20,6 @@ if TYPE_CHECKING:
 
 
 class Embassy:
-    embassy_id: int
-    alliance_id: int
-    config_id: int
-    guild_id: int
     __slots__ = (
         "embassy_id",
         "alliance_id",
@@ -31,15 +29,31 @@ class Embassy:
     )
 
     def __init__(self, data: EmbassyData) -> None:
-        self.embassy_id = data["embassy_id"]
-        self.alliance_id = data["alliance_id"]
-        self.config_id = data["config_id"]
-        self.guild_id = data["guild_id"]
-        self.open = data["open"]
+        self.embassy_id: int = data["embassy_id"]
+        self.alliance_id: int = data["alliance_id"]
+        self.config_id: int = data["config_id"]
+        self.guild_id: int = data["guild_id"]
+        self.open: bool = data["open"]
+
+    @classmethod
+    async def convert(cls, ctx: commands.Context, argument: str) -> Embassy:
+        try:
+            embassy = cache.get_embassy(int(argument))
+            if embassy:
+                return embassy
+            raise EmbassyNotFoundError(argument)
+        except ValueError:
+            raise EmbassyNotFoundError(argument)
 
     @classmethod
     async def fetch(cls, embassy_id: int) -> Embassy:
-        return cls(await get_embassy(embassy_id=embassy_id))
+        embassy = cache.get_embassy(embassy_id)
+        if embassy:
+            return embassy
+        raise EmbassyNotFoundError(embassy_id)
+
+    def __int__(self) -> int:
+        return self.embassy_id
 
     async def save(self) -> None:
         await execute_query(
@@ -51,17 +65,10 @@ class Embassy:
             self.open,
         )
 
-    @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str) -> Embassy:
-        ...
-
     async def delete(self) -> None:
         await execute_read_query(
             """DELETE FROM embassies WHERE embassy_id = $1;""", self.embassy_id
         )
-
-    def __int__(self) -> int:
-        return self.embassy_id
 
     async def start(
         self,
@@ -91,10 +98,6 @@ class Embassy:
 
 
 class EmbassyConfig:
-    config_id: int
-    category_id: Optional[int]
-    guild_id: int
-    start_message: str
     __slots__ = (
         "config_id",
         "category_id",
@@ -103,14 +106,30 @@ class EmbassyConfig:
     )
 
     def __init__(self, data: EmbassyConfigData) -> None:
-        self.config_id = data["config_id"]
-        self.category_id = data["category_id"]
-        self.guild_id = data["guild_id"]
-        self.start_message = data["start_message"]
+        self.config_id: int = data["config_id"]
+        self.category_id: Optional[int] = data["category_id"]
+        self.guild_id: int = data["guild_id"]
+        self.start_message: str = data["start_message"]
+
+    @classmethod
+    async def convert(cls, ctx: commands.Context, argument: str) -> EmbassyConfig:
+        try:
+            config = cache.get_embassy_config(int(argument))
+            if config:
+                return config
+            raise EmbassyConfigNotFoundError(argument)
+        except ValueError:
+            raise EmbassyConfigNotFoundError(argument)
 
     @classmethod
     async def fetch(cls, config_id: int) -> EmbassyConfig:
-        return EmbassyConfig(await query_embassy_config(config_id=config_id))
+        config = cache.get_embassy_config(config_id)
+        if config:
+            return config
+        raise EmbassyConfigNotFoundError(config_id)
+
+    def __int__(self) -> int:
+        return self.config_id
 
     async def save(self) -> None:
         await execute_read_query(
@@ -200,12 +219,3 @@ class EmbassyConfig:
         embassy = Embassy(data)
         await embassy.save()
         return embassy, True
-
-    def __int__(self) -> int:
-        return self.config_id
-
-    @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str) -> EmbassyConfig:
-        if TYPE_CHECKING:
-            assert argument.isdigit()
-        return await cls.fetch(int(argument))
