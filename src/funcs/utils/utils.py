@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import random
 import string
-from asyncio import sleep
-from typing import Mapping
+from typing import TYPE_CHECKING, Mapping, Union
+
+from discord.ext import commands
 
 color_map = (
     "Beige",
@@ -23,7 +26,7 @@ color_map = (
 )
 
 
-def get_color(color_id):
+def get_color(color_id: int) -> str:
     return color_map[color_id]
     # if id == 0:
     #     return f"{color_map[id]} ({beige_turns} Turns)"
@@ -31,7 +34,7 @@ def get_color(color_id):
     #     return color_map[id]
 
 
-def get_color_id(name):
+def get_color_id(name: str) -> int:
     return color_map.index(name)
 
 
@@ -44,7 +47,7 @@ domestic_policy_map = (
 )
 
 
-def get_domestic_policy(policy_id):
+def get_domestic_policy(policy_id: int) -> str:
     return domestic_policy_map[policy_id - 1]
 
 
@@ -62,18 +65,18 @@ war_policy_map = (
 )
 
 
-def get_war_policy(policy_id):
+def get_war_policy(policy_id: int) -> str:
     return war_policy_map[policy_id - 1]
 
 
 alliance_position_map = ("None", "Applicant", "Member", "Officer", "Heir", "Leader")
 
 
-def get_alliance_position(position_id):
+def get_alliance_position(position_id: int) -> str:
     return alliance_position_map[position_id]
 
 
-def get_alliance_position_id(position):
+def get_alliance_position_id(position: str) -> int:
     return alliance_position_map.index(position)
 
 
@@ -88,22 +91,11 @@ continent_map = (
 )
 
 
-def get_continent(continent_id):
+def get_continent(continent_id: int) -> str:
     return continent_map[continent_id - 1]
 
 
-async def find(predicate, iterable):
-    counter = 0
-    for element in iterable:
-        counter += 1
-        if predicate(element):
-            return element
-        if counter == 100:
-            await sleep(0)
-            counter = 0
-
-
-async def convert_bool(value):
+async def convert_bool(value: str) -> bool:
     from ...errors import BoolError
 
     if value.lower() in {"true", "yes", "approve", "go", "accept"}:
@@ -113,18 +105,20 @@ async def convert_bool(value):
     raise BoolError
 
 
-async def get_command_signature(ctx):
+async def get_command_signature(ctx: commands.Context) -> str:
+    if TYPE_CHECKING:
+        assert ctx.command is not None
     return f"?{ctx.command.qualified_name} {ctx.command.signature}"
 
 
 get_command_help = get_command_signature
 
 
-async def generate_code(length=16):
+async def generate_code(length: int = 16) -> str:
     return "".join(random.choices(string.ascii_letters + string.digits, k=length))
 
 
-async def convert_link(search):
+async def convert_link(search: str) -> str:
     from ...errors import LinkError
 
     if "politicsandwar" in search:
@@ -132,7 +126,7 @@ async def convert_link(search):
     raise LinkError
 
 
-async def convert_number(num):
+async def convert_number(num: str) -> Union[int, float]:
     num = "".join(i for i in num if i in string.digits or i == ".")
     if num.count(".") > 1:
         last = num.rfind(".")
@@ -163,7 +157,7 @@ resources = (
 )
 
 
-async def check_resource(arg):
+async def check_resource(arg: str) -> bool:
     return arg.lower() in resources
 
 
