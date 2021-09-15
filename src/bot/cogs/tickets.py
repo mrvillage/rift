@@ -49,11 +49,14 @@ class Tickets(commands.Cog):
         config = await TicketConfig.fetch(ticket.config_id)
         ticket.open = False
         await ticket.set_(open=False)
-        category = self.bot.get_channel(config.archive_category_id)  # type: ignore
+        category = self.bot.get_channel(config.archive_category_id) or ctx.channel.category # type: ignore
         if TYPE_CHECKING:
             assert isinstance(category, discord.CategoryChannel) or category is None
             assert isinstance(ctx.channel, discord.TextChannel)
-        await ctx.channel.edit(category=category, sync_permissions=True)
+        name = f"archived-{ctx.channel.name}"
+        if len(name) > 100:
+            name = f"archived-{ticket.ticket_number}"
+        await ctx.channel.edit(name=name, category=category, sync_permissions=True)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author, f"Ticket `{ctx.channel.id}` has been archived."
