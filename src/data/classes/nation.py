@@ -1,22 +1,21 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, Sequence, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Union
 from urllib.parse import quote
 
 import aiohttp
 import discord
 import pnwkit
-from aiohttp import request
 from bs4 import BeautifulSoup
-from discord.ext.commands import Context
+from discord.ext import commands
 
+from ...cache import cache
 from ...data.get import get_link_nation
-from ...errors import NationNotFoundError, SentError
+from ...errors import NationNotFoundError
 from ...find import search_nation
 from ...funcs import utils
-from ..query import query_nation
-from ..query.city import query_nation_cities
+from ..query import query_nation, query_nation_cities
 from .base import Makeable
 
 __all__ = ("Nation",)
@@ -26,6 +25,8 @@ if TYPE_CHECKING:
 
     from typings import NationData
 
+    from .alliance import Alliance
+    from .city import City
     from .resources import Resources
     from .trade import TradePrices
 
@@ -57,9 +58,6 @@ class Nation(Makeable):
         "ships",
         "missiles",
         "nukes",
-        "alliance",
-        "user",
-        "partial_cities",
     )
 
     def __init__(self, data: NationData):
@@ -90,10 +88,76 @@ class Nation(Makeable):
         self.missiles: int = data["missiles"]
         self.nukes: int = data["nukes"]
 
-    def __repr__(self):
+    @classmethod
+    async def convert(cls, ctx, search):
+        return await search_nation(ctx, search)
+
+    @classmethod
+    async def fetch(cls, nation_id: int) -> Nation:
+        nation = cache.get_nation(nation_id)
+        if nation:
+            return nation
+        raise NationNotFoundError(nation_id)
+
+    def _update(self, data: NationData):
+        self.id: int = data["id"]
+        self.name: str = data["name"]
+        self.leader: str = data["leader"]
+        self.continent: str = utils.get_continent(data["continent"])
+        self.war_policy: str = utils.get_war_policy(data["war_policy"])
+        self.domestic_policy: str = utils.get_domestic_policy(data["domestic_policy"])
+        self.color: str = utils.get_color(data["color"])
+        self.alliance_id: int = data["alliance_id"]
+        self.alliance_position: str = utils.get_alliance_position(
+            data["alliance_position"]
+        )
+        self.cities: int = data["cities"]
+        self.offensive_wars: int = data["offensive_wars"]
+        self.defensive_wars: int = data["defensive_wars"]
+        self.score: float = data["score"]
+        self.v_mode: bool = data["v_mode"]
+        self.v_mode_turns: int = data["v_mode_turns"]
+        self.beige_turns: int = data["beige_turns"]
+        self.last_active: str = data["last_active"]
+        self.founded: str = data["founded"]
+        self.soldiers: int = data["soldiers"]
+        self.tanks: int = data["tanks"]
+        self.aircraft: int = data["aircraft"]
+        self.ships: int = data["ships"]
+        self.missiles: int = data["missiles"]
+        self.nukes: int = data["nukes"]
+
+    def __repr__(self) -> str:
         return f"{self.id} - {self.name}"
 
-    async def send_message(self, *, subject=None, content=None):
+    def __str__(self) -> str:
+        return self.name
+
+    def __int__(self) -> int:
+        return self.id
+
+    def __float__(self) -> float:
+        return self.score
+
+    def __len__(self) -> int:
+        return self.cities
+
+    def __bool__(self) -> bool:
+        return True
+
+    @property
+    def alliance(self) -> Optional[Alliance]:
+        return cache.get_alliance(self.alliance_id)
+
+    @property
+    def user(self) -> Optional[discord.User]:
+        ...
+
+    @property
+    def partial_cities(self) -> List[City]:
+        return [i for i in cache.cities if i.nation_id == self.id]
+
+    async def send_message(self, *, subject: str = None, content: str = None):
         from ...ref import bot
 
         message_data = {
@@ -106,10 +170,7 @@ class Nation(Makeable):
         async with bot.pnw_session.post(
             "https://politicsandwar.com/inbox/message", data=message_data, timeout=30.0
         ) as response:
-            if "successfully" in (await response.text()).lower():
-                return True
-            else:
-                return SentError
+            return "successfully" in (await response.text()).lower()
 
     def get_militarization(self):
         militarization = {
@@ -121,73 +182,24 @@ class Nation(Makeable):
         militarization["total"] = sum(militarization.values()) / 4
         return militarization
 
-    def __str__(self):
-        return self.name
-
-    def __int__(self):
-        return self.id
-
-    def __float__(self):
-        return self.score
-
-    def __len__(self):
-        return self.cities
-
-    def __bool__(self):
-        return True
-
     def get_average_infrastructure(self):
         return sum(i.infrastructure for i in self.partial_cities) / self.cities
 
     avg_infra = get_average_infrastructure
 
     async def get_discord_page_username(self):
-        async with request(
+        async with aiohttp.request(
             "GET", f"https://politicsandwar.com/nation/id={self.id}"
         ) as response:
             return [
-                i.contents[1].text
+                i.contents[1].text  # type: ignore
                 for i in BeautifulSoup(await response.text(), "html.parser").find_all(
                     "tr", class_="notranslate"
                 )
-                if any("Discord Username:" in str(j) for j in i.contents)
+                if any("Discord Username:" in str(j) for j in i.contents)  # type: ignore
             ][0]
 
-    @classmethod
-    async def convert(cls, ctx, search):
-        return await search_nation(ctx, search)
-
-    @classmethod
-    async def fetch(cls, nation_id: Union[int, str] = None) -> Nation:
-        try:
-            return cls(data=await query_nation(nation_id=nation_id))
-        except IndexError:
-            raise NationNotFoundError(nation_id)
-
-    async def _make_alliance(self) -> None:
-        from .alliance import Alliance
-
-        if self.alliance_id != 0:
-            self.alliance = await Alliance.fetch(self.alliance_id)
-
-    async def _make_user(self) -> None:
-        from ...ref import bot
-
-        try:
-            self.user = await bot.fetch_user(
-                (await get_link_nation(self.id))["user_id"]
-            )
-        except (IndexError, discord.NotFound):
-            self.user = None
-
-    async def _make_partial_cities(self):
-        from .city import City
-
-        partial_cities = await query_nation_cities(self.id)
-        partial_cities = [dict(i) for i in partial_cities]
-        self.partial_cities = [City(data=i) for i in partial_cities]
-
-    async def get_info_embed(self, ctx: Context) -> discord.Embed:
+    async def get_info_embed(self, ctx: commands.Context) -> discord.Embed:
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
         await self.make_attrs("alliance", "user", "partial_cities")
@@ -247,7 +259,16 @@ class Nation(Makeable):
             },
         ]
         return (
-            get_embed_author_guild(
+            get_embed_author_member(
+                ctx.author,
+                f'[Nation Page](https://politicsandwar.com/nation/id={self.id} "https://politicsandwar.com/nation/id={self.id}")',
+                timestamp=datetime.fromisoformat(self.founded),
+                footer="Nation created",
+                fields=fields,
+                color=discord.Color.blue(),
+            )
+            if ctx.guild is None
+            else get_embed_author_guild(
                 ctx.guild,
                 f'[Nation Page](https://politicsandwar.com/nation/id={self.id} "https://politicsandwar.com/nation/id={self.id}")',
                 timestamp=datetime.fromisoformat(self.founded),
@@ -464,30 +485,12 @@ class Nation(Makeable):
         revenue["trade_bonus"] = bonus
         return revenue
 
-    def _update(self, data: NationData):
-        self.id: int = data["id"]
-        self.name: str = data["name"]
-        self.leader: str = data["leader"]
-        self.continent: str = utils.get_continent(data["continent"])
-        self.war_policy: str = utils.get_war_policy(data["war_policy"])
-        self.domestic_policy: str = utils.get_domestic_policy(data["domestic_policy"])
-        self.color: str = utils.get_color(data["color"])
-        self.alliance_id: int = data["alliance_id"]
-        self.alliance_position: str = utils.get_alliance_position(
-            data["alliance_position"]
-        )
-        self.cities: int = data["cities"]
-        self.offensive_wars: int = data["offensive_wars"]
-        self.defensive_wars: int = data["defensive_wars"]
-        self.score: float = data["score"]
-        self.v_mode: bool = data["v_mode"]
-        self.v_mode_turns: int = data["v_mode_turns"]
-        self.beige_turns: int = data["beige_turns"]
-        self.last_active: str = data["last_active"]
-        self.founded: str = data["founded"]
-        self.soldiers: int = data["soldiers"]
-        self.tanks: int = data["tanks"]
-        self.aircraft: int = data["aircraft"]
-        self.ships: int = data["ships"]
-        self.missiles: int = data["missiles"]
-        self.nukes: int = data["nukes"]
+    # PHASE OUT
+    async def _make_alliance(self) -> None:
+        pass
+
+    async def _make_user(self) -> None:
+        pass
+
+    async def _make_partial_cities(self) -> None:
+        pass
