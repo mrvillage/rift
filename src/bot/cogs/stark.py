@@ -6,16 +6,17 @@ from typing import TYPE_CHECKING, Optional
 import discord
 import pnwkit
 from discord.ext import commands, tasks
+
 from src.data.classes.bank.transaction import Transaction
 from src.data.classes.resources import Resources
 from src.funcs.bank.bank import withdraw
 
 from ... import funcs
 from ...data.classes import Alliance, Nation, TradePrices
-from ...ref import Rift
 from ...errors import AllianceNotFoundError
+from ...ref import Rift
 
-OFFSHORE_ID = 9014
+OFFSHORE_ID = 9066
 
 
 class Confirm(discord.ui.View):
