@@ -8,6 +8,8 @@ from ..errors import LinkError, NationNotFoundError
 from ..funcs.utils import convert_link
 from .link import get_link_user
 
+__all__ = ("search_nation",)
+
 
 async def search_nation(ctx: commands.Context, search: str) -> Nation:
     try:
