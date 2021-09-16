@@ -35,7 +35,7 @@ async def search_alliance(ctx: commands.Context, search: str) -> Alliance:
     if search.isdigit():
         try:
             return await Alliance.fetch(int(search))
-        except KeyError:
+        except AllianceNotFoundError:
             pass
     alliances = cache.alliances
     # full name search, case sensitive
