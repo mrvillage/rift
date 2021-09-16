@@ -38,14 +38,8 @@ async def search_alliance(ctx: commands.Context, search: str) -> Alliance:
         except AllianceNotFoundError:
             pass
     alliances = cache.alliances
-    # full name search, case sensitive
-    if len(l := [i for i in alliances if i.name == search]) == 1:
-        return l[0]
     # full name search, case insensitive
     if len(l := [i for i in alliances if i.name.lower() == search.lower()]) == 1:
-        return l[0]
-    # provided acronym search, case sensitive
-    if len(l := [i for i in alliances if i.acronym == search]) == 1:
         return l[0]
     # provided acronym search, case insensitive
     if len(l := [i for i in alliances if i.acronym.lower() == search.lower()]) == 1:
@@ -83,19 +77,6 @@ async def search_alliance(ctx: commands.Context, search: str) -> Alliance:
                 for i in alliances
                 if i.name.lower().replace("the ", "")
                 == search.lower().replace("the ", "")
-            ]
-        )
-        == 1
-    ):
-        return l[0]
-    # startswith and endswith search, case sensitive
-    if (
-        len(
-            l := [
-                i
-                for i in alliances
-                if i.name.lower().startswith(search.lower())
-                or i.name.lower().endswith(search.lower())
             ]
         )
         == 1
