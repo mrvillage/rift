@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from asyncpg import exceptions
-import discord
 from discord.ext.commands import (
     Context,
     MemberConverter,
@@ -12,6 +9,7 @@ from discord.ext.commands import (
     UserNotFound,
 )
 
+from ..cache import cache
 from ..data import get
 from ..data.classes import Alliance, Nation
 from ..errors import AllianceNotFoundError, LinkError
@@ -24,17 +22,14 @@ async def search_alliance(ctx: Context, search: str) -> Alliance:
         search = await convert_link(search)
     except LinkError:
         pass
-    user = None
     try:
         user = await MemberConverter().convert(ctx, search)
     except MemberNotFound:
         try:
             user = await UserConverter().convert(ctx, search)
         except UserNotFound:
-            pass
+            user = None
     if user is not None:
-        if TYPE_CHECKING:
-            assert isinstance(user, (discord.User, discord.Member))
         try:
             return await Alliance.fetch(
                 (
@@ -50,10 +45,101 @@ async def search_alliance(ctx: Context, search: str) -> Alliance:
             pass
         except exceptions.DataError:
             raise AllianceNotFoundError(search)
-    alliance = await get.get_alliance(search)
-    if alliance is not None:
-        return await Alliance.fetch(alliance.id)
-    nation = await get.get_nation(search)
-    if nation is not None and nation.alliance_id != 0:
-        return await Alliance.fetch(nation.alliance_id)
+    alliances = cache.alliances
+    # full name search, case sensitive
+    if len(l := [i for i in alliances if i.name == search]) == 1:
+        return l[0]
+    # full name search, case insensitive
+    if len(l := [i for i in alliances if i.name.lower() == search.lower()]) == 1:
+        return l[0]
+    # provided acronym search, case sensitive
+    if len(l := [i for i in alliances if i.acronym == search]) == 1:
+        return l[0]
+    # provided acronym search, case insensitive
+    if len(l := [i for i in alliances if i.acronym.lower() == search.lower()]) == 1:
+        return l[0]
+    # calculated acronym search, case insensitive
+    if (
+        len(
+            l := [
+                i
+                for i in alliances
+                if "".join(j[0] for j in i.name.lower().split(" ")) == search.lower()
+            ]
+        )
+        == 1
+    ):
+        return l[0]
+    # calculated acronym search, case insensitive, no "the"
+    if (
+        len(
+            l := [
+                i
+                for i in alliances
+                if "".join(j[0] for j in i.name.lower().split(" ") if j != "the")
+                == search.lower()
+            ]
+        )
+        == 1
+    ):
+        return l[0]
+    # full name search, case insensitive, no "the"
+    if (
+        len(
+            l := [
+                i
+                for i in alliances
+                if i.name.lower().replace("the ", "")
+                == search.lower().replace("the ", "")
+            ]
+        )
+        == 1
+    ):
+        return l[0]
+    # startswith and endswith search, case sensitive
+    if (
+        len(
+            l := [
+                i
+                for i in alliances
+                if i.name.lower().startswith(search.lower())
+                or i.name.lower().endswith(search.lower())
+            ]
+        )
+        == 1
+    ):
+        return l[0]
+    # startswith and endswith search, case insensitive
+    if (
+        len(
+            l := [
+                i
+                for i in alliances
+                if i.name.lower().startswith(search.lower())
+                or i.name.lower().endswith(search.lower())
+            ]
+        )
+        == 1
+    ):
+        return l[0]
+    # startswith and endswith search, case insensitive, no "the"
+    if (
+        len(
+            l := [
+                i
+                for i in alliances
+                if i.name.lower()
+                .replace("the ", "")
+                .startswith(search.lower().replace("the ", ""))
+                or i.name.lower()
+                .replace("the ", "")
+                .endswith(search.lower().replace("the ", ""))
+            ]
+        )
+        == 1
+    ):
+        return l[0]
+    # partial name search
+    if len(l := [i for i in alliances if search.lower() in i.name.lower()]) == 1:
+        return l[0]
     raise AllianceNotFoundError(search)
