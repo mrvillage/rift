@@ -7,6 +7,7 @@ from ..data.classes import Alliance, Nation
 from ..errors import AllianceNotFoundError, LinkError
 from ..funcs.utils import convert_link
 from .link import get_link_user
+from .nation import search_nation
 
 __all__ = ("search_alliance",)
 
@@ -115,4 +116,9 @@ async def search_alliance(ctx: commands.Context, search: str) -> Alliance:
     # partial name search
     if len(l := [i for i in alliances if search.lower() in i.name.lower()]) == 1:
         return l[0]
+    try:
+        n = await search_nation(ctx, search)
+        return n.alliance
+    except NationNotFoundError:
+        raise AllianceNotFoundError(search)
     raise AllianceNotFoundError(search)
