@@ -355,7 +355,7 @@ class Alliance(Makeable):
         )
         if TYPE_CHECKING:
             assert isinstance(data, tuple)
-        prices = await get_trade_prices()
+        prices = cache.prices
         revenues = [
             await i.calculate_revenue(
                 prices,
