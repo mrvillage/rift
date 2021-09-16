@@ -1,7 +1,10 @@
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import List
 
+from typings import Link
+
+from ...cache import cache
 from ..query import link
 
 __all__ = (
@@ -14,25 +17,42 @@ __all__ = (
 )
 
 
-async def get_links() -> List[Dict[str, int]]:
-    return await link.query_links()
+async def get_links() -> List[Link]:
+    return cache._links
 
 
 async def add_link(user_id: int, nation_id: int, /) -> None:
+    cache._links.append({"user_id": user_id, "nation_id": nation_id})
     await link.add_link(user_id, nation_id)
 
 
 async def remove_link_user(user_id: int, /) -> None:
+    try:
+        cache._links.remove(next(i for i in cache._links if i["user_id"] == user_id))
+    except StopIteration:
+        pass
     await link.remove_link_user(user_id)
 
 
 async def remove_link_nation(nation_id: int, /) -> None:
+    try:
+        cache._links.remove(
+            next(i for i in cache._links if i["nation_id"] == nation_id)
+        )
+    except StopIteration:
+        pass
     await link.remove_link_nation(nation_id)
 
 
-async def get_link_user(user_id: int, /) -> Dict[str, int]:
-    return (await link.query_link_user(user_id))[0]
+async def get_link_user(user_id: int, /) -> Link:
+    try:
+        return next(i for i in cache._links if i["user_id"] == user_id)
+    except StopIteration:
+        raise IndexError
 
 
-async def get_link_nation(nation_id: int, /) -> Dict[str, int]:
-    return (await link.query_link_nation(nation_id))[0]
+async def get_link_nation(nation_id: int, /) -> Link:
+    try:
+        return next(i for i in cache._links if i["nation_id"] == nation_id)
+    except StopIteration:
+        raise IndexError
