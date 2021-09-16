@@ -1,33 +1,27 @@
 from __future__ import annotations
 
-from asyncpg import exceptions
-from discord.ext.commands import (
-    Context,
-    MemberConverter,
-    MemberNotFound,
-    UserConverter,
-    UserNotFound,
-)
+from discord.ext import commands
 
 from ..cache import cache
-from ..data import get
 from ..data.classes import Alliance, Nation
 from ..errors import AllianceNotFoundError, LinkError
 from ..funcs.utils import convert_link
 from .link import get_link_user
 
+__all__ = ("search_alliance",)
 
-async def search_alliance(ctx: Context, search: str) -> Alliance:
+
+async def search_alliance(ctx: commands.Context, search: str) -> Alliance:
     try:
         search = await convert_link(search)
     except LinkError:
         pass
     try:
-        user = await MemberConverter().convert(ctx, search)
-    except MemberNotFound:
+        user = await commands.MemberConverter().convert(ctx, search)
+    except commands.MemberNotFound:
         try:
-            user = await UserConverter().convert(ctx, search)
-        except UserNotFound:
+            user = await commands.UserConverter().convert(ctx, search)
+        except commands.UserNotFound:
             user = None
     if user is not None:
         try:
@@ -43,8 +37,6 @@ async def search_alliance(ctx: Context, search: str) -> Alliance:
             return await Alliance.fetch(int(search))
         except KeyError:
             pass
-        except exceptions.DataError:
-            raise AllianceNotFoundError(search)
     alliances = cache.alliances
     # full name search, case sensitive
     if len(l := [i for i in alliances if i.name == search]) == 1:
