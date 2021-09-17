@@ -39,6 +39,15 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                     color=discord.Color.red(),
                 )
             )
+        elif isinstance(error, commands.MissingPermissions):
+            if error.missing_permissions[0] == "manage":
+                await ctx.reply(
+                    embed=get_embed_author_member(
+                        ctx.author,
+                        f"The `Manage Server` or `Administrator` permission is required to run this command.",
+                        color=discord.Color.red(),
+                    )
+                )
         elif isinstance(error, discord.Forbidden):
             await ctx.reply(
                 'I don\'t have permission to do that! Please make sure I have the "Embed Links" permission.'
