@@ -67,7 +67,9 @@ class Events(commands.Cog):
         self,
         ctx: commands.Context,
         *,
-        event: Literal["ALLIANCE", "COLOR", "PRICE", "NATION"],  # TRADE, TREASURE, WAR
+        event: Literal[
+            "ALLIANCE", "COLOR", "FORUM", "PRICE", "NATION"
+        ],  # TRADE, TREASURE, WAR
         type: Literal["CREATE", "DELETE", "UPDATE"],  # ACCEPT, VICTORY
     ):
         ...
