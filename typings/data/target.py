@@ -12,3 +12,4 @@ class TargetData(TypedDict):
     channel_ids: List[int]
     role_ids: List[int]
     user_ids: List[int]
+    direct_message: bool
