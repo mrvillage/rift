@@ -14,6 +14,7 @@ __all__ = (
     "NationNotFoundError",
     "RecipientNotFoundError",
     "ServerNotFoundError",
+    "TargetNotFoundError",
 )
 
 
@@ -70,4 +71,8 @@ class RecipientNotFoundError(NotFoundError):
 
 
 class ServerNotFoundError(NotFoundError):
+    ...
+
+
+class TargetNotFoundError(NotFoundError):
     ...
