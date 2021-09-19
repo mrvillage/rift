@@ -4,21 +4,21 @@ import asyncio
 import json
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Set
 
-from typings import (
-    AllianceData,
-    CityData,
-    ColorData,
-    Link,
-    NationData,
-    TradePriceData,
-    TreatyData,
-)
-
 from .data.db import execute_read_query
 
 __all__ = ("cache",)
 
 if TYPE_CHECKING:
+    from typings import (
+        AllianceData,
+        CityData,
+        ColorData,
+        Link,
+        NationData,
+        TradePriceData,
+        TreatyData,
+    )
+
     from .data.classes import (
         Alliance,
         City,
@@ -30,6 +30,7 @@ if TYPE_CHECKING:
         Menu,
         MenuItem,
         Nation,
+        Target,
         Ticket,
         TicketConfig,
         TradePrices,
@@ -64,6 +65,7 @@ class Cache:
         "_menus",
         "_nations",
         "_prices",
+        "_targets",
         "_ticket_configs",
         "_tickets",
         "_trades",
@@ -90,6 +92,7 @@ class Cache:
         self._menus: Dict[int, Menu] = {}
         self._nations: Dict[int, Nation] = {}
         self._prices: TradePrices
+        self._targets: Dict[int, Target] = {}
         self._ticket_configs: Dict[int, TicketConfig] = {}
         self._tickets: Dict[int, Ticket] = {}
         self._trades = {}  # NO CLASS YET
@@ -101,7 +104,7 @@ class Cache:
         self.init: bool = False
         self.validate: Validate = Validate()
 
-    async def initialize(self):
+    async def initialize(self):  # sourcery no-metrics
         from .data.classes import (
             Alliance,
             City,
@@ -113,6 +116,7 @@ class Cache:
             Menu,
             MenuItem,
             Nation,
+            Target,
             Ticket,
             TicketConfig,
             TradePrices,
@@ -133,6 +137,7 @@ class Cache:
             "SELECT * FROM menus;",
             "SELECT * FROM nations;",
             "SELECT * FROM prices ORDER BY datetime DESC LIMIT 1;",
+            "SELECT * FROM targets;",
             "SELECT * FROM ticket_configs;",
             "SELECT * FROM tickets;",
             "SELECT * FROM treaties;",
@@ -151,6 +156,7 @@ class Cache:
             menus,
             nations,
             prices,
+            targets,
             ticket_configs,
             tickets,
             treaties,
@@ -200,6 +206,9 @@ class Cache:
                 for key, value in dict(prices[0]).items()
             }
         )
+        for i in targets:
+            i = Target(i)
+            self._targets[i.id] = i
         for i in ticket_configs:
             i = TicketConfig(i)
             self._ticket_configs[i.config_id] = i
@@ -268,6 +277,10 @@ class Cache:
     @property
     def prices(self) -> TradePrices:
         return self._prices
+
+    @property
+    def targets(self) -> Set[Target]:
+        return set(self._targets.values())
 
     @property
     def ticket_configs(self) -> Set[TicketConfig]:
@@ -359,15 +372,17 @@ class Cache:
             next(i._update(new) for i in self._treasures if i.name == new["name"])
 
     def hook_treaty(
-        self, action: Literal["create", "delete"], data: TreatyData
+        self, action: Literal["create", "update", "delete"], data: TreatyData
     ) -> None:
+        if action == "update":
+            ...  # will need to check if a treaty with those values exists, if it does then update it, if it doesn't then add it
         if action == "delete":
             treaty = next(
                 i
                 for i in self._treaties
                 if i.from_ == data["from_"] and i.to_ == data["to_"]
             )
-            self._treaties.remove(treaty)
+            return self._treaties.remove(treaty)
         alliances = {
             data["from_"]: self.get_alliance(data["from_"]),
             data["to_"]: self.get_alliance(data["to_"]),
@@ -436,6 +451,14 @@ class Cache:
 
     def get_prices(self) -> Optional[TradePrices]:
         return self._prices
+
+    def get_target(self, id: int, owner_id: int, /) -> Optional[Target]:
+        target = self._targets.get(id)
+        if target is None:
+            return
+        if target.owner_id != owner_id:
+            return
+        return target
 
     def get_ticket_config(self, id: int, /) -> Optional[TicketConfig]:
         return self._ticket_configs.get(id)
