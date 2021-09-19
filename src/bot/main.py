@@ -90,7 +90,9 @@ async def on_ready():
             bot.load_extension(f"src.bot.cogs.{cog}")
         bot.unload_extension("src.bot.cogs.database")
         bot.unload_extension("src.bot.cogs.server")
-        bot.unload_extension("src.bot.cogs.logs")
+        bot.unload_extension("src.bot.cogs.tools")
+        if bot.debug:
+            bot.unload_extension("src.bot.cogs.logs")
         bot.cogs_loaded = True
         print("Loaded cogs!", flush=True)
 
