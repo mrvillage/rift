@@ -126,6 +126,14 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                     color=discord.Color.red(),
                 )
             )
+        elif isinstance(error, MenuItemNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No menu item found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                )
+            )
         elif isinstance(error, commands.BadUnionArgument):
             if (error.converters[0] is Alliance or error.converters[0] is Nation) and (
                 error.converters[1] is Alliance or error.converters[1] is Nation
