@@ -2,12 +2,11 @@ from __future__ import annotations
 
 from typing import List, TypedDict
 
-from data.treaty import TreatyData
-
 from .alliance import AllianceData
 from .city import CityData
 from .color import ColorData
 from .nation import NationData
+from .treaty import TreatyData
 
 __all__ = (
     "BulkAllianceListData",
