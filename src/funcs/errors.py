@@ -6,6 +6,8 @@ import traceback
 import discord
 from discord.ext import commands
 
+from src.errors.notfound import MenuItemNotFoundError, TargetNotFoundError
+
 from ..data.classes import Alliance, Nation
 from ..errors import AllianceNotFoundError, MenuNotFoundError, NationNotFoundError
 from .embeds import get_embed_author_member
@@ -131,6 +133,14 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                 embed=get_embed_author_member(
                     ctx.author,
                     f"No menu item found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                )
+            )
+        elif isinstance(error, TargetNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No target found with argument `{error.args[0]}`.",
                     color=discord.Color.red(),
                 )
             )
