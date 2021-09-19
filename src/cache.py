@@ -452,9 +452,13 @@ class Cache:
         except StopIteration:
             return
 
-    def get_treaty(self, from_: int, to_: int, /) -> Optional[Treaty]:
+    def get_treaty(self, from_: int, to_: int, treaty_type: str, /) -> Optional[Treaty]:
         try:
-            return next(i for i in self._treaties if i.from_ == from_ and i.to_ == to_)
+            return next(
+                i
+                for i in self._treaties
+                if i.from_ == from_ and i.to_ == to_ and i.treaty_type == treaty_type
+            )
         except StopIteration:
             return
 
