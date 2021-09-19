@@ -1,4 +1,5 @@
 from .alliance import *
+from .bulk_events import *
 from .city import *
 from .color import *
 from .embassy import *
