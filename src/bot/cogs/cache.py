@@ -1,13 +1,28 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands, tasks
 
 from ...cache import cache
+from ...data.classes import Alliance, City, Color, Nation, TradePrices
 from ...data.db import execute_read_query
 from ...ref import Rift
+
+if TYPE_CHECKING:
+    from typings import (
+        BulkAllianceListData,
+        BulkAllianceUpdateData,
+        BulkCityListData,
+        BulkCityUpdateData,
+        BulkNationListData,
+        BulkNationUpdateData,
+        BulkTreatyListData,
+        ColorUpdateData,
+        TradePriceData,
+    )
 
 
 class Cache(commands.Cog):
@@ -16,47 +31,81 @@ class Cache(commands.Cog):
         self.verify_cache_integrity.start()
 
     @commands.Cog.listener()
-    async def on_bulk_alliance_created(self, data):
+    async def on_bulk_alliance_created(self, data: BulkAllianceListData):
         for i in data:
             cache.hook_alliance("create", i)
+        for i in data:
+            self.bot.dispatch("alliance_created", alliance=cache.get_alliance(i["id"]))
 
     @commands.Cog.listener()
-    async def on_bulk_alliance_update(self, data):
+    async def on_bulk_alliance_update(self, data: BulkAllianceUpdateData):
         for i in data:
             cache.hook_alliance("update", i["after"])
+        for i in data:
+            self.bot.dispatch(
+                "alliance_update",
+                before=Alliance(i["before"]),
+                after=cache.get_alliance(i["after"]["id"]),
+            )
         if cache.validate.alliances:
             fetched_data = await execute_read_query("SELECT * FROM alliances;")
             for i in (dict(i) for i in fetched_data):
                 cache.hook_alliance("update", i)  # type: ignore
 
     @commands.Cog.listener()
-    async def on_bulk_alliance_deleted(self, data):
+    async def on_bulk_alliance_deleted(self, data: BulkAllianceListData):
+        deleted = {
+            i.id: i
+            for i in (cache.get_alliance(j["id"]) for j in data)
+            if i is not None
+        }
         for i in data:
             cache.hook_alliance("delete", i)
+        for i in data:
+            self.bot.dispatch("alliance_deleted", alliance=deleted[i["id"]])
 
     @commands.Cog.listener()
-    async def on_bulk_city_created(self, data):
+    async def on_bulk_city_created(self, data: BulkCityListData):
         for i in data:
             cache.hook_city("create", i)
+        for i in data:
+            self.bot.dispatch("city_created", city=cache.get_city(i["id"]))
 
     @commands.Cog.listener()
-    async def on_bulk_city_update(self, data):
+    async def on_bulk_city_update(self, data: BulkCityUpdateData):
         for i in data:
             cache.hook_city("update", i["after"])
         if cache.validate.cities:
             fetched_data = await execute_read_query("SELECT * FROM cities;")
             for i in (dict(i) for i in fetched_data):
                 cache.hook_city("update", i)  # type: ignore
+        for i in data:
+            self.bot.dispatch(
+                "city_update",
+                before=City(i["before"]),
+                after=cache.get_city(i["after"]["id"]),
+            )
 
     @commands.Cog.listener()
-    async def on_bulk_city_deleted(self, data):
+    async def on_bulk_city_deleted(self, data: BulkCityListData):
+        deleted = {
+            i.id: i for i in (cache.get_city(j["id"]) for j in data) if i is not None
+        }
         for i in data:
             cache.hook_city("delete", i)
+        for i in data:
+            self.bot.dispatch("city_deleted", city=deleted[i["id"]])
 
     @commands.Cog.listener()
-    async def on_colors_update(self, before, after):
+    async def on_colors_update(self, before: ColorUpdateData, after: ColorUpdateData):
         for i in after:
             cache.hook_color("update", i)
+        for i, j in zip(before, after):
+            self.bot.dispatch(
+                "color_update",
+                before=Color(i),
+                after=cache.get_color(j["color"]),
+            )
         if cache.validate.alliances:
             fetched_data = await execute_read_query(
                 "SELECT * FROM colors ORDER BY datetime DESC LIMIT 1;"
@@ -65,28 +114,42 @@ class Cache(commands.Cog):
                 cache.hook_alliance("update", i)  # type: ignore
 
     @commands.Cog.listener()
-    async def on_bulk_nation_created(self, data):
+    async def on_bulk_nation_created(self, data: BulkNationListData):
         for i in data:
             cache.hook_nation("create", i)
+        for i in data:
+            self.bot.dispatch("nation_created", nation=cache.get_nation(i["id"]))
 
     @commands.Cog.listener()
-    async def on_bulk_nation_update(self, data):
+    async def on_bulk_nation_update(self, data: BulkNationUpdateData):
         for i in data:
             cache.hook_nation("update", i["after"])
         if cache.validate.nations:
             fetched_data = await execute_read_query("SELECT * FROM nations;")
             for i in (dict(i) for i in fetched_data):
                 cache.hook_nation("update", i)  # type: ignore
+        for i in data:
+            self.bot.dispatch(
+                "nation_update",
+                before=Nation(i["before"]),
+                after=cache.get_nation(i["after"]["id"]),
+            )
 
     @commands.Cog.listener()
-    async def on_bulk_nation_deleted(self, data):
+    async def on_bulk_nation_deleted(self, data: BulkNationListData):
         for i in data:
             cache.hook_nation("delete", i)
+        for i in data:
+            self.bot.dispatch("nation_deleted", nation=cache.get_nation(i["id"]))
 
     @commands.Cog.listener()
-    async def on_prices_update(self, before, after):
-        for i in after:
-            cache.hook_price("update", i)
+    async def on_prices_update(self, before: TradePriceData, after: TradePriceData):
+        cache.hook_price("update", after)
+        self.bot.dispatch(
+            "price_update",
+            before=TradePrices(before),
+            after=cache.get_prices(),
+        )
         if cache.validate.prices:
             fetched_data = await execute_read_query(
                 "SELECT * FROM prices ORDER BY datetime DESC LIMIT 1;"
@@ -94,18 +157,28 @@ class Cache(commands.Cog):
             cache.hook_price("update", fetched_data[0])  # type: ignore
 
     @commands.Cog.listener()
-    async def on_bulk_new_treaty(self, data):
+    async def on_bulk_new_treaty(self, data: BulkTreatyListData):
         for i in data:
             cache.hook_treaty("create", i)
+        for i in data:
+            self.bot.dispatch(
+                "treaty_created",
+                treaty=cache.get_treaty(i["from_"], i["to_"], i["treaty_type"]),
+            )
         if cache.validate.treaties:
             fetched_data = await execute_read_query("SELECT * FROM treaties;")
             for i in (dict(i) for i in fetched_data):
-                cache.hook_city("update", i)  # type: ignore
+                cache.hook_treaty("update", i)  # type: ignore
 
     @commands.Cog.listener()
-    async def on_bulk_treaty_expired(self, data):
+    async def on_bulk_treaty_expired(self, data: BulkTreatyListData):
         for i in data:
             cache.hook_treaty("delete", i)
+        for i in data:
+            self.bot.dispatch(
+                "treaty_expired",
+                treaty=cache.get_treaty(i["from_"], i["to_"], i["treaty_type"]),
+            )
 
     @tasks.loop(hours=1)
     async def verify_cache_integrity(self):
