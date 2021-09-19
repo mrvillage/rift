@@ -5,7 +5,7 @@ from asyncio import get_event_loop
 from pathlib import Path
 from ssl import create_default_context
 
-from asyncpg import Connection, Pool, connect, create_pool
+from asyncpg import Connection, Pool, create_pool
 
 from ...env import DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER
 
