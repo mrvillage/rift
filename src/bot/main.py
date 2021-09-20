@@ -11,8 +11,6 @@ from discord.ext import commands
 
 from .. import funcs
 from ..cache import cache
-from ..data.classes import Menu
-from ..data.query import query_menus
 from ..env import DEBUG_TOKEN, TOKEN, __version__
 from ..ref import bot
 from ..views import AlliancesPaginator, Margins, Prices
@@ -72,17 +70,6 @@ async def on_raw_message_edit(payload: discord.RawMessageUpdateEvent):
 
 @bot.event
 async def on_ready():
-    if not bot.persistent_views_loaded:
-        views = await query_menus()
-        views = [Menu(data=i) for i in views]
-        for view in views:
-            bot.add_view(await view.get_view())
-        bot.add_view(Margins())
-        bot.add_view(Prices())
-        bot.add_view(AlliancesPaginator(1, 50))
-        bot.persistent_views_loaded = True
-        print("Loaded persistent views!", flush=True)
-
     if not bot.cogs_loaded:
         cogPath = Path.cwd() / "src" / "bot" / "cogs"
         cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
@@ -102,6 +89,15 @@ async def on_ready():
     if not cache.init:
         await cache.initialize()
         print("Cache initialized!", flush=True)
+
+    if not bot.persistent_views_loaded:
+        for menu in cache.menus:
+            bot.add_view(await menu.get_view())
+        bot.add_view(Margins())
+        bot.add_view(Prices())
+        bot.add_view(AlliancesPaginator(1, 50))
+        bot.persistent_views_loaded = True
+        print("Loaded persistent views!", flush=True)
 
     print("Startup complete!", flush=True)
 
