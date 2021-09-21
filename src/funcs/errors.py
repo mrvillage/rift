@@ -6,10 +6,14 @@ import traceback
 import discord
 from discord.ext import commands
 
-from src.errors.notfound import MenuItemNotFoundError, TargetNotFoundError
-
 from ..data.classes import Alliance, Nation
-from ..errors import AllianceNotFoundError, MenuNotFoundError, NationNotFoundError
+from ..errors import (
+    AllianceNotFoundError,
+    MenuItemNotFoundError,
+    MenuNotFoundError,
+    NationNotFoundError,
+    TargetNotFoundError,
+)
 from .embeds import get_embed_author_member
 from .utils import get_command_signature
 
