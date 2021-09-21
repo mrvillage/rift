@@ -447,7 +447,7 @@ class Cache:
         return menu
 
     def get_nation(self, id: int, /) -> Optional[Nation]:
-        return self._nations[id]
+        return self._nations.get(id)
 
     def get_prices(self) -> Optional[TradePrices]:
         return self._prices
