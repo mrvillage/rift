@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 from typing import TYPE_CHECKING
 
 import discord
@@ -144,6 +145,10 @@ class Cache(commands.Cog):
 
     @commands.Cog.listener()
     async def on_prices_update(self, before: TradePriceData, after: TradePriceData):
+        before = {
+            key: json.loads(value) if isinstance(value, str) else value for key, value in before.items()  # type: ignore
+        }
+        after = {key: json.loads(value) if isinstance(value, str) else value for key, value in after.items()}  # type: ignore
         cache.hook_price("update", after)
         self.bot.dispatch(
             "price_update",
