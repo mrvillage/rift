@@ -23,11 +23,7 @@ class Bank(commands.Cog):
         type=commands.CommandType.chat_input,
     )
     async def bank(self, ctx: commands.Context):
-        await ctx.reply(
-            embed=funcs.get_embed_author_member(
-                ctx.author, "You forgot to give an argument!", color=discord.Color.red()
-            )
-        )
+        ...
 
     @commands.command(
         name="send", help="Send money from your alliance bank.", hidden=True
@@ -47,7 +43,7 @@ class Bank(commands.Cog):
         recipient: Union[Alliance, Nation],
         *,
         transaction: Transaction,
-    ):
+    ):  # sourcery no-metrics
         if isinstance(recipient, Alliance):
             author = ctx.guild
         else:
@@ -108,13 +104,13 @@ class Bank(commands.Cog):
         embed = (
             funcs.get_embed_author_guild(
                 author,
-                f"Are you sure you want to transfer {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**? To confirm please type the id of the **{type(recipient).__name__}**.",
+                f"Are you sure you want to transfer {transaction} to the **{type(recipient).__name__}** of **{repr(recipient)}**? To confirm please type the id of the **{type(recipient).__name__}**.",
                 color=discord.Color.orange(),
             )
             if isinstance(author, discord.Guild)
             else funcs.get_embed_author_member(
                 author,
-                f"Are you sure you want to transfer {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**? To confirm please type the id of the **{type(recipient).__name__}**.",
+                f"Are you sure you want to transfer {transaction} to the **{type(recipient).__name__}** of **{repr(recipient)}**? To confirm please type the id of the **{type(recipient).__name__}**.",
                 color=discord.Color.orange(),
             )
         )
@@ -137,31 +133,33 @@ class Bank(commands.Cog):
             return await message.edit(
                 embed=funcs.get_embed_author_guild(
                     author,
-                    f"You have cancelled the transfer of {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                    f"You have cancelled the transfer of {transaction} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
                     color=discord.Color.red(),
                 )
                 if isinstance(author, discord.Guild)
                 else funcs.get_embed_author_member(
                     author,
-                    f"You have cancelled the transfer of {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                    f"You have cancelled the transfer of {transaction} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
                     color=discord.Color.red(),
                 ),
                 view=None,
             )
+
         message = await message.edit(
             embed=funcs.get_embed_author_guild(
                 author,
-                f"Sending {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**...",
+                f"Sending {transaction} to the **{type(recipient).__name__}** of **{repr(recipient)}**...",
                 color=discord.Color.orange(),
             )
             if isinstance(author, discord.Guild)
             else funcs.get_embed_author_member(
                 author,
-                f"Sending {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**...",
+                f"Sending {transaction} to the **{type(recipient).__name__}** of **{repr(recipient)}**...",
                 color=discord.Color.orange(),
             ),
             view=None,
         )
+
         complete = await transaction.complete(receiver=recipient, action="send")
         if not complete:
             complete = await transaction.complete(receiver=recipient, action="send")
@@ -169,41 +167,43 @@ class Bank(commands.Cog):
                 embed = (
                     funcs.get_embed_author_guild(
                         author,
-                        f"Something went wrong with the transaction. Please try again.",
+                        "Something went wrong with the transaction. Please try again.",
                         color=discord.Color.red(),
                     )
                     if isinstance(author, discord.Guild)
                     else funcs.get_embed_author_member(
                         author,
-                        f"Something went wrong with the transaction. Please try again.",
+                        "Something went wrong with the transaction. Please try again.",
                         color=discord.Color.red(),
                     )
                 )
+
             else:
                 embed = (
                     funcs.get_embed_author_guild(
                         author,
-                        f"You successfully transferred {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                        f"You successfully transferred {transaction} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
                         color=discord.Color.green(),
                     )
                     if isinstance(author, discord.Guild)
                     else funcs.get_embed_author_member(
                         author,
-                        f"You successfully transferred {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                        f"You successfully transferred {transaction} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
                         color=discord.Color.green(),
                     )
                 )
+
         else:
             embed = (
                 funcs.get_embed_author_guild(
                     author,
-                    f"You successfully transferred {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                    f"You successfully transferred {transaction} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
                     color=discord.Color.green(),
                 )
                 if isinstance(author, discord.Guild)
                 else funcs.get_embed_author_member(
                     author,
-                    f"You successfully transferred {str(transaction)} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                    f"You successfully transferred {transaction} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
                     color=discord.Color.green(),
                 )
             )
@@ -216,24 +216,8 @@ class Bank(commands.Cog):
         help="Send money from your alliance bank.",
         type=commands.CommandType.chat_input,
     )
-    async def bank_balance(self, ctx: commands.Context, *, search=None):
-        search = str(ctx.author.id) if search is None else search
-        try:
-            nation = await funcs.search_nation(ctx, search)
-            await nation.make_attrs("alliance")
-            alliance = nation.alliance
-        except NationNotFoundError:
-            try:
-                alliance = await funcs.search_alliance(ctx, search)
-            except AllianceNotFoundError:
-                await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        f"I couldn't find a nation or alliance with argument `{search}`.",
-                        color=discord.Color.red(),
-                    )
-                )
-                raise RecipientNotFoundError
+    async def bank_balance(self, ctx: commands.Context, *, alliance: Alliance = None):
+        alliance = alliance or await Alliance.convert(ctx, alliance)
         try:
             viewer = await funcs.search_nation(ctx, str(ctx.author.id))
         except NationNotFoundError:
