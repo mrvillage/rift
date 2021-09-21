@@ -14,17 +14,6 @@ from ... import funcs
 from ...env import SOCKET_IP, SOCKET_PORT
 from ...ref import Rift
 
-EVENTS = {
-    "alliance_update": "raw_alliance_update",
-    "city_update": "raw_city_update",
-    "market_prices_update": "raw_market_prices_update",
-    "nation_update": "raw_nation_update",
-    "pending_trade_update": "raw_pending_trade_update",
-    "prices_update": "raw_prices_update",
-    "treasures_update": "raw_treasures_update",
-    "war_update": "raw_war_update",
-}
-
 
 class Events(commands.Cog):
     def __init__(self, bot: Rift):
@@ -43,9 +32,7 @@ class Events(commands.Cog):
                         async for message in ws:
                             data = message.json()
                             if "event" in data:
-                                event: str = data["event"]
-                                event = EVENTS.get(event, event)
-                                self.bot.dispatch(event, **data["data"])
+                                self.bot.dispatch(data["event"], **data["data"])
             except ConnectionRefusedError:
                 print("rift-data socket refused", flush=True)
                 delay = backoff.delay()
