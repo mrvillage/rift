@@ -32,11 +32,11 @@ class Cache(commands.Cog):
         self.verify_cache_integrity.start()
 
     @commands.Cog.listener()
-    async def on_bulk_alliance_created(self, data: BulkAllianceListData):
+    async def on_bulk_alliance_create(self, data: BulkAllianceListData):
         for i in data:
             cache.hook_alliance("create", i)
         for i in data:
-            self.bot.dispatch("alliance_created", alliance=cache.get_alliance(i["id"]))
+            self.bot.dispatch("alliance_create", alliance=cache.get_alliance(i["id"]))
 
     @commands.Cog.listener()
     async def on_bulk_alliance_update(self, data: BulkAllianceUpdateData):
@@ -54,7 +54,7 @@ class Cache(commands.Cog):
                 cache.hook_alliance("update", i)  # type: ignore
 
     @commands.Cog.listener()
-    async def on_bulk_alliance_deleted(self, data: BulkAllianceListData):
+    async def on_bulk_alliance_delete(self, data: BulkAllianceListData):
         deleted = {
             i.id: i
             for i in (cache.get_alliance(j["id"]) for j in data)
@@ -63,14 +63,14 @@ class Cache(commands.Cog):
         for i in data:
             cache.hook_alliance("delete", i)
         for i in data:
-            self.bot.dispatch("alliance_deleted", alliance=deleted[i["id"]])
+            self.bot.dispatch("alliance_delete", alliance=deleted[i["id"]])
 
     @commands.Cog.listener()
-    async def on_bulk_city_created(self, data: BulkCityListData):
+    async def on_bulk_city_create(self, data: BulkCityListData):
         for i in data:
             cache.hook_city("create", i)
         for i in data:
-            self.bot.dispatch("city_created", city=cache.get_city(i["id"]))
+            self.bot.dispatch("city_create", city=cache.get_city(i["id"]))
 
     @commands.Cog.listener()
     async def on_bulk_city_update(self, data: BulkCityUpdateData):
@@ -88,14 +88,14 @@ class Cache(commands.Cog):
             )
 
     @commands.Cog.listener()
-    async def on_bulk_city_deleted(self, data: BulkCityListData):
+    async def on_bulk_city_delete(self, data: BulkCityListData):
         deleted = {
             i.id: i for i in (cache.get_city(j["id"]) for j in data) if i is not None
         }
         for i in data:
             cache.hook_city("delete", i)
         for i in data:
-            self.bot.dispatch("city_deleted", city=deleted[i["id"]])
+            self.bot.dispatch("city_delete", city=deleted[i["id"]])
 
     @commands.Cog.listener()
     async def on_colors_update(self, before: ColorUpdateData, after: ColorUpdateData):
@@ -115,11 +115,11 @@ class Cache(commands.Cog):
                 cache.hook_alliance("update", i)  # type: ignore
 
     @commands.Cog.listener()
-    async def on_bulk_nation_created(self, data: BulkNationListData):
+    async def on_bulk_nation_create(self, data: BulkNationListData):
         for i in data:
             cache.hook_nation("create", i)
         for i in data:
-            self.bot.dispatch("nation_created", nation=cache.get_nation(i["id"]))
+            self.bot.dispatch("nation_create", nation=cache.get_nation(i["id"]))
 
     @commands.Cog.listener()
     async def on_bulk_nation_update(self, data: BulkNationUpdateData):
@@ -137,11 +137,11 @@ class Cache(commands.Cog):
             )
 
     @commands.Cog.listener()
-    async def on_bulk_nation_deleted(self, data: BulkNationListData):
+    async def on_bulk_nation_delete(self, data: BulkNationListData):
         for i in data:
             cache.hook_nation("delete", i)
         for i in data:
-            self.bot.dispatch("nation_deleted", nation=cache.get_nation(i["id"]))
+            self.bot.dispatch("nation_delete", nation=cache.get_nation(i["id"]))
 
     @commands.Cog.listener()
     async def on_prices_update(self, before: TradePriceData, after: TradePriceData):
@@ -162,12 +162,12 @@ class Cache(commands.Cog):
             cache.hook_price("update", fetched_data[0])  # type: ignore
 
     @commands.Cog.listener()
-    async def on_bulk_new_treaty(self, data: BulkTreatyListData):
+    async def on_bulk_treaty_create(self, data: BulkTreatyListData):
         for i in data:
             cache.hook_treaty("create", i)
         for i in data:
             self.bot.dispatch(
-                "treaty_created",
+                "treaty_create",
                 treaty=cache.get_treaty(i["from_"], i["to_"], i["treaty_type"]),
             )
         if cache.validate.treaties:
@@ -176,12 +176,12 @@ class Cache(commands.Cog):
                 cache.hook_treaty("update", i)  # type: ignore
 
     @commands.Cog.listener()
-    async def on_bulk_treaty_expired(self, data: BulkTreatyListData):
+    async def on_bulk_treaty_delete(self, data: BulkTreatyListData):
         for i in data:
             cache.hook_treaty("delete", i)
         for i in data:
             self.bot.dispatch(
-                "treaty_expired",
+                "treaty_delete",
                 treaty=cache.get_treaty(i["from_"], i["to_"], i["treaty_type"]),
             )
 
