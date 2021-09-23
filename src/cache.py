@@ -30,6 +30,7 @@ if TYPE_CHECKING:
         Menu,
         MenuItem,
         Nation,
+        Subscription,
         Target,
         Ticket,
         TicketConfig,
@@ -65,6 +66,7 @@ class Cache:
         "_menus",
         "_nations",
         "_prices",
+        "_subscriptions",
         "_targets",
         "_ticket_configs",
         "_tickets",
@@ -92,6 +94,7 @@ class Cache:
         self._menus: Dict[int, Menu] = {}
         self._nations: Dict[int, Nation] = {}
         self._prices: TradePrices
+        self._subscriptions: Dict[int, Subscription] = {}
         self._targets: Dict[int, Target] = {}
         self._ticket_configs: Dict[int, TicketConfig] = {}
         self._tickets: Dict[int, Ticket] = {}
@@ -116,6 +119,7 @@ class Cache:
             Menu,
             MenuItem,
             Nation,
+            Subscription,
             Target,
             Ticket,
             TicketConfig,
@@ -137,6 +141,7 @@ class Cache:
             "SELECT * FROM menus;",
             "SELECT * FROM nations;",
             "SELECT * FROM prices ORDER BY datetime DESC LIMIT 1;",
+            "SELECT * FROM subscriptions;",
             "SELECT * FROM targets;",
             "SELECT * FROM ticket_configs;",
             "SELECT * FROM tickets;",
@@ -156,6 +161,7 @@ class Cache:
             menus,
             nations,
             prices,
+            subscriptions,
             targets,
             ticket_configs,
             tickets,
@@ -206,6 +212,9 @@ class Cache:
                 for key, value in dict(prices[0]).items()
             }
         )
+        for i in subscriptions:
+            i = Subscription(i)
+            self._subscriptions[i.id] = i
         for i in targets:
             i = Target(i)
             self._targets[i.id] = i
@@ -277,6 +286,10 @@ class Cache:
     @property
     def prices(self) -> TradePrices:
         return self._prices
+
+    @property
+    def subscriptions(self) -> Set[Subscription]:
+        return set(self._subscriptions.values())
 
     @property
     def targets(self) -> Set[Target]:
@@ -451,6 +464,9 @@ class Cache:
 
     def get_prices(self) -> Optional[TradePrices]:
         return self._prices
+
+    def get_subscription(self, id: int, /) -> Optional[Subscription]:
+        return self._subscriptions.get(id)
 
     def get_target(self, id: int, owner_id: int, /) -> Optional[Target]:
         target = self._targets.get(id)
