@@ -18,6 +18,8 @@ from .help import EmbedHelpCommand
 
 
 class Rift(Bot):
+    bytes_avatar: bytes
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.alliances_update = datetime.datetime.utcnow()
