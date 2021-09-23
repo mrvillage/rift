@@ -26,7 +26,7 @@ class Events(commands.Cog):
             try:
                 async with aiohttp.ClientSession() as session:
                     async with session.ws_connect(
-                        f"ws://{SOCKET_IP}:{SOCKET_PORT}", max_msg_size=0, timeout=5
+                        f"ws://{SOCKET_IP}:{SOCKET_PORT}", max_msg_size=0, timeout=300
                     ) as ws:
                         print("rift-data socket connected", flush=True)
                         async for message in ws:
