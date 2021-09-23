@@ -1,16 +1,19 @@
 from __future__ import annotations
 
-import json
 import sys
 import traceback
 from asyncio import sleep
-from typing import Literal
+from typing import TYPE_CHECKING, List
 
 import aiohttp
+import discord
 from discord.backoff import ExponentialBackoff
 from discord.ext import commands
 
 from ... import funcs
+from ...cache import cache
+from ...checks import has_manage_permissions
+from ...data.classes import Alliance, Subscription
 from ...env import SOCKET_IP, SOCKET_PORT
 from ...ref import Rift
 
@@ -45,21 +48,233 @@ class Events(commands.Cog):
                 delay = backoff.delay()
                 await sleep(delay)
 
-    @commands.command(
+    @commands.group(
         name="subscribe",
         help="Subscribe to an event stream. Note: Not all types are valid for every event.",
         type=commands.CommandType.chat_input,
     )
+    @has_manage_permissions()
+    @commands.guild_only()
     async def subscribe(
         self,
         ctx: commands.Context,
-        *,
-        event: Literal[
-            "ALLIANCE", "COLOR", "FORUM", "PRICE", "NATION"
-        ],  # TRADE, TREASURE, WAR
-        type: Literal["CREATE", "DELETE", "UPDATE"],  # ACCEPT, VICTORY
     ):
         ...
+
+    @subscribe.group(name="nation", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscribe_nation(self, ctx: commands.Context):
+        ...
+
+    @subscribe_nation.command(name="create", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscribe_nation_create(self, ctx: commands.Context):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.channel, discord.TextChannel)
+            assert isinstance(ctx.author, discord.Member)
+        subscription = await Subscription.subscribe(ctx.channel, "NATION", "CREATE")
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Successfully subscribed to `NATION_CREATE` events.\nSubscription ID: {subscription.id}",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @subscribe_nation.command(name="delete", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscribe_nation_delete(self, ctx: commands.Context):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.channel, discord.TextChannel)
+            assert isinstance(ctx.author, discord.Member)
+        subscription = await Subscription.subscribe(ctx.channel, "NATION", "DELETE")
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Successfully subscribed to `NATION_DELETE` events.\nSubscription ID: {subscription.id}",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @subscribe_nation.command(name="update", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscribe_nation_update(
+        self,
+        ctx: commands.Context,
+        changes: List[str],
+        alliances: List[Alliance] = [],
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.channel, discord.TextChannel)
+            assert isinstance(ctx.author, discord.Member)
+        changes = [
+            u
+            for i in changes
+            if (u := i.upper())
+            in {
+                "ALLIANCE_POSITION",
+                "ALLIANCE_POSITION_ALL",
+                "ALLIANCE",
+                "VACATION_MODE",
+            }
+        ]
+        if not changes:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You didn't give any valid changes!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        subscription = await Subscription.subscribe(
+            ctx.channel, "NATION", "UPDATE", changes, [i.id for i in alliances]
+        )
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Successfully subscribed to `NATION_UPDATE` events for the following changes: {', '.join('`' + i + '`' for i in changes)} for {'the following' if alliances else 'all'} alliances{(': ' + ', '.join(repr(i) for i in alliances)) if alliances else ''}.\nSubscription ID: {subscription.id}",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @subscribe.group(name="alliance", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscribe_alliance(self, ctx: commands.Context):
+        ...
+
+    @subscribe_alliance.command(name="create", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscribe_alliance_create(self, ctx: commands.Context):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.channel, discord.TextChannel)
+            assert isinstance(ctx.author, discord.Member)
+        subscription = await Subscription.subscribe(ctx.channel, "ALLIANCE", "CREATE")
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Successfully subscribed to `ALLIANCE_CREATE` events.\nSubscription ID: {subscription.id}",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @subscribe_alliance.command(name="delete", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscribe_alliance_delete(self, ctx: commands.Context):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.channel, discord.TextChannel)
+            assert isinstance(ctx.author, discord.Member)
+        subscription = await Subscription.subscribe(ctx.channel, "ALLIANCE", "DELETE")
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Successfully subscribed to `ALLIANCE_DELETE` events.\nSubscription ID: {subscription.id}",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @commands.group(name="subscription", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscription(self, ctx: commands.Context):
+        ...
+
+    @subscription.command(name="list", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscription_list(
+        self, ctx: commands.Context, channel: discord.TextChannel = None
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        if channel is None:
+            subscriptions = [
+                i for i in cache.subscriptions if i.guild_id == ctx.guild.id
+            ]
+        else:
+            subscriptions = [
+                i for i in cache.subscriptions if i.channel_id == channel.id
+            ]
+        if not subscriptions:
+            if channel is None:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "There are no subscriptions for this server!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"There are no subscriptions for {channel.mention}.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if channel is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"There are {len(subscriptions):,} on this server.\n\n"
+                    + "\n".join(
+                        f"`{i.category}_{i.type}` - <#{i.channel_id}> - {i.id}"
+                        for i in subscriptions
+                    ),
+                    color=discord.Color.blue(),
+                )
+            )
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"There are {len(subscriptions):,} in {channel.mention}.\n\n"
+                + "\n".join(f"`{i.category}_{i.type}` - {i.id}" for i in subscriptions),
+                color=discord.Color.blue(),
+            )
+        )
+
+    @subscription.command(name="info", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscription_info(
+        self, ctx: commands.Context, subscription: Subscription
+    ):
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Subscription ID: {subscription.id}\nEvent: {subscription.category}_{subscription.type}\nSubtypes: {', '.join(subscription.sub_types) if subscription.sub_types else 'None'}\nArguments: {', '.join(str(i) for i in subscription.arguments) if subscription.arguments else 'None'}",
+                color=discord.Color.blue(),
+            )
+        )
+
+    @subscription.command(name="delete", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscription_delete(
+        self, ctx: commands.Context, subscription: Subscription
+    ):
+        await subscription.delete()
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Subscription {subscription.id} has been deleted.",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
 
 
 def setup(bot: Rift):
