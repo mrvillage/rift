@@ -99,7 +99,7 @@ async def on_ready():
         bot.add_view(AlliancesPaginator(1, 50))
         bot.persistent_views_loaded = True
         print("Loaded persistent views!", flush=True)
-        async with aiohttp.request(bot.user.avatar.url) as req:  # type: ignore
+        async with aiohttp.request("GET", bot.user.display_avatar.url) as req:  # type: ignore
             bot.bytes_avatar = await req.read()
 
     print("Startup complete!", flush=True)
