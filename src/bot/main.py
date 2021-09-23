@@ -101,7 +101,6 @@ async def on_ready():
         print("Loaded persistent views!", flush=True)
         async with aiohttp.request(bot.user.avatar.url) as req:  # type: ignore
             bot.bytes_avatar = await req.read()
-    print("Startup complete!", flush=True)
 
     print("Startup complete!", flush=True)
 
