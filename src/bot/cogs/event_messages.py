@@ -155,7 +155,7 @@ class EventMessages(commands.Cog):
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
-                    f"**Treaty created!**\n\n{treaty.treaty_type} from {repr(treaty.from_)} to {repr(treaty.to_)}.",
+                    f"**Treaty created!**\n{treaty.treaty_type} from {repr(treaty.from_)} to {repr(treaty.to_)}.",
                     color=discord.Color.blue(),
                 )
             )
@@ -173,7 +173,7 @@ class EventMessages(commands.Cog):
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
-                    f"**Treaty deleted!**\n\n{treaty.treaty_type} from {repr(treaty.from_)} to {repr(treaty.to_)}.",
+                    f"**Treaty deleted!**\n{treaty.treaty_type} from {repr(treaty.from_)} to {repr(treaty.to_)}.",
                     color=discord.Color.blue(),
                 ),
                 False,
