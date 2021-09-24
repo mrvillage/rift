@@ -157,7 +157,8 @@ class EventMessages(commands.Cog):
                     bot.user,
                     f"**Treaty created!**\n{treaty.treaty_type} from {repr(treaty.from_)} to {repr(treaty.to_)}.",
                     color=discord.Color.blue(),
-                )
+                ),
+                False,
             )
 
     @commands.Cog.listener()
