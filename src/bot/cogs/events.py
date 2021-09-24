@@ -191,7 +191,7 @@ class Events(commands.Cog):
     async def subscribe_treaty(self, ctx: commands.Context):
         ...
 
-    @subscribe_alliance.command(name="create", type=commands.CommandType.chat_input)
+    @subscribe_treaty.command(name="create", type=commands.CommandType.chat_input)
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_treaty_create(self, ctx: commands.Context):
@@ -208,7 +208,7 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
-    @subscribe_alliance.command(name="delete", type=commands.CommandType.chat_input)
+    @subscribe_treaty.command(name="delete", type=commands.CommandType.chat_input)
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_treaty_delete(self, ctx: commands.Context):
