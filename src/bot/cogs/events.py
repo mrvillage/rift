@@ -185,6 +185,46 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
+    @subscribe.group(name="treaty", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscribe_treaty(self, ctx: commands.Context):
+        ...
+
+    @subscribe_alliance.command(name="create", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscribe_treaty_create(self, ctx: commands.Context):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.channel, discord.TextChannel)
+            assert isinstance(ctx.author, discord.Member)
+        subscription = await Subscription.subscribe(ctx.channel, "TREATY", "CREATE")
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Successfully subscribed to `TREATY_CREATE` events.\nSubscription ID: {subscription.id}",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @subscribe_alliance.command(name="delete", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscribe_treaty_delete(self, ctx: commands.Context):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.channel, discord.TextChannel)
+            assert isinstance(ctx.author, discord.Member)
+        subscription = await Subscription.subscribe(ctx.channel, "TREATY", "DELETE")
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Successfully subscribed to `TREATY_DELETE` events.\nSubscription ID: {subscription.id}",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
     @commands.group(name="subscription", type=commands.CommandType.chat_input)
     @has_manage_permissions()
     @commands.guild_only()
