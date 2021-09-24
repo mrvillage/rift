@@ -3,12 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import discord
-from discord.components import C
 from discord.ext import commands
 
 from ... import funcs
 from ...cache import cache
-from ...data.classes import Alliance, Nation
+from ...data.classes import Alliance, Nation, Treaty
 from ...ref import Rift, bot
 
 
@@ -138,6 +137,43 @@ class EventMessages(commands.Cog):
                 funcs.get_embed_author_member(
                     bot.user,
                     f'**Nation deleted!**\n[{repr(nation)}](https://politicsandwar.com/nation/id={nation.id} "https://politicsandwar.com/nation/id={nation.id}")',
+                    color=discord.Color.blue(),
+                ),
+                False,
+            )
+
+    @commands.Cog.listener()
+    async def on_treaty_create(self, treaty: Treaty):
+        if TYPE_CHECKING:
+            assert isinstance(bot.user, discord.User)
+        subscriptions = [
+            i
+            for i in cache.subscriptions
+            if i.category == "TREATY" and i.type == "CREATE"
+        ]
+        for sub in subscriptions:
+            await sub.send(
+                funcs.get_embed_author_member(
+                    bot.user,
+                    f"**Treaty created!**\n\n{treaty.treaty_type} from {repr(treaty.from_)} to {repr(treaty.to_)}.",
+                    color=discord.Color.blue(),
+                )
+            )
+
+    @commands.Cog.listener()
+    async def on_treaty_delete(self, treaty: Treaty):
+        if TYPE_CHECKING:
+            assert isinstance(bot.user, discord.User)
+        subscriptions = [
+            i
+            for i in cache.subscriptions
+            if i.category == "TREATY" and i.type == "DELETE"
+        ]
+        for sub in subscriptions:
+            await sub.send(
+                funcs.get_embed_author_member(
+                    bot.user,
+                    f"**Treaty deleted!**\n\n{treaty.treaty_type} from {repr(treaty.from_)} to {repr(treaty.to_)}.",
                     color=discord.Color.blue(),
                 ),
                 False,
