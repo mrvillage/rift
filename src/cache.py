@@ -387,20 +387,18 @@ class Cache:
     def hook_treaty(
         self, action: Literal["create", "update", "delete"], data: TreatyData
     ) -> None:
-        if action == "update":
-            ...  # will need to check if a treaty with those values exists, if it does then update it, if it doesn't then add it
+        alliances: Dict[int, Alliance] = {  # type: ignore
+            data["from_"]: self.get_alliance(data["from_"]),
+            data["to_"]: self.get_alliance(data["to_"]),
+        }
         if action == "delete":
             treaty = next(
                 i
                 for i in self._treaties
                 if i.from_ == data["from_"] and i.to_ == data["to_"]
             )
-            return self._treaties.remove(treaty)
-        alliances = {
-            data["from_"]: self.get_alliance(data["from_"]),
-            data["to_"]: self.get_alliance(data["to_"]),
-        }
-        self._treaties.append(Treaty(list(data.values()), alliances))  # type: ignore
+            treaty._update(data, alliances)
+        self._treaties.append(Treaty(data, alliances))
 
     def get_alliance(self, id: int, /) -> Optional[Alliance]:
         return self._alliances.get(id)
