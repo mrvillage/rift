@@ -43,7 +43,12 @@ class Subscription:
     @classmethod
     async def convert(cls, ctx: commands.Context, argument: str, /) -> Subscription:
         try:
-            return await cls.fetch(int(argument))
+            subscription = await cls.fetch(int(argument))
+            if TYPE_CHECKING:
+                assert isinstance(ctx.guild, discord.Guild)
+            if subscription.guild_id != ctx.guild.id:
+                raise SubscriptionNotFoundError(argument)
+            return subscription
         except ValueError:
             raise SubscriptionNotFoundError(argument)
 
