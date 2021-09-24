@@ -5,7 +5,7 @@ from typing import List, Literal, TypedDict
 __all__ = ("SubscriptionData", "EventCategoryLiteral", "EventTypeLiteral")
 
 EventCategoryLiteral = Literal[
-    "ALLIANCE", "FORUM", "NATION"
+    "ALLIANCE", "FORUM", "NATION", "TREATY"
 ]  # ATTACK, COLOR, PRICE, TRADE, TREASURE, WAR
 EventTypeLiteral = Literal["CREATE", "DELETE", "UPDATE"]  # ACCEPT, VICTORY
 
