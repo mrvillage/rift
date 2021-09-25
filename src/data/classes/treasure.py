@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from discord.ext import commands
 
@@ -11,6 +11,8 @@ __all__ = ("Treasure",)
 
 if TYPE_CHECKING:
     from typings import TreasureData
+
+    from .nation import Nation
 
 
 class Treasure:
@@ -38,3 +40,7 @@ class Treasure:
         self.bonus = data["bonus"]
         self.spawn_date = data["spawndate"]
         self.nation_id = int(data["nation"])
+
+    @property
+    def nation(self) -> Optional[Nation]:
+        return cache.get_nation(self.nation_id)
