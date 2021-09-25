@@ -2,6 +2,7 @@ from .base import BaseError
 
 __all__ = (
     "AllianceNotFoundError",
+    "AttackNotFoundError",
     "CategoryNotFoundError",
     "CityNotFoundError",
     "ColorNotFoundError",
@@ -16,6 +17,7 @@ __all__ = (
     "ServerNotFoundError",
     "SubscriptionNotFoundError",
     "TargetNotFoundError",
+    "WarNotFoundError",
 )
 
 
@@ -24,6 +26,10 @@ class NotFoundError(BaseError):
 
 
 class AllianceNotFoundError(NotFoundError):
+    ...
+
+
+class AttackNotFoundError(NotFoundError):
     ...
 
 
@@ -80,4 +86,8 @@ class SubscriptionNotFoundError(NotFoundError):
 
 
 class TargetNotFoundError(NotFoundError):
+    ...
+
+
+class WarNotFoundError(NotFoundError):
     ...
