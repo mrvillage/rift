@@ -14,6 +14,7 @@ from typing import (
 import discord
 from discord.ext import commands
 
+from ...cache import cache
 from ...errors import MenuItemNotFoundError, MenuNotFoundError
 from ..db import execute_query, execute_read_query
 from ..get import get_menu, get_menu_item
@@ -253,15 +254,15 @@ class Menu(Makeable):
 
     @classmethod
     async def fetch(cls, menu_id: int, guild_id: int) -> Menu:
-        try:
-            return cls(data=await get_menu(menu_id, guild_id))
-        except IndexError:
-            raise MenuNotFoundError(menu_id)
+        menu = cache.get_menu(menu_id, guild_id)
+        if menu:
+            return menu
+        raise MenuNotFoundError(menu_id)
 
     @classmethod
     def default(cls, menu_id: int, guild_id: int) -> Menu:
         menu = cls(
-            data={
+            data={  # type: ignore
                 "menu_id": menu_id,
                 "guild_id": guild_id,
                 "name": None,
@@ -374,7 +375,10 @@ class MenuItem:
 
     @classmethod
     async def fetch(cls, item_id: int, guild_id: int) -> MenuItem:
-        return cls(data=await get_menu_item(item_id, guild_id))
+        item = cache.get_menu_item(item_id, guild_id)
+        if item:
+            return item
+        raise MenuItemNotFoundError(item_id)
 
     def get_item(self, menu_id: int, row: int) -> Union[Button, Select]:
         custom_id = f"{menu_id}-{self.item_id}"

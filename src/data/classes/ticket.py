@@ -5,8 +5,10 @@ from typing import TYPE_CHECKING, Optional, Union
 import discord
 from discord.ext import commands
 
+from ...cache import cache
+from ...errors import TicketConfigNotFoundError, TicketNotFoundError
 from ..db import execute_query, execute_read_query
-from ..get import get_current_ticket_number, get_ticket
+from ..get import get_current_ticket_number
 from ..query import query_ticket_config
 
 __all__ = ("Ticket", "TicketConfig")
@@ -42,7 +44,10 @@ class Ticket:
 
     @classmethod
     async def fetch(cls, ticket_id: int) -> Ticket:
-        return Ticket(await get_ticket(ticket_id=ticket_id))
+        ticket = cache.get_ticket(ticket_id)
+        if ticket:
+            return ticket
+        raise TicketNotFoundError(ticket_id)
 
     async def save(self) -> None:
         await execute_read_query(
@@ -130,7 +135,10 @@ class TicketConfig:
 
     @classmethod
     async def fetch(cls, config_id: int) -> TicketConfig:
-        return TicketConfig(await query_ticket_config(config_id=config_id))
+        config = cache.get_ticket_config(config_id)
+        if config:
+            return config
+        raise TicketConfigNotFoundError(config_id)
 
     async def save(self) -> None:
         await execute_query(
