@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 
 
 class Forum:
+    __slots__ = ("id", "link", "name")
+
     def __init__(self, data: ForumData):
         self.id: int = data["id"]
         self.link: str = data["link"]
@@ -43,6 +45,8 @@ class Forum:
 
 
 class ForumPost:
+    __slots__ = ("id", "link", "forum_id")
+
     def __init__(self, data: ForumPostData):
         self.id: int = data["id"]
         self.link: str = data["link"]

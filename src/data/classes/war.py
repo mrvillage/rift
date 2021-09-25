@@ -14,6 +14,57 @@ if TYPE_CHECKING:
 
 
 class War:
+    __slots__ = (
+        "id",
+        "date",
+        "reason",
+        "war_type",
+        "active",
+        "ground_control",
+        "air_superiority",
+        "naval_blockade",
+        "winner",
+        "turns_left",
+        "attacker_id",
+        "attacker_alliance_id",
+        "defender_id",
+        "defender_alliance_id",
+        "attacker_points",
+        "defender_points",
+        "attacker_peace",
+        "defender_peace",
+        "attacker_resistance",
+        "defender_resistance",
+        "attacker_fortify",
+        "defender_fortify",
+        "attacker_gas_used",
+        "defender_gas_used",
+        "attacker_munitions_used",
+        "defender_munitions_used",
+        "attacker_aluminum_used",
+        "defender_aluminum_used",
+        "attacker_steel_used",
+        "defender_steel_used",
+        "attacker_infra_destroyed",
+        "defender_infra_destroyed",
+        "attacker_money_looted",
+        "defender_money_looted",
+        "attacker_soldiers_killed",
+        "defender_soldiers_killed",
+        "attacker_tanks_killed",
+        "defender_tanks_killed",
+        "attacker_aircraft_killed",
+        "defender_aircraft_killed",
+        "attacker_ships_killed",
+        "defender_ships_killed",
+        "attacker_missiles_used",
+        "defender_missiles_used",
+        "attacker_nukes_used",
+        "defender_nukes_used",
+        "attacker_infra_destroyed_value",
+        "defender_infra_destroyed_value",
+    )
+
     def __init__(self, data: WarData):
         self.id: int = data["id"]
         self.date: str = data["date"]
@@ -138,6 +189,32 @@ class War:
 
 
 class Attack:
+    __slots__ = (
+        "id",
+        "war_id",
+        "date",
+        "type",
+        "victor",
+        "success",
+        "attcas1",
+        "defcas1",
+        "attcas2",
+        "defcas2",
+        "city_id",
+        "infra_destroyed",
+        "improvements_lost",
+        "money_stolen",
+        "loot_info",
+        "resistance_eliminated",
+        "city_infra_before",
+        "infra_destroyed_value",
+        "attacker_munitions_used",
+        "defender_munitions_used",
+        "attacker_gas_used",
+        "defender_gas_used",
+        "aircraft_killed_by_tanks",
+    )
+
     def __init__(self, data: AttackData):
         self.id: int = data["id"]
         self.war_id: int = data["war_id"]
