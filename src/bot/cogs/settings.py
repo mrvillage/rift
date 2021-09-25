@@ -313,6 +313,132 @@ class Settings(commands.Cog):
             ephemeral=True,
         )
 
+    @server_settings.command(
+        name="welcome_channels",
+        help="Modify the server's welcome channels format.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "channels": "The new welcome channels, given by space separated channel mentions.",
+            "clear": "Set to True to clear the welcome channels.",
+        },
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_welcome_channels(
+        self, ctx: commands.Context, *, channels: List[discord.TextChannel] = None, clear: bool = False  # type: ignore
+    ):
+        channels: Optional[str]
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
+        if TYPE_CHECKING:
+            assert settings.welcome_settings is not None
+        if channels is None and not clear:
+            if settings.welcome_settings.welcome_channels:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The welcome channels are:\n\n{''.join(f'<#{i}>' for i in settings.welcome_settings.welcome_channels)}",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="This server has no welcome channels.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        if channels:
+            channels = channels.strip("\n ")
+        if clear:
+            channels = None
+        await settings.welcome_settings.set_(welcome_channels=channels)
+        if channels:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The welcome channels are now:\n\n{''.join(f'<#{i}>' for i in channels)}",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The welcome channels have been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @server_settings.command(
+        name="join_roles",
+        help="Modify the server's join roles.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "channels": "The new join roles, given by space separated role mentions.",
+            "clear": "Set to True to clear the join roles.",
+        },
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_join_roles(
+        self, ctx: commands.Context, *, roles: List[discord.Role] = None, clear: bool = False  # type: ignore
+    ):
+        roles: Optional[str]
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
+        if TYPE_CHECKING:
+            assert settings.welcome_settings is not None
+        if roles is None and not clear:
+            if settings.welcome_settings.join_roles:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The join roles are:\n\n{''.join(f'<#{i}>' for i in settings.welcome_settings.join_roles)}",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="This server has no join roles.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        if roles:
+            roles = roles.strip("\n ")
+        if clear:
+            roles = None
+        await settings.welcome_settings.set_(join_roles=roles)
+        if roles:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The join roles are now:\n\n{''.join(f'<@&{i}>' for i in roles)}",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The join roles have been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         # sourcery no-metrics skip: merge-nested-ifs
