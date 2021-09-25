@@ -9,3 +9,4 @@ from .mmr import *
 from .nation import *
 from .ticket import *
 from .treaty import *
+from .war import *
