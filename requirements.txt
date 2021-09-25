@@ -4,3 +4,4 @@ beautifulsoup4
 pnwkit-py
 git+https://github.com/Rapptz/discord-ext-menus
 python-dotenv
+feedparser
