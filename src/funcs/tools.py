@@ -26,7 +26,7 @@ def calculate_infrastructure_value(start: float, end: float, /) -> float:
     if difference < 0:
         return 150 * difference
     if difference > 100 and difference % 100 == 0:
-        chunk = round(infrastructure_price(start + 100), 2) * 100
+        chunk = round(infrastructure_price(start), 2) * 100
         return value + chunk + calculate_infrastructure_value(start + 100, end)
     if difference > 100 and difference % 100 != 0:
         chunk = round(infrastructure_price(start), 2) * (difference % 100)
@@ -55,7 +55,7 @@ def calculate_land_value(start: float, end: float) -> float:
     if difference < 0:
         return 50 * difference
     if difference > 500 and difference % 500 == 0:
-        chunk = round(land_price(start + 500), 2) * 500
+        chunk = round(land_price(start), 2) * 500
         return value + chunk + calculate_land_value(start + 500, end)
     if difference > 500 and difference % 500 != 0:
         chunk = round(land_price(start), 2) * (difference % 500)
