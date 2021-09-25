@@ -63,11 +63,11 @@ class AlliancesPaginator(discord.ui.View):
         max_page = await get_max_alliances_page()
         if page == max_page:
             button.disabled = True
-            self.right.disabled = False  # type: ignore
+            self.left.disabled = False  # type: ignore
         elif page > max_page:
             page = max_page
             button.disabled = True
-            self.right.disabled = False  # type: ignore
+            self.left.disabled = False  # type: ignore
         offset = (page - 1) * 50
         alliances = await get_alliances_offset(offset=offset)
         await asyncio.gather(*(i._make_members() for i in alliances))
