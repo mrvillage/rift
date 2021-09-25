@@ -77,6 +77,9 @@ async def on_raw_message_edit(payload: discord.RawMessageUpdateEvent):
 
 @bot.event
 async def on_ready():
+    if not cache.init:
+        await cache.initialize()
+        print("Cache initialized!", flush=True)
     if not bot.cogs_loaded:
         cogPath = Path.cwd() / "src" / "bot" / "cogs"
         cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
@@ -91,10 +94,6 @@ async def on_ready():
 
     await bot.register_application_commands()
     print("Application commands registered!", flush=True)
-
-    if not cache.init:
-        await cache.initialize()
-        print("Cache initialized!", flush=True)
 
     if not bot.persistent_views_loaded:
         for menu in cache.menus:
