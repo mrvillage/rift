@@ -19,6 +19,7 @@ __all__ = (
     "TargetNotFoundError",
     "TicketConfigNotFoundError",
     "TicketNotFoundError",
+    "TreasureNotFoundError",
     "WarNotFoundError",
 )
 
@@ -96,6 +97,10 @@ class TicketConfigNotFoundError(NotFoundError):
 
 
 class TicketNotFoundError(NotFoundError):
+    ...
+
+
+class TreasureNotFoundError(NotFoundError):
     ...
 
 
