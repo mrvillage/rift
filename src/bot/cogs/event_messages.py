@@ -7,7 +7,7 @@ from discord.ext import commands
 
 from ... import funcs
 from ...cache import cache
-from ...data.classes import Alliance, Nation, Treaty
+from ...data.classes import Alliance, ForumPost, Nation, Treaty
 from ...ref import Rift, bot
 
 
@@ -47,6 +47,27 @@ class EventMessages(commands.Cog):
                 funcs.get_embed_author_member(
                     bot.user,
                     f'**Alliance deleted!**\n[{repr(alliance)}](https://politicsandwar.com/alliance/id={alliance.id} "https://politicsandwar.com/alliance/id={alliance.id}")',
+                    color=discord.Color.blue(),
+                ),
+                False,
+            )
+
+    @commands.Cog.listener()
+    async def on_forum_post_create(self, post: ForumPost, title: str):
+        if TYPE_CHECKING:
+            assert isinstance(bot.user, discord.User)
+        subscriptions = [
+            i
+            for i in cache.subscriptions
+            if i.category == "FORUM_POST" and i.type == "CREATE"
+        ]
+        for sub in subscriptions:
+            if post.forum.name.upper().replace(" ", "_") not in sub.sub_types:
+                continue
+            await sub.send(
+                funcs.get_embed_author_member(
+                    bot.user,
+                    f'**Forum Post Created!**\nForum: {post.forum.name}\n[{title}]({post.link} "{post.link}")',
                     color=discord.Color.blue(),
                 ),
                 False,
