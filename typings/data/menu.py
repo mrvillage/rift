@@ -6,7 +6,7 @@ __all__ = ("MenuData", "MenuInterfaceData", "MenuItemData")
 
 
 class MenuData(TypedDict):
-    menu_id: int
+    id: int
     guild_id: int
     name: Optional[str]
     description: Optional[str]
@@ -20,7 +20,7 @@ class MenuInterfaceData(TypedDict):
 
 
 class MenuItemData(TypedDict):
-    item_id: int
+    id: int
     guild_id: int
     type_: str
     data_: Dict[str, Any]  # fully type this

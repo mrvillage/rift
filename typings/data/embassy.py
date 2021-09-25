@@ -6,7 +6,7 @@ __all__ = ("EmbassyData", "EmbassyConfigData")
 
 
 class EmbassyData(TypedDict):
-    embassy_id: int
+    id: int
     alliance_id: int
     config_id: int
     guild_id: int
@@ -14,7 +14,7 @@ class EmbassyData(TypedDict):
 
 
 class EmbassyConfigData(TypedDict):
-    config_id: int
+    id: int
     category_id: Optional[int]
     guild_id: int
     start_message: str

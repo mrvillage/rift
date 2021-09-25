@@ -61,7 +61,7 @@ class Embassies(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         data = {
-            "config_id": ctx.interaction.id,
+            "id": ctx.interaction.id,
             "category_id": category and category.id,
             "guild_id": ctx.guild.id,
             "start_message": start,
@@ -73,7 +73,7 @@ class Embassies(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Embassy Configuration {config.config_id} created.",
+                f"Embassy Configuration {config.id} created.",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
@@ -105,7 +105,7 @@ class Embassies(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 "\n".join(
-                    f"{config.config_id} - {category}"
+                    f"{config.id} - {category}"
                     for config in configs
                     if config.category_id
                     and (category := ctx.guild.get_channel(config.category_id))
@@ -140,9 +140,9 @@ class Embassies(commands.Cog):
             )
         channel = channel or ctx.channel
         data = {
-            "embassy_id": channel.id,
+            "id": channel.id,
             "alliance_id": alliance.id,
-            "config_id": config.config_id,
+            "config_id": config.id,
             "guild_id": ctx.guild.id,
             "open": True,
         }
@@ -153,7 +153,7 @@ class Embassies(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"{channel.mention} claimed for {repr(alliance)} under embassy configuration {config.config_id}.",
+                f"{channel.mention} claimed for {repr(alliance)} under embassy configuration {config.id}.",
             ),
             ephemeral=True,
         )

@@ -21,11 +21,7 @@ if TYPE_CHECKING:
 
 async def query_ticket(ticket_id: int) -> TicketData:
     data = dict(
-        (
-            await execute_read_query(
-                "SELECT * FROM tickets WHERE ticket_id = $1;", ticket_id
-            )
-        )[0]
+        (await execute_read_query("SELECT * FROM tickets WHERE id = $1;", ticket_id))[0]
     )
     if TYPE_CHECKING:
         assert isinstance(data, TicketData)
@@ -59,11 +55,7 @@ async def query_ticket_by_guild(guild_id: int) -> Tuple[TicketData, ...]:
 
 async def query_ticket_by_config(config_id: int) -> TicketData:
     data = dict(
-        (
-            await execute_read_query(
-                "SELECT * FROM tickets WHERE config_id = $1;", config_id
-            )
-        )
+        (await execute_read_query("SELECT * FROM tickets WHERE id = $1;", config_id))
     )
     if TYPE_CHECKING:
         assert isinstance(data, TicketData)
@@ -74,7 +66,7 @@ async def query_ticket_config(config_id: int) -> TicketConfigData:
     data = dict(
         (
             await execute_read_query(
-                "SELECT * FROM ticket_configs WHERE config_id = $1;", config_id
+                "SELECT * FROM ticket_configs WHERE id = $1;", config_id
             )
         )[0]
     )
@@ -111,7 +103,7 @@ async def query_ticket_config_by_guild(guild_id: int) -> Tuple[TicketConfigData,
 async def query_current_ticket_number(config_id: int) -> int:
     data = (
         await execute_read_query(
-            "SELECT MAX(ticket_number) FROM tickets WHERE config_id = $1;",
+            "SELECT MAX(ticket_number) FROM tickets WHERE id = $1;",
             config_id,
         )
     )[0][0]

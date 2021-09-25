@@ -22,7 +22,7 @@ async def query_embassy(embassy_id: int) -> EmbassyData:
     data = dict(
         (
             await execute_read_query(
-                "SELECT * FROM embassies WHERE embassy_id = $1;", embassy_id
+                "SELECT * FROM embassies WHERE id = $1;", embassy_id
             )
         )[0]
     )
@@ -58,11 +58,7 @@ async def query_embassy_by_guild(guild_id: int) -> Tuple[EmbassyData, ...]:
 
 async def query_embassy_by_config(config_id: int) -> EmbassyData:
     data = dict(
-        (
-            await execute_read_query(
-                "SELECT * FROM embassies WHERE config_id = $1;", config_id
-            )
-        )
+        (await execute_read_query("SELECT * FROM embassies WHERE id = $1;", config_id))
     )
     if TYPE_CHECKING:
         assert isinstance(data, EmbassyData)
@@ -73,7 +69,7 @@ async def query_embassy_config(config_id: int) -> EmbassyConfigData:
     data = dict(
         (
             await execute_read_query(
-                "SELECT * FROM embassy_configs WHERE config_id = $1;", config_id
+                "SELECT * FROM embassy_configs WHERE id = $1;", config_id
             )
         )[0]
     )

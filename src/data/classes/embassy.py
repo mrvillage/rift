@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 class Embassy:
     __slots__ = (
-        "embassy_id",
+        "id",
         "alliance_id",
         "config_id",
         "guild_id",
@@ -29,7 +29,7 @@ class Embassy:
     )
 
     def __init__(self, data: EmbassyData) -> None:
-        self.embassy_id: int = data["embassy_id"]
+        self.id: int = data["id"]
         self.alliance_id: int = data["alliance_id"]
         self.config_id: int = data["config_id"]
         self.guild_id: int = data["guild_id"]
@@ -53,12 +53,12 @@ class Embassy:
         raise EmbassyNotFoundError(embassy_id)
 
     def __int__(self) -> int:
-        return self.embassy_id
+        return self.id
 
     async def save(self) -> None:
         await execute_query(
-            """INSERT INTO embassies (embassy_id, alliance_id, config_id, guild_id, open) VALUES ($1, $2, $3, $4, $5);""",
-            self.embassy_id,
+            """INSERT INTO embassies (id, alliance_id, config_id, guild_id, open) VALUES ($1, $2, $3, $4, $5);""",
+            self.id,
             self.alliance_id,
             self.config_id,
             self.guild_id,
@@ -66,9 +66,7 @@ class Embassy:
         )
 
     async def delete(self) -> None:
-        await execute_read_query(
-            """DELETE FROM embassies WHERE embassy_id = $1;""", self.embassy_id
-        )
+        await execute_read_query("""DELETE FROM embassies WHERE id = $1;""", self.id)
 
     async def start(
         self,
@@ -79,7 +77,7 @@ class Embassy:
     ) -> None:
         from ...funcs import get_embed_author_member
 
-        channel = user.guild.get_channel(self.embassy_id)
+        channel = user.guild.get_channel(self.id)
         if TYPE_CHECKING:
             assert isinstance(channel, discord.TextChannel)
         if response is not None:
@@ -99,14 +97,14 @@ class Embassy:
 
 class EmbassyConfig:
     __slots__ = (
-        "config_id",
+        "id",
         "category_id",
         "guild_id",
         "start_message",
     )
 
     def __init__(self, data: EmbassyConfigData) -> None:
-        self.config_id: int = data["config_id"]
+        self.id: int = data["id"]
         self.category_id: Optional[int] = data["category_id"]
         self.guild_id: int = data["guild_id"]
         self.start_message: str = data["start_message"]
@@ -129,12 +127,12 @@ class EmbassyConfig:
         raise EmbassyConfigNotFoundError(config_id)
 
     def __int__(self) -> int:
-        return self.config_id
+        return self.id
 
     async def save(self) -> None:
         await execute_read_query(
-            """INSERT INTO embassy_configs (config_id, category_id, guild_id, start_message) VALUES ($1, $2, $3,$4);""",
-            self.config_id,
+            """INSERT INTO embassy_configs (id, category_id, guild_id, start_message) VALUES ($1, $2, $3,$4);""",
+            self.id,
             self.category_id,
             self.guild_id,
             self.start_message,
@@ -146,9 +144,9 @@ class EmbassyConfig:
         args = tuple(kwargs.values())
         await execute_query(
             f"""
-        UPDATE embassy_configs SET {sets} WHERE config_id = $1;
+        UPDATE embassy_configs SET {sets} WHERE id = $1;
         """,
-            self.config_id,
+            self.id,
             *args,
         )
         return self
@@ -163,11 +161,11 @@ class EmbassyConfig:
         valid = [
             i
             for i in embassies
-            if i["config_id"] == self.config_id and i["alliance_id"] == alliance.id
+            if i["config_id"] == self.id and i["alliance_id"] == alliance.id
         ]
         if valid:
-            embassy = await Embassy.fetch(valid[0]["embassy_id"])
-            channel = bot.get_channel(embassy.embassy_id)
+            embassy = await Embassy.fetch(valid[0]["id"])
+            channel = bot.get_channel(embassy.id)
             if channel is None:
                 await embassy.delete()
             else:
@@ -208,9 +206,9 @@ class EmbassyConfig:
             category=category,
         )
         data = {
-            "embassy_id": channel.id,
+            "id": channel.id,
             "alliance_id": alliance.id,
-            "config_id": self.config_id,
+            "config_id": self.id,
             "guild_id": self.guild_id,
             "open": True,
         }
