@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Union
 
 import discord
 
+from ...cache import cache
 from ..db.sql import execute_query
 from ..get import get_guild_settings, get_guild_welcome_settings
 from .base import Makeable
@@ -91,9 +92,9 @@ class GuildWelcomeSettings(Makeable):
 
     @classmethod
     async def fetch(cls, guild_id: int) -> GuildWelcomeSettings:
-        data = await get_guild_welcome_settings(guild_id)
-        if data:
-            return cls(data)
+        settings = cache.get_guild_welcome_settings(guild_id)
+        if settings:
+            return settings
         return cls.default(guild_id)
 
     def format_welcome_embed(self, member: discord.Member, verified: bool):
@@ -201,10 +202,8 @@ class GuildSettings(Makeable):
 
     @classmethod
     async def fetch(cls, guild_id: int, *attrs) -> GuildSettings:
-        data = await get_guild_settings(guild_id)
-        if data:
-            settings: GuildSettings = cls(data)
-        else:
+        settings = cache.get_guild_settings(guild_id)
+        if not settings:
             settings = cls.default(guild_id)
         await settings.make_attrs(*attrs)
         return settings
