@@ -190,10 +190,10 @@ class Cache:
             self._colors[i.name] = i
         for i in embassies:
             i = Embassy(i)
-            self._embassies[i.embassy_id] = i
+            self._embassies[i.id] = i
         for i in embassy_configs:
             i = EmbassyConfig(i)
-            self._embassy_configs[i.config_id] = i
+            self._embassy_configs[i.id] = i
         for i in forums:
             i = Forum(i)
             self._forums[i.id] = i
@@ -209,10 +209,10 @@ class Cache:
             self._menu_interfaces.append(dict(i))  # type: ignore
         for i in menu_items:
             i = MenuItem(i)
-            self._menu_items[i.item_id] = i
+            self._menu_items[i.id] = i
         for i in menus:
             i = Menu(i)
-            self._menus[i.menu_id] = i
+            self._menus[i.id] = i
         for i in nations:
             i = Nation(i)
             self._nations[i.id] = i
@@ -233,10 +233,10 @@ class Cache:
             self._targets[i.id] = i
         for i in ticket_configs:
             i = TicketConfig(i)
-            self._ticket_configs[i.config_id] = i
+            self._ticket_configs[i.id] = i
         for i in tickets:
             i = Ticket(i)
-            self._tickets[i.ticket_id] = i
+            self._tickets[i.id] = i
         for i in treasures[0]["treasures"]:
             i = Treasure(i)
             self._treasures.append(i)
