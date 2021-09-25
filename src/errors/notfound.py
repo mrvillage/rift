@@ -17,6 +17,8 @@ __all__ = (
     "ServerNotFoundError",
     "SubscriptionNotFoundError",
     "TargetNotFoundError",
+    "TicketConfigNotFoundError",
+    "TicketNotFoundError",
     "WarNotFoundError",
 )
 
@@ -86,6 +88,14 @@ class SubscriptionNotFoundError(NotFoundError):
 
 
 class TargetNotFoundError(NotFoundError):
+    ...
+
+
+class TicketConfigNotFoundError(NotFoundError):
+    ...
+
+
+class TicketNotFoundError(NotFoundError):
     ...
 
 
