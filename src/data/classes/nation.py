@@ -349,7 +349,7 @@ class Nation(Makeable):
         spies = await calculate_spies(self) if fetch_spies else 0
         prices = prices or await get_trade_prices()
         if not data:
-            raw_data = await pnwkit.async_nation_query(
+            raw_data = await pnwkit.async_nation_query(  # type: ignore
                 {"id": self.id},
                 "id",
                 "ironw",
@@ -484,6 +484,41 @@ class Nation(Makeable):
         )
         revenue["trade_bonus"] = bonus
         return revenue
+
+    async def fetch_projects(self) -> PnWKitNation:
+        return (
+            await pnwkit.async_nation_query(  # type: ignore
+                {"id": self.id},
+                "id",
+                "ironw",
+                "bauxitew",
+                "armss",
+                "egr",
+                "massirr",
+                "itc",
+                "mlp",
+                "nrf",
+                "irond",
+                "vds",
+                "cia",
+                "cfce",
+                "propb",
+                "uap",
+                "city_planning",
+                "adv_city_planning",
+                "space_program",
+                "spy_satellite",
+                "moon_landing",
+                "pirate_economy",
+                "recycling_initiative",
+                "telecom_satellite",
+                "green_tech",
+                "arable_land_agency",
+                "clinical_research_center",
+                "specialized_police_training",
+                "adv_engineering_corps",
+            )
+        )[0]
 
     # PHASE OUT
     async def _make_alliance(self) -> None:
