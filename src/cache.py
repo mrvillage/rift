@@ -100,7 +100,7 @@ class Cache:
         self._ticket_configs: Dict[int, TicketConfig] = {}
         self._tickets: Dict[int, Ticket] = {}
         self._trades = {}  # NO CLASS YET
-        self._treasures: Set[Treasure] = set()  # NO CLASS YET
+        self._treasures: List[Treasure] = []
         self._treaties: Set[Treaty] = set()
         self._user_settings: Dict[int, UserSettings] = {}
         self._war_attacks = {}  # NO CLASS YET
@@ -230,7 +230,7 @@ class Cache:
             self._tickets[i.ticket_id] = i
         for i in treasures[0]["treasures"]:
             i = Treasure(i)
-            self._treasures.add(i)
+            self._treasures.append(i)
         for i in treaties:
             i = Treaty(
                 i,
@@ -315,7 +315,7 @@ class Cache:
         return set(self._trades.values())
 
     @property
-    def treasures(self) -> Set[Treasure]:
+    def treasures(self) -> List[Treasure]:
         return self._treasures
 
     @property
