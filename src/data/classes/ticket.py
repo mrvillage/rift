@@ -95,7 +95,9 @@ class Ticket:
                 ),
             )
         await channel.send(
-            user.mention,
+            user.mention
+            + "".join(f"<@{i}>" for i in config.user_mentions)
+            + "".join(f"<@&{i}" for i in config.role_mentions),
             embed=get_embed_author_member(
                 user, config.start_message.replace("\\n", "\n")
             ),
@@ -113,6 +115,8 @@ class TicketConfig:
         "guild_id",
         "start_message",
         "archive_category_id",
+        "role_mentions",
+        "user_mentions",
     )
 
     def __init__(self, data: TicketConfigData) -> None:
@@ -121,6 +125,8 @@ class TicketConfig:
         self.guild_id = data["guild_id"]
         self.start_message = data["start_message"]
         self.archive_category_id = data["archive_category_id"]
+        self.role_mentions = data["role_mentions"]
+        self.user_mentions = data["user_mentions"]
 
     @classmethod
     async def fetch(cls, config_id: int) -> TicketConfig:
@@ -128,12 +134,14 @@ class TicketConfig:
 
     async def save(self) -> None:
         await execute_query(
-            """INSERT INTO ticket_configs (config_id, category_id, guild_id, start_message, archive_category_id) VALUES ($1, $2, $3, $4, $5);""",
+            """INSERT INTO ticket_configs (config_id, category_id, guild_id, start_message, archive_category_id) VALUES ($1, $2, $3, $4, $5, $6, $7);""",
             self.config_id,
             self.category_id,
             self.guild_id,
             self.start_message,
             self.archive_category_id,
+            self.role_mentions,
+            self.user_mentions,
         )
 
     async def set_(self, **kwargs: Union[int, bool]) -> TicketConfig:
