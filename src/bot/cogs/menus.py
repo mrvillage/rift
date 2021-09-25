@@ -9,7 +9,6 @@ from ... import funcs
 from ...cache import cache
 from ...checks import has_manage_permissions
 from ...data.classes import Menu, MenuItem
-from ...data.query import query_menus_guild
 from ...flags import ButtonFlags, SelectFlags, SelectOptionFlags
 from ...ref import Rift
 

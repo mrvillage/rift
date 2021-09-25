@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
     List,
     Mapping,
     MutableMapping,
@@ -17,8 +16,7 @@ from discord.ext import commands
 
 from ...cache import cache
 from ...errors import MenuItemNotFoundError, MenuNotFoundError
-from ..db import execute_query, execute_read_query
-from ..get import get_menu, get_menu_item
+from ..db import execute_query
 from ..query import insert_interface
 from .base import Makeable
 

@@ -8,8 +8,6 @@ from discord.ext import commands
 from ...cache import cache
 from ...errors import EmbassyConfigNotFoundError, EmbassyNotFoundError
 from ..db import execute_query, execute_read_query
-from ..get import get_embassy
-from ..query import query_embassy_by_guild, query_embassy_config
 
 __all__ = ("Embassy", "EmbassyConfig")
 
@@ -56,6 +54,7 @@ class Embassy:
         return self.id
 
     async def save(self) -> None:
+        cache._embassies[self.id] = self
         await execute_query(
             """INSERT INTO embassies (id, alliance_id, config_id, guild_id, open) VALUES ($1, $2, $3, $4, $5);""",
             self.id,
@@ -66,6 +65,7 @@ class Embassy:
         )
 
     async def delete(self) -> None:
+        del cache._embassies[self.id]
         await execute_read_query("""DELETE FROM embassies WHERE id = $1;""", self.id)
 
     async def start(
@@ -130,6 +130,7 @@ class EmbassyConfig:
         return self.id
 
     async def save(self) -> None:
+        cache._embassy_configs[self.id] = self
         await execute_read_query(
             """INSERT INTO embassy_configs (id, category_id, guild_id, start_message) VALUES ($1, $2, $3,$4);""",
             self.id,
@@ -157,14 +158,14 @@ class EmbassyConfig:
         from ...errors import GuildNotFoundError
         from ...ref import bot
 
-        embassies = await query_embassy_by_guild(self.guild_id)
+        embassies = [i for i in cache.embassies if i.guild_id == self.guild_id]
         valid = [
             i
             for i in embassies
-            if i["config_id"] == self.id and i["alliance_id"] == alliance.id
+            if i.config_id == self.id and i.alliance_id == alliance.id
         ]
         if valid:
-            embassy = await Embassy.fetch(valid[0]["id"])
+            embassy = await Embassy.fetch(valid[0].id)
             channel = bot.get_channel(embassy.id)
             if channel is None:
                 await embassy.delete()

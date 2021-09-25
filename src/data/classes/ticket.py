@@ -8,8 +8,6 @@ from discord.ext import commands
 from ...cache import cache
 from ...errors import TicketConfigNotFoundError, TicketNotFoundError
 from ..db import execute_query, execute_read_query
-from ..get import get_current_ticket_number
-from ..query import query_ticket_config
 
 __all__ = ("Ticket", "TicketConfig")
 
@@ -50,6 +48,7 @@ class Ticket:
         raise TicketNotFoundError(ticket_id)
 
     async def save(self) -> None:
+        cache._tickets[self.id] = self
         await execute_read_query(
             """INSERT INTO tickets (id, ticket_number, config_id, guild_id, user_id, open) VALUES ($1, $2, $3, $4, $5, $6);""",
             self.id,
@@ -141,6 +140,7 @@ class TicketConfig:
         raise TicketConfigNotFoundError(config_id)
 
     async def save(self) -> None:
+        cache._ticket_configs[self.id] = self
         await execute_query(
             """INSERT INTO ticket_configs (id, category_id, guild_id, start_message, archive_category_id) VALUES ($1, $2, $3, $4, $5, $6, $7);""",
             self.id,
@@ -175,7 +175,9 @@ class TicketConfig:
         category = self.category_id and guild.get_channel(self.category_id)
         if TYPE_CHECKING and category is not None:
             assert isinstance(category, discord.CategoryChannel)
-        number = await get_current_ticket_number(self.id) + 1
+        number = (
+            max(i.ticket_number for i in cache.tickets if i.config_id == self.id) + 1
+        )
         if category is not None:
             overwrites = {key: value for key, value in category.overwrites.items()}
             overwrites[user] = discord.PermissionOverwrite(
