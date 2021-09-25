@@ -9,6 +9,7 @@ __all__ = (
     "DocumentNotFoundError",
     "EmbassyConfigNotFoundError",
     "EmbassyNotFoundError",
+    "ForumNotFoundError",
     "GuildNotFoundError",
     "MenuItemNotFoundError",
     "MenuNotFoundError",
@@ -57,6 +58,10 @@ class EmbassyConfigNotFoundError(NotFoundError):
 
 
 class EmbassyNotFoundError(NotFoundError):
+    ...
+
+
+class ForumNotFoundError(NotFoundError):
     ...
 
 
