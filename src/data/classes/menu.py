@@ -7,6 +7,7 @@ from typing import (
     List,
     Mapping,
     MutableMapping,
+    Optional,
     Sequence,
     Union,
 )
@@ -220,8 +221,8 @@ class SelectOption(discord.SelectOption):
 class Menu(Makeable):
     menu_id: int
     items: Sequence[List[MenuItem]]
-    name: str
-    description: str
+    name: Optional[str]
+    description: Optional[str]
     item_ids: Sequence[Sequence[int]]
     permissions: Mapping[str, Any]
 
