@@ -12,3 +12,4 @@ from .subscription import *
 from .target import *
 from .ticket import *
 from .treaty import *
+from .war import *
