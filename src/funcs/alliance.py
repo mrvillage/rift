@@ -4,7 +4,7 @@ from discord.ext import commands
 
 from ..cache import cache
 from ..data.classes import Alliance, Nation
-from ..errors import AllianceNotFoundError, LinkError
+from ..errors import AllianceNotFoundError, LinkError, NationNotFoundError
 from ..funcs.utils import convert_link
 from .link import get_link_user
 from .nation import search_nation
@@ -118,7 +118,9 @@ async def search_alliance(ctx: commands.Context, search: str) -> Alliance:
         return l[0]
     try:
         n = await search_nation(ctx, search)
+        if n.alliance is None:
+            raise AllianceNotFoundError(search)
         return n.alliance
-    except NationNotFoundError:
+    except (NationNotFoundError, AttributeError):
         raise AllianceNotFoundError(search)
     raise AllianceNotFoundError(search)
