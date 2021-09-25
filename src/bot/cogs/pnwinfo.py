@@ -243,7 +243,7 @@ class PnWInfo(commands.Cog):
     @commands.command(
         name="alliances",
         aliases=["as"],
-        brief="Get a list of alliances",
+        brief="Get a list of alliances.",
         type=commands.CommandType.chat_input,
         descriptions={
             "page": "The page of alliances to get, defaults to 1.",
