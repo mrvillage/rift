@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Union
 
 import discord
 from discord.ext import commands
@@ -49,7 +49,7 @@ class Tickets(commands.Cog):
         config = await TicketConfig.fetch(ticket.config_id)
         ticket.open = False
         await ticket.set_(open=False)
-        category = self.bot.get_channel(config.archive_category_id) or ctx.channel.category # type: ignore
+        category = self.bot.get_channel(config.archive_category_id) or ctx.channel.category  # type: ignore
         if TYPE_CHECKING:
             assert isinstance(category, discord.CategoryChannel) or category is None
             assert isinstance(ctx.channel, discord.TextChannel)
@@ -89,6 +89,7 @@ class Tickets(commands.Cog):
         start: str,
         category: discord.CategoryChannel = None,
         archive_category: discord.CategoryChannel = None,
+        mentions: List[Union[discord.Member, discord.User, discord.Role]] = [],
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
@@ -98,6 +99,10 @@ class Tickets(commands.Cog):
             "guild_id": ctx.guild.id,
             "start_message": start,
             "archive_category_id": archive_category and archive_category.id,
+            "role_mentions": [i.id for i in mentions if isinstance(i, discord.Role)],
+            "user_mentions": [
+                i.id for i in mentions if isinstance(i, (discord.Member, discord.User))
+            ],
         }
         if TYPE_CHECKING:
             assert isinstance(data, TicketConfigData)

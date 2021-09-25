@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, TypedDict
+from typing import List, Optional, TypedDict
 
 __all__ = ("TicketData", "TicketConfigData")
 
@@ -20,3 +20,5 @@ class TicketConfigData(TypedDict):
     guild_id: int
     start_message: str
     archive_category_id: Optional[int]
+    role_mentions: List[int]
+    user_mentions: List[int]
