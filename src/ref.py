@@ -73,7 +73,10 @@ class Rift(Bot):
 
 
 intents = Intents(
-    dm_messages=True, guild_messages=True, guilds=True, members=True, reactions=True
+    dm_messages=True,
+    guild_messages=True,
+    guilds=True,
+    members=True,
 )
 debug = False
 
