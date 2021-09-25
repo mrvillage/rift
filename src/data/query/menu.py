@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Dict, List
 import discord
 from discord import Message
 
+from ...cache import cache
 from ..db import execute_query, execute_read_query
 
 
@@ -40,6 +41,7 @@ async def insert_interface(*, menu_id: int, message: Message) -> None:
         menu_id,
         message.id,
     )
+    cache._menu_interfaces.append({"menu_id": menu_id, "message_id": message.id})
 
 
 async def query_menus() -> List[Dict[str, Any]]:

@@ -6,9 +6,9 @@ import discord
 from discord.ext import commands
 
 from ... import funcs
+from ...cache import cache
 from ...checks import has_manage_permissions
 from ...data.classes import Alliance, Embassy, EmbassyConfig
-from ...data.query import query_embassy_config_by_guild
 from ...ref import Rift
 
 if TYPE_CHECKING:
@@ -89,10 +89,7 @@ class Embassies(commands.Cog):
     async def embassy_config_list(self, ctx: commands.Context):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
-        configs = [
-            EmbassyConfig(config)
-            for config in await query_embassy_config_by_guild(ctx.guild.id)
-        ]
+        configs = [i for i in cache.embassy_configs if i.guild_id == ctx.guild.id]
         if not configs:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
