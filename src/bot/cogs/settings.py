@@ -67,7 +67,7 @@ class Settings(commands.Cog):
             "COMMUNITY",
             "PERSONAL",
         ] = None,
-    ):
+    ):  # sourcery no-metrics
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id)
@@ -76,7 +76,7 @@ class Settings(commands.Cog):
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    description=f"The server has been set to have no purpose.",
+                    description="The server has been set to have no purpose.",
                     color=discord.Color.green(),
                 ),
                 ephemeral=True,
