@@ -6,6 +6,7 @@ import discord
 from discord.ext import commands
 
 from ... import funcs
+from ...cache import cache
 from ...checks import has_manage_permissions
 from ...data.classes import Menu, MenuItem
 from ...data.query import query_menus_guild
@@ -20,7 +21,7 @@ class Menus(commands.Cog):
     @commands.group(
         name="menu",
         aliases=["menus", "role-menu", "rolemenu", "reaction-menu", "reactionmenu"],
-        help="A group of commands related to menus.",
+        brief="A group of commands related to menus.",
         case_insensitive=True,
         invoke_without_command=True,
         type=commands.CommandType.chat_input,
@@ -49,7 +50,7 @@ class Menus(commands.Cog):
     @menu.command(
         name="list",
         aliases=["l", "li"],
-        help="List the menu configurations for this guild.",
+        brief="List the menu configurations for this guild.",
         type=commands.CommandType.chat_input,
     )
     @commands.guild_only()
@@ -57,8 +58,7 @@ class Menus(commands.Cog):
     async def menu_list(self, ctx: commands.Context):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
-        menus = await query_menus_guild(guild_id=ctx.guild.id)
-        menus = [Menu(data=i) for i in menus]
+        menus = [i for i in cache.menus if i.guild_id == ctx.guild.id]
         if menus:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -77,8 +77,9 @@ class Menus(commands.Cog):
     @menu.command(
         name="create",
         aliases=["new"],
-        help="Create a new menu configuration.",
+        brief="Create a new menu configuration.",
         type=commands.CommandType.chat_input,
+        descriptions={"description": "The description to send with the menu."},
     )
     @commands.guild_only()
     @has_manage_permissions()
@@ -145,7 +146,7 @@ class Menus(commands.Cog):
                         continue
                     flags = await MenuItem.format_flags(ctx, flags)
                     item = MenuItem(
-                        {
+                        {  # type: ignore
                             "item_id": message.id,
                             "guild_id": ctx.guild.id,
                             "type_": "button",
@@ -207,8 +208,12 @@ class Menus(commands.Cog):
     @menu.command(
         name="send",
         aliases=["post"],
-        help="Send a menu configuration to a channel.",
+        brief="Send a menu configuration to a channel.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "menu": "The menu to send.",
+            "channel": "The channel to send the menu to.",
+        },
     )
     @commands.guild_only()
     @has_manage_permissions()
@@ -231,8 +236,11 @@ class Menus(commands.Cog):
     @menu.command(
         name="info",
         aliases=["details"],
-        help="Get information about a menu configuration.",
+        brief="Get information about a menu configuration.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "menu": "The menu to get information about.",
+        },
     )
     @commands.guild_only()
     @has_manage_permissions()
@@ -250,8 +258,11 @@ class Menus(commands.Cog):
     @menu.command(
         name="item",
         aliases=["items"],
-        help="Get information about a menu item.",
+        brief="Get information about a menu item.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "item": "The menu item to get information about.",
+        },
     )
     @commands.guild_only()
     @has_manage_permissions()

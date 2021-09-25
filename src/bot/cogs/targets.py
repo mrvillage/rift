@@ -21,11 +21,25 @@ class Targets(commands.Cog):
     def __init__(self, bot: Rift):
         self.bot = bot
 
-    @commands.group(name="target", type=commands.CommandType.chat_input)
+    @commands.group(
+        name="target",
+        brief="A group of commands to manage targets",
+        type=commands.CommandType.chat_input,
+    )
     async def target(self, ctx: commands.Context):
         ...
 
-    @target.command(name="add", type=commands.CommandType.chat_input)
+    @target.command(
+        name="add",
+        brief="Add a target.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "nation": "The nation to add.",
+            "channels": "The channels to send notifications in.",
+            "mentions": "The roles and users to mention when a notification comes.",
+            "direct_message": "Whether or not to send a Direct Message as a notification.",
+        },
+    )
     async def target_add(
         self,
         ctx: commands.Context,
@@ -52,7 +66,12 @@ class Targets(commands.Cog):
             ephemeral=True,
         )
 
-    @target.command(name="remove", type=commands.CommandType.chat_input)
+    @target.command(
+        name="remove",
+        brief="Remove a target.",
+        type=commands.CommandType.chat_input,
+        descriptions={"target": "The target to remove."},
+    )
     async def target_remove(self, ctx: commands.Context, *, target: Target):
         await target.remove()
         await ctx.reply(
@@ -64,7 +83,11 @@ class Targets(commands.Cog):
             ephemeral=True,
         )
 
-    @target.command(name="list", type=commands.CommandType.chat_input)
+    @target.command(
+        name="list",
+        brief="List all your targets.",
+        type=commands.CommandType.chat_input,
+    )
     async def target_list(self, ctx: commands.Context):
         await ctx.reply(
             embed=funcs.get_embed_author_member(

@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Literal, Optional
+from typing import TYPE_CHECKING, List, Literal, Optional
 
 import discord
-from discord import NotFound
 from discord.ext import commands
 
 from src.views.settings import AlliancePurposeConfirm
@@ -34,7 +33,7 @@ class Settings(commands.Cog):
     @commands.group(
         name="server-settings",
         aliases=["ss", "serversettings", "settings"],
-        help="View of modify server settings.",
+        brief="View of modify server settings.",
         invoke_without_command=True,
         type=commands.CommandType.chat_input,
     )
@@ -46,8 +45,9 @@ class Settings(commands.Cog):
     @server_settings.command(
         name="purpose",
         aliases=["p"],
-        help="View or modify the server's purpose.",
+        brief="View or modify the server's purpose.",
         type=commands.CommandType.chat_input,
+        descriptions={"purpose": "The new purpose of the server."},
     )
     @has_manage_permissions()
     @commands.guild_only()
@@ -241,8 +241,11 @@ class Settings(commands.Cog):
     @server_settings.command(
         name="welcome-message",
         aliases=["wm", "welcomemessage"],
-        help="Modify the server's welcome message.",
+        brief="Modify the server's welcome message.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "message": "The new welcome message.",
+        },
     )
     @has_manage_permissions()
     @commands.guild_only()
@@ -278,8 +281,11 @@ class Settings(commands.Cog):
     @server_settings.command(
         name="verified-nickname",
         aliases=["vn", "verifiednickname"],
-        help="Modify the server's verified nickname format.",
+        brief="Modify the server's verified nickname format.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "nickname": "The new verified nickname format.",
+        },
     )
     @has_manage_permissions()
     @commands.guild_only()
@@ -315,7 +321,7 @@ class Settings(commands.Cog):
 
     @server_settings.command(
         name="welcome_channels",
-        help="Modify the server's welcome channels format.",
+        brief="Modify the server's welcome channels format.",
         type=commands.CommandType.chat_input,
         descriptions={
             "channels": "The new welcome channels, given by space separated channel mentions.",
@@ -352,8 +358,6 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        if channels:
-            channels = channels.strip("\n ")
         if clear:
             channels = None
         await settings.welcome_settings.set_(welcome_channels=channels)
@@ -378,7 +382,7 @@ class Settings(commands.Cog):
 
     @server_settings.command(
         name="join_roles",
-        help="Modify the server's join roles.",
+        brief="Modify the server's join roles.",
         type=commands.CommandType.chat_input,
         descriptions={
             "channels": "The new join roles, given by space separated role mentions.",
@@ -415,8 +419,6 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        if roles:
-            roles = roles.strip("\n ")
         if clear:
             roles = None
         await settings.welcome_settings.set_(join_roles=roles)

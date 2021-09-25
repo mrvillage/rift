@@ -10,6 +10,7 @@ import pnwkit
 from discord.ext import commands
 
 from ... import find, funcs
+from ...data.classes import Alliance, Nation
 from ...errors import AllianceNotFoundError, NationNotFoundError
 
 
@@ -20,25 +21,14 @@ class Military(commands.Cog):
     @commands.group(
         name="militarization",
         aliases=["m", "mil", "military"],
-        help="A group of commands related to militarization, defaults to alliance.",
+        brief="A group of commands related to militarization, defaults to alliance.",
         case_insensitive=True,
         invoke_without_command=True,
         type=(commands.CommandType.default, commands.CommandType.chat_input),
+        descriptions={"alliance": "The alliance to check the militarization of."},
     )
-    async def militarization(self, ctx: commands.Context, *, search=None):
-        search = str(ctx.author.id) if search is None else search
-        try:
-            alliance = await funcs.search_alliance(ctx, search)
-        except AllianceNotFoundError:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"No alliance found with argument `{search}`.",
-                    color=discord.Color.red(),
-                )
-            )
-            return
-        await alliance.make_attrs("members", "member_count")
+    async def militarization(self, ctx: commands.Context, *, alliance: Alliance = None):
+        alliance = alliance or await Alliance.convert(ctx, alliance)
         if ctx.interaction:
             await ctx.interaction.response.defer()
             async with aiohttp.request(
@@ -125,36 +115,31 @@ class Military(commands.Cog):
         await ctx.reply(file=image, embed=embed)
 
     @commands.command(name="militarization-nation", aliases=["mn"], hidden=True)
-    async def mn_shortcut(self, ctx: commands.Context, *, search=None):
-        await ctx.invoke(self.militarization_nation, search=search)
+    async def mn_shortcut(self, ctx: commands.Context, *, nation: Nation = None):
+        await ctx.invoke(self.militarization_nation, nation=nation)
 
     @militarization.command(
         name="alliance",
         aliases=["m", "aa"],
-        help="Get the militarization of an alliance.",
+        brief="Get the militarization of an alliance.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
+        descriptions={"alliance": "The alliance to check the militarization of."},
     )
-    async def militarization_alliance(self, ctx: commands.Context, *, search=None):
-        await ctx.invoke(self.militarization, search=search)
+    async def militarization_alliance(
+        self, ctx: commands.Context, *, alliance: Alliance = None
+    ):
+        await ctx.invoke(self.militarization, alliance=alliance)
 
     @militarization.command(
         name="nation",
         aliases=["n", "nat", "me"],
-        help="Get the militarization of a nation.",
+        brief="Get the militarization of a nation.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
+        descriptions={"nation": "The nation to check the militarization of."},
     )
-    async def militarization_nation(self, ctx, *, search=None):
-        try:
-            author, nation = await find.search_nation_author(ctx, search)
-        except NationNotFoundError:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"No nation found with argument `{search}`.",
-                    color=discord.Color.red(),
-                )
-            )
-            return
+    async def militarization_nation(self, ctx, *, nation: Nation = None):
+        nation = nation or await Nation.convert(ctx, nation)
+        author = nation.user or ctx.author
         militarization = nation.get_militarization()
         nation_data = await pnwkit.async_nation_query(
             {"id": nation.id},

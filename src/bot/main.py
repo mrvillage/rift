@@ -115,7 +115,7 @@ async def on_ready():
 @bot.command(
     name="about",
     aliases=["version", "rift", "credits"],
-    help="Get the bot credits and version.",
+    brief="Get the bot credits, version, and about.",
     type=(commands.CommandType.default, commands.CommandType.chat_input),
 )
 async def about(ctx: commands.Context):
