@@ -71,4 +71,4 @@ def city_price(city: int, /) -> float:
 
 
 def calculate_city_value(start: int, end: int, /) -> float:
-    return sum(city_price(i) for i in range(start, end + 1))
+    return sum(city_price(i) for i in range(start + 1, end + 1))
