@@ -13,3 +13,4 @@ from .target import *
 from .ticket import *
 from .trade import *
 from .treaty import *
+from .war import *
