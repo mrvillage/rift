@@ -80,6 +80,20 @@ async def on_ready():
     if not cache.init:
         await cache.initialize()
         print("Cache initialized!", flush=True)
+
+    if not bot.persistent_views_loaded:
+        for menu in cache.menus:
+            bot.add_view(await menu.get_view())
+        bot.add_view(Margins())
+        bot.add_view(Prices())
+        bot.add_view(AlliancesPaginator(1, 50))
+        bot.add_view(EventExtraInformationView())
+        bot.add_view(TreasuresView())
+        bot.persistent_views_loaded = True
+        print("Loaded persistent views!", flush=True)
+        async with aiohttp.request("GET", bot.user.display_avatar.url) as req:  # type: ignore
+            bot.bytes_avatar = await req.read()
+
     if not bot.cogs_loaded:
         cogPath = Path.cwd() / "src" / "bot" / "cogs"
         cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
@@ -94,19 +108,6 @@ async def on_ready():
 
     await bot.register_application_commands()
     print("Application commands registered!", flush=True)
-
-    if not bot.persistent_views_loaded:
-        for menu in cache.menus:
-            bot.add_view(await menu.get_view())
-        bot.add_view(Margins())
-        bot.add_view(Prices())
-        bot.add_view(AlliancesPaginator(1, 50))
-        bot.add_view(EventExtraInformationView())
-        bot.add_view(TreasuresView())
-        bot.persistent_views_loaded = True
-        print("Loaded persistent views!", flush=True)
-        async with aiohttp.request("GET", bot.user.display_avatar.url) as req:  # type: ignore
-            bot.bytes_avatar = await req.read()
 
     print("Startup complete!", flush=True)
 
