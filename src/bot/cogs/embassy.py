@@ -22,7 +22,7 @@ class Embassies(commands.Cog):
     @commands.group(
         name="embassy",
         case_insensitive=True,
-        help="A group of commands related to embassies.",
+        brief="A group of commands related to embassies.",
         type=commands.CommandType.chat_input,
     )
     @commands.guild_only()
@@ -31,7 +31,7 @@ class Embassies(commands.Cog):
 
     @embassy.group(
         name="config",
-        help="A group of commands related to embassy configuration.",
+        brief="A group of commands related to embassy configuration.",
         case_insensitive=True,
         invoke_without_command=True,
         type=commands.CommandType.chat_input,
@@ -43,8 +43,12 @@ class Embassies(commands.Cog):
 
     @embassy_config.command(
         name="create",
-        help="Create an embassy configuration.",
+        brief="Create an embassy configuration.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "start": "The starting message when an embassy is created.",
+            "category": "The category to create the embassy in.",
+        },
     )
     @commands.guild_only()
     @has_manage_permissions()
@@ -77,7 +81,7 @@ class Embassies(commands.Cog):
 
     @embassy_config.command(
         name="list",
-        help="List the embassy configurations in the server.",
+        brief="List the embassy configurations in the server.",
         type=commands.CommandType.chat_input,
     )
     @commands.guild_only()
@@ -112,20 +116,31 @@ class Embassies(commands.Cog):
 
     @embassy_config.command(
         name="claim",
-        help="Claim a channel for an alliance in an embassy configuration.",
+        brief="Claim a channel for an alliance in an embassy configuration.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "config": "The embassy config to claim under.",
+            "alliance": "The alliance to claim the embassy for.",
+            "channel": "The channel to claim.",
+        },
     )
     @commands.guild_only()
     @has_manage_permissions()
     async def embassy_config_claim(
-        self, ctx: commands.Context, config: EmbassyConfig, *, alliance: Alliance
+        self,
+        ctx: commands.Context,
+        config: EmbassyConfig,
+        *,
+        alliance: Alliance,
+        channel: discord.TextChannel = None,
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild) and isinstance(
                 ctx.channel, discord.TextChannel
             )
+        channel = channel or ctx.channel
         data = {
-            "embassy_id": ctx.channel.id,
+            "embassy_id": channel.id,
             "alliance_id": alliance.id,
             "config_id": config.config_id,
             "guild_id": ctx.guild.id,
@@ -138,7 +153,7 @@ class Embassies(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"{ctx.channel.mention} claimed for {repr(alliance)} under embassy configuration {config.config_id}.",
+                f"{channel.mention} claimed for {repr(alliance)} under embassy configuration {config.config_id}.",
             ),
             ephemeral=True,
         )

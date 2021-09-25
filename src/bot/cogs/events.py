@@ -52,7 +52,7 @@ class Events(commands.Cog):
 
     @commands.group(
         name="subscribe",
-        help="Subscribe to an event stream. Note: Not all types are valid for every event.",
+        brief="Subscribe to an event stream.",
         type=commands.CommandType.chat_input,
     )
     @has_manage_permissions()
@@ -69,7 +69,11 @@ class Events(commands.Cog):
     async def subscribe_nation(self, ctx: commands.Context):
         ...
 
-    @subscribe_nation.command(name="create", type=commands.CommandType.chat_input)
+    @subscribe_nation.command(
+        name="create",
+        brief="Subscribe to NATION_CREATE events in this channel.",
+        type=commands.CommandType.chat_input,
+    )
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_nation_create(self, ctx: commands.Context):
@@ -86,7 +90,11 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
-    @subscribe_nation.command(name="delete", type=commands.CommandType.chat_input)
+    @subscribe_nation.command(
+        name="delete",
+        brief="Subscribe to NATION_DELETE events in this channel.",
+        type=commands.CommandType.chat_input,
+    )
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_nation_delete(self, ctx: commands.Context):
@@ -103,7 +111,15 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
-    @subscribe_nation.command(name="update", type=commands.CommandType.chat_input)
+    @subscribe_nation.command(
+        name="update",
+        brief="Subscribe to NATION_UPDATE events in this channel.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "changes": "A space separated list of changes. ALLIANCE_POSITION, ALLIANCE_POSITION_ALL, ALLIANCE, VACATION_MODE",
+            "alliances": "A space separated list of alliances to get updates of, defaults to all alliances if not provided.",
+        },
+    )
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_nation_update(
@@ -153,7 +169,11 @@ class Events(commands.Cog):
     async def subscribe_alliance(self, ctx: commands.Context):
         ...
 
-    @subscribe_alliance.command(name="create", type=commands.CommandType.chat_input)
+    @subscribe_alliance.command(
+        name="create",
+        brief="Subscribe to ALLIANCE_CREATE events in this channel.",
+        type=commands.CommandType.chat_input,
+    )
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_alliance_create(self, ctx: commands.Context):
@@ -170,7 +190,11 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
-    @subscribe_alliance.command(name="delete", type=commands.CommandType.chat_input)
+    @subscribe_alliance.command(
+        name="delete",
+        brief="Subscribe to ALLIANCE_DELETE events in this channel.",
+        type=commands.CommandType.chat_input,
+    )
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_alliance_delete(self, ctx: commands.Context):
@@ -193,7 +217,11 @@ class Events(commands.Cog):
     async def subscribe_treaty(self, ctx: commands.Context):
         ...
 
-    @subscribe_treaty.command(name="create", type=commands.CommandType.chat_input)
+    @subscribe_treaty.command(
+        name="create",
+        brief="Subscribe to TREATY_CREATE events in this channel.",
+        type=commands.CommandType.chat_input,
+    )
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_treaty_create(self, ctx: commands.Context):
@@ -210,7 +238,11 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
-    @subscribe_treaty.command(name="delete", type=commands.CommandType.chat_input)
+    @subscribe_treaty.command(
+        name="delete",
+        brief="Subscribe to TREATY_DELETE events in this channel.",
+        type=commands.CommandType.chat_input,
+    )
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_treaty_delete(self, ctx: commands.Context):
@@ -233,7 +265,12 @@ class Events(commands.Cog):
     async def subscribe_forum_post(self, ctx: commands.Context):
         ...
 
-    @subscribe_forum_post.command(name="create", type=commands.CommandType.chat_input)
+    @subscribe_forum_post.command(
+        name="create",
+        brief="Subscribe to FORUM_POST_CREATE events in this channel.",
+        type=commands.CommandType.chat_input,
+        descriptions={"forums": "Space separated list of any of: ALLIANCE_AFFAIRS."},
+    )
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_forum_post_create(
@@ -274,7 +311,14 @@ class Events(commands.Cog):
     async def subscription(self, ctx: commands.Context):
         ...
 
-    @subscription.command(name="list", type=commands.CommandType.chat_input)
+    @subscription.command(
+        name="list",
+        brief="List the subscriptions for this server or a channel.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "channel": "The channel to list subscriptions of, defaults to the server."
+        },
+    )
     @has_manage_permissions()
     @commands.guild_only()
     async def subscription_list(
@@ -286,6 +330,15 @@ class Events(commands.Cog):
             subscriptions = [
                 i for i in cache.subscriptions if i.guild_id == ctx.guild.id
             ]
+        elif channel.guild.id != ctx.guild.id:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You can only list subscriptions for this server.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
         else:
             subscriptions = [
                 i for i in cache.subscriptions if i.channel_id == channel.id
@@ -329,7 +382,12 @@ class Events(commands.Cog):
             )
         )
 
-    @subscription.command(name="info", type=commands.CommandType.chat_input)
+    @subscription.command(
+        name="info",
+        brief="Get info on a subscription.",
+        type=commands.CommandType.chat_input,
+        descriptions={"subscription": "The subscription to get info on."},
+    )
     @has_manage_permissions()
     @commands.guild_only()
     async def subscription_info(
@@ -343,7 +401,12 @@ class Events(commands.Cog):
             )
         )
 
-    @subscription.command(name="delete", type=commands.CommandType.chat_input)
+    @subscription.command(
+        name="delete",
+        brief="Delete a subscription.",
+        type=commands.CommandType.chat_input,
+        descriptions={"subscription": "The subscription to delete."},
+    )
     @has_manage_permissions()
     @commands.guild_only()
     async def subscription_delete(

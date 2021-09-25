@@ -16,7 +16,7 @@ class Trade(commands.Cog):
     @commands.command(
         name="prices",
         aliases=["p", "resource", "price"],
-        help="Get the current prices of all resources.",
+        brief="Get the current prices of all resources.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def prices(self, ctx: commands.Context):
@@ -143,7 +143,7 @@ class Trade(commands.Cog):
     @commands.command(
         name="margins",
         aliases=["trade-margin", "trademargin", "margin", "tm"],
-        help="Get the current trade margins.",
+        brief="Get the current trade margins.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def margins(self, ctx: commands.Context):

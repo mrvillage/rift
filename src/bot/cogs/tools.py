@@ -17,7 +17,18 @@ class Tools(commands.Cog):
     async def tools(self, ctx: commands.Context):
         ...
 
-    @tools.command(name="infrastructure", type=commands.CommandType.chat_input)
+    @tools.command(
+        name="infrastructure",
+        brief="Calculates infrastructure cost.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "before": "The starting infrastructure.",
+            "after": "The final infrastructure.",
+            "urbanization_policy": "Whether or not the Urbanization policy should be accounted for.",
+            "center_for_civil_engineering": "Whether or not the Center for Civil Engineering project should be accounted for.",
+            "advanced_engineering_corps": "Whether or not the Advanced Engineering Corps project should be accounted for.",
+        },
+    )
     async def tools_infrastructure(
         self,
         ctx: commands.Context,
@@ -51,7 +62,18 @@ class Tools(commands.Cog):
             )
         )
 
-    @tools.command(name="land", type=commands.CommandType.chat_input)
+    @tools.command(
+        name="land",
+        brief="Calculates land cost.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "before": "The starting land.",
+            "after": "The final land.",
+            "rapid_expansion_policy": "Whether or not the Rapid Expansion policy should be accounted for.",
+            "arable_land_agency": "Whether or not the Arable Land Agency project should be accounted for.",
+            "advanced_engineering_corps": "Whether or not the Advanced Engineering Corps project should be accounted for.",
+        },
+    )
     async def tools_land(
         self,
         ctx: commands.Context,
@@ -85,7 +107,18 @@ class Tools(commands.Cog):
             )
         )
 
-    @tools.command(name="city", type=commands.CommandType.chat_input)
+    @tools.command(
+        name="city",
+        brief="Calculates city cost.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "before": "The starting city.",
+            "after": "The final city.",
+            "manifest_destiny_policy": "Whether or not the Manifest Destiny policy should be accounted for.",
+            "urban_planning": "Whether or not the Urban Planning project should be accounted for.",
+            "advanced_urban_planning": "Whether or not the Advanced Urban Planning project should be accounted for.",
+        },
+    )
     async def tools_city(
         self,
         ctx: commands.Context,
@@ -123,10 +156,23 @@ class Tools(commands.Cog):
     async def tools_nation(self, ctx: commands.Context):
         ...
 
-    @tools_nation.command(name="infrastructure", type=commands.CommandType.chat_input)
+    @tools_nation.command(
+        name="infrastructure",
+        brief="Calculate infrastructure cost for a nation.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "after": "The final infrastructure.",
+            "nation": "The nation to calculate for, defaults to your nation.",
+        },
+    )
     async def tools_nation_infrastructure(
-        self, ctx: commands.Context, *, nation: Nation, after: float
+        self,
+        ctx: commands.Context,
+        *,
+        after: float,
+        nation: Nation = None,
     ):
+        nation = nation or await Nation.convert(ctx, nation)
         if any(after - i.infrastructure >= 1000000 for i in nation.partial_cities):
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -158,10 +204,23 @@ class Tools(commands.Cog):
             )
         )
 
-    @tools_nation.command(name="land", type=commands.CommandType.chat_input)
+    @tools_nation.command(
+        name="land",
+        brief="Calculate land cost for a nation.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "after": "The final land.",
+            "nation": "The nation to calculate for, defaults to your nation.",
+        },
+    )
     async def tools_nation_land(
-        self, ctx: commands.Context, *, nation: Nation, after: float
+        self,
+        ctx: commands.Context,
+        *,
+        after: float,
+        nation: Nation = None,
     ):
+        nation = nation or await Nation.convert(ctx, nation)
         if any(after - i.land >= 1000000 for i in nation.partial_cities):
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -193,10 +252,23 @@ class Tools(commands.Cog):
             )
         )
 
-    @tools_nation.command(name="city", type=commands.CommandType.chat_input)
+    @tools_nation.command(
+        name="city",
+        brief="Calculate city cost for a nation.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "after": "The city infrastructure.",
+            "nation": "The nation to calculate for, defaults to your nation.",
+        },
+    )
     async def tools_nation_city(
-        self, ctx: commands.Context, *, nation: Nation, after: int
+        self,
+        ctx: commands.Context,
+        *,
+        after: int,
+        nation: Nation = None,
     ):
+        nation = nation or await Nation.convert(ctx, nation)
         if after > 100:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(

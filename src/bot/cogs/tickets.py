@@ -21,7 +21,7 @@ class Tickets(commands.Cog):
 
     @commands.group(
         name="ticket",
-        help="A group of commands related to tickets.",
+        brief="A group of commands related to tickets.",
         case_insensitive=True,
         invoke_without_command=True,
         type=commands.CommandType.chat_input,
@@ -32,12 +32,20 @@ class Tickets(commands.Cog):
 
     @ticket.command(
         name="archive",
-        help="Archive a ticket.",
+        brief="Archive a ticket.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "channel": "The channel of the ticket to archive, defaults to the current channel.",
+        },
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def ticket_archive(self, ctx: commands.Context):
+    async def ticket_archive(
+        self, ctx: commands.Context, channel: discord.TextChannel = None
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.channel, discord.TextChannel)
+        channel = channel or ctx.channel
         try:
             ticket = await Ticket.fetch(ctx.channel.id)
         except IndexError:
@@ -66,7 +74,7 @@ class Tickets(commands.Cog):
 
     @ticket.group(
         name="config",
-        help="A group of commands related to ticket configurations.",
+        brief="A group of commands related to ticket configurations.",
         case_insensitive=True,
         invoke_without_command=True,
         type=commands.CommandType.chat_input,
@@ -78,8 +86,14 @@ class Tickets(commands.Cog):
 
     @ticket_config.command(
         name="create",
-        help="Create a new ticket configuration.",
+        brief="Create a new ticket configuration.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "start": "The starting message for tickets created.",
+            "category": "The category to make tickets in, defaults to no category.",
+            "archive_category": "The category to archive tickets in, defaults to the category of the channel at archive.",
+            "mentions": "The users and roles to mention on ticket creation, given by space separated user and role mentions.",
+        },
     )
     @commands.guild_only()
     @has_manage_permissions()
@@ -119,7 +133,7 @@ class Tickets(commands.Cog):
 
     @ticket_config.command(
         name="list",
-        help="List the embassy configurations in the server.",
+        brief="List the embassy configurations in the server.",
         type=commands.CommandType.chat_input,
     )
     @commands.guild_only()

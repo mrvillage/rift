@@ -29,8 +29,11 @@ class PnWInfo(commands.Cog):
     @commands.command(
         name="nation",
         aliases=["n", "check-link", "checklink", "nat"],
-        help="Get information about a nation.",
+        brief="Get information about a nation.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
+        descriptions={
+            "nation": "The nation to get information about, defaults to your nation.",
+        },
     )
     async def nation(self, ctx: commands.Context, *, nation: Nation = None):
         nation = nation or await Nation.convert(ctx, nation)
@@ -38,7 +41,7 @@ class PnWInfo(commands.Cog):
 
     @commands.command(
         name="me",
-        help="Get information about your nation.",
+        brief="Get information about your nation.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def me(self, ctx: commands.Context):
@@ -47,9 +50,12 @@ class PnWInfo(commands.Cog):
     @commands.command(
         name="alliance",
         aliases=["a"],
-        help="Get information about an alliance.",
+        brief="Get information about an alliance.",
         case_insensitive=True,
         type=(commands.CommandType.default, commands.CommandType.chat_input),
+        descriptions={
+            "alliance": "The alliance to get information about, defaults to your alliance.",
+        },
     )
     async def alliance(self, ctx: commands.Context, *, alliance: Alliance = None):
         alliance = alliance or await Alliance.convert(ctx, alliance)
@@ -58,8 +64,11 @@ class PnWInfo(commands.Cog):
     @commands.command(
         name="who",
         aliases=["w", "who-is", "whois"],
-        help="Get information about a nation or alliance.",
+        brief="Get information about a nation or alliance.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
+        descriptions={
+            "search": "The nation or alliance to get information about, defaults to your nation.",
+        },
     )
     async def who(
         self, ctx: commands.Context, *, search: Union[Nation, Alliance] = None
@@ -72,8 +81,11 @@ class PnWInfo(commands.Cog):
 
     @commands.command(
         name="members",
-        help="Get a list of the members of an alliance.",
+        brief="Get a list of the members of an alliance.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "nation": "The nation to get information about, defaults to your nationf.",
+        },
     )
     async def members(self, ctx: commands.Context, *, alliance: Alliance = None):
         alliance = alliance or await Alliance.convert(ctx, alliance)
@@ -112,8 +124,11 @@ class PnWInfo(commands.Cog):
     @commands.command(
         name="treaties",
         aliases=["t", "treaty"],
-        description="Get the treaties of an alliance.",
+        brief="Get the treaties of an alliance.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "alliance": "The alliance to get treaties of, defaults to your alliance.",
+        },
     )
     async def treaties(self, ctx: commands.Context, *, alliance: Alliance = None):
         alliance = alliance or await Alliance.convert(ctx, alliance)
@@ -128,8 +143,11 @@ class PnWInfo(commands.Cog):
 
     @commands.command(
         name="spies",
-        help="Get the spies of a nation.",
+        brief="Get the spies of a nation.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "nation": "The nation to get spies of.",
+        },
     )
     async def spies(self, ctx: commands.Context, *, nation: Nation):
         await ctx.interaction.response.defer()
@@ -144,10 +162,11 @@ class PnWInfo(commands.Cog):
 
     @commands.command(
         name="revenue",
-        help="Get the revenue of a nation or alliance.",
+        brief="Get the revenue of a nation or alliance.",
         type=commands.CommandType.chat_input,
         descriptions={
-            "fetch_spies": "Fetches spies for every nation being calculated. Incredibly slow, need to be whitelisted."
+            "search": "The nation or alliance to get revenue of, defaults to your nation.",
+            "fetch_spies": "Fetches spies for every nation being calculated. Incredibly slow, need to be whitelisted.",
         },
     )
     async def revenue(
@@ -224,8 +243,11 @@ class PnWInfo(commands.Cog):
     @commands.command(
         name="alliances",
         aliases=["as"],
-        help="Get a list of alliances",
+        brief="Get a list of alliances",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "page": "The page of alliances to get, defaults to 1.",
+        },
     )
     async def alliances(self, ctx: commands.Context, page: int = 1):
         max_page = await get_max_alliances_page()
@@ -257,7 +279,7 @@ class PnWInfo(commands.Cog):
 
     @commands.command(
         name="colors",
-        help="Get a list of color bloc information.",
+        brief="Get a list of color bloc information.",
         type=commands.CommandType.chat_input,
     )
     async def colors(self, ctx: commands.Context):
@@ -285,8 +307,11 @@ class PnWInfo(commands.Cog):
 
     @commands.command(
         name="treasures",
-        help="Get a list of treasure information.",
+        brief="Get a list of treasure information.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "page": "The page of treasures to get, can be 1 or 2, defaults to 1.",
+        },
     )
     async def treasures(self, ctx: commands.Context, page: int = 1):
         if page < 1:

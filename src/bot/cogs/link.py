@@ -15,8 +15,12 @@ class Link(commands.Cog):
     @commands.command(
         name="link",
         aliases=["verify", "validate"],
-        help="Link a nation to a Discord account.",
+        brief="Link a nation to a Discord account.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "nation": "The nation to link.",
+            "discord": "The Discord account to link, defaults to your account.",
+        },
     )
     async def link(
         self, ctx: commands.Context, nation: Nation, user: discord.User = None
