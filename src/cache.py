@@ -25,6 +25,7 @@ if TYPE_CHECKING:
         Color,
         Embassy,
         EmbassyConfig,
+        Forum,
         GuildSettings,
         GuildWelcomeSettings,
         Menu,
@@ -59,6 +60,7 @@ class Cache:
         "_colors",
         "_embassies",
         "_embassy_configs",
+        "_forums",
         "_guild_settings",
         "_guild_welcome_settings",
         "_links",
@@ -87,6 +89,7 @@ class Cache:
         self._colors: Dict[str, Color] = {}
         self._embassies: Dict[int, Embassy] = {}
         self._embassy_configs: Dict[int, EmbassyConfig] = {}
+        self._forums: Dict[int, Forum] = {}
         self._guild_settings: Dict[int, GuildSettings] = {}
         self._guild_welcome_settings: Dict[int, GuildWelcomeSettings] = {}
         self._links: List[Link] = list()
@@ -115,6 +118,7 @@ class Cache:
             Color,
             Embassy,
             EmbassyConfig,
+            Forum,
             GuildSettings,
             GuildWelcomeSettings,
             Menu,
@@ -135,6 +139,7 @@ class Cache:
             "SELECT * FROM colors ORDER BY datetime DESC LIMIT 1;",
             "SELECT * FROM embassies;",
             "SELECT * FROM embassy_configs;",
+            "SELECT * FROM forums;",
             "SELECT * FROM guild_settings;",
             "SELECT * FROM guild_welcome_settings;",
             "SELECT * FROM links;",
@@ -156,6 +161,7 @@ class Cache:
             colors,
             embassies,
             embassy_configs,
+            forums,
             guild_settings,
             guild_welcome_settings,
             links,
@@ -188,6 +194,9 @@ class Cache:
         for i in embassy_configs:
             i = EmbassyConfig(i)
             self._embassy_configs[i.config_id] = i
+        for i in forums:
+            i = Forum(i)
+            self._forums[i.id] = i
         for i in guild_settings:
             i = GuildSettings(i)
             self._guild_settings[i.guild_id] = i
@@ -261,6 +270,10 @@ class Cache:
     @property
     def embassy_configs(self) -> Set[EmbassyConfig]:
         return set(self._embassy_configs.values())
+
+    @property
+    def forums(self) -> Set[Forum]:
+        return set(self._forums.values())
 
     @property
     def guild_settings(self) -> Set[GuildSettings]:
@@ -421,6 +434,9 @@ class Cache:
 
     def get_embassy_config(self, id: int, /) -> Optional[EmbassyConfig]:
         return self._embassy_configs.get(id)
+
+    def get_forum(self, id: int, /) -> Optional[Forum]:
+        return self._forums.get(id)
 
     def get_guild_settings(self, id: int, /) -> Optional[GuildSettings]:
         return self._guild_settings.get(id)
