@@ -11,5 +11,6 @@ from .settings import *
 from .subscription import *
 from .target import *
 from .ticket import *
+from .treasure import *
 from .treaty import *
 from .war import *
