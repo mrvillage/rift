@@ -251,6 +251,24 @@ class Alliance(Makeable):
                 "name": "Vacation Mode",
                 "value": f"{len(self.vm_members):,}",
             },
+            {
+                "name": "Average Cities",
+                "value": f"{sum(i.cities for i in self.members)/self.member_count:,.2f}",
+            },
+            {
+                "name": "Average Infrastructure",
+                "value": f"{sum(i.avg_infra() for i in self.members)/self.member_count:,.2f}",
+            },
+            {
+                "name": "Treasures",
+                "value": len(
+                    [
+                        i
+                        for i in cache.treasures
+                        if (i.nation and i.nation.alliance) is self
+                    ]
+                ),
+            },
         ]
         embed = (
             get_embed_author_guild(
