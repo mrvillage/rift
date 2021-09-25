@@ -108,7 +108,7 @@ class Tickets(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         data = {
-            "config_id": ctx.interaction.id,
+            "id": ctx.interaction.id,
             "category_id": category and category.id,
             "guild_id": ctx.guild.id,
             "start_message": start,
@@ -125,7 +125,7 @@ class Tickets(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Ticket Configuration {config.config_id} created.",
+                f"Ticket Configuration {config.id} created.",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
@@ -157,7 +157,7 @@ class Tickets(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 "\n".join(
-                    f"{config.config_id} - {category}"
+                    f"{config.id} - {category}"
                     for config in configs
                     if config.category_id
                     and (category := ctx.guild.get_channel(config.category_id))

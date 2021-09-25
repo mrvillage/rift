@@ -147,7 +147,7 @@ class Menus(commands.Cog):
                     flags = await MenuItem.format_flags(ctx, flags)
                     item = MenuItem(
                         {  # type: ignore
-                            "item_id": message.id,
+                            "id": message.id,
                             "guild_id": ctx.guild.id,
                             "type_": "button",
                             "data_": flags,
@@ -191,7 +191,7 @@ class Menus(commands.Cog):
                 await main_message.reply(
                     embed=funcs.get_embed_author_member(
                         ctx.author,
-                        f"Menu ID: {menu.menu_id}\n\n"
+                        f"Menu ID: {menu.id}\n\n"
                         + "\n\n".join(str(j) for i in menu.items for j in i),
                         color=discord.Color.green(),
                     )
@@ -227,7 +227,7 @@ class Menus(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Menu {menu.menu_id} sent to {channel.mention}!",
+                f"Menu {menu.id} sent to {channel.mention}!",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
@@ -249,7 +249,7 @@ class Menus(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Menu ID: {menu.menu_id}\n\n"
+                f"Menu ID: {menu.id}\n\n"
                 "\n\n".join(str(j) for i in menu.items for j in i),
                 color=discord.Color.green(),
             )

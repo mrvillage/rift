@@ -38,11 +38,12 @@ class View(discord.ui.View):
         if TYPE_CHECKING:
             assert isinstance(interaction.message, discord.Message)
         return bool(
-            await execute_read_query(
-                "SELECT * FROM menu_interfaces WHERE menu_id = $1 AND message_id = $2;",
-                self.menu_id,
-                interaction.message.id,
-            )
+            [
+                i
+                for i in cache.menu_interfaces
+                if i["menu_id"] == self.menu_id
+                and i["message_id"] == interaction.message.id
+            ]
         )
 
 
@@ -219,7 +220,7 @@ class SelectOption(discord.SelectOption):
 
 
 class Menu(Makeable):
-    menu_id: int
+    id: int
     items: Sequence[List[MenuItem]]
     name: Optional[str]
     description: Optional[str]
@@ -227,7 +228,7 @@ class Menu(Makeable):
     permissions: Mapping[str, Any]
 
     __slots__ = (
-        "menu_id",
+        "id",
         "guild_id",
         "name",
         "description",
@@ -237,7 +238,7 @@ class Menu(Makeable):
     )
 
     def __init__(self, data: MenuData) -> None:
-        self.menu_id = data["menu_id"]
+        self.id = data["id"]
         self.guild_id = data["guild_id"]
         self.name = data["name"]
         self.description = data["description"]
@@ -264,7 +265,7 @@ class Menu(Makeable):
     def default(cls, menu_id: int, guild_id: int) -> Menu:
         menu = cls(
             data={  # type: ignore
-                "menu_id": menu_id,
+                "id": menu_id,
                 "guild_id": guild_id,
                 "name": None,
                 "description": None,
@@ -290,9 +291,9 @@ class Menu(Makeable):
         args = tuple(kwargs.values())
         await execute_query(
             f"""
-        UPDATE menus SET {sets} WHERE menu_id = $1;
+        UPDATE menus SET {sets} WHERE id = $1;
         """,
-            self.menu_id,
+            self.id,
             *args,
         )
         return self
@@ -300,13 +301,13 @@ class Menu(Makeable):
     async def save(self) -> None:
         await execute_query(
             """
-        INSERT INTO menus (menu_id, guild_id, name, description, items, permissions) VALUES ($1, $2, $3, $4, $5, $6);
+        INSERT INTO menus (id, guild_id, name, description, items, permissions) VALUES ($1, $2, $3, $4, $5, $6);
         """,
-            self.menu_id,
+            self.id,
             self.guild_id,
             self.name,
             self.description,
-            [[i.item_id for i in row] for row in self.items]
+            [[i.id for i in row] for row in self.items]
             if self.items
             else [
                 [],
@@ -324,17 +325,17 @@ class Menu(Makeable):
     def remove_item(self, item_id: str) -> None:
         for i in self.items:
             for j in i:
-                if j.item_id == item_id:
+                if j.id == item_id:
                     del j
 
     async def get_view(self) -> View:
         from ...ref import bot
 
         await self.make_attrs("items")
-        self.view = View(bot=bot, menu_id=self.menu_id, timeout=None)
+        self.view = View(bot=bot, menu_id=self.id, timeout=None)
         for index, item_set in enumerate(self.items):
             for item in item_set:
-                self.view.add_item(item.get_item(self.menu_id, index))
+                self.view.add_item(item.get_item(self.id, index))
         return self.view
 
     def get_description_embed(self, ctx: commands.Context) -> discord.Embed:
@@ -347,19 +348,19 @@ class Menu(Makeable):
         return self.embed
 
     async def new_interface(self, message: discord.Message) -> None:
-        await insert_interface(menu_id=self.menu_id, message=message)
+        await insert_interface(menu_id=self.id, message=message)
 
     def __str__(self) -> str:
         if self.name is None:
-            return f"{self.menu_id}"
-        return f"{self.menu_id} - {self.name}"
+            return f"{self.id}"
+        return f"{self.id} - {self.name}"
 
 
 class MenuItem:
-    __slots__ = ("item_id", "guild_id", "type", "data")
+    __slots__ = ("id", "guild_id", "type", "data")
 
     def __init__(self, data: MenuItemData) -> None:
-        self.item_id = data["item_id"]
+        self.id = data["id"]
         self.guild_id = data["guild_id"]
         self.type = data["type_"]
         self.data = data["data_"] or {}
@@ -381,7 +382,7 @@ class MenuItem:
         raise MenuItemNotFoundError(item_id)
 
     def get_item(self, menu_id: int, row: int) -> Union[Button, Select]:
-        custom_id = f"{menu_id}-{self.item_id}"
+        custom_id = f"{menu_id}-{self.id}"
         if self.type == "button":
             return Button(
                 style=discord.ButtonStyle[self.data.get("style", "blurple")],
@@ -421,9 +422,9 @@ class MenuItem:
     async def save(self) -> None:
         await execute_query(
             """
-        INSERT INTO menu_items (item_id, guild_id, type_, data_) VALUES ($1, $2, $3, $4);
+        INSERT INTO menu_items (id, guild_id, type_, data_) VALUES ($1, $2, $3, $4);
         """,
-            self.item_id,
+            self.id,
             self.guild_id,
             self.type,
             self.data,
@@ -550,7 +551,7 @@ class MenuItem:
 
     def __str__(self) -> str:
         if self.type == "button":
-            return f"ID: {self.item_id} - Type: {self.type} - Style: {self.data.get('style', 'blurple').capitalize()} - Label: {self.data.get('label', None)} - Disabled: {self.data.get('disabled', False)} - URL: {self.data.get('url', None)} - Emoji: {self.data.get('emoji', None)} - Row: {self.data.get('row', None)} - Action: {self.data.get('action', None)}"
+            return f"ID: {self.id} - Type: {self.type} - Style: {self.data.get('style', 'blurple').capitalize()} - Label: {self.data.get('label', None)} - Disabled: {self.data.get('disabled', False)} - URL: {self.data.get('url', None)} - Emoji: {self.data.get('emoji', None)} - Row: {self.data.get('row', None)} - Action: {self.data.get('action', None)}"
         if self.type == "select":
-            return f"ID: {self.item_id} - Type: {self.type} - Placeholder: {self.data.get('placeholder', None)} - Min Values: {self.data.get('min_values', 1)} - Max Values: {self.data.get('max_values', 1)} - Options: {', '.join(str(option) for option in self.data.get('options', [None]))}"
-        return f"ID: {self.item_id} - Type: {self.type}"
+            return f"ID: {self.id} - Type: {self.type} - Placeholder: {self.data.get('placeholder', None)} - Min Values: {self.data.get('min_values', 1)} - Max Values: {self.data.get('max_values', 1)} - Options: {', '.join(str(option) for option in self.data.get('options', [None]))}"
+        return f"ID: {self.id} - Type: {self.type}"

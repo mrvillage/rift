@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 class Ticket:
-    ticket_id: int
+    id: int
     ticket_number: int
     config_id: int
     guild_id: int
@@ -26,7 +26,7 @@ class Ticket:
     open: bool
 
     __slots__ = (
-        "ticket_id",
+        "id",
         "ticket_number",
         "config_id",
         "guild_id",
@@ -35,7 +35,7 @@ class Ticket:
     )
 
     def __init__(self, data: TicketData) -> None:
-        self.ticket_id = data["ticket_id"]
+        self.id = data["id"]
         self.ticket_number = data["ticket_number"]
         self.config_id = data["config_id"]
         self.guild_id = data["guild_id"]
@@ -51,8 +51,8 @@ class Ticket:
 
     async def save(self) -> None:
         await execute_read_query(
-            """INSERT INTO tickets (ticket_id, ticket_number, config_id, guild_id, user_id, open) VALUES ($1, $2, $3, $4, $5, $6);""",
-            self.ticket_id,
+            """INSERT INTO tickets (id, ticket_number, config_id, guild_id, user_id, open) VALUES ($1, $2, $3, $4, $5, $6);""",
+            self.id,
             self.ticket_number,
             self.config_id,
             self.guild_id,
@@ -66,9 +66,9 @@ class Ticket:
         args = tuple(kwargs.values())
         await execute_query(
             f"""
-        UPDATE tickets SET {sets} WHERE config_id = $1;
+        UPDATE tickets SET {sets} WHERE id = $1;
         """,
-            self.config_id,
+            self.id,
             *args,
         )
         return self
@@ -78,7 +78,7 @@ class Ticket:
         ...
 
     def __int__(self) -> int:
-        return self.ticket_id
+        return self.id
 
     async def start(
         self,
@@ -89,7 +89,7 @@ class Ticket:
     ) -> None:
         from ...funcs import get_embed_author_member
 
-        channel = user.guild.get_channel(self.ticket_id)
+        channel = user.guild.get_channel(self.id)
         if TYPE_CHECKING:
             assert isinstance(channel, discord.TextChannel)
         if response is not None:
@@ -110,12 +110,12 @@ class Ticket:
 
 
 class TicketConfig:
-    config_id: int
+    id: int
     category_id: Optional[int]
     guild_id: int
     start_message: str
     __slots__ = (
-        "config_id",
+        "id",
         "category_id",
         "guild_id",
         "start_message",
@@ -125,7 +125,7 @@ class TicketConfig:
     )
 
     def __init__(self, data: TicketConfigData) -> None:
-        self.config_id = data["config_id"]
+        self.id = data["id"]
         self.category_id = data["category_id"]
         self.guild_id = data["guild_id"]
         self.start_message = data["start_message"]
@@ -142,8 +142,8 @@ class TicketConfig:
 
     async def save(self) -> None:
         await execute_query(
-            """INSERT INTO ticket_configs (config_id, category_id, guild_id, start_message, archive_category_id) VALUES ($1, $2, $3, $4, $5, $6, $7);""",
-            self.config_id,
+            """INSERT INTO ticket_configs (id, category_id, guild_id, start_message, archive_category_id) VALUES ($1, $2, $3, $4, $5, $6, $7);""",
+            self.id,
             self.category_id,
             self.guild_id,
             self.start_message,
@@ -158,9 +158,9 @@ class TicketConfig:
         args = tuple(kwargs.values())
         await execute_query(
             f"""
-        UPDATE ticket_configs SET {sets} WHERE config_id = $1;
+        UPDATE ticket_configs SET {sets} WHERE id = $1;
         """,
-            self.config_id,
+            self.id,
             *args,
         )
         return self
@@ -175,7 +175,7 @@ class TicketConfig:
         category = self.category_id and guild.get_channel(self.category_id)
         if TYPE_CHECKING and category is not None:
             assert isinstance(category, discord.CategoryChannel)
-        number = await get_current_ticket_number(self.config_id) + 1
+        number = await get_current_ticket_number(self.id) + 1
         if category is not None:
             overwrites = {key: value for key, value in category.overwrites.items()}
             overwrites[user] = discord.PermissionOverwrite(
@@ -203,7 +203,7 @@ class TicketConfig:
         data = {
             "ticket_id": channel.id,
             "ticket_number": number,
-            "config_id": self.config_id,
+            "config_id": self.id,
             "guild_id": self.guild_id,
             "user_id": user.id,
             "open": True,
@@ -215,4 +215,4 @@ class TicketConfig:
         return ticket
 
     def __int__(self) -> int:
-        return self.config_id
+        return self.id

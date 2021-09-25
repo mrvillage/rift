@@ -6,7 +6,7 @@ __all__ = ("TicketData", "TicketConfigData")
 
 
 class TicketData(TypedDict):
-    ticket_id: int
+    id: int
     ticket_number: int
     config_id: int
     guild_id: int
@@ -15,7 +15,7 @@ class TicketData(TypedDict):
 
 
 class TicketConfigData(TypedDict):
-    config_id: int
+    id: int
     category_id: Optional[int]
     guild_id: int
     start_message: str
