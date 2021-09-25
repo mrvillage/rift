@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import asyncio
+import time
+from datetime import datetime
 from typing import TYPE_CHECKING, Union
 
 import discord
 from discord.ext import commands
 
-from ... import find, funcs
+from ... import funcs
+from ...cache import cache
 from ...data.classes import Alliance, Nation
 from ...data.get import (
     get_alliances_offset,
@@ -16,7 +19,7 @@ from ...data.get import (
 )
 from ...errors import AllianceNotFoundError, NationNotFoundError
 from ...ref import Rift
-from ...views import AlliancesPaginator
+from ...views import AlliancesPaginator, TreasuresView
 
 
 class PnWInfo(commands.Cog):
@@ -278,6 +281,33 @@ class PnWInfo(commands.Cog):
                 fields=fields,
                 color=discord.Color.blue(),
             )
+        )
+
+    @commands.command(
+        name="treasures",
+        help="Get a list of treasure information.",
+        type=commands.CommandType.chat_input,
+    )
+    async def treasures(self, ctx: commands.Context, page: int = 1):
+        if page < 1:
+            page = 1
+        elif page > 2:
+            page = 2
+        fields = [
+            {
+                "name": i.name,
+                "value": f"Color: {i.color.capitalize()}\nBonus: %{i.bonus}\nSpawn Date: <t:{int(time.mktime(datetime.fromisoformat(i.spawn_date).timetuple()))}:D>",
+            }
+            for i in list(cache.treasures)[(page - 1) * 15 : (page) * 15]
+        ]
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Page **{page}** of **2**",
+                fields=fields,
+                color=discord.Color.blue(),
+            ),
+            view=TreasuresView(page),
         )
 
 
