@@ -3,6 +3,7 @@ from .bulk_events import *
 from .city import *
 from .color import *
 from .embassy import *
+from .forum import *
 from .link import *
 from .menu import *
 from .nation import *
