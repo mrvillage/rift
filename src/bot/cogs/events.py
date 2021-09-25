@@ -10,6 +10,8 @@ import discord
 from discord.backoff import ExponentialBackoff
 from discord.ext import commands
 
+from src.data.classes.forum import Forum
+
 from ... import funcs
 from ...cache import cache
 from ...checks import has_manage_permissions
@@ -220,6 +222,47 @@ class Events(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"Successfully subscribed to `TREATY_DELETE` events.\nSubscription ID: {subscription.id}",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @subscribe.group(name="forum_post", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscribe_forum_post(self, ctx: commands.Context):
+        ...
+
+    @subscribe_forum_post.command(name="create", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscribe_forum_post_create(
+        self,
+        ctx: commands.Context,
+        forums: List[Forum],
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.channel, discord.TextChannel)
+            assert isinstance(ctx.author, discord.Member)
+        if not forums:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You didn't give any valid forums!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        subscription = await Subscription.subscribe(
+            ctx.channel,
+            "FORUM_POST",
+            "CREATE",
+            [i.name.upper().replace(" ", "_") for i in forums],
+        )
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Successfully subscribed to `FORUM_POST_CREATE` events for the following forums: {', '.join('`' + i.name.upper().replace(' ', '_') + '`' for i in forums)}.\nSubscription ID: {subscription.id}",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
