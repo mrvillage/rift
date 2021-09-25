@@ -55,7 +55,7 @@ class Settings(commands.Cog):
         self,
         ctx: commands.Context,
         *,
-        purpose: Literal[
+        purpose: Literal[  # type: ignore
             "ALLIANCE",
             "ALLIANCE_GOVERNMENT",
             "ALLIANCE_MILITARY_AFFAIRS",
@@ -68,9 +68,20 @@ class Settings(commands.Cog):
             "PERSONAL",
         ] = None,
     ):  # sourcery no-metrics
+        purpose: Optional[str]
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id)
+        if purpose is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The current server purpose is `{settings.purpose}`.",
+                    color=discord.Color.blue(),
+                )
+            )
+        if purpose.lower() == "none":
+            purpose = None
         if not purpose:
             await settings.set_(purpose=purpose, purpose_argument=None)
             return await ctx.reply(
@@ -236,13 +247,24 @@ class Settings(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def server_settings_welcome_message(
-        self, ctx: commands.Context, *, message: str = None
+        self, ctx: commands.Context, *, message: str = None  # type: ignore
     ):
+        message: Optional[str]
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
+        if message is None:
+            return await ctx.send(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The current welcome message is `{settings.welcome_settings.welcome_message}`.",
+                    color=discord.Color.blue(),
+                )
+            )
         if message:
             message = message.strip("\n ")
+        if message.lower() == "none":
+            message = None
         await settings.welcome_settings.set_(welcome_message=message)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -262,13 +284,25 @@ class Settings(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def server_settings_verified_nickname(
-        self, ctx: commands.Context, *, nickname: str = None
+        self, ctx: commands.Context, *, nickname: str = None  # type: ignore
     ):
+        nickname: Optional[str]
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
+        if nickname is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The verified nickname format is set to:\n\n`{settings.welcome_settings.verified_nickname}`",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
         if nickname:
             nickname = nickname.strip("\n ")
+        if nickname.lower() == "none":
+            nickname = None
         await settings.welcome_settings.set_(verified_nickname=nickname)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
