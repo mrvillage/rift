@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from .city_costs import CITY_COSTS
-
 __all__ = (
     "infrastructure_price",
     "calculate_infrastructure_value",
@@ -67,7 +65,7 @@ def calculate_land_value(start: float, end: float) -> float:
 
 
 def city_price(city: int, /) -> float:
-    return CITY_COSTS.get(city, 0)
+    return 50000 * (city - 2) ** 3 + 150000 * (city - 1) + 75000
 
 
 def calculate_city_value(start: int, end: int, /) -> float:
