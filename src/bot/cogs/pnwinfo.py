@@ -242,7 +242,7 @@ class PnWInfo(commands.Cog):
         await asyncio.gather(*(i._make_member_count() for i in alliances))
         embed = funcs.get_embed_author_member(
             ctx.author,
-            f"Page: **{page}** of **{max_page}**\n"
+            f"Page **{page}** of **{max_page}**\n"
             + "Rank: ID, Name, Score, Members\n"
             + "\n".join(
                 f"**#{i.rank}**: {i.id}, {i.name}, {i.score:,.2f}, {i.member_count}"
