@@ -1,6 +1,6 @@
 git+git://github.com/mrvillage/discord.py2.git
 asyncpg
 beautifulsoup4
-pnwkit
+pnwkit-py
 git+https://github.com/Rapptz/discord-ext-menus
 python-dotenv
