@@ -35,6 +35,7 @@ if TYPE_CHECKING:
         Ticket,
         TicketConfig,
         TradePrices,
+        Treasure,
         Treaty,
         UserSettings,
     )
@@ -99,8 +100,8 @@ class Cache:
         self._ticket_configs: Dict[int, TicketConfig] = {}
         self._tickets: Dict[int, Ticket] = {}
         self._trades = {}  # NO CLASS YET
-        self._treasures = list()  # NO CLASS YET
-        self._treaties: List[Treaty] = list()
+        self._treasures: Set[Treasure] = set()  # NO CLASS YET
+        self._treaties: Set[Treaty] = set()
         self._user_settings: Dict[int, UserSettings] = {}
         self._war_attacks = {}  # NO CLASS YET
         self._wars = {}  # NO CLASS YET
@@ -124,6 +125,7 @@ class Cache:
             Ticket,
             TicketConfig,
             TradePrices,
+            Treasure,
             Treaty,
         )
 
@@ -145,6 +147,7 @@ class Cache:
             "SELECT * FROM targets;",
             "SELECT * FROM ticket_configs;",
             "SELECT * FROM tickets;",
+            "SELECT * FROM treasures ORDER BY datetime DESC LIMIT 1;",
             "SELECT * FROM treaties;",
         ]
         (
@@ -165,6 +168,7 @@ class Cache:
             targets,
             ticket_configs,
             tickets,
+            treasures,
             treaties,
         ) = tuple(
             await asyncio.gather(*(execute_read_query(query) for query in queries))
@@ -224,6 +228,9 @@ class Cache:
         for i in tickets:
             i = Ticket(i)
             self._tickets[i.ticket_id] = i
+        for i in treasures[0]["treasures"]:
+            i = Treasure(i)
+            self._treasures.add(i)
         for i in treaties:
             i = Treaty(
                 i,
@@ -232,7 +239,7 @@ class Cache:
                     i["to_"]: self.get_alliance(i["to_"]),  # type: ignore
                 },
             )
-            self._treaties.append(i)
+            self._treaties.add(i)
         self.init = True
 
     @property
@@ -308,11 +315,11 @@ class Cache:
         return set(self._trades.values())
 
     @property
-    def treasures(self) -> List[int]:
+    def treasures(self) -> Set[Treasure]:
         return self._treasures
 
     @property
-    def treaties(self) -> List[Treaty]:
+    def treaties(self) -> Set[Treaty]:
         return self._treaties
 
     @property
@@ -398,7 +405,7 @@ class Cache:
                 if i.from_ == data["from_"] and i.to_ == data["to_"]
             )
             treaty._update(data, alliances)
-        self._treaties.append(Treaty(data, alliances))
+        self._treaties.add(Treaty(data, alliances))
 
     def get_alliance(self, id: int, /) -> Optional[Alliance]:
         return self._alliances.get(id)
@@ -483,7 +490,7 @@ class Cache:
     def get_trade(self, id: int, /) -> Optional[int]:
         return self._trades.get(id)
 
-    def get_treasure(self, name: str, /) -> Optional[int]:
+    def get_treasure(self, name: str, /) -> Optional[Treasure]:
         try:
             return next(i for i in self._treasures if i.name == name)
         except StopIteration:
