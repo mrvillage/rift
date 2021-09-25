@@ -342,9 +342,8 @@ class Menu(Makeable):
 
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
-        self.embed = get_embed_author_guild(
-            ctx.guild, self.description.replace("\\n", "\n")
-        )
+        desc = str(self.description).replace("\\n", "\n")
+        self.embed = get_embed_author_guild(ctx.guild, desc)
         return self.embed
 
     async def new_interface(self, message: discord.Message) -> None:
