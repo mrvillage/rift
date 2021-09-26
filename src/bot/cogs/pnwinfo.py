@@ -19,7 +19,7 @@ from ...data.get import (
 )
 from ...errors import AllianceNotFoundError, NationNotFoundError
 from ...ref import Rift
-from ...views import AlliancesPaginator, TreasuresView
+from ...views import AlliancesPaginator, Colors, TreasuresView
 
 
 class PnWInfo(commands.Cog):
@@ -302,7 +302,8 @@ class PnWInfo(commands.Cog):
                 f"Average Bonus: ${average_bonus:,.2f}",
                 fields=fields,
                 color=discord.Color.blue(),
-            )
+            ),
+            view=Colors(),
         )
 
     @commands.command(
