@@ -47,6 +47,9 @@ class EmbedHelpCommand(commands.HelpCommand):
     def get_command_signature(self, command):
         return f"{command.qualified_name} {command.signature}"
 
+    def get_destination(self):
+        return self.context
+
     async def send_bot_help(self, mapping):
         embed = get_embed_author_member(self.context.author, title="Bot Commands")
         description = self.context.bot.description
@@ -80,7 +83,7 @@ class EmbedHelpCommand(commands.HelpCommand):
                 inline=False,
             )
 
-        await self.get_destination().send(embed=embed)
+        await self.context.reply(embed=embed)
 
     async def send_group_help(self, group):
         embed = get_embed_author_member(self.context.author, title=group.qualified_name)
@@ -96,6 +99,6 @@ class EmbedHelpCommand(commands.HelpCommand):
                     inline=False,
                 )
 
-        await self.get_destination().send(embed=embed)
+        await self.context.reply(embed=embed)
 
     send_command_help = send_group_help

@@ -3,6 +3,7 @@ import datetime
 import aiohttp
 from bs4 import BeautifulSoup
 from discord import AllowedMentions, Game, Intents
+from discord.ext import commands
 from discord.ext.commands import Bot, when_mentioned_or
 
 from .data.db import execute_read_query
@@ -79,6 +80,7 @@ intents = Intents(
     members=True,
 )
 debug = False
+debug = True
 
 ID = DEBUG_APPLICATION_ID if debug else APPLICATION_ID
 bot = Rift(
@@ -88,7 +90,11 @@ bot = Rift(
     allowed_mentions=AllowedMentions(replied_user=False),
     activity=Game(name=__version__),
     strip_after_prefix=True,
-    help_command=EmbedHelpCommand(),
+    help_command=EmbedHelpCommand(
+        command_attrs={
+            "type": (commands.CommandType.default, commands.CommandType.chat_input)
+        }
+    ),
     application_id=ID,
     debug_command_prefix="!!",
     debug_guild_id=654109011473596417,
