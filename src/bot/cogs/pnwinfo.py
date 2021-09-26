@@ -74,9 +74,9 @@ class PnWInfo(commands.Cog):
         self, ctx: commands.Context, *, search: Union[Nation, Alliance] = None
     ):
         return (
-            await ctx.invoke(self.nation, nation=search)
-            if isinstance(search, Nation)
-            else await ctx.invoke(self.alliance, alliance=search)
+            await ctx.invoke(self.alliance, alliance=search)
+            if isinstance(search, Alliance)
+            else await ctx.invoke(self.nation, nation=search)
         )
 
     @commands.command(
