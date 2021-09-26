@@ -77,38 +77,6 @@ async def on_raw_message_edit(payload: discord.RawMessageUpdateEvent):
 
 @bot.event
 async def on_ready():
-    if not cache.init:
-        await cache.initialize()
-        print("Cache initialized!", flush=True)
-
-    if not bot.persistent_views_loaded:
-        for menu in cache.menus:
-            bot.add_view(await menu.get_view())
-        bot.add_view(Margins())
-        bot.add_view(Prices())
-        bot.add_view(AlliancesPaginator(1, 50))
-        bot.add_view(EventExtraInformationView())
-        bot.add_view(TreasuresView())
-        bot.persistent_views_loaded = True
-        print("Loaded persistent views!", flush=True)
-        async with aiohttp.request("GET", bot.user.display_avatar.url) as req:  # type: ignore
-            bot.bytes_avatar = await req.read()
-
-    if not bot.cogs_loaded:
-        cogPath = Path.cwd() / "src" / "bot" / "cogs"
-        cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
-        for cog in cogs:
-            bot.load_extension(f"src.bot.cogs.{cog}")
-        bot.unload_extension("src.bot.cogs.database")
-        bot.unload_extension("src.bot.cogs.server")
-        if bot.debug:
-            bot.unload_extension("src.bot.cogs.logs")
-        bot.cogs_loaded = True
-        print("Loaded cogs!", flush=True)
-
-    await bot.register_application_commands()
-    print("Application commands registered!", flush=True)
-
     print("Startup complete!", flush=True)
 
 
@@ -135,8 +103,39 @@ async def main() -> None:
                 await bot.login(DEBUG_TOKEN)
             else:
                 await bot.login(TOKEN)
-            bot.loop.create_task(bot.update_pnw_session())
-            bot.loop.create_task(bot.get_staff())
+            await bot.update_pnw_session()
+            if not cache.init:
+                await cache.initialize()
+                print("Cache initialized!", flush=True)
+
+            if not bot.persistent_views_loaded:
+                for menu in cache.menus:
+                    bot.add_view(await menu.get_view())
+                bot.add_view(Margins())
+                bot.add_view(Prices())
+                bot.add_view(AlliancesPaginator(1, 50))
+                bot.add_view(EventExtraInformationView())
+                bot.add_view(TreasuresView())
+                bot.persistent_views_loaded = True
+                print("Loaded persistent views!", flush=True)
+                async with aiohttp.request("GET", bot.user.display_avatar.url) as req:  # type: ignore
+                    bot.bytes_avatar = await req.read()
+
+            if not bot.cogs_loaded:
+                cogPath = Path.cwd() / "src" / "bot" / "cogs"
+                cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
+                for cog in cogs:
+                    bot.load_extension(f"src.bot.cogs.{cog}")
+                bot.unload_extension("src.bot.cogs.database")
+                bot.unload_extension("src.bot.cogs.server")
+                if bot.debug:
+                    bot.unload_extension("src.bot.cogs.logs")
+                bot.cogs_loaded = True
+                print("Loaded cogs!", flush=True)
+
+            await bot.register_application_commands()
+            print("Application commands registered!", flush=True)
+
             await bot.connect(reconnect=True)
         finally:
             await bot.close()
