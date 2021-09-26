@@ -16,6 +16,7 @@ from ..env import DEBUG_TOKEN, TOKEN, __version__
 from ..ref import bot
 from ..views import (
     AlliancesPaginator,
+    Colors,
     EventExtraInformationView,
     Margins,
     Prices,
@@ -116,6 +117,7 @@ async def main() -> None:
                 bot.add_view(AlliancesPaginator(1, 50))
                 bot.add_view(EventExtraInformationView())
                 bot.add_view(TreasuresView())
+                bot.add_view(Colors())
                 bot.persistent_views_loaded = True
                 print("Loaded persistent views!", flush=True)
                 async with aiohttp.request("GET", bot.user.display_avatar.url) as req:  # type: ignore
