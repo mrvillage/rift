@@ -45,7 +45,6 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         member = user or ctx.author
         try:
             await funcs.get_link_user(member.id)
-        except IndexError:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -53,9 +52,10 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                     color=discord.Color.red(),
                 )
             )
+        except IndexError:
+            pass
         try:
             await funcs.get_link_nation(nation.id)
-        except IndexError:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -63,6 +63,8 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                     color=discord.Color.red(),
                 )
             )
+        except IndexError:
+            pass
         await funcs.add_link(member.id, nation.id)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
