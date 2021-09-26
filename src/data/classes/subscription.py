@@ -87,7 +87,10 @@ class Subscription:
         arguments: List[int] = [],
         /,
     ) -> Subscription:
-        webhook = await channel.create_webhook(
+        target = channel.parent if isinstance(channel, discord.Thread) else channel
+        if TYPE_CHECKING:
+            assert target is not None
+        webhook = await target.create_webhook(
             name=f"{category}_{type}",
             avatar=bot.bytes_avatar,
             reason=f"Subscribed to event {category}_{type}",
