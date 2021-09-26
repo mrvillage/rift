@@ -194,6 +194,7 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                         ephemeral=True,
                     )
             else:
+                await print_handler(ctx, error)
                 await ctx.reply(
                     embed=get_embed_author_member(
                         ctx.author,
@@ -202,8 +203,8 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                     ),
                     ephemeral=True,
                 )
-                await print_handler(ctx, error)
         else:
+            await print_handler(ctx, error)
             await ctx.reply(
                 embed=get_embed_author_member(
                     ctx.author,
@@ -212,12 +213,12 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                 ),
                 ephemeral=True,
             )
-            await print_handler(ctx, error)
     except discord.Forbidden:
         await ctx.reply(
             'I don\'t have permission to do that! Please make sure I have the "Embed Links" permission.'
         )
     except Exception as e:
+        await print_handler(ctx, e)
         await ctx.reply(
             embed=get_embed_author_member(
                 ctx.author,
@@ -226,4 +227,3 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
             ),
             ephemeral=True,
         )
-        await print_handler(ctx, e)
