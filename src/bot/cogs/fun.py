@@ -11,6 +11,7 @@ class Fun(commands.Cog):
 
     @commands.command(
         name="toot",
+        brief="Toot tooooooot!",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def toot(self, ctx: commands.Context):
