@@ -21,8 +21,8 @@ class AlliancesPaginator(discord.ui.View):
 
     @discord.ui.button(
         custom_id="XMP7cqDL99UKz5UHNoPv3zuds64epgX2mD07hV6cfd3ZF9P2JWiPsFhIHYUG1yWW1AQsh1venmDXoF6k",
-        emoji="⬅",
-        style=discord.ButtonStyle.blurple,
+        label="Previous",
+        style=discord.ButtonStyle.gray,
     )
     async def left(self, button: discord.ui.Button, interaction: discord.Interaction):
         desc = interaction.message.embeds[0].description[7:]  # type: ignore
@@ -52,8 +52,8 @@ class AlliancesPaginator(discord.ui.View):
 
     @discord.ui.button(
         custom_id="Sti8atDJZR3yCa53mOwN87AaTiV9SrRI0CDV4fd6xtvud6Etx6uYKgUhgqZZ1DZ94fexUhQQYcGdu7pJ",
-        emoji="🔃",
-        style=discord.ButtonStyle.blurple,
+        label="Refresh",
+        style=discord.ButtonStyle.gray,
     )
     async def refresh(
         self, button: discord.ui.Button, interaction: discord.Interaction
@@ -85,8 +85,8 @@ class AlliancesPaginator(discord.ui.View):
 
     @discord.ui.button(
         custom_id="NixTSNYXBclJfdBbY8mDzTTGziFovBC3f1pTSl7CDoVAxDUlJ7io6Wc4IISyoyXQ6BqQrTsW3XlupLpV",
-        emoji="➡",
-        style=discord.ButtonStyle.blurple,
+        label="Next",
+        style=discord.ButtonStyle.gray,
     )
     async def right(self, button: discord.ui.Button, interaction: discord.Interaction):
         desc = interaction.message.embeds[0].description[7:]  # type: ignore

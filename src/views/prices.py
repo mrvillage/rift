@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 import discord
 from discord import ButtonStyle, Interaction, Member, Message, User, ui
 
-from ..env import APPLICATION_ID
 from ..funcs import get_embed_author_member, get_trade_prices
+from ..ref import ID
 
 __all__ = ("Prices",)
 
@@ -24,8 +24,8 @@ class Prices(ui.View):
         if not isinstance(message.embeds[0].description, str):
             return
         if (
-            message.embeds[0].description.startswith("Market Index:")
-            and message.author.id != APPLICATION_ID
+            not message.embeds[0].description.startswith("Market Index:")
+            or message.author.id != ID
         ):
             return
         prices = await get_trade_prices()
