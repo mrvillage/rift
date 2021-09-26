@@ -3,11 +3,13 @@ from __future__ import annotations
 import asyncio
 import time
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 import discord
 
 from .. import funcs
 from ..cache import cache
+from ..ref import ID
 
 __all__ = ("TreasuresView",)
 
@@ -23,6 +25,11 @@ class TreasuresView(discord.ui.View):
     async def callback(
         self, button: discord.ui.Button, interaction: discord.Interaction, page: int
     ):
+        if TYPE_CHECKING:
+            assert isinstance(interaction.message, discord.Message)
+            assert isinstance(interaction.user, (discord.Member, discord.User))
+        if interaction.message.author.id != ID:
+            return
         desc = interaction.message.embeds[0].description[7:]  # type: ignore
         page = page or int(desc[: desc.index("**")])
         if page == 1:
@@ -49,15 +56,15 @@ class TreasuresView(discord.ui.View):
     @discord.ui.button(
         custom_id="MYUVf8qSrCsSq78nyHcRSWuhWWlsUerBSVYFxqgQcvF2gVoTEd9OqtP3Kaa51B4rMgbVfTlvkGOAPgn3",
         label="Page 1",
-        style=discord.ButtonStyle.blurple,
+        style=discord.ButtonStyle.gray,
     )
     async def one(self, button: discord.ui.Button, interaction: discord.Interaction):
         await self.callback(button, interaction, 1)
 
     @discord.ui.button(
         custom_id="HipBhbpcigjQwysxH6yqHUUl2BOFJvsm3CmJHQs3ZsLY1aA5qJdHBI67u7jgY5Aq21fzbzlABU1lO3GH",
-        emoji="🔃",
-        style=discord.ButtonStyle.blurple,
+        label="Refresh",
+        style=discord.ButtonStyle.gray,
     )
     async def refresh(
         self, button: discord.ui.Button, interaction: discord.Interaction
@@ -67,7 +74,7 @@ class TreasuresView(discord.ui.View):
     @discord.ui.button(
         custom_id="xMV8GXEACJcmvhFtTVKIa3M41IT38RCewSq14n62e7OVASX5U6pfMnBAyFmrkmVGPhPsvXK60ggVdngp",
         label="Page 2",
-        style=discord.ButtonStyle.blurple,
+        style=discord.ButtonStyle.gray,
     )
     async def two(self, button: discord.ui.Button, interaction: discord.Interaction):
         await self.callback(button, interaction, 2)

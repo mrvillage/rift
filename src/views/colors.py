@@ -6,8 +6,8 @@ import discord
 from discord import ButtonStyle, Interaction, Member, Message, User, ui
 
 from ..data.get import get_colors, get_nation_color_counts
-from ..env import APPLICATION_ID
 from ..funcs import get_embed_author_member
+from ..ref import ID
 
 __all__ = ("Colors",)
 
@@ -21,13 +21,12 @@ class Colors(ui.View):
         message = interaction.message
         if TYPE_CHECKING:
             assert isinstance(message, Message)
+            assert isinstance(interaction.user, (Member, User))
         if (
-            message.embeds[0].description.startswith("Average Bonus:")
-            and message.author.id != APPLICATION_ID
+            not message.embeds[0].description.startswith("Average Bonus:")
+            or message.author.id != ID
         ):
             return
-        if TYPE_CHECKING:
-            assert isinstance(interaction.user, (Member, User))
         colors = await get_colors()
         nations = await get_nation_color_counts()
         average_bonus = (

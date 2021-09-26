@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 import discord
 from discord import ButtonStyle, Interaction, Member, Message, User, ui
 
-from ..env import APPLICATION_ID
 from ..funcs import get_embed_author_member, get_trade_prices
+from ..ref import ID
 
 __all__ = ("Margins",)
 
@@ -22,7 +22,7 @@ class Margins(ui.View):
             assert isinstance(message, Message)
         if (
             message.embeds[0].title != "Trade Margins"
-            and message.author.id != APPLICATION_ID
+            or message.author.id != ID
         ):
             return
         prices = await get_trade_prices()
@@ -108,6 +108,6 @@ class Margins(ui.View):
             """,
                     },
                 ],
-            color=discord.Color.blue(),
+                color=discord.Color.blue(),
             ),
         )
