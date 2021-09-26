@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from discord import ButtonStyle, Interaction, Message, Member, User, ui
+import discord
+from discord import ButtonStyle, Interaction, Member, Message, User, ui
 
 from ..env import APPLICATION_ID
 from ..funcs import get_embed_author_member, get_trade_prices
@@ -143,5 +144,6 @@ class Prices(ui.View):
                 """,
                     },
                 ],
+                color=discord.Color.blue(),
             ),
         )
