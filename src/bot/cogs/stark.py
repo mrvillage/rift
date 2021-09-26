@@ -99,7 +99,7 @@ class HouseStark(commands.Cog):
     async def mmr(self, ctx: commands.Context, *, nation: Nation = None):
         nation = nation or await Nation.convert(ctx, nation)
         author_nation = await Nation.convert(ctx, None)
-        if nation.alliance_id not in {3683, 8139}:
+        if nation.alliance_id not in {3683, 8139, OFFSHORE_ID}:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -108,7 +108,7 @@ class HouseStark(commands.Cog):
                 )
             )
             return
-        if author_nation.alliance_id not in {3683, 8139}:
+        if author_nation.alliance_id not in {3683, 8139, OFFSHORE_ID}:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -164,7 +164,7 @@ class HouseStark(commands.Cog):
             assert isinstance(nat, tuple)
         nat = nat[0]
         author_nation = await Nation.convert(ctx, None)
-        if nation.alliance_id not in {3683, 8139}:
+        if nation.alliance_id not in {3683, 8139, OFFSHORE_ID}:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -173,7 +173,7 @@ class HouseStark(commands.Cog):
                 )
             )
             return
-        if author_nation.alliance_id not in {3683, 8139}:
+        if author_nation.alliance_id not in {3683, 8139, OFFSHORE_ID}:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
