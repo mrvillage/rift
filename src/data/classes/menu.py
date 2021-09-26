@@ -130,7 +130,7 @@ class Button(discord.ui.Button):
                 await ticket.start(interaction.user, config)
                 tickets.append(ticket)
             if len(tickets) > 1:
-                tickets = "\n".join(f"<#{ticket.ticket_id}" for ticket in tickets)
+                tickets = "\n".join(f"<#{ticket.id}" for ticket in tickets)
                 await interaction.followup.send(
                     ephemeral=True,
                     embed=get_embed_author_member(
@@ -141,7 +141,7 @@ class Button(discord.ui.Button):
                 await interaction.followup.send(
                     ephemeral=True,
                     embed=get_embed_author_member(
-                        interaction.user, f"Ticket Created!\n<#{tickets[0].ticket_id}>"
+                        interaction.user, f"Ticket Created!\n<#{tickets[0].id}>"
                     ),
                 )
         elif self.action in {"CLOSE_TICKET", "CREATE_TICKETS"}:
@@ -183,7 +183,7 @@ class Button(discord.ui.Button):
                 embassies.append(embassy)
             if len(embassies) > 1:
                 embassies = "\n".join(
-                    f"<#{embassy.embassy_id}" for embassy in embassies
+                    f"<#{embassy.id}" for embassy in embassies
                 )
                 await interaction.followup.send(
                     ephemeral=True,
@@ -195,7 +195,7 @@ class Button(discord.ui.Button):
                 await interaction.followup.send(
                     ephemeral=True,
                     embed=get_embed_author_member(
-                        interaction.user, f"Embassy:\n<#{embassies[0].embassy_id}>"
+                        interaction.user, f"Embassy:\n<#{embassies[0].id}>"
                     ),
                 )
         elif self.action in {"CLOSE_EMBASSY", "CLOSE_EMBASSIES"}:

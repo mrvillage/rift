@@ -100,8 +100,8 @@ class Ticket:
             )
         await channel.send(
             user.mention
-            + "".join(f"<@{i}>" for i in config.user_mentions)
-            + "".join(f"<@&{i}" for i in config.role_mentions),
+            + "".join(f"<@{i}>" for i in (config.user_mentions or []))
+            + "".join(f"<@&{i}" for i in (config.role_mentions or [])),
             embed=get_embed_author_member(
                 user, config.start_message.replace("\\n", "\n")
             ),
@@ -203,7 +203,7 @@ class TicketConfig:
             category=category,
         )
         data = {
-            "ticket_id": channel.id,
+            "id": channel.id,
             "ticket_number": number,
             "config_id": self.id,
             "guild_id": self.guild_id,
