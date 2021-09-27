@@ -146,7 +146,7 @@ class Tickets(commands.Cog):
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    "No ticket configurations found for this guild.",
+                    "No ticket configurations found for this server.",
                     discord.Color.red(),
                 )
             )

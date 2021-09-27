@@ -69,7 +69,9 @@ class Menus(commands.Cog):
         else:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, "You don't have any menus!", color=discord.Color.red()
+                    ctx.author,
+                    "No menus found for this server!",
+                    color=discord.Color.red(),
                 )
             )
 
