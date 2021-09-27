@@ -43,7 +43,7 @@ class EventExtraInformationButton(discord.ui.Button):
             alliance = cache.get_alliance(int(id))
             if alliance is None:
                 return
-            embed = await alliance.get_info_embed(
+            embed = alliance.get_info_embed(
                 FakeContext(interaction.user, interaction.guild)  # type: ignore
             )
         else:
