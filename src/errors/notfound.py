@@ -14,6 +14,7 @@ __all__ = (
     "MenuItemNotFoundError",
     "MenuNotFoundError",
     "NationNotFoundError",
+    "NationOrAllianceNotFoundError",
     "RecipientNotFoundError",
     "ServerNotFoundError",
     "SubscriptionNotFoundError",
@@ -78,6 +79,10 @@ class MenuNotFoundError(NotFoundError):
 
 
 class NationNotFoundError(NotFoundError):
+    ...
+
+
+class NationOrAllianceNotFoundError(NotFoundError):
     ...
 
 

@@ -12,6 +12,7 @@ from ..errors import (
     MenuItemNotFoundError,
     MenuNotFoundError,
     NationNotFoundError,
+    NationOrAllianceNotFoundError,
     SubscriptionNotFoundError,
     TargetNotFoundError,
 )
@@ -209,6 +210,25 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                     embed=get_embed_author_member(
                         ctx.author,
                         "Unknown Fatal Error. Please try again. If this problem persists please contact <@!258298021266063360> for assistance.\nPlease remember the bot is still in Beta, there is a good chance new features may result in new bugs to older features. To report an issue please send a message to <@!258298021266063360> so it can be addressed as soon as possible.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        elif isinstance(error, NationOrAllianceNotFoundError):
+            if error.args[0] == str(ctx.author.id):
+                await ctx.reply(
+                    embed=get_embed_author_member(
+                        ctx.author,
+                        "You're not linked so I can't infer your nation!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                await ctx.reply(
+                    embed=get_embed_author_member(
+                        ctx.author,
+                        f"No nation or alliance found with argument `{error.args[0]}`.",
                         color=discord.Color.red(),
                     ),
                     ephemeral=True,
