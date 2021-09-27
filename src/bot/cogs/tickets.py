@@ -148,7 +148,8 @@ class Tickets(commands.Cog):
                     ctx.author,
                     "No ticket configurations found for this server.",
                     discord.Color.red(),
-                )
+                ),
+                ephemeral=True,
             )
         await ctx.reply(
             embed=funcs.get_embed_author_member(

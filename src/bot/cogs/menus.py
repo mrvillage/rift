@@ -72,7 +72,8 @@ class Menus(commands.Cog):
                     ctx.author,
                     "No menus found for this server!",
                     color=discord.Color.red(),
-                )
+                ),
+                ephemeral=True,
             )
 
     @menu.command(
