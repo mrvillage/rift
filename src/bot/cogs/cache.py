@@ -112,7 +112,7 @@ class Cache(commands.Cog):
                 "SELECT * FROM colors ORDER BY datetime DESC LIMIT 1;"
             )
             for i in (dict(i) for i in fetched_data[0]["colors"]):
-                cache.hook_alliance("update", i)  # type: ignore
+                cache.hook_color("update", i)  # type: ignore
 
     @commands.Cog.listener()
     async def on_bulk_nation_create(self, data: BulkNationListData):
