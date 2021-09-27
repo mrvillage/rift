@@ -89,11 +89,21 @@ class Alliance(Makeable):
 
     @property
     def members(self) -> List[Nation]:
-        return [i for i in cache.nations if i.alliance_id == self.id]
+        return [
+            i
+            for i in cache.nations
+            if i.alliance_id == self.id and i.alliance_position != "APPLICANT"
+        ]
 
     @property
     def vm_members(self) -> List[Nation]:
-        return [i for i in cache.nations if i.alliance_id == self.id and i.v_mode]
+        return [
+            i
+            for i in cache.nations
+            if i.alliance_id == self.id
+            and i.v_mode
+            and i.alliance_position != "APPLICANT"
+        ]
 
     @property
     def leaders(self) -> List[Nation]:
@@ -157,14 +167,23 @@ class Alliance(Makeable):
 
     @property
     def militarization(self) -> Dict[str, float]:
+        cities = self.cities
         militarization = {
-            "soldiers": self.soldiers / (self.cities * 15000),
-            "tanks": self.tanks / (self.cities * 1250),
-            "aircraft": self.aircraft / (self.cities * 75),
-            "ships": self.ships / (self.cities * 15),
+            "soldiers": self.soldiers / (cities * 15000),
+            "tanks": self.tanks / (cities * 1250),
+            "aircraft": self.aircraft / (cities * 75),
+            "ships": self.ships / (cities * 15),
         }
         militarization["total"] = sum(militarization.values()) / 4
         return militarization
+
+    @property
+    def average_infrastructure(self) -> float:
+        ids = {i.id for i in self.members}
+        return (
+            sum(i.infrastructure for i in cache.cities if i.nation_id in ids)
+            / self.cities
+        )
 
     async def get_resources(self) -> Resources:
         from ...funcs import parse_alliance_bank
@@ -180,6 +199,11 @@ class Alliance(Makeable):
         # sourcery no-metrics
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
+        member_count = self.member_count
+        score = self.score
+        leaders = self.leaders
+        heirs = self.heirs
+        officers = self.officers
         fields = [
             {"name": "Alliance ID", "value": self.id},
             {"name": "Alliance Name", "value": self.name},
@@ -191,12 +215,12 @@ class Alliance(Makeable):
             {"name": "Rank", "value": f"#{self.rank}"},
             {
                 "name": "Members",
-                "value": f"[{self.member_count:,}](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\")",
+                "value": f"[{member_count:,}](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\")",
             },
-            {"name": "Score", "value": f"{self.score:,.2f}"},
+            {"name": "Score", "value": f"{score:,.2f}"},
             {
                 "name": "Average Score",
-                "value": f"{self.score/self.member_count if self.member_count != 0 else 0:,.2f}",
+                "value": f"{score/member_count if member_count != 0 else 0:,.2f}",
             },
             {
                 "name": "Applicants",
@@ -206,33 +230,33 @@ class Alliance(Makeable):
                 "name": "Leaders",
                 "value": "\n".join(
                     f'[{repr(i)}](https://politicsandwar.com/nation/id={i.id} "https://politicsandwar.com/nation/id={i.id}")'
-                    for i in self.leaders
+                    for i in leaders
                 )
-                if self.leaders and not short
-                else ", ".join(str(i.id) for i in self.leaders)
-                if self.leaders and short
+                if leaders and not short
+                else ", ".join(str(i.id) for i in leaders)
+                if leaders and short
                 else "None",
             },
             {
                 "name": "Heirs",
                 "value": "\n".join(
                     f'[{repr(i)}](https://politicsandwar.com/nation/id={i.id} "https://politicsandwar.com/nation/id={i.id}")'
-                    for i in self.heirs
+                    for i in heirs
                 )
-                if self.heirs and not short
-                else ", ".join(str(i.id) for i in self.heirs)
-                if self.heirs and short
+                if heirs and not short
+                else ", ".join(str(i.id) for i in heirs)
+                if heirs and short
                 else "None",
             },
             {
                 "name": "Officers",
                 "value": "\n".join(
                     f'[{repr(i)}](https://politicsandwar.com/nation/id={i.id} "https://politicsandwar.com/nation/id={i.id}")'
-                    for i in self.officers
+                    for i in officers
                 )
-                if self.officers and not short
-                else ", ".join(str(i.id) for i in self.officers)
-                if self.officers and short
+                if officers and not short
+                else ", ".join(str(i.id) for i in officers)
+                if officers and short
                 else "None",
             },
             {
@@ -253,11 +277,11 @@ class Alliance(Makeable):
             },
             {
                 "name": "Average Cities",
-                "value": f"{sum(i.cities for i in self.members)/self.member_count:,.2f}",
+                "value": f"{self.cities/member_count:,.2f}",
             },
             {
                 "name": "Average Infrastructure",
-                "value": f"{sum(i.avg_infra() for i in self.members)/self.member_count:,.2f}",
+                "value": f"{self.average_infrastructure:,.2f}",
             },
             {
                 "name": "Treasures",
