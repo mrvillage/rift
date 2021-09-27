@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING, Union
 import discord
 from discord.ext import commands
 
+from src.errors.notfound import NationOrAllianceNotFoundError
+
 from ... import funcs
 from ...cache import cache
 from ...data.classes import Alliance, Nation
@@ -70,14 +72,37 @@ class PnWInfo(commands.Cog):
             "search": "The nation or alliance to get information about, defaults to your nation.",
         },
     )
-    async def who(
-        self, ctx: commands.Context, *, search: Union[Nation, Alliance] = None
-    ):
-        return (
-            await ctx.invoke(self.alliance, alliance=search)
-            if isinstance(search, Alliance)
-            else await ctx.invoke(self.nation, nation=search)
-        )
+    async def who(self, ctx: commands.Context, *, search: str = None):
+        if search is None:
+            try:
+                return await ctx.invoke(
+                    self.nation,
+                    nation=await Nation.convert(ctx, search, False),
+                )
+            except NationNotFoundError:
+                raise NationOrAllianceNotFoundError(search)
+        try:
+            await ctx.invoke(
+                self.nation, nation=await Nation.convert(ctx, search, False)
+            )
+        except NationNotFoundError:
+            try:
+                await ctx.invoke(
+                    self.alliance, alliance=await Alliance.convert(ctx, search, False)
+                )
+            except AllianceNotFoundError:
+                try:
+                    await ctx.invoke(
+                        self.nation, nation=await Nation.convert(ctx, search, True)
+                    )
+                except NationNotFoundError:
+                    try:
+                        await ctx.invoke(
+                            self.alliance,
+                            alliance=await Alliance.convert(ctx, search, True),
+                        )
+                    except AllianceNotFoundError:
+                        raise NationOrAllianceNotFoundError(search)
 
     @commands.command(
         name="members",
