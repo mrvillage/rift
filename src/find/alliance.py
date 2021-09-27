@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from discord.ext import commands
 
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 async def search_alliance(
-    ctx: commands.Context, search: str, advanced: bool = True
+    ctx: commands.Context, search: Optional[str], advanced: bool = True
 ) -> Alliance:
     search = search or str(ctx.author.id)
     return await funcs.search_alliance(ctx, search, advanced)
