@@ -103,10 +103,9 @@ class Embassies(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 "\n".join(
-                    f"{config.id} - {category}"
+                    f"{config.id} - {ctx.guild.get_channel(config.category_id)}"
                     for config in configs
                     if config.category_id
-                    and (category := ctx.guild.get_channel(config.category_id))
                 ),
                 color=discord.Color.green(),
             )
