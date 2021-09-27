@@ -94,7 +94,7 @@ class Embassies(commands.Cog):
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    "No embassy configurations found for this guild.",
+                    "No embassy configurations found for this server.",
                     discord.Color.red(),
                 )
             )
