@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from discord.ext import commands
 
+from ...cache import cache
 from ...errors import AttackNotFoundError, WarNotFoundError
 from .. import query
 
@@ -11,6 +12,8 @@ __all__ = ("War", "Attack")
 
 if TYPE_CHECKING:
     from typings import AttackData, WarData
+
+    from .nation import Nation
 
 
 class War:
@@ -186,6 +189,14 @@ class War:
         self.defender_infra_destroyed_value: float = data[
             "defender_infra_destroyed_value"
         ]
+
+    @property
+    def attacker(self) -> Optional[Nation]:
+        return cache.get_nation(self.attacker_id)
+
+    @property
+    def defender(self) -> Optional[Nation]:
+        return cache.get_nation(self.defender_id)
 
 
 class Attack:
