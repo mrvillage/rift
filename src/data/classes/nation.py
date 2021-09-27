@@ -88,7 +88,7 @@ class Nation(Makeable):
 
     @classmethod
     async def convert(
-        cls, ctx: commands.Context, search: str, advanced: bool = True
+        cls, ctx: commands.Context, search: Optional[str], advanced: bool = True
     ) -> Nation:
         return await search_nation(ctx, search, advanced)
 
