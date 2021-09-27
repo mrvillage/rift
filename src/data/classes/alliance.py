@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import discord
 import pnwkit
@@ -49,7 +49,7 @@ class Alliance(Makeable):
 
     @classmethod
     async def convert(
-        cls, ctx: commands.Context, search: Optional[str], advanced: bool = True
+        cls, ctx: commands.Context, search: Any, advanced: bool = True
     ) -> Alliance:
         return await search_alliance(ctx, search, advanced)
 
