@@ -38,6 +38,7 @@ class Rift(Bot):
         self.subscribable_events = {
             "war_declaration",
         }
+        self.enable_debug = False
 
     async def update_pnw_session(self):
         login_data = {

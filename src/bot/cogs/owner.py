@@ -168,6 +168,16 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                 )
             )
 
+    @commands.command(name="enable-debug", aliases=["debug", "enabledebug"])
+    async def enable_debug(self, ctx: commands.Context):
+        ctx.bot.enable_debug = not ctx.bot.enable_debug
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Debug mode has been {'enabled' if ctx.bot.enable_debug else 'disabled'}.",
+            )
+        )
+
     @commands.group(name="staff", invoke_without_command=True)
     async def staff(self, ctx):
         await ctx.reply(
