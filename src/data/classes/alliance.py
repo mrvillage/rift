@@ -49,7 +49,7 @@ class Alliance(Makeable):
 
     @classmethod
     async def convert(
-        cls, ctx: commands.Context, search: str, advanced: bool = True
+        cls, ctx: commands.Context, search: Optional[str], advanced: bool = True
     ) -> Alliance:
         return await search_alliance(ctx, search, advanced)
 
