@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from ..data.classes import Alliance
 
 
-async def search_alliance(ctx: commands.Context, search: str) -> Alliance:
+async def search_alliance(
+    ctx: commands.Context, search: str, advanced: bool = True
+) -> Alliance:
     search = search or str(ctx.author.id)
-    return await funcs.search_alliance(ctx, search)
+    return await funcs.search_alliance(ctx, search, advanced)

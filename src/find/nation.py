@@ -22,6 +22,6 @@ async def search_nation_author(
         return nation.user, nation
 
 
-async def search_nation(ctx: commands.Context, search: str) -> Nation:
+async def search_nation(ctx: commands.Context, search: str, advanced: bool = True) -> Nation:
     search = str(ctx.author.id) if search is None else search
-    return await funcs.search_nation(ctx, search)
+    return await funcs.search_nation(ctx, search, advanced)

@@ -12,7 +12,9 @@ from .nation import search_nation
 __all__ = ("search_alliance",)
 
 
-async def search_alliance(ctx: commands.Context, search: str) -> Alliance:
+async def search_alliance(
+    ctx: commands.Context, search: str, advanced: bool = False
+) -> Alliance:
     try:
         search = await convert_link(search)
     except LinkError:
@@ -45,6 +47,8 @@ async def search_alliance(ctx: commands.Context, search: str) -> Alliance:
     # provided acronym search, case insensitive
     if len(l := [i for i in alliances if i.acronym.lower() == search.lower()]) == 1:
         return l[0]
+    if not advanced:
+        raise AllianceNotFoundError(search)
     # calculated acronym search, case insensitive
     if (
         len(
