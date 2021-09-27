@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 import discord
 import pnwkit
-from discord.ext.commands.context import Context
+from discord.ext import commands
 
 from ...cache import cache
 from ...errors import AllianceNotFoundError
@@ -48,8 +48,10 @@ class Alliance(Makeable):
         self.ircchan: Optional[str] = data["ircchan"]
 
     @classmethod
-    async def convert(cls, ctx, search) -> Alliance:
-        return await search_alliance(ctx, search)
+    async def convert(
+        cls, ctx: commands.Context, search: str, advanced: bool = True
+    ) -> Alliance:
+        return await search_alliance(ctx, search, advanced)
 
     @classmethod
     async def fetch(cls, alliance_id: int) -> Alliance:
@@ -195,7 +197,9 @@ class Alliance(Makeable):
         await bot.parse_token(content)
         return await Resources.from_dict(await parse_alliance_bank(content))
 
-    def get_info_embed(self, ctx: Context, short: bool = False) -> discord.Embed:
+    def get_info_embed(
+        self, ctx: commands.Context, short: bool = False
+    ) -> discord.Embed:
         # sourcery no-metrics
         from ...funcs import get_embed_author_guild, get_embed_author_member
 

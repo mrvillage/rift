@@ -11,7 +11,9 @@ from .link import get_link_user
 __all__ = ("search_nation",)
 
 
-async def search_nation(ctx: commands.Context, search: str) -> Nation:
+async def search_nation(
+    ctx: commands.Context, search: str, advanced: bool = True
+) -> Nation:
     try:
         search = await convert_link(search)
     except LinkError:
@@ -40,6 +42,8 @@ async def search_nation(ctx: commands.Context, search: str) -> Nation:
     # leader name search, case insensitive
     if len(l := [i for i in nations if i.leader.lower() == search.lower()]) == 1:
         return l[0]
+    if not advanced:
+        raise NationNotFoundError(search)
     # full name search, case insensitive, no "the"
     if (
         len(

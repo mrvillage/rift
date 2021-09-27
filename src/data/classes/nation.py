@@ -11,11 +11,9 @@ from bs4 import BeautifulSoup
 from discord.ext import commands
 
 from ...cache import cache
-from ...data.get import get_link_nation
 from ...errors import NationNotFoundError
 from ...find import search_nation
 from ...funcs import utils
-from ..query import query_nation, query_nation_cities
 from .base import Makeable
 
 __all__ = ("Nation",)
@@ -89,8 +87,10 @@ class Nation(Makeable):
         self.nukes: int = data["nukes"]
 
     @classmethod
-    async def convert(cls, ctx, search):
-        return await search_nation(ctx, search)
+    async def convert(
+        cls, ctx: commands.Context, search: str, advanced: bool = True
+    ) -> Nation:
+        return await search_nation(ctx, search, advanced)
 
     @classmethod
     async def fetch(cls, nation_id: int) -> Nation:
