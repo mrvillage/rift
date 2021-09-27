@@ -167,7 +167,7 @@ class FullCity(Makeable):
                 - ((self.disease * 100 * self.infrastructure) / 10)
             )
             - max((self.crime / 10) * (100 * self.infrastructure) - 25, 0)
-        ) * (1 + math.log(self.age) / 15)
+        ) * (1 + (math.log(self.age) if self.age else 0) / 15)
 
     @cached_property
     def disease(self) -> float:
