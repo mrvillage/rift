@@ -96,10 +96,12 @@ class Menus(commands.Cog):
             description
             or "This is a menu! Someone was lazy and didn't put a description. :)"
         )
+        # will have to update for buttons and selects
+        # when selects are added and work properly
         main_message = await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                "Waiting for followup messages to assemble a menu...",
+                "Waiting for followup messages to assemble a menu...\n\nEach message should look something like this: `button <flags>` where flags is something like `label: This is a label style: gray action: CREATE_TICKET options: 1234`. The following are valid flags:\naction: The action to perform when the button is clicked, can be nothing or any of CREATE_TICKET, CREATE_TICKETS, ADD_ROLE, ADD_ROLES, CREATE_EMBASSY, or CREATE_EMBASSIES.\nurl: The url to navigate to when the button is clicked, if specified the only other valid options are row, label, and emoji.\ndisabled: Whether the button should be disabled or not, accepts a boolean like yes or no.\nstyle: The style of the button, can be any of primary, secondary, success, danger, link, blurple, grey, gray, green, red, or url.\nlabel: The label for the button, must be present if emoji is not.\nemoji: The emoji to put on the button, must be present if label is not.\noptions: A space separated list of options for the action, can be embassy or ticket configs or roles.\nrow: The row to put the button on, can be and number from 1 through 5.\nid: The ID of the menu item, can be used instead of the above options to use a specific item that's already created.",
                 color=discord.Color.blue(),
             ),
             return_message=True,
