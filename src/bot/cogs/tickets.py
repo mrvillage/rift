@@ -155,9 +155,8 @@ class Tickets(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 "\n".join(
-                    f"{config.id} - {ctx.guild.get_channel(config.category_id)}"
+                    f"{config.id} - {ctx.guild.get_channel(config.category_id or 0)}"
                     for config in configs
-                    if config.category_id
                 ),
                 color=discord.Color.green(),
             )
