@@ -8,7 +8,7 @@ import discord
 from discord.ext import commands, tasks
 
 from ...cache import cache
-from ...data.classes import Alliance, City, Color, Nation, TradePrices
+from ...data.classes import Alliance, City, Color, Nation, TradePrices, War
 from ...data.db import execute_read_query
 from ...ref import Rift
 
@@ -21,6 +21,7 @@ if TYPE_CHECKING:
         BulkNationListData,
         BulkNationUpdateData,
         BulkTreatyListData,
+        BulkWarListData,
         ColorUpdateData,
         TradePriceData,
     )
@@ -159,7 +160,7 @@ class Cache(commands.Cog):
             fetched_data = await execute_read_query(
                 "SELECT * FROM prices ORDER BY datetime DESC LIMIT 1;"
             )
-            cache.hook_price("update", fetched_data[0])  # type: ignore
+            cache.hook_price("update", {key: json.loads(value) if isinstance(value, str) and key != "datetime" else value for key, value in dict(fetched_data[0]).items()})  # type: ignore
 
     @commands.Cog.listener()
     async def on_bulk_treaty_create(self, data: BulkTreatyListData):
