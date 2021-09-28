@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from discord import Embed, utils
+from discord import Color, Embed, utils
 from discord.ext import commands
 
 from .env import COLOR, FOOTER
@@ -51,7 +51,9 @@ class EmbedHelpCommand(commands.HelpCommand):
         return self.context
 
     async def send_bot_help(self, mapping):
-        embed = get_embed_author_member(self.context.author, title="Bot Commands")
+        embed = get_embed_author_member(
+            self.context.author, title="Bot Commands", color=Color.blue()
+        )
         description = self.context.bot.description
         if description:
             embed.description = description
@@ -70,7 +72,9 @@ class EmbedHelpCommand(commands.HelpCommand):
 
     async def send_cog_help(self, cog):
         embed = get_embed_author_member(
-            self.context.author, title="{0.qualified_name} Commands".format(cog)
+            self.context.author,
+            title="{0.qualified_name} Commands".format(cog),
+            color=Color.blue(),
         )
         if cog.description:
             embed.description = cog.description
@@ -86,7 +90,9 @@ class EmbedHelpCommand(commands.HelpCommand):
         await self.context.reply(embed=embed)
 
     async def send_group_help(self, group):
-        embed = get_embed_author_member(self.context.author, title=group.qualified_name)
+        embed = get_embed_author_member(
+            self.context.author, title=group.qualified_name, color=Color.blue()
+        )
         if group.help:
             embed.description = group.help
 
