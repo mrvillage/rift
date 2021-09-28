@@ -197,7 +197,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                "\n".join(i.name for i in self.bot.guilds),
+                "\n".join(f"{i.name} - {i.member_count}" for i in self.bot.guilds),
                 title=f"{len(self.bot.guilds):,} guilds",
             )
         )
