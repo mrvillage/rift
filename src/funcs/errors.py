@@ -206,6 +206,7 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                 )
         elif isinstance(error, discord.NotFound):
             if error.code != 10062:
+                await print_handler(ctx, error)
                 await ctx.reply(
                     embed=get_embed_author_member(
                         ctx.author,
@@ -224,6 +225,7 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                     )
                 )
             else:
+                await print_handler(ctx, error)
                 await ctx.reply(
                     embed=get_embed_author_member(
                         ctx.author,
