@@ -237,8 +237,8 @@ class Cache:
         for i in tickets:
             i = Ticket(i)
             self._tickets[i.id] = i
-        for i in treasures[0]["treasures"]:
-            i = Treasure(json.loads(i) if isinstance(i, str) else i)
+        for i in (json.loads(treasures[0]["treasures"]) if isinstance(treasures[0]["treasures"], str) else treasures[0]["treasures"]):
+            i = Treasure(i)
             self._treasures.append(i)
         for i in treaties:
             i = Treaty(
