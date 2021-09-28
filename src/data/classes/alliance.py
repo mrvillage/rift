@@ -94,7 +94,9 @@ class Alliance(Makeable):
         return [
             i
             for i in cache.nations
-            if i.alliance_id == self.id and i.alliance_position != "APPLICANT"
+            if i.alliance_id == self.id
+            and i.alliance_position != "Applicant"
+            and not i.v_mode
         ]
 
     @property
@@ -104,7 +106,7 @@ class Alliance(Makeable):
             for i in cache.nations
             if i.alliance_id == self.id
             and i.v_mode
-            and i.alliance_position != "APPLICANT"
+            and i.alliance_position != "Applicant"
         ]
 
     @property
