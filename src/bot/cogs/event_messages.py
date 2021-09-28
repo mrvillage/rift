@@ -112,7 +112,7 @@ class EventMessages(commands.Cog):
                 "ALLIANCE" in sub.sub_types or "ALLIANCE_POSITION" in sub.sub_types
             ) and before.alliance != after.alliance:
                 changes.append(
-                    f'- Alliance changed from [{repr(before.alliance)}](https://politicsandwar.com/alliance/id={(before.alliance and before.alliance.id) or 0} "https://politicsandwar.com/alliance/id={(before.alliance and before.alliance.id) or 0}") to [{repr(after.alliance)}](https://politicsandwar.com/alliance/id={after.id} "https://politicsandwar.com/alliance/id={after.id}").'
+                    f'- Alliance changed from [{repr(before.alliance)}](https://politicsandwar.com/alliance/id={(before.alliance and before.alliance.id) or 0} "https://politicsandwar.com/alliance/id={(before.alliance and before.alliance.id) or 0}") to [{repr(after.alliance)}](https://politicsandwar.com/alliance/id={(after.alliance and after.alliance.id) or 0} "https://politicsandwar.com/alliance/id={(after.alliance and after.alliance.id) or 0}").'
                 )
             if (
                 (
