@@ -214,6 +214,23 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                     ),
                     ephemeral=True,
                 )
+        elif isinstance(error, discord.HTTPException):
+            if error.code == 30007:
+                await ctx.reply(
+                    embed=get_embed_author_member(
+                        ctx.author,
+                        "Sorry, but I can't add any more subscriptions to this channel, the maximum number of webhooks (10) has been reached! Please try again in a different channel.",
+                    )
+                )
+            else:
+                await ctx.reply(
+                    embed=get_embed_author_member(
+                        ctx.author,
+                        "Unknown Fatal Error. Please try again. If this problem persists please contact <@!258298021266063360> for assistance.\nPlease remember the bot is still in Beta, there is a good chance new features may result in new bugs to older features. To report an issue please send a message to <@!258298021266063360> so it can be addressed as soon as possible.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
         elif isinstance(error, NationOrAllianceNotFoundError):
             if error.args[0] == str(ctx.author.id):
                 await ctx.reply(
