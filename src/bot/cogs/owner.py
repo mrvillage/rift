@@ -187,8 +187,18 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                 fields=[
                     {"name": "Guilds", "value": f"{len(self.bot.guilds):,}"},
                     {"name": "Users", "value": f"{len(self.bot.users):,}"},
-                    {"name": "Latency", "value": f"{self.bot.latency:.2f}ms"},
+                    {"name": "Latency", "value": f"{self.bot.latency::,}ms"},
                 ],
+            )
+        )
+
+    @commands.command(name="guilds")
+    async def guilds(self, ctx: commands.Context):
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                "\n".join(i.name for i in self.bot.guilds),
+                title=f"{len(self.bot.guilds):,} guilds",
             )
         )
 
