@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Mapping, Sequence, Union
 
 import discord
+from discord.embeds import EmptyEmbed
 
 from ..env import COLOR, FOOTER
 
@@ -69,7 +70,9 @@ def get_embed_author_guild(
             title=title,
         )
         .set_footer(text=footer)
-        .set_author(name=guild.name, icon_url=guild.icon and guild.icon.url)
+        .set_author(
+            name=guild.name, icon_url=(guild.icon and guild.icon.url) or EmptyEmbed
+        )
         .set_image(url=image_url),
         fields,
     )
