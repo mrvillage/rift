@@ -139,7 +139,9 @@ class Alliance(Makeable):
 
     @property
     def treaties(self) -> List[Treaty]:
-        return [i for i in cache.treaties if i.from_ == self.id or i.to_ == self.id]
+        return [
+            i for i in cache.treaties if i.from_.id == self.id or i.to_.id == self.id
+        ]
 
     @property
     def soldiers(self) -> int:
