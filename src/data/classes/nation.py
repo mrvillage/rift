@@ -14,6 +14,7 @@ from ...cache import cache
 from ...errors import NationNotFoundError
 from ...find import search_nation
 from ...funcs import utils
+from ...ref import bot
 from .base import Makeable
 
 __all__ = ("Nation",)
@@ -151,7 +152,10 @@ class Nation(Makeable):
 
     @property
     def user(self) -> Optional[discord.User]:
-        ...
+        link = cache.get_link(self.id)
+        if link is None:
+            return
+        return bot.get_user(link["user_id"])
 
     @property
     def partial_cities(self) -> List[City]:
@@ -260,6 +264,15 @@ class Nation(Makeable):
         ]
         return (
             get_embed_author_member(
+                self.user,
+                f'[Nation Page](https://politicsandwar.com/nation/id={self.id} "https://politicsandwar.com/nation/id={self.id}")',
+                timestamp=datetime.fromisoformat(self.founded),
+                footer="Nation created",
+                fields=fields,
+                color=discord.Color.blue(),
+            )
+            if self.user is not None
+            else get_embed_author_member(
                 ctx.author,
                 f'[Nation Page](https://politicsandwar.com/nation/id={self.id} "https://politicsandwar.com/nation/id={self.id}")',
                 timestamp=datetime.fromisoformat(self.founded),
@@ -270,15 +283,6 @@ class Nation(Makeable):
             if ctx.guild is None
             else get_embed_author_guild(
                 ctx.guild,
-                f'[Nation Page](https://politicsandwar.com/nation/id={self.id} "https://politicsandwar.com/nation/id={self.id}")',
-                timestamp=datetime.fromisoformat(self.founded),
-                footer="Nation created",
-                fields=fields,
-                color=discord.Color.blue(),
-            )
-            if self.user is None
-            else get_embed_author_member(
-                self.user,
                 f'[Nation Page](https://politicsandwar.com/nation/id={self.id} "https://politicsandwar.com/nation/id={self.id}")',
                 timestamp=datetime.fromisoformat(self.founded),
                 footer="Nation created",
