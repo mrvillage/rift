@@ -1,5 +1,4 @@
 import asyncio
-from typing import Union
 
 import discord
 from discord.ext import commands
@@ -7,6 +6,7 @@ from discord.ext import commands
 from ... import funcs
 from ...data.classes import Alliance, Nation
 from ...data.query import query_alliances
+from ...env import __version__
 from ...ref import Rift
 
 
@@ -175,6 +175,20 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"Debug mode has been {'enabled' if ctx.bot.enable_debug else 'disabled'}.",
+            )
+        )
+
+    @commands.command(name="stats")
+    async def stats(self, ctx: commands.Context):
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                __version__,
+                fields=[
+                    {"name": "Guilds", "value": f"{len(self.bot.guilds):,}"},
+                    {"name": "Users", "value": f"{len(self.bot.users):,}"},
+                    {"name": "Latency", "value": f"{self.bot.latency:.2f}ms"},
+                ],
             )
         )
 
