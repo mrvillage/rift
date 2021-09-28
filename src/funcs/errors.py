@@ -220,6 +220,7 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                     embed=get_embed_author_member(
                         ctx.author,
                         "Sorry, but I can't add any more subscriptions to this channel, the maximum number of webhooks (10) has been reached! Please try again in a different channel.",
+                        color=discord.Color.red(),
                     )
                 )
             else:
