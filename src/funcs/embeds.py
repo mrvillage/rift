@@ -61,8 +61,6 @@ def get_embed_author_guild(
     fields: Sequence[Mapping[str, str]] = [],
     image_url: Union[str, discord.embeds._EmptyEmbed] = discord.Embed.Empty,
 ) -> discord.Embed:
-    if TYPE_CHECKING:
-        assert isinstance(guild.icon, discord.Asset)
     return add_fields(
         discord.Embed(
             color=color,
@@ -71,7 +69,7 @@ def get_embed_author_guild(
             title=title,
         )
         .set_footer(text=footer)
-        .set_author(name=guild.name, icon_url=str(guild.icon.url))
+        .set_author(name=guild.name, icon_url=guild.icon and guild.icon.url)
         .set_image(url=image_url),
         fields,
     )
