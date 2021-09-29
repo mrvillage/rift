@@ -34,7 +34,7 @@ class ResourcePrice:
 
     def __init__(self, data: ResourcePriceData):
         self.name: str = data["resource"]
-        self.average_price: int = int(data["avgprice"])
+        self.average_price: int = int(data["avgprice"] or 0)
         self.avg_price: int = self.average_price
         self.market_index: int = int(data["marketindex"].replace(",", ""))
         self.highest_buy: TradeOffer = TradeOffer(data["highestbuy"])
@@ -43,7 +43,7 @@ class ResourcePrice:
 
     def _update(self, data: ResourcePriceData):
         self.name: str = data["resource"]
-        self.average_price: int = int(data["avgprice"])
+        self.average_price: int = int(data["avgprice"] or 0)
         self.avg_price: int = self.average_price
         self.market_index: int = int(data["marketindex"].replace(",", ""))
         self.highest_buy: TradeOffer = TradeOffer(data["highestbuy"])
