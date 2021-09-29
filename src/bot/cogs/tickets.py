@@ -58,7 +58,8 @@ class Tickets(commands.Cog):
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author, "This ticket is already archived!"
-                )
+                ),
+                ephemeral=True,
             )
         config = await TicketConfig.fetch(ticket.config_id)
         ticket.open = False
