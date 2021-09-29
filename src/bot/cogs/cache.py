@@ -139,10 +139,13 @@ class Cache(commands.Cog):
 
     @commands.Cog.listener()
     async def on_bulk_nation_delete(self, data: BulkNationListData):
+        deleted = {
+            i.id: i for i in (cache.get_nation(j["id"]) for j in data) if i is not None
+        }
         for i in data:
             cache.hook_nation("delete", i)
         for i in data:
-            self.bot.dispatch("nation_delete", nation=cache.get_nation(i["id"]))
+            self.bot.dispatch("nation_delete", nation=deleted[i["id"]])
 
     @commands.Cog.listener()
     async def on_prices_update(self, before: TradePriceData, after: TradePriceData):
