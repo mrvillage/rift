@@ -161,7 +161,7 @@ class PnWInfo(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                str(alliance.treaties),
+                "\n".join(str(i) for i in alliance.treaties),
                 color=discord.Color.blue(),
             )
         )
