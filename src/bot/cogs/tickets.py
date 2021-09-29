@@ -54,6 +54,12 @@ class Tickets(commands.Cog):
                     ctx.author, "This channel is not a ticket."
                 )
             )
+        if not ticket.open:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "This ticket is already archived!"
+                )
+            )
         config = await TicketConfig.fetch(ticket.config_id)
         ticket.open = False
         await ticket.set_(open=False)
