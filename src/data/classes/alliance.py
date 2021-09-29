@@ -140,7 +140,9 @@ class Alliance(Makeable):
     @property
     def treaties(self) -> List[Treaty]:
         return [
-            i for i in cache.treaties if i.from_.id == self.id or i.to_.id == self.id
+            i
+            for i in cache.treaties
+            if (i.from_ and i.from_.id) == self.id or (i.to_ and i.to_.id) == self.id
         ]
 
     @property
