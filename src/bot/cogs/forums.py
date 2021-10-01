@@ -50,6 +50,38 @@ class Forums(commands.Cog):
     async def before_check_alliance_affairs(self):
         await self.bot.wait_until_ready()
 
+    @tasks.loop(minutes=1)
+    async def check_orbis_central(self):
+        async with aiohttp.request(
+            "GET",
+            "https://forum.politicsandwar.com/index.php?/forum/40-orbis-central.xml",
+        ) as r:
+            m = (
+                await execute_read_query(
+                    "SELECT MAX(id) FROM forum_posts WHERE forum_id = 40;"
+                )
+            )[0]["max"]
+            feed = feedparser.parse(await r.text())
+            for entry in feed.entries:
+                try:
+                    g = int(entry.guid)  # type: ignore
+                except (ValueError, AttributeError):
+                    continue
+                if g > m:
+                    if TYPE_CHECKING:
+                        assert isinstance(entry.guid, int) and isinstance(
+                            entry.link, str
+                        )
+                    post = ForumPost(
+                        {"id": int(entry.guid), "link": entry.link, "forum_id": 40}
+                    )
+                    await post.save()
+                    self.bot.dispatch("forum_post_create", post, entry.title)
+
+    @check_orbis_central.before_loop
+    async def before_check_orbis_central(self):
+        await self.bot.wait_until_ready()
+
 
 def setup(bot: Rift):
     bot.add_cog(Forums(bot))
