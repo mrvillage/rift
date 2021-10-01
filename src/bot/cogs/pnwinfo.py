@@ -123,7 +123,7 @@ class PnWInfo(commands.Cog):
             + "\n"
         )
         fields = []
-        if len(full) >= 6000:
+        if len(full) >= 5120:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
