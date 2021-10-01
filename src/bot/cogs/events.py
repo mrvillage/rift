@@ -269,7 +269,9 @@ class Events(commands.Cog):
         name="create",
         brief="Subscribe to FORUM_POST_CREATE events in this channel.",
         type=commands.CommandType.chat_input,
-        descriptions={"forums": "Space separated list of any of: ALLIANCE_AFFAIRS."},
+        descriptions={
+            "forums": "Space separated list of any of: ALLIANCE_AFFAIRS, ORBIS_CENTRAL."
+        },
     )
     @has_manage_permissions()
     @commands.guild_only()
