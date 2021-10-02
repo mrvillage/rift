@@ -187,7 +187,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                 fields=[
                     {"name": "Guilds", "value": f"{len(self.bot.guilds):,}"},
                     {"name": "Users", "value": f"{len(self.bot.users):,}"},
-                    {"name": "Latency", "value": f"{self.bot.latency::,}ms"},
+                    {"name": "Latency", "value": f"{self.bot.latency:,}ms"},
                 ],
             )
         )
