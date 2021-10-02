@@ -403,7 +403,7 @@ class Settings(commands.Cog):
                 return await ctx.reply(
                     embed=funcs.get_embed_author_member(
                         ctx.author,
-                        description=f"The join roles are:\n\n{''.join(f'<#{i}>' for i in settings.welcome_settings.join_roles)}",
+                        description=f"The join roles are:\n\n{''.join(f'<@&{i}>' for i in settings.welcome_settings.join_roles)}",
                         color=discord.Color.green(),
                     ),
                     ephemeral=True,
