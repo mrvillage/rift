@@ -358,14 +358,13 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        if clear:
-            channels = None
-        await settings.welcome_settings.set_(welcome_channels=channels)
-        if channels:
+        channels_set = None if clear else [i.id for i in channels]  # type: ignore
+        await settings.welcome_settings.set_(welcome_channels=channels_set)
+        if channels_set:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    description=f"The welcome channels are now:\n\n{''.join(f'<#{i}>' for i in channels)}",
+                    description=f"The welcome channels are now:\n\n{''.join(f'<#{i}>' for i in channels_set)}",
                     color=discord.Color.green(),
                 ),
                 ephemeral=True,
@@ -394,7 +393,6 @@ class Settings(commands.Cog):
     async def server_settings_join_roles(
         self, ctx: commands.Context, *, roles: List[discord.Role] = None, clear: bool = False  # type: ignore
     ):
-        roles: Optional[str]
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
@@ -419,14 +417,13 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        if clear:
-            roles = None
-        await settings.welcome_settings.set_(join_roles=roles)
-        if roles:
+        roles_set = None if clear else [i.id for i in roles]  # type: ignore
+        await settings.welcome_settings.set_(join_roles=roles_set)
+        if roles_set:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    description=f"The join roles are now:\n\n{''.join(f'<@&{i}>' for i in roles)}",
+                    description=f"The join roles are now:\n\n{''.join(f'<@&{i}>' for i in roles_set)}",
                     color=discord.Color.green(),
                 ),
                 ephemeral=True,
