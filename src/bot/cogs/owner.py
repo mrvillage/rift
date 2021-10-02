@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 
 from ... import funcs
+from ...cache import cache
 from ...data.classes import Alliance, Nation
 from ...data.query import query_alliances
 from ...env import __version__
@@ -188,6 +189,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                     {"name": "Guilds", "value": f"{len(self.bot.guilds):,}"},
                     {"name": "Users", "value": f"{len(self.bot.users):,}"},
                     {"name": "Latency", "value": f"{self.bot.latency:,}ms"},
+                    {"name": "Links", "value": f"{len(cache.links):,}"},
                 ],
             )
         )
