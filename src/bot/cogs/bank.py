@@ -63,7 +63,8 @@ class Bank(commands.Cog):
                     ctx.author,
                     "You're not linked so I couldn't verify your bank permissions!",
                     color=discord.Color.red(),
-                )
+                ),
+                ephemeral=True,
             )
             return
         try:
@@ -75,7 +76,8 @@ class Bank(commands.Cog):
                         ctx.author,
                         "You don't have permission to send money from your alliance bank!",
                         color=discord.Color.red(),
-                    )
+                    ),
+                    ephemeral=True,
                 )
                 return
         except IndexError:
@@ -84,7 +86,8 @@ class Bank(commands.Cog):
                     ctx.author,
                     "Your alliance hasn't configured this command!",
                     color=discord.Color.red(),
-                )
+                ),
+                ephemeral=True,
             )
             return
         except AttributeError:
@@ -93,7 +96,8 @@ class Bank(commands.Cog):
                     ctx.author,
                     "You're not in an alliance so you can't send money!",
                     color=discord.Color.red(),
-                )
+                ),
+                ephemeral=True,
             )
             return
         if len(resources) == 0:
@@ -102,7 +106,8 @@ class Bank(commands.Cog):
                     ctx.author,
                     "You didn't give any valid resources!",
                     color=discord.Color.red(),
-                )
+                ),
+                ephemeral=True,
             )
             return
         if ctx.guild is None:
@@ -111,7 +116,8 @@ class Bank(commands.Cog):
                     ctx.author,
                     "This command isn't publicly available yet! If you want it bug Village for it!",
                     color=discord.Color.red(),
-                )
+                ),
+                ephemeral=True,
             )
         if ctx.guild.id not in {239076753065115648, 654109011473596417}:
             return await ctx.reply(
@@ -119,7 +125,8 @@ class Bank(commands.Cog):
                     ctx.author,
                     "This command isn't publicly available yet! If you want it bug Village for it!",
                     color=discord.Color.red(),
-                )
+                ),
+                ephemeral=True,
             )
         embed = (
             funcs.get_embed_author_guild(
@@ -249,7 +256,8 @@ class Bank(commands.Cog):
                     ctx.author,
                     "You're not linked so I couldn't verify your bank permissions!",
                     color=discord.Color.red(),
-                )
+                ),
+                ephemeral=True,
             )
         try:
             if not await perms.check_bank_perms(
@@ -260,7 +268,8 @@ class Bank(commands.Cog):
                         ctx.author,
                         "You don't have permission to view your alliance bank!",
                         color=discord.Color.red(),
-                    )
+                    ),
+                    ephemeral=True,
                 )
         except IndexError:
             return await ctx.reply(
@@ -268,7 +277,8 @@ class Bank(commands.Cog):
                     ctx.author,
                     "Your alliance hasn't configured this command!",
                     color=discord.Color.red(),
-                )
+                ),
+                ephemeral=True,
             )
         except AttributeError:
             return await ctx.reply(
@@ -276,7 +286,8 @@ class Bank(commands.Cog):
                     ctx.author,
                     "You're not in an alliance so you can't view a bank balance!",
                     color=discord.Color.red(),
-                )
+                ),
+                ephemeral=True,
             )
         if ctx.guild is None:
             return await ctx.reply(
@@ -284,7 +295,8 @@ class Bank(commands.Cog):
                     ctx.author,
                     "This command isn't publicly available yet! If you want it bug Village for it!",
                     color=discord.Color.red(),
-                )
+                ),
+                ephemeral=True,
             )
         if ctx.guild.id not in {239076753065115648, 654109011473596417}:
             return await ctx.reply(
@@ -292,7 +304,8 @@ class Bank(commands.Cog):
                     ctx.author,
                     "This command isn't publicly available yet! If you want it bug Village for it!",
                     color=discord.Color.red(),
-                )
+                ),
+                ephemeral=True,
             )
         message = await ctx.reply(
             embed=funcs.get_embed_author_member(
