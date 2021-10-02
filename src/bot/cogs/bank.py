@@ -278,6 +278,22 @@ class Bank(commands.Cog):
                     color=discord.Color.red(),
                 )
             )
+        if ctx.guild is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "This command isn't publicly available yet! If you want it bug Village for it!",
+                    color=discord.Color.red(),
+                )
+            )
+        if ctx.guild.id not in {239076753065115648, 654109011473596417}:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "This command isn't publicly available yet! If you want it bug Village for it!",
+                    color=discord.Color.red(),
+                )
+            )
         message = await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
