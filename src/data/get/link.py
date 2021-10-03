@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List
 
-from typings import Link
+from _typings import LinkData
 
 from ...cache import cache
 from ..query import link
@@ -17,7 +17,7 @@ __all__ = (
 )
 
 
-async def get_links() -> List[Link]:
+async def get_links() -> List[LinkData]:
     return cache._links
 
 
@@ -44,14 +44,14 @@ async def remove_link_nation(nation_id: int, /) -> None:
     await link.remove_link_nation(nation_id)
 
 
-async def get_link_user(user_id: int, /) -> Link:
+async def get_link_user(user_id: int, /) -> LinkData:
     try:
         return next(i for i in cache._links if i["user_id"] == user_id)
     except StopIteration:
         raise IndexError
 
 
-async def get_link_nation(nation_id: int, /) -> Link:
+async def get_link_nation(nation_id: int, /) -> LinkData:
     try:
         return next(i for i in cache._links if i["nation_id"] == nation_id)
     except StopIteration:
