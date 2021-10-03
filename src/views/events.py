@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Type, Union
+from typing import TYPE_CHECKING, Union
 
 import discord
 
@@ -28,7 +28,7 @@ class EventExtraInformationButton(discord.ui.Button):
     async def callback(self, interaction: discord.Interaction) -> None:
         if TYPE_CHECKING:
             assert interaction.message is not None
-        desc = interaction.message.embeds[0].description
+        desc: str = interaction.message.embeds[0].description  # type: ignore
         short = desc[desc.find("politicsandwar.com/") + 19 :]
         type = short[: short.find("/")]
         id = short[short.find("id=") + 3 : short.find(" ")]
@@ -54,4 +54,4 @@ class EventExtraInformationButton(discord.ui.Button):
 class EventExtraInformationView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
-        self.add_item(EventExtraInformationButton())
+        self.add_item(EventExtraInformationButton())  # type: ignore

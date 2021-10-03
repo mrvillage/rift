@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import asyncio
 import time
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 import discord
 
@@ -13,32 +12,38 @@ from ..ref import ID
 
 __all__ = ("TreasuresView",)
 
+if TYPE_CHECKING:
+    from _typings import Field
+
 
 class TreasuresView(discord.ui.View):
     def __init__(self, page: int = 1) -> None:
         super().__init__(timeout=None)
         if page == 1:
-            self.one.disabled = True
+            self.one.disabled = True  # type: ignore
         else:
-            self.two.disabled = True
+            self.two.disabled = True  # type: ignore
 
     async def callback(
-        self, button: discord.ui.Button, interaction: discord.Interaction, page: int
+        self,
+        button: discord.ui.Button[discord.ui.View],
+        interaction: discord.Interaction,
+        page: int,
     ):
         if TYPE_CHECKING:
             assert isinstance(interaction.message, discord.Message)
             assert isinstance(interaction.user, (discord.Member, discord.User))
         if interaction.message.author.id != ID:
             return
-        desc = interaction.message.embeds[0].description[7:]  # type: ignore
+        desc: str = interaction.message.embeds[0].description[7:]  # type: ignore
         page = page or int(desc[: desc.index("**")])
         if page == 1:
-            self.one.disabled = True
-            self.two.disabled = False
+            self.one.disabled = True  # type: ignore
+            self.two.disabled = False  # type: ignore
         else:
-            self.two.disabled = True
-            self.one.disabled = False
-        fields = [
+            self.two.disabled = True  # type: ignore
+            self.one.disabled = False  # type: ignore
+        fields: List[Field] = [
             {
                 "name": i.name,
                 "value": f"Color: {i.color.capitalize()}\nBonus: %{i.bonus}\nSpawn Date: <t:{int(time.mktime(datetime.fromisoformat(i.spawn_date).timetuple()))}:D>",
@@ -58,7 +63,11 @@ class TreasuresView(discord.ui.View):
         label="Page 1",
         style=discord.ButtonStyle.gray,
     )
-    async def one(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def one(
+        self,
+        button: discord.ui.Button[discord.ui.View],
+        interaction: discord.Interaction,
+    ):
         await self.callback(button, interaction, 1)
 
     @discord.ui.button(
@@ -67,7 +76,9 @@ class TreasuresView(discord.ui.View):
         style=discord.ButtonStyle.gray,
     )
     async def refresh(
-        self, button: discord.ui.Button, interaction: discord.Interaction
+        self,
+        button: discord.ui.Button[discord.ui.View],
+        interaction: discord.Interaction,
     ):
         await self.callback(button, interaction, 0)
 
@@ -76,5 +87,9 @@ class TreasuresView(discord.ui.View):
         label="Page 2",
         style=discord.ButtonStyle.gray,
     )
-    async def two(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def two(
+        self,
+        button: discord.ui.Button[discord.ui.View],
+        interaction: discord.Interaction,
+    ):
         await self.callback(button, interaction, 2)

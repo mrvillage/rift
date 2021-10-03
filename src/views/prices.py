@@ -4,32 +4,38 @@ import inspect
 from typing import TYPE_CHECKING
 
 import discord
-from discord import ButtonStyle, Interaction, Member, Message, User, ui
 
-from ..funcs import get_embed_author_member, get_trade_prices
+from ..cache import cache
+from ..funcs import get_embed_author_member
 from ..ref import ID
 
 __all__ = ("Prices",)
 
 
-class Prices(ui.View):
+class Prices(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @ui.button(label="Refresh", style=ButtonStyle.gray, custom_id="PRICES_REFRESH_1")
-    async def refresh(self, button: ui.Button, interaction: Interaction):
+    @discord.ui.button(
+        label="Refresh", style=discord.ButtonStyle.gray, custom_id="PRICES_REFRESH_1"
+    )
+    async def refresh(
+        self,
+        button: discord.ui.Button[discord.ui.View],
+        interaction: discord.Interaction,
+    ):
         message = interaction.message
         if TYPE_CHECKING:
-            assert isinstance(message, Message)
-            assert isinstance(interaction.user, (Member, User))
-        if not isinstance(message.embeds[0].description, str):
+            assert isinstance(message, discord.Message)
+            assert isinstance(interaction.user, (discord.Member, discord.User))
+        if not isinstance(message.embeds[0].description, str):  # type: ignore
             return
         if (
-            not message.embeds[0].description.startswith("Market Index:")
+            not message.embeds[0].description.startswith("Market Index:")  # type: ignore
             or message.author.id != ID
         ):
             return
-        prices = await get_trade_prices()
+        prices = cache.prices
         await interaction.response.edit_message(
             view=self,
             embed=get_embed_author_member(
