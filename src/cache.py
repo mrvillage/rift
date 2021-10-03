@@ -542,7 +542,9 @@ class Cache:
             return next(
                 i
                 for i in self._treaties
-                if i.from_.id == from_ and i.to_.id == to_ and i.treaty_type == treaty_type
+                if i.from_.id == from_
+                and i.to_.id == to_
+                and i.treaty_type == treaty_type
             )
         except StopIteration:
             return
@@ -550,6 +552,32 @@ class Cache:
     def get_user_settings(self, id: int, /) -> Optional[UserSettings]:
         return self._user_settings.get(id)
 
+    def add_embassy(self, embassy: Embassy, /) -> None:
+        self._embassies[embassy.id] = embassy
+
+    def add_embassy_config(self, config: EmbassyConfig, /) -> None:
+        self._embassy_configs[config.id] = config
+
+    def add_subscription(self, subscription: Subscription, /) -> None:
+        self._subscriptions[subscription.id] = subscription
+
+    def add_ticket(self, ticket: Ticket, /) -> None:
+        self._tickets[ticket.id] = ticket
+
+    def add_ticket_config(self, config: TicketConfig, /) -> None:
+        self._ticket_configs[config.id] = config
+
+    def add_target(self, target: Target, /) -> None:
+        self._targets[target.id] = target
+
+    def remove_embassy(self, embassy: Embassy, /) -> None:
+        self._embassies.pop(embassy.id)
+
+    def remove_subscription(self, subscription: Subscription, /) -> None:
+        self._subscriptions.pop(subscription.id)
+
+    def remove_target(self, target: Target, /) -> None:
+        self._targets.pop(target.id)
 
 
 cache = Cache()
