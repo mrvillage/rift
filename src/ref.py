@@ -1,12 +1,12 @@
-import datetime
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Optional
 
 import aiohttp
+import discord
 from bs4 import BeautifulSoup
-from discord import AllowedMentions, Game, Intents
 from discord.ext import commands
-from discord.ext.commands import Bot, when_mentioned_or
 
-from .data.db import execute_read_query
 from .env import (
     APPLICATION_ID,
     DEBUG_APPLICATION_ID,
@@ -14,33 +14,26 @@ from .env import (
     PNW_PASSWORD,
     __version__,
 )
-from .errors import LoginError
 from .help import EmbedHelpCommand
 
 
-class Rift(Bot):
+class Rift(commands.Bot):
     bytes_avatar: bytes
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.alliances_update = datetime.datetime.utcnow()
-        self.nations_update = datetime.datetime.utcnow()
-        self.cities_update = datetime.datetime.utcnow()
-        self.prices_update = datetime.datetime.utcnow()
+    def __init__(self, *args: Any, **kwargs: Any):
+        super().__init__(*args, **kwargs)  # type: ignore
         print("Starting up!")
         self.pnw_session = aiohttp.ClientSession(
             timeout=aiohttp.ClientTimeout(total=30.0)
         )
-        self.staff = None
-        self.auth_token = None
-        self.cogs_loaded = False
-        self.persistent_views_loaded = False
-        self.subscribable_events = {
-            "war_declaration",
-        }
-        self.enable_debug = False
+        self.auth_token: Optional[str] = None
+        self.cogs_loaded: bool = False
+        self.persistent_views_loaded: bool = False
+        self.enable_debug: bool = False
 
     async def update_pnw_session(self):
+        from .errors import LoginError
+
         login_data = {
             "email": PNW_EMAIL,
             "password": PNW_PASSWORD,
@@ -56,25 +49,25 @@ class Rift(Bot):
             pass
 
     async def get_staff(self):
-        self.staff = [i[0] for i in await execute_read_query("SELECT * FROM staff;")]
-        return self.staff
+        ...
 
     async def close(self):
         await self.pnw_session.close()
         await super().close()
 
-    async def parse_token(self, content):
+    async def parse_token(self, content: str):
         data = BeautifulSoup(content, "html.parser")
         self.auth_token = data.find("input", {"name": "token"}).attrs["value"]  # type: ignore
 
     async def get_global_application_commands(self):
-        self.application_id: int
+        if TYPE_CHECKING:
+            assert isinstance(self.application_id, int)
         self.global_application_commands = await bot.http.get_global_commands(
             self.application_id
         )
 
 
-intents = Intents(
+intents = discord.Intents(
     dm_messages=True,
     guild_messages=True,
     guilds=True,
@@ -84,11 +77,11 @@ debug = False
 
 ID = DEBUG_APPLICATION_ID if debug else APPLICATION_ID
 bot = Rift(
-    command_prefix=when_mentioned_or("?"),
+    command_prefix=commands.when_mentioned_or("?"),
     intents=intents,
     case_insensitive=True,
-    allowed_mentions=AllowedMentions(replied_user=False),
-    activity=Game(name=__version__),
+    allowed_mentions=discord.AllowedMentions(replied_user=False),
+    activity=discord.Game(name=__version__),
     strip_after_prefix=True,
     help_command=EmbedHelpCommand(
         command_attrs={
@@ -101,3 +94,7 @@ bot = Rift(
     debug=debug,
     chunk_guilds_at_startup=True,
 )
+
+
+class RiftContext(commands.Context[Rift]):
+    command: Optional[commands.Command[commands.Cog, Any, Any]]
