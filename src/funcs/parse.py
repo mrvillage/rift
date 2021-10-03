@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 from .utils import convert_number
 
+__all__ = ("parse_alliance_bank",)
 
 async def parse_alliance_bank(content: str) -> Dict[str, Union[float, int]]:
     soup = BeautifulSoup(content, "html.parser")

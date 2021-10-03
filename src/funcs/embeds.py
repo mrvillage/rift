@@ -9,6 +9,8 @@ from _typings import Field, MaybeEmptyEmbed
 
 from ..env import COLOR, FOOTER
 
+__all__ = ("get_embed_author_member", "get_embed_author_guild")
+
 
 def add_fields(embed: discord.Embed, fields: List[Field]) -> discord.Embed:
     for field in fields:
