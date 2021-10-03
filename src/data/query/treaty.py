@@ -5,8 +5,10 @@ from typing import TYPE_CHECKING, List
 from ..db import execute_read_query
 
 __all__ = ("query_treaties",)
+
 if TYPE_CHECKING:
     from _typings import TreatyData
+
 
 async def query_treaties(alliance_id: int) -> List[TreatyData]:
     return await execute_read_query(

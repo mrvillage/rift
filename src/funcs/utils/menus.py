@@ -4,8 +4,7 @@ from typing import TYPE_CHECKING, Any, Mapping, Optional, Sequence
 
 import discord
 
-__all__ = ("get_row",
-)
+__all__ = ("get_row",)
 if TYPE_CHECKING:
     from ...data.classes import MenuItem
 

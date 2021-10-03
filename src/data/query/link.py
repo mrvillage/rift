@@ -12,6 +12,7 @@ __all__ = (
     "query_link_user",
     "query_link_nation",
 )
+
 if TYPE_CHECKING:
     from _typings import LinkData
 

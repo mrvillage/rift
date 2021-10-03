@@ -1,10 +1,11 @@
 from __future__ import annotations
-from ..errors import InvalidSpyResponseError, SpiesNotFoundError
 
-import aiohttp
 from typing import Union
 
+import aiohttp
+
 from ..data.classes import Nation
+from ..errors import InvalidSpyResponseError, SpiesNotFoundError
 
 __all__ = ("calculate_spies",)
 

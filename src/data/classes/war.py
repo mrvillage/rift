@@ -2,16 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
 
-from discord.ext import commands
-
 from ...cache import cache
 from ...errors import AttackNotFoundError, WarNotFoundError
+from ...ref import RiftContext
 from .. import query
 
 __all__ = ("War", "Attack")
 
 if TYPE_CHECKING:
-    from typings import AttackData, WarData
+    from _typings import AttackData, WarData
 
     from .nation import Nation
 
@@ -123,7 +122,7 @@ class War:
         ]
 
     @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str) -> War:
+    async def convert(cls, ctx: RiftContext, argument: str) -> War:
         try:
             return await cls.fetch(int(argument))
         except ValueError:
@@ -252,7 +251,7 @@ class Attack:
         self.aircraft_killed_by_tanks: int = data["aircraft_killed_by_tanks"]
 
     @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str) -> Attack:
+    async def convert(cls, ctx: RiftContext, argument: str) -> Attack:
         try:
             return await cls.fetch(int(argument))
         except ValueError:

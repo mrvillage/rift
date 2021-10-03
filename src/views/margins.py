@@ -15,8 +15,14 @@ class Margins(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Refresh", style=discord.ButtonStyle.gray, custom_id="MARGINS_REFRESH_1")
-    async def refresh(self, button: discord.ui.Button[discord.ui.View], interaction: discord.Interaction):
+    @discord.ui.button(
+        label="Refresh", style=discord.ButtonStyle.gray, custom_id="MARGINS_REFRESH_1"
+    )
+    async def refresh(
+        self,
+        button: discord.ui.Button[discord.ui.View],
+        interaction: discord.Interaction,
+    ):
         message = interaction.message
         if TYPE_CHECKING:
             assert isinstance(message, discord.Message)

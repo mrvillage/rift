@@ -141,7 +141,9 @@ class Military(commands.Cog):
         type=(commands.CommandType.default, commands.CommandType.chat_input),
         descriptions={"nation": "The nation to check the militarization of."},
     )
-    async def militarization_nation(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
+    async def militarization_nation(
+        self, ctx: RiftContext, *, nation: Optional[Nation] = None
+    ):
         nation = nation or await Nation.convert(ctx, nation)
         author = nation.user or ctx.author
         militarization = nation.get_militarization()

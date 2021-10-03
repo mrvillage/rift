@@ -15,7 +15,7 @@ from discord.ext.commands.converter import CONVERTER_MAPPING
 
 
 async def _actual_conversion(
-    ctx: Context, converter: Any, argument: str, param: inspect.Parameter
+    ctx: Context, converter: Any, argument: str, param: inspect.Parameter  # type: ignore
 ) -> Any:
     from .funcs.utils import convert_bool, convert_number
 
@@ -47,8 +47,8 @@ async def _actual_conversion(
 
     try:
         if inspect.isclass(converter) and issubclass(converter, Converter):
-            if inspect.ismethod(converter.convert):
-                return await converter.convert(ctx, argument)
+            if inspect.ismethod(converter.convert):  # type: ignore
+                return await converter.convert(ctx, argument)  # type: ignore
             else:
                 return await converter().convert(ctx, argument)  # type: ignore
         elif isinstance(converter, Converter):
@@ -74,4 +74,4 @@ async def _actual_conversion(
 
 
 def override():
-    converter._actual_conversion = _actual_conversion
+    converter._actual_conversion = _actual_conversion  # type: ignore
