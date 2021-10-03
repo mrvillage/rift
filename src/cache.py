@@ -107,7 +107,7 @@ class Cache:
         self._guild_settings: Dict[int, GuildSettings] = {}
         self._guild_welcome_settings: Dict[int, GuildWelcomeSettings] = {}
         self._links: List[LinkData] = list()
-        self._menu_interfaces: List[Dict[str, int]] = list()
+        self._menu_interfaces: List[MenuInterfaceData] = list()
         self._menu_items: Dict[int, MenuItem] = {}
         self._menus: Dict[int, Menu] = {}
         self._nations: Dict[int, Nation] = {}
@@ -328,7 +328,7 @@ class Cache:
         return self._links
 
     @property
-    def menu_interfaces(self) -> List[Dict[str, int]]:
+    def menu_interfaces(self) -> List[MenuInterfaceData]:
         return self._menu_interfaces
 
     @property
@@ -482,7 +482,7 @@ class Cache:
 
     def get_menu_interface(
         self, menu_id: int, message_id: int, /
-    ) -> Optional[Dict[str, int]]:
+    ) -> Optional[MenuInterfaceData]:
         try:
             return next(
                 i
@@ -557,6 +557,9 @@ class Cache:
 
     def add_embassy_config(self, config: EmbassyConfig, /) -> None:
         self._embassy_configs[config.id] = config
+
+    def add_menu_interface(self, interface: MenuInterfaceData, /) -> None:
+        self._menu_interfaces.append(interface)
 
     def add_subscription(self, subscription: Subscription, /) -> None:
         self._subscriptions[subscription.id] = subscription
