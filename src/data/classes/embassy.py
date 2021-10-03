@@ -3,16 +3,16 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Tuple, Union
 
 import discord
-from discord.ext import commands
 
 from ...cache import cache
 from ...errors import EmbassyConfigNotFoundError, EmbassyNotFoundError
+from ...ref import RiftContext
 from ..db import execute_query, execute_read_query
 
 __all__ = ("Embassy", "EmbassyConfig")
 
 if TYPE_CHECKING:
-    from typings import EmbassyConfigData, EmbassyData
+    from _typings import EmbassyConfigData, EmbassyData
 
     from .alliance import Alliance
 
@@ -34,7 +34,7 @@ class Embassy:
         self.open: bool = data["open"]
 
     @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str) -> Embassy:
+    async def convert(cls, ctx: RiftContext, argument: str) -> Embassy:
         try:
             embassy = cache.get_embassy(int(argument))
             if embassy:
@@ -54,7 +54,7 @@ class Embassy:
         return self.id
 
     async def save(self) -> None:
-        cache._embassies[self.id] = self
+        cache.add_embassy(self)
         await execute_query(
             """INSERT INTO embassies (id, alliance_id, config_id, guild_id, open) VALUES ($1, $2, $3, $4, $5);""",
             self.id,
@@ -65,7 +65,7 @@ class Embassy:
         )
 
     async def delete(self) -> None:
-        del cache._embassies[self.id]
+        cache.remove_embassy(self)
         await execute_read_query("""DELETE FROM embassies WHERE id = $1;""", self.id)
 
     async def start(
@@ -73,7 +73,7 @@ class Embassy:
         user: discord.Member,
         config: EmbassyConfig,
         *,
-        response: discord.InteractionResponse = None,
+        response: Optional[discord.InteractionResponse] = None,
     ) -> None:
         from ...funcs import get_embed_author_member
 
@@ -110,7 +110,7 @@ class EmbassyConfig:
         self.start_message: str = data["start_message"]
 
     @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str) -> EmbassyConfig:
+    async def convert(cls, ctx: RiftContext, argument: str) -> EmbassyConfig:
         try:
             config = cache.get_embassy_config(int(argument))
             if config:
@@ -130,7 +130,7 @@ class EmbassyConfig:
         return self.id
 
     async def save(self) -> None:
-        cache._embassy_configs[self.id] = self
+        cache.add_embassy_config(self)
         await execute_read_query(
             """INSERT INTO embassy_configs (id, category_id, guild_id, start_message) VALUES ($1, $2, $3,$4);""",
             self.id,

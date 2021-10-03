@@ -8,7 +8,7 @@ from ...errors import ColorNotFoundError
 __all__ = ("Color",)
 
 if TYPE_CHECKING:
-    from typings import ColorData
+    from _typings import ColorData
 
 
 class Color:
@@ -26,7 +26,7 @@ class Color:
             return color
         raise ColorNotFoundError(name)
 
-    def _update(self, data: ColorData) -> None:
+    def update(self, data: ColorData) -> None:
         self.color = data["color"]
         self.name = data["bloc_name"]
         self.bonus = data["turn_bonus"]

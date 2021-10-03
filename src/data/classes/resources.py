@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from typing import Dict, Union
 
-from discord.ext.commands import Context
-
 from ...funcs.utils import check_resource, convert_number
+from ...ref import RiftContext
 
 __all__ = ("Resources",)
 
@@ -27,7 +26,7 @@ class Resources:
     def __init__(
         self,
         *,
-        credit=0.0,
+        credit: Union[float, int] = 0,
         money: Union[float, int] = 0,
         food: Union[float, int] = 0,
         coal: Union[float, int] = 0,
@@ -41,19 +40,19 @@ class Resources:
         steel: Union[float, int] = 0,
         aluminum: Union[float, int] = 0,
     ) -> None:
-        self.credit = credit
-        self.money = money
-        self.food = food
-        self.coal = coal
-        self.oil = oil
-        self.uranium = uranium
-        self.lead = lead
-        self.iron = iron
-        self.bauxite = bauxite
-        self.gasoline = gasoline
-        self.munitions = munitions
-        self.steel = steel
-        self.aluminum = aluminum
+        self.credit: Union[float, int] = credit
+        self.money: Union[float, int] = money
+        self.food: Union[float, int] = food
+        self.coal: Union[float, int] = coal
+        self.oil: Union[float, int] = oil
+        self.uranium: Union[float, int] = uranium
+        self.lead: Union[float, int] = lead
+        self.iron: Union[float, int] = iron
+        self.bauxite: Union[float, int] = bauxite
+        self.gasoline: Union[float, int] = gasoline
+        self.munitions: Union[float, int] = munitions
+        self.steel: Union[float, int] = steel
+        self.aluminum: Union[float, int] = aluminum
 
     def __str__(self) -> str:
         return ", ".join(
@@ -104,22 +103,22 @@ class Resources:
         resources_dict = {}
         if len(args) == 1:
             arg = args[0]
-            num = await convert_number(arg)
+            num = convert_number(arg)
             if arg.startswith("$"):
                 resources_dict["money"] = num
         for i, arg in enumerate(args[:-1]):
             try:
-                num = await convert_number(arg)
+                num = convert_number(arg)
                 if arg.startswith("$"):
                     resources_dict["money"] = num
                 elif arg.lower() in ("credit", "credits"):
                     resources_dict["credit"] = num
-                elif await check_resource(args[i + 1]):
+                elif check_resource(args[i + 1]):
                     resources_dict[args[i + 1].lower()] = num
             except ValueError:
                 pass
         if args[-1].startswith("$"):
-            resources_dict["money"] = await convert_number(args[-1])
+            resources_dict["money"] = convert_number(args[-1])
         return cls(**resources_dict)
 
     @classmethod
@@ -140,7 +139,7 @@ class Resources:
         )
 
     @classmethod
-    async def convert(cls, ctx: Context, argument: str) -> Resources:
+    async def convert(cls, ctx: RiftContext, argument: str) -> Resources:
         return await cls.convert_resources(argument)
 
     def __eq__(self, other: Resources) -> bool:

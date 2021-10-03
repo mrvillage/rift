@@ -2,11 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from discord.ext import commands
-from discord.ext.commands.core import command
-
 from ...cache import cache
 from ...errors import ForumNotFoundError
+from ...ref import RiftContext
 from ..db import execute_query
 
 __all__ = (
@@ -15,7 +13,7 @@ __all__ = (
 )
 
 if TYPE_CHECKING:
-    from typings import ForumData, ForumPostData
+    from _typings import ForumData, ForumPostData
 
 
 class Forum:
@@ -27,7 +25,7 @@ class Forum:
         self.name: str = data["name"]
 
     @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str) -> Forum:
+    async def convert(cls, ctx: RiftContext, argument: str) -> Forum:
         try:
             forum = cache.get_forum(int(argument))
             if forum:
@@ -37,7 +35,7 @@ class Forum:
         try:
             return next(
                 i
-                for i in cache._forums.values()
+                for i in cache.forums
                 if i.name.lower() == argument.lower().replace("_", " ").strip(" _")
             )
         except StopIteration:

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 __all__ = ("TradePrices",)
 
 if TYPE_CHECKING:
-    from typings import ResourcePriceData, TradeOfferData, TradePriceData
+    from _typings import ResourcePriceData, TradeOfferData, TradePriceData
 
 
 class TradeOffer:
@@ -41,7 +41,7 @@ class ResourcePrice:
         self.lowest_sell: TradeOffer = TradeOffer(data["lowestbuy"])
         self.trade_margin: int = self.lowest_sell.price - self.highest_buy.price
 
-    def _update(self, data: ResourcePriceData):
+    def update(self, data: ResourcePriceData):
         self.name: str = data["resource"]
         self.average_price: int = int(data["avgprice"] or 0)
         self.avg_price: int = self.average_price
@@ -84,17 +84,17 @@ class TradePrices:
         self.food: ResourcePrice = ResourcePrice(data["food"])
         self.market_index: int = self.credit.market_index
 
-    def _update(self, data: TradePriceData):
-        self.credit._update(data["credit"])
-        self.coal._update(data["coal"])
-        self.oil._update(data["oil"])
-        self.uranium._update(data["uranium"])
-        self.lead._update(data["lead"])
-        self.iron._update(data["iron"])
-        self.bauxite._update(data["bauxite"])
-        self.gasoline._update(data["gasoline"])
-        self.munitions._update(data["munitions"])
-        self.steel._update(data["steel"])
-        self.aluminum._update(data["aluminum"])
-        self.food._update(data["food"])
+    def update(self, data: TradePriceData):
+        self.credit.update(data["credit"])
+        self.coal.update(data["coal"])
+        self.oil.update(data["oil"])
+        self.uranium.update(data["uranium"])
+        self.lead.update(data["lead"])
+        self.iron.update(data["iron"])
+        self.bauxite.update(data["bauxite"])
+        self.gasoline.update(data["gasoline"])
+        self.munitions.update(data["munitions"])
+        self.steel.update(data["steel"])
+        self.aluminum.update(data["aluminum"])
+        self.food.update(data["food"])
         self.market_index: int = self.credit.market_index

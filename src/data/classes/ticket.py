@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Union
 
 import discord
-from discord.ext import commands
+
+from src.ref import RiftContext
 
 from ...cache import cache
 from ...errors import TicketConfigNotFoundError, TicketNotFoundError
@@ -12,7 +13,7 @@ from ..db import execute_query, execute_read_query
 __all__ = ("Ticket", "TicketConfig")
 
 if TYPE_CHECKING:
-    from typings import TicketConfigData, TicketData
+    from _typings import TicketConfigData, TicketData
 
 
 class Ticket:
@@ -48,7 +49,7 @@ class Ticket:
         raise TicketNotFoundError(ticket_id)
 
     async def save(self) -> None:
-        cache._tickets[self.id] = self
+        cache.add_ticket(self)
         await execute_read_query(
             """INSERT INTO tickets (id, ticket_number, config_id, guild_id, user_id, open) VALUES ($1, $2, $3, $4, $5, $6);""",
             self.id,
@@ -73,8 +74,14 @@ class Ticket:
         return self
 
     @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str) -> Ticket:
-        ...
+    async def convert(cls, ctx: RiftContext, argument: str) -> Ticket:
+        try:
+            ticket = cache.get_ticket(int(argument))
+            if ticket:
+                return ticket
+            raise TicketNotFoundError(argument)
+        except ValueError:
+            raise TicketNotFoundError(argument)
 
     def __int__(self) -> int:
         return self.id
@@ -84,7 +91,7 @@ class Ticket:
         user: discord.Member,
         config: TicketConfig,
         *,
-        response: discord.InteractionResponse = None,
+        response: Optional[discord.InteractionResponse] = None,
     ) -> None:
         from ...funcs import get_embed_author_member
 
@@ -140,7 +147,7 @@ class TicketConfig:
         raise TicketConfigNotFoundError(config_id)
 
     async def save(self) -> None:
-        cache._ticket_configs[self.id] = self
+        cache.add_ticket_config(self)
         await execute_query(
             """INSERT INTO ticket_configs (id, category_id, guild_id, start_message, archive_category_id) VALUES ($1, $2, $3, $4, $5, $6, $7);""",
             self.id,

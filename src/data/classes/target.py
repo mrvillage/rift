@@ -3,17 +3,16 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional, Union
 
 import discord
-from discord.ext import commands
-
-from src.data.query.target import add_target, remove_target
 
 from ...cache import cache
 from ...errors import TargetNotFoundError
+from ...ref import RiftContext
+from ..query import add_target, remove_target
 
 __all__ = ("Target",)
 
 if TYPE_CHECKING:
-    from typings import TargetData
+    from _typings import TargetData
 
     from .nation import Nation
 
@@ -39,7 +38,7 @@ class Target:
         self.direct_message: bool = data["direct_message"]
 
     @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str, /) -> Target:
+    async def convert(cls, ctx: RiftContext, argument: str, /) -> Target:
         try:
             return await cls.fetch(int(argument), ctx.author.id)
         except ValueError:
@@ -95,9 +94,9 @@ class Target:
             direct_message,
         )
         added = cls(data)
-        cache._targets[added.id] = added
+        cache.add_target(added)
         return added
 
     async def remove(self) -> None:
         await remove_target(self.id)
-        del cache._targets[self.id]
+        cache.remove_target(self)

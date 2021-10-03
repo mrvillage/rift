@@ -18,7 +18,7 @@ __all__ = ("City", "FullCity")
 if TYPE_CHECKING:
     from pnwkit.data import Nation as PnWKitNation
 
-    from typings import CityData
+    from _typings import CityData
 
     from .nation import Nation
 
@@ -50,7 +50,7 @@ class City:
             return city
         raise CityNotFoundError(city_id)
 
-    def _update(self, data: CityData, /) -> None:
+    def update(self, data: CityData, /) -> None:
         self.id: int = data["id"]
         self.nation_id: int = data["nation_id"]
         self.name: str = data["name"]

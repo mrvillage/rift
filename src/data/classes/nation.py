@@ -1,20 +1,18 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Union
-from urllib.parse import quote
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import aiohttp
 import discord
 import pnwkit
 from bs4 import BeautifulSoup
-from discord.ext import commands
 
 from ...cache import cache
 from ...errors import NationNotFoundError
 from ...find import search_nation
 from ...funcs import utils
-from ...ref import bot
+from ...ref import RiftContext, bot
 from .base import Makeable
 
 __all__ = ("Nation",)
@@ -22,7 +20,7 @@ __all__ = ("Nation",)
 if TYPE_CHECKING:
     from pnwkit.data import Nation as PnWKitNation
 
-    from typings import NationData
+    from _typings import Field, NationData
 
     from .alliance import Alliance
     from .city import City
@@ -89,7 +87,7 @@ class Nation(Makeable):
 
     @classmethod
     async def convert(
-        cls, ctx: commands.Context, search: Any, advanced: bool = True
+        cls, ctx: RiftContext, search: Any, advanced: bool = True
     ) -> Nation:
         return await search_nation(ctx, search, advanced)
 
@@ -100,7 +98,7 @@ class Nation(Makeable):
             return nation
         raise NationNotFoundError(nation_id)
 
-    def _update(self, data: NationData):
+    def update(self, data: NationData):
         self.id: int = data["id"]
         self.name: str = data["name"]
         self.leader: str = data["leader"]
@@ -161,7 +159,9 @@ class Nation(Makeable):
     def partial_cities(self) -> List[City]:
         return [i for i in cache.cities if i.nation_id == self.id]
 
-    async def send_message(self, *, subject: str = None, content: str = None):
+    async def send_message(
+        self, *, subject: Optional[str] = None, content: Optional[str] = None
+    ):
         from ...ref import bot
 
         message_data = {
@@ -203,11 +203,10 @@ class Nation(Makeable):
                 if any("Discord Username:" in str(j) for j in i.contents)  # type: ignore
             ][0]
 
-    async def get_info_embed(self, ctx: commands.Context) -> discord.Embed:
+    async def get_info_embed(self, ctx: RiftContext) -> discord.Embed:
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
-        await self.make_attrs("alliance", "user", "partial_cities")
-        fields = [
+        fields: List[Field] = [
             {"name": "Nation ID", "value": self.id},
             {"name": "Nation Name", "value": self.name},
             {"name": "Leader Name", "value": self.leader},
@@ -291,67 +290,21 @@ class Nation(Makeable):
             )
         )
 
-    async def scrape_city_manager(self) -> Sequence[Dict[str, Any]]:
-        from ...funcs import get_trade_prices
-        from ...funcs.utils import convert_link
-
-        async with aiohttp.request(
-            "GET", f"https://politicsandwar.com/city/manager/n={quote(self.name)}"
-        ) as response:
-            soup = BeautifulSoup(await response.text(), "html.parser")
-        table = soup.find_all(class_="nationtable")[1]
-        rows = table.find_all("tr")  # type: ignore
-        ids = [
-            int(await convert_link(i.contents[0].attrs["href"]))
-            for i in rows[0].contents[2:]
-        ]
-        del rows[:2]
-        items = [
-            (row.contents[0].contents[0].contents[0].lower().replace(" ", "_"), row)
-            for row in rows
-        ]
-        for row in rows:
-            del row.contents[:2]
-        values = {}
-        for key, row in items:
-            values[key] = []
-            for i in row.contents:
-                val = i.contents[0]
-                if val == "Yes":
-                    values[key].append(True)
-                elif val == "No":
-                    values[key].append(False)
-                elif "%" in val:
-                    values[key].append(float(val.replace("%", "")))
-                elif "." in val:
-                    values[key].append(float(val.replace(",", "")))
-                elif "," in val:
-                    values[key].append(int(val.replace(",", "")))
-                else:
-                    values[key].append(int(val))
-        cities = []
-        for index, id in enumerate(ids):
-            city = {"city_id": id, "nation_id": self.id}
-            for key, value in list(values.items()):
-                city[key] = value[index]
-            cities.append(city)
-        return cities
-
     async def calculate_revenue(
         self,
-        prices: TradePrices = None,
-        data: PnWKitNation = None,
+        prices: Optional[TradePrices] = None,
+        data: Optional[PnWKitNation] = None,
         fetch_spies: bool = False,
     ) -> Dict[str, Union[Resources, Dict[str, float], int, float]]:
         # sourcery no-metrics
-        from ...funcs import calculate_spies, get_trade_prices
+        from ...funcs import calculate_spies
         from .city import FullCity
         from .color import Color
         from .resources import Resources
 
         revenue: Dict[str, Union[Resources, Dict[str, float], int, float]]
         spies = await calculate_spies(self) if fetch_spies else 0
-        prices = prices or await get_trade_prices()
+        prices = prices or cache.prices
         if not data:
             raw_data = await pnwkit.async_nation_query(  # type: ignore
                 {"id": self.id},
@@ -523,13 +476,3 @@ class Nation(Makeable):
                 "adv_engineering_corps",
             )
         )[0]
-
-    # PHASE OUT
-    async def _make_alliance(self) -> None:
-        pass
-
-    async def _make_user(self) -> None:
-        pass
-
-    async def _make_partial_cities(self) -> None:
-        pass

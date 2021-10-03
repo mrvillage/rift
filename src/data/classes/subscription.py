@@ -3,18 +3,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Type
 
 import discord
-from discord.ext import commands
 from discord.utils import MISSING
 
 from ...cache import cache
 from ...errors import SubscriptionNotFoundError
-from ...ref import bot
+from ...ref import RiftContext, bot
 from ..db import execute_query
 
 __all__ = ("Subscription",)
 
 if TYPE_CHECKING:
-    from typings import EventCategoryLiteral, EventTypeLiteral, SubscriptionData
+    from _typings import EventCategoryLiteral, EventTypeLiteral, SubscriptionData
 
 
 class Subscription:
@@ -41,7 +40,7 @@ class Subscription:
         self.arguments: List[int] = data["arguments"]
 
     @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str, /) -> Subscription:
+    async def convert(cls, ctx: RiftContext, argument: str, /) -> Subscription:
         try:
             subscription = await cls.fetch(int(argument))
             if TYPE_CHECKING:
@@ -72,7 +71,7 @@ class Subscription:
                 "guild_id": self.guild_id,
                 "name": f"{self.category}_{self.type}",
             }
-            self._webhook = discord.Webhook.from_state(
+            self._webhook = discord.Webhook.from_state(  # type: ignore
                 data, state=bot._connection  # type: ignore
             )
             return self._webhook
@@ -97,7 +96,7 @@ class Subscription:
         )
         data: SubscriptionData = {
             "id": webhook.id,
-            "token": webhook.token,
+            "token": webhook.token,  # type: ignore
             "guild_id": channel.guild.id,
             "channel_id": channel.id,
             "category": category,
@@ -106,7 +105,7 @@ class Subscription:
             "arguments": arguments,
         }
         subscription = cls(data)
-        cache._subscriptions[subscription.id] = subscription
+        cache.add_subscription(subscription)
         await subscription.save()
         return subscription
 
@@ -116,7 +115,7 @@ class Subscription:
         except discord.NotFound as e:
             if e.code != 10015:
                 raise
-        cache._subscriptions.pop(self.id)
+        cache.remove_subscription(self)
         await execute_query(
             "DELETE FROM subscriptions WHERE id = $1;",
             self.id,

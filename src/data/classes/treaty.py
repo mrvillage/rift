@@ -1,44 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Mapping, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Mapping, Optional
 
-from ..query import query_alliances, query_treaties
-
-__all__ = ("Treaties", "Treaty")
+__all__ = ("Treaty",)
 
 if TYPE_CHECKING:
-    from typings import TreatyData
+    from _typings import TreatyData
 
     from .alliance import Alliance
-
-
-class Treaties:
-    alliance: Alliance
-    treaties: Sequence[Treaty]
-
-    __slots__ = ("alliance", "treaties")
-
-    def __init__(self, alliance: Alliance, treaties: Sequence[Treaty]) -> None:
-        self.alliance = alliance
-        self.treaties = treaties
-
-    @classmethod
-    async def fetch(cls, alliance: Alliance) -> Treaties:
-        from .alliance import Alliance
-
-        alliances = await query_alliances()
-        alliances = {i[0]: Alliance(data=i) for i in alliances}
-        treaties = await query_treaties(alliance.id)
-        treaties = [i for i in treaties if i["stopped"] is None]
-        treaties = [Treaty(dict(i), alliances) for i in treaties]
-        return cls(alliance, treaties)
-
-    def __str__(self) -> str:
-        return "\n".join(str(i) for i in self.treaties)
-
-    def __getitem__(self, index: int) -> Treaty:
-        return self.treaties[index]
-
 
 class Treaty:
     started: str
@@ -61,7 +30,7 @@ class Treaty:
             return f"**{self.treaty_type}:** {self.from_} --> {self.to_}"
         return f"**{self.treaty_type}:** {self.from_} <--> {self.to_}"
 
-    def _update(self, data: TreatyData, alliances: Mapping[int, Alliance]) -> None:
+    def update(self, data: TreatyData, alliances: Mapping[int, Alliance]) -> None:
         self.started = data["started"]
         self.stopped = data["stopped"]
         self.from_ = alliances[data["from_"]]
