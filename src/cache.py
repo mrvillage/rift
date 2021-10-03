@@ -2,19 +2,33 @@ from __future__ import annotations
 
 import asyncio
 import json
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Set
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Set, Tuple
 
 from .data.db import execute_read_query
 
 __all__ = ("cache",)
 
 if TYPE_CHECKING:
-    from typings import (
+    from _typings import (
         AllianceData,
         CityData,
         ColorData,
-        Link,
+        EmbassyConfigData,
+        EmbassyData,
+        ForumData,
+        GuildSettingsData,
+        GuildWelcomeSettingsData,
+        LinkData,
+        MenuData,
+        MenuInterfaceData,
+        MenuItemData,
         NationData,
+        RawColorData,
+        RawTreasureData,
+        SubscriptionData,
+        TargetData,
+        TicketConfigData,
+        TicketData,
         TradePriceData,
         TreatyData,
     )
@@ -92,7 +106,7 @@ class Cache:
         self._forums: Dict[int, Forum] = {}
         self._guild_settings: Dict[int, GuildSettings] = {}
         self._guild_welcome_settings: Dict[int, GuildWelcomeSettings] = {}
-        self._links: List[Link] = list()
+        self._links: List[LinkData] = list()
         self._menu_interfaces: List[Dict[str, int]] = list()
         self._menu_items: Dict[int, MenuItem] = {}
         self._menus: Dict[int, Menu] = {}
@@ -155,6 +169,30 @@ class Cache:
             "SELECT * FROM treasures ORDER BY datetime DESC LIMIT 1;",
             "SELECT * FROM treaties;",
         ]
+        data: Tuple[  # type: ignore
+            List[AllianceData],
+            List[CityData],
+            List[RawColorData],
+            List[EmbassyData],
+            List[EmbassyConfigData],
+            List[ForumData],
+            List[GuildSettingsData],
+            List[GuildWelcomeSettingsData],
+            List[LinkData],
+            List[MenuInterfaceData],
+            List[MenuItemData],
+            List[MenuData],
+            List[NationData],
+            List[TradePriceData],
+            List[SubscriptionData],
+            List[TargetData],
+            List[TicketConfigData],
+            List[TicketData],
+            List[RawTreasureData],
+            List[TreatyData],
+        ] = tuple(  # type: ignore
+            await asyncio.gather(*(execute_read_query(query) for query in queries))  # type: ignore
+        )
         (
             alliances,
             cities,
@@ -176,16 +214,14 @@ class Cache:
             tickets,
             treasures,
             treaties,
-        ) = tuple(
-            await asyncio.gather(*(execute_read_query(query) for query in queries))
-        )
+        ) = data
         for i in alliances:
             i = Alliance(i)
             self._alliances[i.id] = i
         for i in cities:
             i = City(i)
             self._cities[i.id] = i
-        for i in colors[0]["colors"]:  # SPECIAL CASE
+        for i in colors[0]["colors"]:
             i = Color(i)
             self._colors[i.color] = i
         for i in embassies:
@@ -237,7 +273,11 @@ class Cache:
         for i in tickets:
             i = Ticket(i)
             self._tickets[i.id] = i
-        for i in (json.loads(treasures[0]["treasures"]) if isinstance(treasures[0]["treasures"], str) else treasures[0]["treasures"]):
+        for i in (  # type
+            json.loads(treasures[0]["treasures"])
+            if isinstance(treasures[0]["treasures"], str)
+            else treasures[0]["treasures"]
+        ):
             i = Treasure(i)
             self._treasures.append(i)
         for i in treaties:
@@ -284,7 +324,7 @@ class Cache:
         return set(self._guild_welcome_settings.values())
 
     @property
-    def links(self) -> List[Link]:
+    def links(self) -> List[LinkData]:
         return self._links
 
     @property
@@ -324,10 +364,6 @@ class Cache:
         return set(self._tickets.values())
 
     @property
-    def trades(self) -> Set[int]:
-        return set(self._trades.values())
-
-    @property
     def treasures(self) -> List[Treasure]:
         return self._treasures
 
@@ -339,14 +375,6 @@ class Cache:
     def user_settings(self) -> Set[UserSettings]:
         return set(self._user_settings.values())
 
-    @property
-    def war_attacks(self) -> Set[int]:
-        return set(self._war_attacks.values())
-
-    @property
-    def wars(self) -> Set[int]:
-        return set(self._wars.values())
-
     def hook_alliance(
         self, action: Literal["update", "create", "delete"], data: AllianceData
     ) -> None:
@@ -356,7 +384,7 @@ class Cache:
             del self._alliances[data["id"]]
             return
         try:
-            self._alliances[data["id"]]._update(data)
+            self._alliances[data["id"]].update(data)
         except KeyError:
             self._alliances[data["id"]] = Alliance(data)
 
@@ -369,7 +397,7 @@ class Cache:
             del self._cities[data["id"]]
             return
         try:
-            self._cities[data["id"]]._update(data)
+            self._cities[data["id"]].update(data)
         except KeyError:
             self._cities[data["id"]] = City(data)
 
@@ -377,7 +405,7 @@ class Cache:
         from .data.classes import Color
 
         try:
-            self._colors[data["color"]]._update(data)
+            self._colors[data["color"]].update(data)
         except KeyError:
             self._colors[data["color"]] = Color(data)
 
@@ -390,19 +418,19 @@ class Cache:
             del self._nations[data["id"]]
             return
         try:
-            self._nations[data["id"]]._update(data)
+            self._nations[data["id"]].update(data)
         except KeyError:
             self._nations[data["id"]] = Nation(data)
 
     def hook_price(self, action: Literal["update"], data: TradePriceData) -> None:
         try:
-            self._prices._update(data)
+            self._prices.update(data)
         except KeyError:
-            self._prices._update(data)
+            self._prices.update(data)
 
     def hook_treasure(self, action: Literal["update"], data: Dict[Any, Any]) -> None:
         for new in data.values():
-            next(i._update(new) for i in self._treasures if i.name == new["name"])
+            next(i.update(new) for i in self._treasures if i.name == new["name"])
 
     def hook_treaty(
         self, action: Literal["create", "update", "delete"], data: TreatyData
@@ -415,9 +443,9 @@ class Cache:
             treaty = next(
                 i
                 for i in self._treaties
-                if i.from_ == data["from_"] and i.to_ == data["to_"]
+                if i.from_.id == data["from_"] and i.to_.id == data["to_"]
             )
-            treaty._update(data, alliances)
+            treaty.update(data, alliances)
         self._treaties.add(Treaty(data, alliances))
 
     def get_alliance(self, id: int, /) -> Optional[Alliance]:
@@ -444,7 +472,7 @@ class Cache:
     def get_guild_welcome_settings(self, id: int, /) -> Optional[GuildWelcomeSettings]:
         return self._guild_welcome_settings.get(id)
 
-    def get_link(self, id: int, /) -> Optional[Link]:
+    def get_link(self, id: int, /) -> Optional[LinkData]:
         try:
             return next(
                 i for i in self._links if i["user_id"] == id or i["nation_id"] == id
@@ -503,9 +531,6 @@ class Cache:
     def get_ticket(self, id: int, /) -> Optional[Ticket]:
         return self._tickets.get(id)
 
-    def get_trade(self, id: int, /) -> Optional[int]:
-        return self._trades.get(id)
-
     def get_treasure(self, name: str, /) -> Optional[Treasure]:
         try:
             return next(i for i in self._treasures if i.name == name)
@@ -517,7 +542,7 @@ class Cache:
             return next(
                 i
                 for i in self._treaties
-                if i.from_ == from_ and i.to_ == to_ and i.treaty_type == treaty_type
+                if i.from_.id == from_ and i.to_.id == to_ and i.treaty_type == treaty_type
             )
         except StopIteration:
             return
@@ -525,11 +550,6 @@ class Cache:
     def get_user_settings(self, id: int, /) -> Optional[UserSettings]:
         return self._user_settings.get(id)
 
-    def get_war_attack(self, id: int, /) -> Optional[int]:
-        return self._war_attacks.get(id)
-
-    def get_war(self, id: int, /) -> Optional[int]:
-        return self._wars.get(id)
 
 
 cache = Cache()
