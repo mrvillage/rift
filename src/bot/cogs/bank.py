@@ -25,12 +25,6 @@ class Bank(commands.Cog):
     async def bank(self, ctx: commands.Context):
         ...
 
-    @commands.command(
-        name="send", brief="Send money from your alliance bank.", hidden=True
-    )
-    async def send(self, ctx: commands.Context, recipient, *, resources: Transaction):
-        await ctx.invoke(self.bank_transfer, recipient, resources=resources)
-
     @bank.command(
         name="transfer",
         aliases=["send"],
