@@ -4,6 +4,8 @@ from typing import Optional
 
 from ..data.db import execute_query
 
+__all__ = ("insert_log",)
+
 
 async def insert_log(
     time: str,
@@ -15,8 +17,8 @@ async def insert_log(
     qualified_name: Optional[str],
     args: str,
     kwargs: str,
-    success: bool = None,
-    error_message: str = None,
+    success: Optional[bool] = None,
+    error_message: Optional[str] = None,
 ) -> None:
     await execute_query(
         """
