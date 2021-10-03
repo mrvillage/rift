@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import Any, TypedDict
 
 __all__ = ("Field",)
 
@@ -11,4 +11,4 @@ class FieldOptional(TypedDict, total=False):
 
 class Field(FieldOptional):
     name: str
-    value: str
+    value: Any
