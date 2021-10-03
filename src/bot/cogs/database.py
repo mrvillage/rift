@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
 
-from ... import cache, checks
-from ... import funcs
+from ... import cache, checks, funcs
 from ...errors import BoolError, DocumentNotFoundError
 from ...menus import Confirm
 

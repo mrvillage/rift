@@ -1,14 +1,14 @@
-from asyncio import TimeoutError
-from typing import TYPE_CHECKING, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional, Union
 
 import discord
 from discord.ext import commands
 
-from ... import find, funcs, perms
-from ...data.classes import Alliance, Nation
-from ...data.classes.bank import Transaction
-from ...errors import AllianceNotFoundError, NationNotFoundError, RecipientNotFoundError
-from ...ref import Rift
+from ... import funcs, perms
+from ...data.classes import Alliance, Nation, Transaction
+from ...errors import NationNotFoundError
+from ...ref import Rift, RiftContext
 from ...views import Confirm
 
 
@@ -22,7 +22,7 @@ class Bank(commands.Cog):
         invoke_without_command=True,
         type=commands.CommandType.chat_input,
     )
-    async def bank(self, ctx: commands.Context):
+    async def bank(self, ctx: RiftContext):
         ...
 
     @bank.command(
@@ -37,7 +37,7 @@ class Bank(commands.Cog):
     )
     async def bank_transfer(
         self,
-        ctx: commands.Context,
+        ctx: RiftContext,
         recipient: Union[Alliance, Nation],
         *,
         resources: Transaction,
@@ -240,7 +240,9 @@ class Bank(commands.Cog):
             "alliance": "The alliance to check the balance of, defaults to your alliance.",
         },
     )
-    async def bank_balance(self, ctx: commands.Context, *, alliance: Alliance = None):
+    async def bank_balance(
+        self, ctx: RiftContext, *, alliance: Optional[Alliance] = None
+    ):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         try:
             viewer = await funcs.search_nation(ctx, str(ctx.author.id))

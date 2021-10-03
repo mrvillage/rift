@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import discord
 from discord.ext import commands
@@ -9,10 +9,10 @@ from ... import funcs
 from ...cache import cache
 from ...checks import has_manage_permissions
 from ...data.classes import Alliance, Embassy, EmbassyConfig
-from ...ref import Rift
+from ...ref import Rift, RiftContext
 
 if TYPE_CHECKING:
-    from typings import EmbassyConfigData, EmbassyData
+    from _typings import EmbassyConfigData, EmbassyData
 
 
 class Embassies(commands.Cog):
@@ -26,7 +26,7 @@ class Embassies(commands.Cog):
         type=commands.CommandType.chat_input,
     )
     @commands.guild_only()
-    async def embassy(self, ctx: commands.Context):
+    async def embassy(self, ctx: RiftContext):
         ...
 
     @embassy.group(
@@ -38,7 +38,7 @@ class Embassies(commands.Cog):
     )
     @commands.guild_only()
     @has_manage_permissions()
-    async def embassy_config(self, ctx: commands.Context):
+    async def embassy_config(self, ctx: RiftContext):
         ...
 
     @embassy_config.command(
@@ -54,9 +54,9 @@ class Embassies(commands.Cog):
     @has_manage_permissions()
     async def embassy_config_create(
         self,
-        ctx: commands.Context,
+        ctx: RiftContext,
         start: str,
-        category: discord.CategoryChannel = None,
+        category: Optional[discord.CategoryChannel] = None,
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
@@ -86,7 +86,7 @@ class Embassies(commands.Cog):
     )
     @commands.guild_only()
     @has_manage_permissions()
-    async def embassy_config_list(self, ctx: commands.Context):
+    async def embassy_config_list(self, ctx: RiftContext):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         configs = [i for i in cache.embassy_configs if i.guild_id == ctx.guild.id]
@@ -124,11 +124,11 @@ class Embassies(commands.Cog):
     @has_manage_permissions()
     async def embassy_config_claim(
         self,
-        ctx: commands.Context,
+        ctx: RiftContext,
         config: EmbassyConfig,
         *,
         alliance: Alliance,
-        channel: discord.TextChannel = None,
+        channel: Optional[discord.TextChannel] = None,
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild) and isinstance(

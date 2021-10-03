@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from typing import Optional
+
 import discord
 from discord.ext import commands
 
 from ... import funcs
 from ...data.classes import Nation
-from ...ref import Rift
+from ...ref import Rift, RiftContext
 
 
 class Link(commands.Cog):
@@ -23,7 +25,7 @@ class Link(commands.Cog):
         },
     )
     async def link(
-        self, ctx: commands.Context, nation: Nation, user: discord.User = None
+        self, ctx: RiftContext, nation: Nation, user: Optional[discord.User] = None
     ):
         member = user or ctx.author
         try:

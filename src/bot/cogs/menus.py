@@ -1,6 +1,7 @@
-import json
+from __future__ import annotations
+
 from asyncio import TimeoutError
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import discord
 from discord.ext import commands
@@ -10,7 +11,7 @@ from ...cache import cache
 from ...checks import has_manage_permissions
 from ...data.classes import Menu, MenuItem
 from ...flags import ButtonFlags, SelectFlags, SelectOptionFlags
-from ...ref import Rift
+from ...ref import Rift, RiftContext
 
 
 class Menus(commands.Cog):
@@ -27,24 +28,8 @@ class Menus(commands.Cog):
     )
     @commands.guild_only()
     @has_manage_permissions()
-    async def menu(self, ctx: commands.Context, menu: Menu = None):
-        # sourcery skip: merge-nested-ifs
-        if ctx.invoked_with is not None:
-            if ctx.invoked_with.lower() == "menus":
-                await self.menu_list.invoke(ctx)
-                return
-        if menu is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author, "You didn't specify a menu!", color=discord.Color.red()
-                )
-            )
-        if TYPE_CHECKING:
-            assert isinstance(menu, Menu)
-        await ctx.send(str(menu))
-        view = await menu.get_view()
-        message = await ctx.reply("View", view=view)
-        await menu.new_interface(message)
+    async def menu(self, ctx: RiftContext, menu: Optional[Menu] = None):
+        ...
 
     @menu.command(
         name="list",
@@ -54,7 +39,7 @@ class Menus(commands.Cog):
     )
     @commands.guild_only()
     @has_manage_permissions()
-    async def menu_list(self, ctx: commands.Context):
+    async def menu_list(self, ctx: RiftContext):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         menus = [i for i in cache.menus if i.guild_id == ctx.guild.id]
@@ -86,7 +71,7 @@ class Menus(commands.Cog):
     @commands.guild_only()
     @has_manage_permissions()
     async def menu_create(
-        self, ctx: commands.Context, *, description: str = None
+        self, ctx: RiftContext, *, description: Optional[str] = None
     ):  # sourcery no-metrics
         message: discord.Message
         if TYPE_CHECKING:
@@ -192,7 +177,7 @@ class Menus(commands.Cog):
                     for item in row:
                         await item.save()
                 await menu.save()
-                await main_message.reply(
+                await main_message.reply(  # type: ignore
                     embed=funcs.get_embed_author_member(
                         ctx.author,
                         f"Menu ID: {menu.id}\n\n"
@@ -201,7 +186,7 @@ class Menus(commands.Cog):
                     )
                 )
         except TimeoutError:
-            await main_message.reply(
+            await main_message.reply(  # type: ignore
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     "Menu creation timed out. Please try again.",
@@ -222,7 +207,7 @@ class Menus(commands.Cog):
     @commands.guild_only()
     @has_manage_permissions()
     async def menu_send(
-        self, ctx: commands.Context, menu: Menu, *, channel: discord.TextChannel
+        self, ctx: RiftContext, menu: Menu, *, channel: discord.TextChannel
     ):
         view = await menu.get_view()
         embed = menu.get_description_embed(ctx)
@@ -248,8 +233,7 @@ class Menus(commands.Cog):
     )
     @commands.guild_only()
     @has_manage_permissions()
-    async def menu_info(self, ctx: commands.Context, *, menu: Menu):
-        await menu._make_items()
+    async def menu_info(self, ctx: RiftContext, *, menu: Menu):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
@@ -270,7 +254,7 @@ class Menus(commands.Cog):
     )
     @commands.guild_only()
     @has_manage_permissions()
-    async def menu_item(self, ctx: commands.Context, *, item: MenuItem):
+    async def menu_item(self, ctx: RiftContext, *, item: MenuItem):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,

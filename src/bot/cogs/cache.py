@@ -13,7 +13,10 @@ from ...data.db import execute_read_query
 from ...ref import Rift
 
 if TYPE_CHECKING:
-    from typings import (
+    from typing import List
+
+    from _typings import (
+        AllianceData,
         BulkAllianceListData,
         BulkAllianceUpdateData,
         BulkCityListData,
@@ -22,8 +25,12 @@ if TYPE_CHECKING:
         BulkNationUpdateData,
         BulkTreatyListData,
         BulkWarListData,
+        CityData,
         ColorUpdateData,
+        NationData,
+        RawColorData,
         TradePriceData,
+        TreatyData,
     )
 
 
@@ -50,7 +57,9 @@ class Cache(commands.Cog):
                 after=cache.get_alliance(i["after"]["id"]),
             )
         if cache.validate.alliances:
-            fetched_data = await execute_read_query("SELECT * FROM alliances;")
+            fetched_data: List[AllianceData] = await execute_read_query(
+                "SELECT * FROM alliances;"
+            )
             for i in (dict(i) for i in fetched_data):
                 cache.hook_alliance("update", i)  # type: ignore
 
@@ -78,7 +87,9 @@ class Cache(commands.Cog):
         for i in data:
             cache.hook_city("update", i["after"])
         if cache.validate.cities:
-            fetched_data = await execute_read_query("SELECT * FROM cities;")
+            fetched_data: List[CityData] = await execute_read_query(
+                "SELECT * FROM cities;"
+            )
             for i in (dict(i) for i in fetched_data):
                 cache.hook_city("update", i)  # type: ignore
         for i in data:
@@ -109,11 +120,11 @@ class Cache(commands.Cog):
                 after=cache.get_color(j["color"]),
             )
         if cache.validate.alliances:
-            fetched_data = await execute_read_query(
+            fetched_data: List[RawColorData] = await execute_read_query(
                 "SELECT * FROM colors ORDER BY datetime DESC LIMIT 1;"
             )
-            for i in (dict(i) for i in fetched_data[0]["colors"]):
-                cache.hook_color("update", i)  # type: ignore
+            for i in fetched_data[0]["colors"]:
+                cache.hook_color("update", i)
 
     @commands.Cog.listener()
     async def on_bulk_nation_create(self, data: BulkNationListData):
@@ -127,8 +138,10 @@ class Cache(commands.Cog):
         for i in data:
             cache.hook_nation("update", i["after"])
         if cache.validate.nations:
-            fetched_data = await execute_read_query("SELECT * FROM nations;")
-            for i in (dict(i) for i in fetched_data):
+            fetched_data: List[NationData] = await execute_read_query(
+                "SELECT * FROM nations;"
+            )
+            for i in fetched_data:
                 cache.hook_nation("update", i)  # type: ignore
         for i in data:
             self.bot.dispatch(
@@ -160,7 +173,7 @@ class Cache(commands.Cog):
             after=cache.get_prices(),
         )
         if cache.validate.prices:
-            fetched_data = await execute_read_query(
+            fetched_data: List[TradePriceData] = await execute_read_query(
                 "SELECT * FROM prices ORDER BY datetime DESC LIMIT 1;"
             )
             cache.hook_price("update", {key: json.loads(value) if isinstance(value, str) and key != "datetime" else value for key, value in dict(fetched_data[0]).items()})  # type: ignore
@@ -175,8 +188,10 @@ class Cache(commands.Cog):
                 treaty=cache.get_treaty(i["from_"], i["to_"], i["treaty_type"]),
             )
         if cache.validate.treaties:
-            fetched_data = await execute_read_query("SELECT * FROM treaties;")
-            for i in (dict(i) for i in fetched_data):
+            fetched_data: List[TreatyData] = await execute_read_query(
+                "SELECT * FROM treaties;"
+            )
+            for i in fetched_data:
                 cache.hook_treaty("update", i)  # type: ignore
 
     @commands.Cog.listener()

@@ -1,20 +1,19 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 import discord
 import pnwkit
 from discord.ext import commands, tasks
 
-from src.data.classes.bank.transaction import Transaction
-from src.data.classes.resources import Resources
+from src.data.classes import Transaction
 from src.funcs.bank.bank import withdraw
 
 from ... import funcs
 from ...data.classes import Alliance, Nation, TradePrices
 from ...errors import AllianceNotFoundError
-from ...ref import Rift
+from ...ref import Rift, RiftContext
 
 OFFSHORE_ID = 9066
 
@@ -40,7 +39,11 @@ class Confirm(discord.ui.View):
         label="Yes",
         style=discord.ButtonStyle.green,
     )
-    async def yes(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def yes(
+        self,
+        button: discord.ui.Button[discord.ui.View],
+        interaction: discord.Interaction,
+    ):
         self.interaction = interaction
         self.value = True
         await interaction.response.defer()
@@ -82,7 +85,11 @@ class Confirm(discord.ui.View):
         label="No",
         style=discord.ButtonStyle.red,
     )
-    async def no(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def no(
+        self,
+        button: discord.ui.Button[discord.ui.View],
+        interaction: discord.Interaction,
+    ):
         self.interaction = interaction
         self.value = False
         await interaction.edit_original_message(view=None)
@@ -96,7 +103,7 @@ class HouseStark(commands.Cog):
         self.bot.add_view(Confirm())
 
     @commands.command(name="mmr", help="Check to see if a nation meets MMR.")
-    async def mmr(self, ctx: commands.Context, *, nation: Nation = None):
+    async def mmr(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
         nation = nation or await Nation.convert(ctx, nation)
         author_nation = await Nation.convert(ctx, None)
         if nation.alliance_id not in {3683, 8139, OFFSHORE_ID}:
@@ -148,7 +155,7 @@ class HouseStark(commands.Cog):
         aliases=["stockpiles"],
         help="Check to see if a nation meets stockpile requirements.",
     )
-    async def stockpile(self, ctx: commands.Context, *, nation: Nation = None):
+    async def stockpile(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
         nation = nation or await Nation.convert(ctx, nation)
         nat = await pnwkit.async_nation_query(
             {"id": nation.id},
@@ -201,7 +208,7 @@ class HouseStark(commands.Cog):
             )
             return
         prices: TradePrices = await funcs.get_trade_prices()
-        amounts = []
+        amounts: List[str] = []
         cost = 0
         for key, needs in stockpile.items():
             has = getattr(nat, key)
@@ -218,11 +225,11 @@ class HouseStark(commands.Cog):
                         f"**{key.capitalize()}** - {has:,.2f}/{needs:,.2f} ({has/needs:.2%})\n${amount:,.2f}"
                     )
                 cost += amount
-        amounts = "\n".join(amounts)
+        amounts_str = "\n".join(amounts)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"{nation} doesn't meet stockpiles!\n\n{amounts}\n\n**Total:** ${cost:,.2f}",
+                f"{nation} doesn't meet stockpiles!\n\n{amounts_str}\n\n**Total:** ${cost:,.2f}",
                 color=discord.Color.orange(),
             )
         )

@@ -1,13 +1,16 @@
 import asyncio
-from src.flags.base import BooleanFlagConverter
 from typing import Optional
+
 import discord
 from discord.ext import commands
 from discord.ext.commands.flags import FlagConverter
 
+from src.flags.base import BooleanFlagConverter
+
+from ... import funcs
 from ...data.classes import FullCity, Nation
 from ...data.query import query_mmr
-from ... import funcs
+from ...ref import RiftContext
 
 
 class Flags(
@@ -56,7 +59,7 @@ class Experiments(commands.Cog, command_attrs=dict(hidden=True)):
         await ctx.send("View", view=view)
 
     @commands.command(name="provider")
-    async def provider(self, ctx: commands.Context):
+    async def provider(self, ctx: RiftContext):
         embed = discord.Embed(description="This is a provider")
         print(embed.provider)
         embed._provider = {

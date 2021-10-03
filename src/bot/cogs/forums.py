@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING
 
 import aiohttp
-import discord
 import feedparser
 from discord.ext import commands, tasks
+from feedparser.util import FeedParserDict
 
 from ...data.classes import ForumPost
 from ...data.db import execute_read_query
@@ -24,27 +23,32 @@ class Forums(commands.Cog):
             "GET",
             "https://forum.politicsandwar.com/index.php?/forum/42-alliance-affairs.xml",
         ) as r:
-            m = (
+            m: int = (
                 await execute_read_query(
                     "SELECT MAX(id) FROM forum_posts WHERE forum_id = 42;"
                 )
             )[0]["max"]
-            feed = feedparser.parse(await r.text())
-            for entry in feed.entries:
+            feed: FeedParserDict = feedparser.parse(await r.text())  # type: ignore
+            for entry in feed["entries"]:  # type: ignore
+                entry: FeedParserDict
                 try:
                     g = int(entry.guid)  # type: ignore
                 except (ValueError, AttributeError):
                     continue
                 if g > m:
                     if TYPE_CHECKING:
-                        assert isinstance(entry.guid, int) and isinstance(
-                            entry.link, str
+                        assert isinstance(entry["guid"], int) and isinstance(
+                            entry["link"], str
                         )
                     post = ForumPost(
-                        {"id": int(entry.guid), "link": entry.link, "forum_id": 42}
+                        {
+                            "id": int(entry["guid"]),  # type: ignore
+                            "link": entry["link"],  # type: ignore
+                            "forum_id": 42,
+                        }
                     )
                     await post.save()
-                    self.bot.dispatch("forum_post_create", post, entry.title)
+                    self.bot.dispatch("forum_post_create", post, entry["title"])
 
     @check_alliance_affairs.before_loop
     async def before_check_alliance_affairs(self):
@@ -56,27 +60,32 @@ class Forums(commands.Cog):
             "GET",
             "https://forum.politicsandwar.com/index.php?/forum/40-orbis-central.xml",
         ) as r:
-            m = (
+            m: int = (
                 await execute_read_query(
                     "SELECT MAX(id) FROM forum_posts WHERE forum_id = 40;"
                 )
             )[0]["max"]
-            feed = feedparser.parse(await r.text())
-            for entry in feed.entries:
+            feed: FeedParserDict = feedparser.parse(await r.text())  # type: ignore
+            for entry in feed["entries"]:  # type: ignore
+                entry: FeedParserDict
                 try:
                     g = int(entry.guid)  # type: ignore
                 except (ValueError, AttributeError):
                     continue
                 if g > m:
                     if TYPE_CHECKING:
-                        assert isinstance(entry.guid, int) and isinstance(
-                            entry.link, str
+                        assert isinstance(entry["guid"], int) and isinstance(
+                            entry["link"], str
                         )
                     post = ForumPost(
-                        {"id": int(entry.guid), "link": entry.link, "forum_id": 40}
+                        {
+                            "id": int(entry["guid"]),  # type: ignore
+                            "link": entry["link"],  # type: ignore
+                            "forum_id": 40,
+                        }
                     )
                     await post.save()
-                    self.bot.dispatch("forum_post_create", post, entry.title)
+                    self.bot.dispatch("forum_post_create", post, entry["title"])
 
     @check_orbis_central.before_loop
     async def before_check_orbis_central(self):
