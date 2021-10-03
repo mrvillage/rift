@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 
 from ..db import execute_read_query
 from ..query import query_alliances_offset, query_max_alliances_page
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from ..classes import Alliance
 
 
-async def get_alliance(search):
+async def get_alliance(search: str) -> Optional[Alliance]:
     from ..classes.alliance import Alliance
 
     alliance = await execute_read_query(
@@ -28,7 +28,7 @@ async def get_alliances_offset(*, limit: int = 50, offset: int = 0) -> List[Alli
     from ..classes import Alliance
 
     return [
-        Alliance(data=dict(i))
+        Alliance(data=i)
         for i in await query_alliances_offset(limit=limit, offset=offset)
     ]
 

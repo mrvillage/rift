@@ -1,7 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional
+
 from ..db import execute_read_query
 
+__all__ = ("get_nation",)
 
-async def get_nation(search):
+if TYPE_CHECKING:
+    from ..classes import Nation
+
+
+async def get_nation(search: str) -> Optional[Nation]:
     from ..classes import Nation
 
     nation = await execute_read_query(
