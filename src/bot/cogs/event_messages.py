@@ -7,7 +7,7 @@ from discord.ext import commands
 
 from ... import funcs
 from ...cache import cache
-from ...data.classes import Alliance, ForumPost, Nation, Treaty
+from ...data.classes import Alliance, ForumPost, Nation, Treaty, War
 from ...ref import Rift, bot
 
 
@@ -198,6 +198,23 @@ class EventMessages(commands.Cog):
                 funcs.get_embed_author_member(
                     bot.user,
                     f"**Treaty deleted!**\n{treaty.treaty_type} from {repr(treaty.from_)} to {repr(treaty.to_)}.",
+                    color=discord.Color.blue(),
+                ),
+                False,
+            )
+
+    @commands.Cog.listener()
+    async def on_war_create(self, war: War):
+        if TYPE_CHECKING:
+            assert isinstance(bot.user, discord.User)
+        subscriptions = [
+            i for i in cache.subscriptions if i.category == "WAR" and i.type == "CREATE"
+        ]
+        for sub in subscriptions:
+            await sub.send(
+                funcs.get_embed_author_member(
+                    bot.user,
+                    f"**War created!**\n{repr(war.attacker)} declared war on {repr(war.defender)}",
                     color=discord.Color.blue(),
                 ),
                 False,
