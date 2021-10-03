@@ -5,6 +5,25 @@ import os
 from dotenv import load_dotenv
 from pnwkit import set_key
 
+__all__ = (
+    "TOKEN",
+    "DEBUG_TOKEN",
+    "FOOTER",
+    "COLOR",
+    "PNW_API_KEY",
+    "PNW_EMAIL",
+    "PNW_PASSWORD",
+    "DB_HOST",
+    "DB_PORT",
+    "DB_USER",
+    "DB_PASSWORD",
+    "DB_NAME",
+    "SOCKET_PORT",
+    "SOCKET_IP",
+    "APPLICATION_ID",
+    "DEBUG_APPLICATION_ID",
+)
+
 load_dotenv()
 
 TOKEN = str(os.getenv("TOKEN"))
