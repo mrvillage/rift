@@ -4,6 +4,8 @@ from typing import Optional
 
 from ..data.db import execute_query
 
+__all__ = ("edit_log",)
+
 
 async def edit_log(
     datetime: str,
@@ -13,8 +15,8 @@ async def edit_log(
     author_id: int,
     message_content: str,
     qualified_name: Optional[str],
-    success: bool = None,
-    error_message: str = None,
+    success: Optional[bool] = None,
+    error_message: Optional[str] = None,
 ) -> None:
     await execute_query(
         """
