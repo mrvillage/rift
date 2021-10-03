@@ -1,5 +1,6 @@
-import json
-from typing import Union
+from __future__ import annotations
+
+from typing import Any, Dict, List, Union
 
 from discord import Member, User
 
@@ -7,29 +8,13 @@ from ..data.classes import Nation
 from ..data.db import execute_read_query
 from ..funcs.utils import get_alliance_position_id
 
-# async def check_bank_perms(*, nation: Nation, author: Union[Member, User], action):
-#     """ACTION MUST BE 'send' or 'view'"""
-#     try:
-#         perm = (await execute_read_query("SELECT * FROM bankpermissions WHERE allianceid = $1;", nation.alliance.id))[0]
-#         nation_position = get_alliance_position_id(nation.alliance_position)
-#         alliance_position = get_alliance_position_id(perm[f"{action}rank"])
-#         if nation_position >= alliance_position:
-#             return True
-#         if author.id in json.loads(perm[f'{action}users']) if perm[f'{action}users'] is not None else []:
-#             return True
-#         roles = [role.id for role in author.roles]
-#         role_perms = json.loads(perm[f'{action}roles']) if perm[f'{action}roles'] is not None else []
-#         if any(role in role_perms for role in roles):
-#             return True
-#         return False
-#     except Exception:  # pylint: disable=broad-except
-#         return False
+__all__ = ("check_bank_perms",)
 
 
-async def check_bank_perms(*, nation: Nation, author: Union[Member, User], action):
+async def check_bank_perms(*, nation: Nation, author: Union[Member, User], action: str):
     """ACTION MUST BE 'send' or 'view'"""
     try:
-        perm = (
+        perm: Dict[str, Any] = (
             await execute_read_query(
                 "SELECT * FROM bankpermissions WHERE allianceid = 3683;"
             )
@@ -37,6 +22,8 @@ async def check_bank_perms(*, nation: Nation, author: Union[Member, User], actio
         nation_position = get_alliance_position_id(nation.alliance_position)
         alliance_position = get_alliance_position_id(perm[f"{action}rank"])
         await nation.make_attrs("alliance")
+        if nation.alliance is None:
+            return False
         if nation_position >= alliance_position and nation.alliance.id == 3683:
             return True
         if (
@@ -45,12 +32,12 @@ async def check_bank_perms(*, nation: Nation, author: Union[Member, User], actio
             else []
         ):
             return True
+        if isinstance(author, User):
+            return False
         roles = [role.id for role in author.roles]
-        role_perms = (
+        role_perms: List[int] = (
             perm[f"{action}roles"] if perm[f"{action}roles"] is not None else []
         )
-        if any(role in role_perms for role in roles):
-            return True
-        return False
-    except Exception as error:  # pylint: disable=broad-except
+        return any(role in role_perms for role in roles)
+    except Exception:
         return False
