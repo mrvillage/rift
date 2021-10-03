@@ -307,6 +307,33 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
+    @subscribe.group(name="war", type=commands.CommandType.chat_input)
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscribe_war(self, ctx: commands.Context):
+        ...
+
+    @subscribe_war.command(
+        name="create",
+        brief="Subscribe to WAR_CREATE events in this channel.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def subscribe_war_create(self, ctx: commands.Context):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.channel, discord.TextChannel)
+            assert isinstance(ctx.author, discord.Member)
+        subscription = await Subscription.subscribe(ctx.channel, "WAR", "CREATE")
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Successfully subscribed to `WAR_CREATE` events.\nSubscription ID: {subscription.id}",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
     @commands.group(name="subscription", type=commands.CommandType.chat_input)
     @has_manage_permissions()
     @commands.guild_only()
