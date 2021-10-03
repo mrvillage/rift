@@ -2,15 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
 
-from discord.ext import commands
-
 from ...cache import cache
 from ...errors import TreasureNotFoundError
+from ...ref import RiftContext
 
 __all__ = ("Treasure",)
 
 if TYPE_CHECKING:
-    from typings import TreasureData
+    from _typings import TreasureData
 
     from .nation import Nation
 
@@ -27,13 +26,13 @@ class Treasure:
         self.nation_id: int = int(data["nation"])
 
     @classmethod
-    async def fetch(cls, ctx: commands.Context, name: str, /):
+    async def fetch(cls, ctx: RiftContext, name: str, /):
         treasure = cache.get_treasure(name)
         if treasure:
             return treasure
         raise TreasureNotFoundError(name)
 
-    def _update(self, data: TreasureData, /):
+    def update(self, data: TreasureData, /):
         self.name = data["name"]
         self.color = data["color"]
         self._continent = data["continent"]

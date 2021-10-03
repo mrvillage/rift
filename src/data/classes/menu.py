@@ -1,21 +1,13 @@
 from __future__ import annotations
 
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    List,
-    Mapping,
-    MutableMapping,
-    Optional,
-    Sequence,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Sequence, Union
 
 import discord
 from discord.ext import commands
 
 from ...cache import cache
 from ...errors import MenuItemNotFoundError, MenuNotFoundError
+from ...ref import Rift, RiftContext
 from ..db import execute_query
 from ..query import insert_interface
 from .base import Makeable
@@ -23,13 +15,16 @@ from .base import Makeable
 __all__ = ("Menu", "MenuItem")
 
 if TYPE_CHECKING:
-    from typings import MenuData, MenuItemData
+    from _typings import MenuData, MenuFormattedFlags, MenuItemData
+
+    from .embassy import Embassy
+    from .ticket import Ticket
 
 
 class View(discord.ui.View):
-    def __init__(self, *args, **kwargs) -> None:
-        self.menu_id = kwargs.pop("menu_id")
-        self.bot = kwargs.pop("bot")
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.menu_id: int = kwargs.pop("menu_id")
+        self.bot: Rift = kwargs.pop("bot")
         super().__init__(*args, **kwargs)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
@@ -46,9 +41,9 @@ class View(discord.ui.View):
 
 
 class Button(discord.ui.Button):
-    def __init__(self, *args, **kwargs) -> None:
-        self.action = kwargs.pop("action")
-        self.options = kwargs.pop("options")
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.action: str = kwargs.pop("action")
+        self.options: List[int] = kwargs.pop("options")
         super().__init__(*args, **kwargs)
 
     async def callback(self, interaction: discord.Interaction) -> None:
@@ -70,7 +65,7 @@ class Button(discord.ui.Button):
         if self.action is None:
             return await interaction.response.defer()
         if self.action in {"ADD_ROLE", "ADD_ROLES"}:
-            roles = []
+            roles: List[discord.Role] = []
             for role in self.options:
                 role = interaction.guild.get_role(role)
                 if role is None:
@@ -122,7 +117,7 @@ class Button(discord.ui.Button):
         elif self.action in {"CREATE_TICKET", "CREATE_TICKETS"}:
             await interaction.response.defer()
             configs = [await TicketConfig.fetch(opt) for opt in self.options]
-            tickets = []
+            tickets: List[Ticket] = []
             for config in configs:
                 if config.guild_id != interaction.guild.id:
                     continue
@@ -130,11 +125,11 @@ class Button(discord.ui.Button):
                 await ticket.start(interaction.user, config)
                 tickets.append(ticket)
             if len(tickets) > 1:
-                tickets = "\n".join(f"<#{ticket.id}" for ticket in tickets)
+                tickets_str = "\n".join(f"<#{ticket.id}" for ticket in tickets)
                 await interaction.followup.send(
                     ephemeral=True,
                     embed=get_embed_author_member(
-                        interaction.user, f"Tickets Created!\n{tickets}"
+                        interaction.user, f"Tickets Created!\n{tickets_str}"
                     ),
                 )
             else:
@@ -149,7 +144,7 @@ class Button(discord.ui.Button):
         elif self.action in {"CREATE_EMBASSY", "CREATE_EMBASSIES"}:
             await interaction.response.defer()
             configs = [await EmbassyConfig.fetch(opt) for opt in self.options]
-            embassies = []
+            embassies: List[Embassy] = []
             try:
                 nation = await get_link_user(interaction.user.id)
                 nation = await Nation.fetch(nation["nation_id"])
@@ -182,13 +177,11 @@ class Button(discord.ui.Button):
                     await embassy.start(interaction.user, config)
                 embassies.append(embassy)
             if len(embassies) > 1:
-                embassies = "\n".join(
-                    f"<#{embassy.id}" for embassy in embassies
-                )
+                embassies_str = "\n".join(f"<#{embassy.id}" for embassy in embassies)
                 await interaction.followup.send(
                     ephemeral=True,
                     embed=get_embed_author_member(
-                        interaction.user, f"Embassies:\n{embassies}"
+                        interaction.user, f"Embassies:\n{embassies_str}"
                     ),
                 )
             else:
@@ -204,17 +197,17 @@ class Button(discord.ui.Button):
 
 class Select(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction) -> None:
-        values = self.values.copy()
+        values = self.values.copy()  # type: ignore
 
 
 class SelectOption(discord.SelectOption):
-    def __init__(self, *args, **kwargs) -> None:
-        self.action = kwargs.pop("action")
-        self.options = kwargs.pop("options")
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.action: str = kwargs.pop("action")
+        self.options: List[int] = kwargs.pop("options")
         super().__init__(*args, **kwargs)
 
     def __str__(self) -> str:
-        return f"Label: {self.label} - Description: {self.description} - Emoji: {self.emoji} - Default: {self.default} - Action: {self.action}"
+        return f"Label: {self.label} - Description: {self.description} - Emoji: {self.emoji} - Default: {self.default} - Action: {self.action}"  # type: ignore
 
 
 class Menu(Makeable):
@@ -244,7 +237,7 @@ class Menu(Makeable):
         self.permissions = data["permissions"] or {}
 
     @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str) -> Menu:
+    async def convert(cls, ctx: RiftContext, argument: str) -> Menu:
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         try:
@@ -275,7 +268,7 @@ class Menu(Makeable):
         return menu
 
     async def _make_items(self) -> None:
-        items = []
+        items: List[List[MenuItem]] = []
         for i in self.item_ids:
             if i:
                 items.append([(await MenuItem.fetch(j, self.guild_id)) for j in i])
@@ -333,10 +326,10 @@ class Menu(Makeable):
         self.view = View(bot=bot, menu_id=self.id, timeout=None)
         for index, item_set in enumerate(self.items):
             for item in item_set:
-                self.view.add_item(item.get_item(self.id, index))
+                self.view.add_item(item.get_item(self.id, index))  # type: ignore
         return self.view
 
-    def get_description_embed(self, ctx: commands.Context) -> discord.Embed:
+    def get_description_embed(self, ctx: RiftContext) -> discord.Embed:
         from ...funcs import get_embed_author_guild
 
         if TYPE_CHECKING:
@@ -364,7 +357,7 @@ class MenuItem:
         self.data = data["data_"] or {}
 
     @classmethod
-    async def convert(cls, ctx: commands.Context, argument: str) -> MenuItem:
+    async def convert(cls, ctx: RiftContext, argument: str) -> MenuItem:
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         try:
@@ -465,22 +458,22 @@ class MenuItem:
 
     @staticmethod
     async def format_flags(
-        ctx: commands.Context, flags: Mapping[str, List[Any]]
-    ) -> MutableMapping[str, Any]:  # sourcery no-metrics
+        ctx: RiftContext, flags: Mapping[str, List[Any]]
+    ) -> MenuFormattedFlags:  # sourcery no-metrics
         from ...funcs import get_embed_author_member
         from .embassy import Embassy, EmbassyConfig
         from .ticket import Ticket, TicketConfig
 
-        formatted_flags = {}
+        formatted_flags: MenuFormattedFlags = {}
         if "action" in flags:
             formatted_flags["action"] = flags["action"][0].upper().replace(" ", "_")
         if "style" in flags:
             formatted_flags["style"] = flags["style"][0].lower()
-        if "options" in flags:
+        if "options" in flags and "action" in flags:
             formatted_flags["options"] = set()
             for i in flags["options"]:
                 for j in i.split(" "):
-                    if formatted_flags["action"] in {
+                    if formatted_flags["action"] in {  # type: ignore
                         "ADD_ROLE",
                         "REMOVE_ROLE",
                         "ADD_ROLES",
@@ -488,7 +481,7 @@ class MenuItem:
                     }:
                         try:
                             formatted_flags["options"].add(
-                                (await commands.RoleConverter().convert(ctx, j)).id
+                                (await commands.RoleConverter().convert(ctx, j)).id  # type: ignore
                             )
                         except commands.RoleNotFound as error:
                             if error.argument:
@@ -498,7 +491,7 @@ class MenuItem:
                                         f"No role found with argument `{error.argument}`.\nPlease continue with further input, to correct please restart.",
                                     )
                                 )
-                    elif formatted_flags["action"] in {
+                    elif formatted_flags["action"] in {  # type: ignore
                         "CREATE_TICKET",
                         "CREATE_TICKETS",
                     }:
@@ -514,11 +507,14 @@ class MenuItem:
                                         f"No ticket found with ID `{j}`.\nPlease continue with further input, to correct please restart.",
                                     )
                                 )
-                    elif formatted_flags["action"] in {"CLOSE_TICKET", "CLOSE_TICKETS"}:
-                        formatted_flags["options"].add(
+                    elif formatted_flags["action"] in {  # type: ignore
+                        "CLOSE_TICKET",
+                        "CLOSE_TICKETS",
+                    }:
+                        formatted_flags["options"].add(  # type: ignore
                             int(await Ticket.convert(ctx, j))
                         )
-                    elif formatted_flags["action"] in {
+                    elif formatted_flags["action"] in {  # type: ignore
                         "CREATE_EMBASSY",
                         "CREATE_EMBASSIES",
                     }:
@@ -534,14 +530,14 @@ class MenuItem:
                                         f"No embassy found with ID `{j}`.\nPlease continue with further input, to correct please restart.",
                                     )
                                 )
-                    elif formatted_flags["action"] in {
+                    elif formatted_flags["action"] in {  # type: ignore
                         "CLOSE_EMBASSY",
                         "CLOSE_EMBASSIES",
                     }:
-                        formatted_flags["options"].add(
+                        formatted_flags["options"].add(  # type: ignore
                             int(await Embassy.convert(ctx, j))
                         )
-            formatted_flags["options"] = list(formatted_flags["options"])
+            formatted_flags["options"] = list(formatted_flags["options"])  # type: ignore
         for key, value in flags.items():
             if key not in formatted_flags:
                 formatted_flags[key] = value[0]

@@ -1,19 +1,18 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import discord
 
 from ...cache import cache
 from ..db.sql import execute_query
-from ..get import get_guild_settings, get_guild_welcome_settings
 from .base import Makeable
 from .nation import Nation
 
 __all__ = ("UserSettings", "GuildWelcomeSettings", "GuildSettings")
 
 if TYPE_CHECKING:
-    from typings import GuildSettingsData, GuildWelcomeSettingsData
+    from _typings import GuildSettingsData, GuildWelcomeSettingsData
 
 
 class UserSettings(Makeable):
@@ -201,7 +200,7 @@ class GuildSettings(Makeable):
         return settings
 
     @classmethod
-    async def fetch(cls, guild_id: int, *attrs) -> GuildSettings:
+    async def fetch(cls, guild_id: int, *attrs: str) -> GuildSettings:
         settings = cache.get_guild_settings(guild_id)
         if not settings:
             settings = cls.default(guild_id)

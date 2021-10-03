@@ -5,19 +5,18 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import discord
 import pnwkit
-from discord.ext import commands
 
 from ...cache import cache
 from ...errors import AllianceNotFoundError
 from ...find import search_alliance
-from ...ref import bot
+from ...ref import RiftContext, bot
 from .base import Makeable
 from .resources import Resources
 
 __all__ = ("Alliance",)
 
 if TYPE_CHECKING:
-    from typings import AllianceData
+    from _typings import AllianceData
 
     from .nation import Nation
     from .treaty import Treaty
@@ -49,7 +48,7 @@ class Alliance(Makeable):
 
     @classmethod
     async def convert(
-        cls, ctx: commands.Context, search: Any, advanced: bool = True
+        cls, ctx: RiftContext, search: Any, advanced: bool = True
     ) -> Alliance:
         return await search_alliance(ctx, search, advanced)
 
@@ -60,7 +59,7 @@ class Alliance(Makeable):
             return alliance
         raise AllianceNotFoundError(alliance_id)
 
-    def _update(self, data: AllianceData, /) -> None:
+    def update(self, data: AllianceData, /) -> None:
         self.id: int = data["id"]
         self.found_date: str = data["found_date"]
         self.name: str = data["name"]
@@ -203,9 +202,7 @@ class Alliance(Makeable):
         await bot.parse_token(content)
         return await Resources.from_dict(await parse_alliance_bank(content))
 
-    def get_info_embed(
-        self, ctx: commands.Context, short: bool = False
-    ) -> discord.Embed:
+    def get_info_embed(self, ctx: RiftContext, short: bool = False) -> discord.Embed:
         # sourcery no-metrics
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
@@ -430,55 +427,3 @@ class Alliance(Makeable):
                 (i["net_total"] for i in revenues[1:]), revenues[0]["net_total"]
             ),
         }
-
-    # PHASE OUT
-    def get_militarization(self, vm=None):
-        return self.militarization
-
-    def get_soldiers(self, vm=None):
-        return self.soldiers
-
-    def get_tanks(self, vm=None):
-        return self.tanks
-
-    def get_aircraft(self, vm=None):
-        return self.aircraft
-
-    def get_ships(self, vm=None):
-        return self.ships
-
-    def get_missiles(self, vm=None):
-        return self.missiles
-
-    def get_nukes(self, vm=None):
-        return self.nukes
-
-    def get_cities(self, vm=None):
-        return self.cities
-
-    async def _make_members(self) -> None:
-        pass
-
-    async def _make_vm_members(self) -> None:
-        pass
-
-    async def _make_leaders(self) -> None:
-        pass
-
-    async def _make_heirs(self) -> None:
-        pass
-
-    async def _make_officers(self) -> None:
-        pass
-
-    async def _make_applicants(self) -> None:
-        pass
-
-    async def _make_calculated_score(self) -> None:
-        pass
-
-    async def _make_member_count(self) -> None:
-        pass
-
-    async def _make_treaties(self) -> None:
-        pass
