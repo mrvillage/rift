@@ -7,7 +7,7 @@ from src.overrides import override
 
 override()
 
-from src.bot.main import main
+from src.bot import main
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())
