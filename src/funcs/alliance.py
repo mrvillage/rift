@@ -17,7 +17,7 @@ async def search_alliance(
     ctx: RiftContext, search: str, advanced: bool = False
 ) -> Alliance:
     try:
-        search = await convert_link(search)
+        search = convert_link(search)
     except LinkError:
         pass
     try:

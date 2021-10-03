@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING, Any, Mapping, Optional, Sequence
 
 import discord
 
+__all__ = ("get_row",
+)
 if TYPE_CHECKING:
     from ...data.classes import MenuItem
 
@@ -31,7 +33,7 @@ async def get_row(
                     continue
                 else:
                     return index
-            await message.reply( # type: ignore
+            await message.reply(  # type: ignore
                 embed=get_embed_author_member(
                     message.author, "There's no space for that item in the menu!"
                 )
@@ -45,7 +47,7 @@ async def get_row(
                     or len(row) == 5
                     or (type_ == "select" and len(row) != 0)
                 ):
-                    await message.reply( # type: ignore
+                    await message.reply(  # type: ignore
                         embed=get_embed_author_member(
                             message.author,
                             f"Row {row_num} doesn't have space for your item!",
@@ -55,7 +57,7 @@ async def get_row(
             return row_num
         raise ValueError
     except ValueError:
-        await message.reply( # type: ignore
+        await message.reply(  # type: ignore
             embed=get_embed_author_member(
                 message.author, f"`{flags['row'][0]}` is not a valid row!"
             )

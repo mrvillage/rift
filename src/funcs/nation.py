@@ -14,7 +14,7 @@ __all__ = ("search_nation",)
 
 async def search_nation(ctx: RiftContext, search: str, advanced: bool = True) -> Nation:
     try:
-        search = await convert_link(search)
+        search = convert_link(search)
     except LinkError:
         pass
     try:

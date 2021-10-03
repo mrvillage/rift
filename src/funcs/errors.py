@@ -20,6 +20,8 @@ from ..ref import RiftContext
 from .embeds import get_embed_author_member
 from .utils import get_command_signature
 
+__all__ = ("print_handler", "handler")
+
 
 async def print_handler(ctx: RiftContext, error: Exception) -> None:
     if hasattr(ctx.command, "on_error"):
@@ -44,7 +46,7 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
             await ctx.reply(
                 embed=get_embed_author_member(
                     ctx.author,
-                    f"You forgot an argument!\n\n`{await get_command_signature(ctx)}`",
+                    f"You forgot an argument!\n\n`{get_command_signature(ctx)}`",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
@@ -76,7 +78,7 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
             await ctx.reply(
                 embed=get_embed_author_member(
                     ctx.author,
-                    f"You gave an invalid argument!\n\n`{await get_command_signature(ctx)}`",
+                    f"You gave an invalid argument!\n\n`{get_command_signature(ctx)}`",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,

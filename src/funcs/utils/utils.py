@@ -6,6 +6,24 @@ from typing import TYPE_CHECKING, Dict, Mapping, Union
 
 from ...ref import RiftContext
 
+__all__ = (
+    "get_color",
+    "get_color_id",
+    "get_domestic_policy",
+    "get_war_policy",
+    "get_alliance_position",
+    "get_alliance_position_id",
+    "get_continent",
+    "convert_bool",
+    "get_command_signature",
+    "generate_code",
+    "convert_link",
+    "convert_number",
+    "check_resource",
+    "parse_time",
+    "convert_seconds_to_text",
+)
+
 color_map = (
     "Beige",
     "Gray",
@@ -95,7 +113,7 @@ def get_continent(continent_id: int) -> str:
     return continent_map[continent_id - 1]
 
 
-async def convert_bool(value: str) -> bool:
+def convert_bool(value: str) -> bool:
     from ...errors import BoolError
 
     if value.lower() in {"true", "yes", "approve", "go", "accept"}:
@@ -105,7 +123,7 @@ async def convert_bool(value: str) -> bool:
     raise BoolError
 
 
-async def get_command_signature(ctx: RiftContext) -> str:
+def get_command_signature(ctx: RiftContext) -> str:
     if TYPE_CHECKING:
         assert ctx.command is not None
     return f"?{ctx.command.qualified_name} {ctx.command.signature}"  # type: ignore
@@ -114,11 +132,11 @@ async def get_command_signature(ctx: RiftContext) -> str:
 get_command_help = get_command_signature
 
 
-async def generate_code(length: int = 16) -> str:
+def generate_code(length: int = 16) -> str:
     return "".join(random.choices(string.ascii_letters + string.digits, k=length))
 
 
-async def convert_link(search: str) -> str:
+def convert_link(search: str) -> str:
     from ...errors import LinkError
 
     if "politicsandwar" in search:
@@ -126,7 +144,7 @@ async def convert_link(search: str) -> str:
     raise LinkError
 
 
-async def convert_number(num: str) -> Union[int, float]:
+def convert_number(num: str) -> Union[int, float]:
     num = "".join(i for i in num if i in string.digits or i == ".")
     if num.count(".") > 1:
         last = num.rfind(".")
@@ -157,7 +175,7 @@ resources = (
 )
 
 
-async def check_resource(arg: str) -> bool:
+def check_resource(arg: str) -> bool:
     return arg.lower() in resources
 
 
