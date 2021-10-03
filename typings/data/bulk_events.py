@@ -7,6 +7,7 @@ from .city import CityData
 from .color import ColorData
 from .nation import NationData
 from .treaty import TreatyData
+from .war import WarData
 
 __all__ = (
     "BulkAllianceListData",
@@ -17,6 +18,7 @@ __all__ = (
     "BulkNationListData",
     "BulkNationUpdateData",
     "BulkTreatyListData",
+    "BulkWarListData",
 )
 
 BulkAllianceListData = List[AllianceData]
@@ -52,3 +54,5 @@ class NationUpdateData(TypedDict):
 BulkNationUpdateData = List[NationUpdateData]
 
 BulkTreatyListData = List[TreatyData]
+
+BulkWarListData = List[WarData]
