@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import TYPE_CHECKING, List
 
 from ..db import execute_query, execute_read_query
 
@@ -12,66 +12,38 @@ __all__ = (
     "query_link_user",
     "query_link_nation",
 )
+if TYPE_CHECKING:
+    from _typings import LinkData
 
 
-async def query_links() -> List[Dict[str, int]]:
-    return [
-        dict(i)
-        for i in await execute_read_query(
-            """
-        SELECT * FROM links;
-    """
-        )
-    ]
+async def query_links() -> List[LinkData]:
+    return await execute_read_query("SELECT * FROM links;")
 
 
 async def add_link(user_id: int, nation_id: int, /) -> None:
     await execute_query(
-        f"""
-        INSERT INTO links
-        VALUES
-        ({user_id},{nation_id})
-    """
+        "INSERT INTO links VALUES ($1, $2);",
+        user_id,
+        nation_id,
     )
 
 
 async def remove_link_user(user_id: int, /) -> None:
     await execute_query(
-        f"""
-        DELETE FROM links
-        WHERE user_id = {user_id};
-    """
+        "DELETE FROM links WHERE user_id = $1;",
+        user_id,
     )
 
 
 async def remove_link_nation(nation_id: int, /) -> None:
-    await execute_query(
-        f"""
-        DELETE FROM links
-        WHERE nation_id = {nation_id};
-    """
+    await execute_query("DELETE FROM links WHERE nation_id = $1;", nation_id)
+
+
+async def query_link_user(user_id: int, /) -> List[LinkData]:
+    return await execute_read_query("SELECT * FROM links WHERE user_id = $1;", user_id)
+
+
+async def query_link_nation(nation_id: int, /) -> List[LinkData]:
+    return await execute_read_query(
+        "SELECT * FROM links WHERE nation_id = $1;", nation_id
     )
-
-
-async def query_link_user(user_id: int, /) -> List[Dict[str, int]]:
-    return [
-        dict(i)
-        for i in await execute_read_query(
-            f"""
-        SELECT * FROM links
-        WHERE user_id = {user_id};
-    """
-        )
-    ]
-
-
-async def query_link_nation(nation_id: int, /) -> List[Dict[str, int]]:
-    return [
-        dict(i)
-        for i in await execute_read_query(
-            f"""
-        SELECT * FROM links
-        WHERE nation_id = {nation_id};
-    """
-        )
-    ]

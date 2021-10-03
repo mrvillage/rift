@@ -5,8 +5,8 @@ from .database import *
 from .embassy import *
 from .link import *
 from .menu import *
-from .mmr import *
 from .nation import *
+from .target import *
 from .ticket import *
 from .treaty import *
 from .war import *

@@ -11,7 +11,7 @@ from ...env import DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER
 
 
 async def init(conn: Connection) -> Connection:
-    await conn.set_type_codec(
+    await conn.set_type_codec(  # type: ignore
         "json", encoder=json.dumps, decoder=json.loads, schema="pg_catalog"
     )
     return conn

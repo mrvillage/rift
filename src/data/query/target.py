@@ -9,7 +9,7 @@ from ..db import execute_query
 __all__ = ("add_target", "edit_target", "remove_target")
 
 if TYPE_CHECKING:
-    from typings import TargetData
+    from _typings import TargetData
 
 
 async def add_target(
