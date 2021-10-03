@@ -118,11 +118,13 @@ async def main() -> None:
 
             if not bot.cogs_loaded:
                 cogPath = Path.cwd() / "src" / "bot" / "cogs"
-                cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
+                cogs = [
+                    i.name.replace(".py", "")
+                    for i in cogPath.glob("*.py")
+                    if i not in {"server", "database"}
+                ]
                 for cog in cogs:
                     bot.load_extension(f"src.bot.cogs.{cog}")
-                bot.unload_extension("src.bot.cogs.database")
-                bot.unload_extension("src.bot.cogs.server")
                 if bot.debug:  # type: ignore
                     bot.unload_extension("src.bot.cogs.logs")
                 bot.cogs_loaded = True
