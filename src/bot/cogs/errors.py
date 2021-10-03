@@ -23,7 +23,7 @@ class Errors(commands.Cog):
         cog = ctx.cog
         if (
             cog
-            and commands.Cog._get_overridden_method(cog.cog_command_error) is not None # type: ignore
+            and commands.Cog._get_overridden_method(cog.cog_command_error) is not None  # type: ignore
         ):
             return
         await funcs.handler(ctx, error)

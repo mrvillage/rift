@@ -9,7 +9,6 @@ from src.errors.notfound import CityNotFoundError
 
 from ...cache import cache
 from ...errors import CityNotFoundError
-from ..requests import get_city_build
 from .base import Makeable
 from .resources import Resources
 
@@ -77,9 +76,6 @@ class City:
 
     async def _make_nation(self) -> None:
         pass
-
-    async def get_build(self) -> Dict[str, Any]:
-        return await get_city_build(city_id=self.id)
 
 
 class FullCity(Makeable):

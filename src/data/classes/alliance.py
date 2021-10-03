@@ -16,7 +16,7 @@ from .resources import Resources
 __all__ = ("Alliance",)
 
 if TYPE_CHECKING:
-    from _typings import AllianceData
+    from _typings import AllianceData, Field
 
     from .nation import Nation
     from .treaty import Treaty
@@ -211,7 +211,7 @@ class Alliance(Makeable):
         leaders = self.leaders
         heirs = self.heirs
         officers = self.officers
-        fields = [
+        fields: List[Field] = [
             {"name": "Alliance ID", "value": self.id},
             {"name": "Alliance Name", "value": self.name},
             {
@@ -328,8 +328,6 @@ class Alliance(Makeable):
         self,
         fetch_spies: bool = False,
     ) -> Dict[str, Union[Resources, Dict[str, float], int, float]]:
-        from ...funcs import get_trade_prices
-
         data = await pnwkit.async_alliance_query(
             {"id": self.id, "first": 1},
             {

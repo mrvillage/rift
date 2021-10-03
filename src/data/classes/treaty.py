@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 
     from .alliance import Alliance
 
+
 class Treaty:
     started: str
     stopped: Optional[str]
