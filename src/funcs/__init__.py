@@ -1,19 +1,12 @@
-from . import bank, utils
+from . import utils  # type: ignore
 from .alliance import *
+from .bank import *
 from .city import *
-from .core import *
 from .document import *
 from .embeds import *
 from .errors import *
-from .link import *
-from .message import *
-from .mmr import *
 from .nation import *
 from .parse import *
-from .riftModule import *
 from .server import *
-from .settings import *
 from .spies import *
-from .targets import *
 from .tools import *
-from .trade import *

@@ -4,25 +4,24 @@ from discord.ext import commands
 
 from ..cache import cache
 from ..data.classes import Nation
+from ..data.get import get_link_user
 from ..errors import LinkError, NationNotFoundError
 from ..funcs.utils import convert_link
-from .link import get_link_user
+from ..ref import RiftContext
 
 __all__ = ("search_nation",)
 
 
-async def search_nation(
-    ctx: commands.Context, search: str, advanced: bool = True
-) -> Nation:
+async def search_nation(ctx: RiftContext, search: str, advanced: bool = True) -> Nation:
     try:
         search = await convert_link(search)
     except LinkError:
         pass
     try:
-        user = await commands.MemberConverter().convert(ctx, search)
+        user = await commands.MemberConverter().convert(ctx, search)  # type: ignore
     except commands.MemberNotFound:
         try:
-            user = await commands.UserConverter().convert(ctx, search)
+            user = await commands.UserConverter().convert(ctx, search)  # type: ignore
         except commands.UserNotFound:
             user = None
     if user is not None:

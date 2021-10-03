@@ -1,7 +1,21 @@
-from ...ref import bot
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional, Union
+
+from ..ref import bot
+
+if TYPE_CHECKING:
+    from ..data.classes import Alliance, Nation, Transaction
+
+__all__ = ("withdraw",)
 
 
-async def withdraw(*, transaction, receiver, note: str = None):
+async def withdraw(
+    *,
+    transaction: Transaction,
+    receiver: Union[Alliance, Nation],
+    note: Optional[str] = None
+):
     transaction_data = transaction.get_data_withdraw()
     transaction_data["withtype"] = type(receiver).__name__
     if note is not None:
@@ -16,9 +30,6 @@ async def withdraw(*, transaction, receiver, note: str = None):
     ) as response:
         content = await response.text()
     await bot.parse_token(content)
-    if "Something went wrong" in content:
-        return False
-    elif "successfully transferred" in content:
-        return True
-    else:
-        return False
+    return (
+        "Something went wrong" not in content and "successfully transferred" in content
+    )

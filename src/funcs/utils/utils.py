@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import random
 import string
-from typing import TYPE_CHECKING, Mapping, Union
+from typing import TYPE_CHECKING, Dict, Mapping, Union
 
-from discord.ext import commands
+from ...ref import RiftContext
 
 color_map = (
     "Beige",
@@ -105,10 +105,10 @@ async def convert_bool(value: str) -> bool:
     raise BoolError
 
 
-async def get_command_signature(ctx: commands.Context) -> str:
+async def get_command_signature(ctx: RiftContext) -> str:
     if TYPE_CHECKING:
         assert ctx.command is not None
-    return f"?{ctx.command.qualified_name} {ctx.command.signature}"
+    return f"?{ctx.command.qualified_name} {ctx.command.signature}"  # type: ignore
 
 
 get_command_help = get_command_signature
@@ -176,7 +176,7 @@ def parse_time(time: str) -> Mapping[str, int]:
     keys = sorted(indexes, key=lambda x: indexes[x])
     if len(keys) == 1:
         raise ValueError("No valid time was specified")
-    kwargs = {}
+    kwargs: Dict[str, int] = {}
     for index in range(1, len(keys)):
         duration = durations[keys[index]]
         value = time[indexes[keys[index - 1]] + 1 : indexes[keys[index]]]
