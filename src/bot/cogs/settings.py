@@ -10,6 +10,7 @@ from src.views.settings import AlliancePurposeConfirm
 
 from ... import funcs
 from ...checks import has_manage_permissions
+from ...data import get
 from ...data.classes import Alliance, GuildSettings, Nation
 from ...errors import AllianceNotFoundError
 from ...ref import Rift, RiftContext
@@ -443,7 +444,7 @@ class Settings(commands.Cog):
         if member.pending:
             return
         try:
-            nat = await funcs.get_link_user(member.id)
+            nat = await get.get_link_user(member.id)
             nation: Optional[Nation] = await Nation.fetch(nat["nation_id"])
             await nation.make_attrs("alliance")
         except IndexError:
