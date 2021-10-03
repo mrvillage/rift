@@ -187,7 +187,7 @@ class Cache:
             self._cities[i.id] = i
         for i in colors[0]["colors"]:  # SPECIAL CASE
             i = Color(i)
-            self._colors[i.name] = i
+            self._colors[i.color] = i
         for i in embassies:
             i = Embassy(i)
             self._embassies[i.id] = i
