@@ -20,3 +20,4 @@ profile = "black"
 
 [tool.pyright]
 reportMissingTypeStubs = false
+reportImportCycles = false
