@@ -2,20 +2,20 @@ from __future__ import annotations
 
 import inspect
 from io import BytesIO
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import aiohttp
 import discord
 import pnwkit
 from discord.ext import commands
 
-from ... import find, funcs
+from ... import funcs
 from ...data.classes import Alliance, Nation
-from ...errors import AllianceNotFoundError, NationNotFoundError
+from ...ref import Rift, RiftContext
 
 
 class Military(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Rift):
         self.bot = bot
 
     @commands.group(
@@ -27,7 +27,9 @@ class Military(commands.Cog):
         type=(commands.CommandType.default, commands.CommandType.chat_input),
         descriptions={"alliance": "The alliance to check the militarization of."},
     )
-    async def militarization(self, ctx: commands.Context, *, alliance: Alliance = None):
+    async def militarization(
+        self, ctx: RiftContext, *, alliance: Optional[Alliance] = None
+    ):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         if ctx.interaction:
             await ctx.interaction.response.defer()
@@ -42,9 +44,9 @@ class Military(commands.Cog):
                     f"https://checkapi.bsnk.dev/getChart?allianceID={alliance.id}",
                 ) as req:
                     byte = await req.read()
-        militarization = alliance.get_militarization(vm=False)
+        militarization = alliance.militarization
         image = discord.File(BytesIO(byte), f"militarization_{alliance.id}.png")
-        cities = alliance.get_cities()
+        cities = alliance.cities
         alliance_data = await pnwkit.async_alliance_query(
             {"id": alliance.id, "first": 1},
             {
@@ -99,23 +101,24 @@ class Military(commands.Cog):
             fields=[
                 {
                     "name": "Soldiers",
-                    "value": f"{alliance.get_soldiers():,}/{cities*15000:,}",
+                    "value": f"{alliance.soldiers:,}/{cities*15000:,}",
                 },
-                {"name": "Tanks", "value": f"{alliance.get_tanks():,}/{cities*1250:,}"},
+                {"name": "Tanks", "value": f"{alliance.tanks:,}/{cities*1250:,}"},
                 {
                     "name": "Aircraft",
-                    "value": f"{alliance.get_aircraft():,}/{cities*75:,}",
+                    "value": f"{alliance.aircraft:,}/{cities*75:,}",
                 },
-                {"name": "Ships", "value": f"{alliance.get_ships():,}/{cities*15:,}"},
-                {"name": "Missiles", "value": f"{alliance.get_missiles():,}"},
-                {"name": "Nukes", "value": f"{alliance.get_nukes():,}"},
+                {"name": "Ships", "value": f"{alliance.ships:,}/{cities*15:,}"},
+                {"name": "Missiles", "value": f"{alliance.missiles:,}"},
+                {"name": "Nukes", "value": f"{alliance.nukes:,}"},
             ],
             color=discord.Color.blue(),
         )
         await ctx.reply(file=image, embed=embed)
 
     @commands.command(name="militarization-nation", aliases=["mn"], hidden=True)
-    async def mn_shortcut(self, ctx: commands.Context, *, nation: Nation = None):
+    async def mn_shortcut(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
+        nation = nation or await Nation.convert(ctx, nation)
         await ctx.invoke(self.militarization_nation, nation=nation)
 
     @militarization.command(
@@ -126,8 +129,9 @@ class Military(commands.Cog):
         descriptions={"alliance": "The alliance to check the militarization of."},
     )
     async def militarization_alliance(
-        self, ctx: commands.Context, *, alliance: Alliance = None
+        self, ctx: RiftContext, *, alliance: Optional[Alliance] = None
     ):
+        alliance = alliance or await Alliance.convert(ctx, alliance)
         await ctx.invoke(self.militarization, alliance=alliance)
 
     @militarization.command(
@@ -137,7 +141,7 @@ class Military(commands.Cog):
         type=(commands.CommandType.default, commands.CommandType.chat_input),
         descriptions={"nation": "The nation to check the militarization of."},
     )
-    async def militarization_nation(self, ctx, *, nation: Nation = None):
+    async def militarization_nation(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
         nation = nation or await Nation.convert(ctx, nation)
         author = nation.user or ctx.author
         militarization = nation.get_militarization()
@@ -216,5 +220,5 @@ class Military(commands.Cog):
         await ctx.reply(embed=embed)
 
 
-def setup(bot):
+def setup(bot: Rift):
     bot.add_cog(Military(bot))

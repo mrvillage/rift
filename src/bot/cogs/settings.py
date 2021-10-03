@@ -12,9 +12,7 @@ from ... import funcs
 from ...checks import has_manage_permissions
 from ...data.classes import Alliance, GuildSettings, Nation
 from ...errors import AllianceNotFoundError
-
-if TYPE_CHECKING:
-    from ...ref import Rift
+from ...ref import Rift, RiftContext
 
 
 class Settings(commands.Cog):
@@ -27,7 +25,7 @@ class Settings(commands.Cog):
         invoke_without_command=True,
         enabled=False,
     )
-    async def user_settings(self, ctx: commands.Context):
+    async def user_settings(self, ctx: RiftContext):
         ...
 
     @commands.group(
@@ -39,7 +37,7 @@ class Settings(commands.Cog):
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def server_settings(self, ctx: commands.Context):
+    async def server_settings(self, ctx: RiftContext):
         ...
 
     @server_settings.command(
@@ -53,22 +51,23 @@ class Settings(commands.Cog):
     @commands.guild_only()
     async def server_settings_purpose(
         self,
-        ctx: commands.Context,
+        ctx: RiftContext,
         *,
-        purpose: Literal[  # type: ignore
-            "ALLIANCE",
-            "ALLIANCE_GOVERNMENT",
-            "ALLIANCE_MILITARY_AFFAIRS",
-            "ALLIANCE_INTERNAL_AFFAIRS",
-            "ALLIANCE_MILITARY_AFFAIRS",
-            "ALLIANCE_FOREIGN_AFFAIRS",
-            "ALLIANCE_ECONOMIC_AFFAIRS",
-            "BUSINESS",
-            "COMMUNITY",
-            "PERSONAL",
+        purpose: Optional[
+            Literal[  # type: ignore
+                "ALLIANCE",
+                "ALLIANCE_GOVERNMENT",
+                "ALLIANCE_MILITARY_AFFAIRS",
+                "ALLIANCE_INTERNAL_AFFAIRS",
+                "ALLIANCE_MILITARY_AFFAIRS",
+                "ALLIANCE_FOREIGN_AFFAIRS",
+                "ALLIANCE_ECONOMIC_AFFAIRS",
+                "BUSINESS",
+                "COMMUNITY",
+                "PERSONAL",
+            ]
         ] = None,
     ):  # sourcery no-metrics
-        purpose: Optional[str]
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id)
@@ -171,7 +170,7 @@ class Settings(commands.Cog):
                     color=discord.Color.orange(),
                 )
             )
-            sent = []
+            sent: List[discord.User] = []
             for i in alliance.leaders:
                 if not i.user:
                     continue
@@ -250,7 +249,7 @@ class Settings(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def server_settings_welcome_message(
-        self, ctx: commands.Context, *, message: str = None  # type: ignore
+        self, ctx: RiftContext, *, message: str = None  # type: ignore
     ):
         message: Optional[str]
         if TYPE_CHECKING:
@@ -290,7 +289,7 @@ class Settings(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def server_settings_verified_nickname(
-        self, ctx: commands.Context, *, nickname: str = None  # type: ignore
+        self, ctx: RiftContext, *, nickname: str = None  # type: ignore
     ):
         nickname: Optional[str]
         if TYPE_CHECKING:
@@ -331,7 +330,7 @@ class Settings(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def server_settings_welcome_channels(
-        self, ctx: commands.Context, *, channels: List[discord.TextChannel] = None, clear: bool = False  # type: ignore
+        self, ctx: RiftContext, *, channels: List[discord.TextChannel] = None, clear: bool = False  # type: ignore
     ):
         channels: Optional[str]
         if TYPE_CHECKING:
@@ -391,7 +390,7 @@ class Settings(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def server_settings_join_roles(
-        self, ctx: commands.Context, *, roles: List[discord.Role] = None, clear: bool = False  # type: ignore
+        self, ctx: RiftContext, *, roles: List[discord.Role] = None, clear: bool = False  # type: ignore
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)

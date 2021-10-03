@@ -8,7 +8,7 @@ from discord.ext import commands
 from ... import funcs
 from ...cache import cache
 from ...data.classes import Nation, Target
-from ...ref import Rift
+from ...ref import Rift, RiftContext
 
 
 class TargetContext:
@@ -26,7 +26,7 @@ class Targets(commands.Cog):
         brief="A group of commands to manage targets",
         type=commands.CommandType.chat_input,
     )
-    async def target(self, ctx: commands.Context):
+    async def target(self, ctx: RiftContext):
         ...
 
     @target.command(
@@ -42,7 +42,7 @@ class Targets(commands.Cog):
     )
     async def target_add(
         self,
-        ctx: commands.Context,
+        ctx: RiftContext,
         *,
         nation: Nation,
         channels: List[discord.TextChannel] = [],
@@ -72,7 +72,7 @@ class Targets(commands.Cog):
         type=commands.CommandType.chat_input,
         descriptions={"target": "The target to remove."},
     )
-    async def target_remove(self, ctx: commands.Context, *, target: Target):
+    async def target_remove(self, ctx: RiftContext, *, target: Target):
         await target.remove()
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -88,7 +88,7 @@ class Targets(commands.Cog):
         brief="List all your targets.",
         type=commands.CommandType.chat_input,
     )
-    async def target_list(self, ctx: commands.Context):
+    async def target_list(self, ctx: RiftContext):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,

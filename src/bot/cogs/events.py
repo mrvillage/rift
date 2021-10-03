@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 import traceback
 from asyncio import sleep
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 
 import aiohttp
 import discord
@@ -17,7 +17,7 @@ from ...cache import cache
 from ...checks import has_manage_permissions
 from ...data.classes import Alliance, Subscription
 from ...env import SOCKET_IP, SOCKET_PORT
-from ...ref import Rift
+from ...ref import Rift, RiftContext
 
 
 class Events(commands.Cog):
@@ -59,14 +59,14 @@ class Events(commands.Cog):
     @commands.guild_only()
     async def subscribe(
         self,
-        ctx: commands.Context,
+        ctx: RiftContext,
     ):
         ...
 
     @subscribe.group(name="nation", type=commands.CommandType.chat_input)
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_nation(self, ctx: commands.Context):
+    async def subscribe_nation(self, ctx: RiftContext):
         ...
 
     @subscribe_nation.command(
@@ -76,7 +76,7 @@ class Events(commands.Cog):
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_nation_create(self, ctx: commands.Context):
+    async def subscribe_nation_create(self, ctx: RiftContext):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
@@ -97,7 +97,7 @@ class Events(commands.Cog):
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_nation_delete(self, ctx: commands.Context):
+    async def subscribe_nation_delete(self, ctx: RiftContext):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
@@ -124,7 +124,7 @@ class Events(commands.Cog):
     @commands.guild_only()
     async def subscribe_nation_update(
         self,
-        ctx: commands.Context,
+        ctx: RiftContext,
         changes: List[str],
         alliances: List[Alliance] = [],
     ):
@@ -166,7 +166,7 @@ class Events(commands.Cog):
     @subscribe.group(name="alliance", type=commands.CommandType.chat_input)
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_alliance(self, ctx: commands.Context):
+    async def subscribe_alliance(self, ctx: RiftContext):
         ...
 
     @subscribe_alliance.command(
@@ -176,7 +176,7 @@ class Events(commands.Cog):
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_alliance_create(self, ctx: commands.Context):
+    async def subscribe_alliance_create(self, ctx: RiftContext):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
@@ -197,7 +197,7 @@ class Events(commands.Cog):
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_alliance_delete(self, ctx: commands.Context):
+    async def subscribe_alliance_delete(self, ctx: RiftContext):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
@@ -214,7 +214,7 @@ class Events(commands.Cog):
     @subscribe.group(name="treaty", type=commands.CommandType.chat_input)
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_treaty(self, ctx: commands.Context):
+    async def subscribe_treaty(self, ctx: RiftContext):
         ...
 
     @subscribe_treaty.command(
@@ -224,7 +224,7 @@ class Events(commands.Cog):
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_treaty_create(self, ctx: commands.Context):
+    async def subscribe_treaty_create(self, ctx: RiftContext):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
@@ -245,7 +245,7 @@ class Events(commands.Cog):
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_treaty_delete(self, ctx: commands.Context):
+    async def subscribe_treaty_delete(self, ctx: RiftContext):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
@@ -262,7 +262,7 @@ class Events(commands.Cog):
     @subscribe.group(name="forum_post", type=commands.CommandType.chat_input)
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_forum_post(self, ctx: commands.Context):
+    async def subscribe_forum_post(self, ctx: RiftContext):
         ...
 
     @subscribe_forum_post.command(
@@ -277,7 +277,7 @@ class Events(commands.Cog):
     @commands.guild_only()
     async def subscribe_forum_post_create(
         self,
-        ctx: commands.Context,
+        ctx: RiftContext,
         forums: List[Forum],
     ):
         if TYPE_CHECKING:
@@ -310,7 +310,7 @@ class Events(commands.Cog):
     @subscribe.group(name="war", type=commands.CommandType.chat_input)
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_war(self, ctx: commands.Context):
+    async def subscribe_war(self, ctx: RiftContext):
         ...
 
     @subscribe_war.command(
@@ -320,7 +320,7 @@ class Events(commands.Cog):
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_war_create(self, ctx: commands.Context):
+    async def subscribe_war_create(self, ctx: RiftContext):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
@@ -337,7 +337,7 @@ class Events(commands.Cog):
     @commands.group(name="subscription", type=commands.CommandType.chat_input)
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscription(self, ctx: commands.Context):
+    async def subscription(self, ctx: RiftContext):
         ...
 
     @subscription.command(
@@ -351,7 +351,7 @@ class Events(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def subscription_list(
-        self, ctx: commands.Context, channel: discord.TextChannel = None
+        self, ctx: RiftContext, channel: Optional[discord.TextChannel] = None
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
@@ -419,9 +419,7 @@ class Events(commands.Cog):
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscription_info(
-        self, ctx: commands.Context, subscription: Subscription
-    ):
+    async def subscription_info(self, ctx: RiftContext, subscription: Subscription):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
@@ -438,9 +436,7 @@ class Events(commands.Cog):
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscription_delete(
-        self, ctx: commands.Context, subscription: Subscription
-    ):
+    async def subscription_delete(self, ctx: RiftContext, subscription: Subscription):
         await subscription.delete()
         await ctx.reply(
             embed=funcs.get_embed_author_member(

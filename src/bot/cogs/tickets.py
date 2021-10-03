@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Union
+from typing import TYPE_CHECKING, List, Optional, Union
 
 import discord
 from discord.ext import commands
@@ -9,10 +9,10 @@ from ... import funcs
 from ...cache import cache
 from ...checks import has_manage_permissions
 from ...data.classes import Ticket, TicketConfig
-from ...ref import Rift
+from ...ref import Rift, RiftContext
 
 if TYPE_CHECKING:
-    from typings import TicketConfigData
+    from _typings import TicketConfigData
 
 
 class Tickets(commands.Cog):
@@ -27,7 +27,7 @@ class Tickets(commands.Cog):
         type=commands.CommandType.chat_input,
     )
     @commands.guild_only()
-    async def ticket(self, ctx: commands.Context):
+    async def ticket(self, ctx: RiftContext):
         ...
 
     @ticket.command(
@@ -41,7 +41,7 @@ class Tickets(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def ticket_archive(
-        self, ctx: commands.Context, channel: discord.TextChannel = None
+        self, ctx: RiftContext, channel: Optional[discord.TextChannel] = None
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
@@ -88,7 +88,7 @@ class Tickets(commands.Cog):
     )
     @commands.guild_only()
     @has_manage_permissions()
-    async def ticket_config(self, ctx: commands.Context):
+    async def ticket_config(self, ctx: RiftContext):
         ...
 
     @ticket_config.command(
@@ -106,10 +106,10 @@ class Tickets(commands.Cog):
     @has_manage_permissions()
     async def ticket_config_create(
         self,
-        ctx: commands.Context,
+        ctx: RiftContext,
         start: str,
-        category: discord.CategoryChannel = None,
-        archive_category: discord.CategoryChannel = None,
+        category: Optional[discord.CategoryChannel] = None,
+        archive_category: Optional[discord.CategoryChannel] = None,
         mentions: List[Union[discord.Member, discord.User, discord.Role]] = [],
     ):
         if TYPE_CHECKING:
@@ -145,7 +145,7 @@ class Tickets(commands.Cog):
     )
     @commands.guild_only()
     @has_manage_permissions()
-    async def ticket_config_list(self, ctx: commands.Context):
+    async def ticket_config_list(self, ctx: RiftContext):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         configs = [i for i in cache.ticket_configs if i.guild_id == ctx.guild.id]

@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+from typing import Optional
+
 import discord
 import pnwkit
 from discord.ext import commands
 
 from ... import Rift, funcs
 from ...data.classes import Nation
-from ...ref import Rift
+from ...ref import Rift, RiftContext
 
 
 class Tools(commands.Cog):
@@ -14,7 +16,7 @@ class Tools(commands.Cog):
         self.bot = bot
 
     @commands.group(name="tools", type=commands.CommandType.chat_input)
-    async def tools(self, ctx: commands.Context):
+    async def tools(self, ctx: RiftContext):
         ...
 
     @tools.command(
@@ -31,8 +33,7 @@ class Tools(commands.Cog):
     )
     async def tools_infrastructure(
         self,
-        ctx: commands.Context,
-        *,
+        ctx: RiftContext,
         before: float,
         after: float,
         urbanization_policy: bool = False,
@@ -76,8 +77,7 @@ class Tools(commands.Cog):
     )
     async def tools_land(
         self,
-        ctx: commands.Context,
-        *,
+        ctx: RiftContext,
         before: float,
         after: float,
         rapid_expansion_policy: bool = False,
@@ -121,8 +121,7 @@ class Tools(commands.Cog):
     )
     async def tools_city(
         self,
-        ctx: commands.Context,
-        *,
+        ctx: RiftContext,
         before: int,
         after: int,
         manifest_destiny_policy: bool = False,
@@ -153,7 +152,7 @@ class Tools(commands.Cog):
         )
 
     @tools.group(name="nation", type=commands.CommandType.chat_input)
-    async def tools_nation(self, ctx: commands.Context):
+    async def tools_nation(self, ctx: RiftContext):
         ...
 
     @tools_nation.command(
@@ -167,10 +166,9 @@ class Tools(commands.Cog):
     )
     async def tools_nation_infrastructure(
         self,
-        ctx: commands.Context,
-        *,
+        ctx: RiftContext,
         after: float,
-        nation: Nation = None,
+        nation: Optional[Nation] = None,
     ):
         nation = nation or await Nation.convert(ctx, nation)
         if any(after - i.infrastructure >= 1000000 for i in nation.partial_cities):
@@ -215,10 +213,9 @@ class Tools(commands.Cog):
     )
     async def tools_nation_land(
         self,
-        ctx: commands.Context,
-        *,
+        ctx: RiftContext,
         after: float,
-        nation: Nation = None,
+        nation: Optional[Nation] = None,
     ):
         nation = nation or await Nation.convert(ctx, nation)
         if any(after - i.land >= 1000000 for i in nation.partial_cities):
@@ -263,10 +260,9 @@ class Tools(commands.Cog):
     )
     async def tools_nation_city(
         self,
-        ctx: commands.Context,
-        *,
+        ctx: RiftContext,
         after: int,
-        nation: Nation = None,
+        nation: Optional[Nation] = None,
     ):
         nation = nation or await Nation.convert(ctx, nation)
         if after > 100:

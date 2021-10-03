@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 import discord
 from discord.ext import commands
@@ -107,7 +107,7 @@ class EventMessages(commands.Cog):
                 and before.alliance_id not in sub.arguments
             ):
                 continue
-            changes = []
+            changes: List[str] = []
             if (
                 "ALLIANCE" in sub.sub_types
                 or "ALLIANCE_POSITION" in sub.sub_types

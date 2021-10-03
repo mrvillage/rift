@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from discord.ext import commands
 
-from ...ref import Rift
+from ...ref import Rift, RiftContext
 
 
 class Fun(commands.Cog):
@@ -14,7 +14,7 @@ class Fun(commands.Cog):
         brief="Toot tooooooot!",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
-    async def toot(self, ctx: commands.Context):
+    async def toot(self, ctx: RiftContext):
         await ctx.send("Toot tooooooot!")
 
 

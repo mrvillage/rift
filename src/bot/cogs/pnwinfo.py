@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-import asyncio
 import time
 from datetime import datetime
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, List, Optional, Union
 
 import discord
 from discord.ext import commands
 
-from src.errors.notfound import NationOrAllianceNotFoundError
+from _typings import Field
 
 from ... import funcs
 from ...cache import cache
@@ -19,8 +18,12 @@ from ...data.get import (
     get_max_alliances_page,
     get_nation_color_counts,
 )
-from ...errors import AllianceNotFoundError, NationNotFoundError
-from ...ref import Rift
+from ...errors import (
+    AllianceNotFoundError,
+    NationNotFoundError,
+    NationOrAllianceNotFoundError,
+)
+from ...ref import Rift, RiftContext
 from ...views import AlliancesPaginator, Colors, TreasuresView
 
 
@@ -37,7 +40,7 @@ class PnWInfo(commands.Cog):
             "nation": "The nation to get information about, defaults to your nation.",
         },
     )
-    async def nation(self, ctx: commands.Context, *, nation: Nation = None):
+    async def nation(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
         nation = nation or await Nation.convert(ctx, nation)
         await ctx.reply(embed=await nation.get_info_embed(ctx))
 
@@ -46,7 +49,7 @@ class PnWInfo(commands.Cog):
         brief="Get information about your nation.",
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
-    async def me(self, ctx: commands.Context):
+    async def me(self, ctx: RiftContext):
         await ctx.invoke(self.nation, nation=None)
 
     @commands.command(
@@ -59,7 +62,7 @@ class PnWInfo(commands.Cog):
             "alliance": "The alliance to get information about, defaults to your alliance.",
         },
     )
-    async def alliance(self, ctx: commands.Context, *, alliance: Alliance = None):
+    async def alliance(self, ctx: RiftContext, *, alliance: Optional[Alliance] = None):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         await ctx.reply(embed=alliance.get_info_embed(ctx))
 
@@ -72,7 +75,7 @@ class PnWInfo(commands.Cog):
             "search": "The nation or alliance to get information about, defaults to your nation.",
         },
     )
-    async def who(self, ctx: commands.Context, *, search: str = None):
+    async def who(self, ctx: RiftContext, *, search: Optional[str] = None):
         if search is None:
             try:
                 return await ctx.invoke(
@@ -112,7 +115,7 @@ class PnWInfo(commands.Cog):
             "nation": "The nation to get information about, defaults to your nationf.",
         },
     )
-    async def members(self, ctx: commands.Context, *, alliance: Alliance = None):
+    async def members(self, ctx: RiftContext, *, alliance: Optional[Alliance] = None):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         await alliance.make_attrs("members")
         full = (
@@ -122,7 +125,7 @@ class PnWInfo(commands.Cog):
             )
             + "\n"
         )
-        fields = []
+        fields: List[Field] = []
         if len(full) >= 5120:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -155,7 +158,7 @@ class PnWInfo(commands.Cog):
             "alliance": "The alliance to get treaties of, defaults to your alliance.",
         },
     )
-    async def treaties(self, ctx: commands.Context, *, alliance: Alliance = None):
+    async def treaties(self, ctx: RiftContext, *, alliance: Optional[Alliance] = None):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         await alliance.make_attrs("treaties")
         await ctx.reply(
@@ -174,7 +177,7 @@ class PnWInfo(commands.Cog):
             "nation": "The nation to get spies of.",
         },
     )
-    async def spies(self, ctx: commands.Context, *, nation: Nation):
+    async def spies(self, ctx: RiftContext, *, nation: Nation):
         await ctx.interaction.response.defer()
         num = await funcs.calculate_spies(nation)
         await ctx.reply(
@@ -196,9 +199,9 @@ class PnWInfo(commands.Cog):
     )
     async def revenue(
         self,
-        ctx: commands.Context,
+        ctx: RiftContext,
         *,
-        search: Union[Alliance, Nation] = None,
+        search: Optional[Union[Alliance, Nation]] = None,
         fetch_spies: bool = False,
     ):
         search = search or await Nation.convert(ctx, search)
@@ -224,7 +227,7 @@ class PnWInfo(commands.Cog):
                 and isinstance(rev["gross_total"], dict)
                 and isinstance(rev["net_total"], dict)
             )
-        fields = [
+        fields: List[Field] = [
             {
                 "name": key.capitalize(),
                 "value": f"Gross: {getattr(rev['gross_income'], key):,.2f} (${rev['gross_total'][key]:,.2f})\nNet: {getattr(rev['net_income'], key):,.2f} (${rev['net_total'][key]:,.2f})",
@@ -274,7 +277,7 @@ class PnWInfo(commands.Cog):
             "page": "The page of alliances to get, defaults to 1.",
         },
     )
-    async def alliances(self, ctx: commands.Context, page: int = 1):
+    async def alliances(self, ctx: RiftContext, page: int = 1):
         max_page = await get_max_alliances_page()
         if page > max_page or page < 0:
             return await ctx.interaction.response.send_message(
@@ -287,9 +290,6 @@ class PnWInfo(commands.Cog):
             )
         offset = (page - 1) * 50
         alliances = await get_alliances_offset(offset=offset)
-        await asyncio.gather(*(i._make_members() for i in alliances))
-        await asyncio.gather(*(i._make_calculated_score() for i in alliances))
-        await asyncio.gather(*(i._make_member_count() for i in alliances))
         embed = funcs.get_embed_author_member(
             ctx.author,
             f"Page **{page}** of **{max_page}**\n"
@@ -307,14 +307,14 @@ class PnWInfo(commands.Cog):
         brief="Get a list of color bloc information.",
         type=commands.CommandType.chat_input,
     )
-    async def colors(self, ctx: commands.Context):
+    async def colors(self, ctx: RiftContext):
         colors = await get_colors()
         nations = await get_nation_color_counts()
         average_bonus = (
             sum(i.bonus for i in colors.values() if i.color not in {"beige", "gray"})
             / len(colors)
         ) - 2
-        fields = [
+        fields: List[Field] = [
             {
                 "name": i.color.capitalize(),
                 "value": f"Name: {i.name}\nTurn Bonus: ${i.bonus:,.0f}\nNations on Color: {nations[i.color.capitalize()]:,}",
@@ -339,12 +339,12 @@ class PnWInfo(commands.Cog):
             "page": "The page of treasures to get, can be 1 or 2, defaults to 1.",
         },
     )
-    async def treasures(self, ctx: commands.Context, page: int = 1):
+    async def treasures(self, ctx: RiftContext, page: int = 1):
         if page < 1:
             page = 1
         elif page > 2:
             page = 2
-        fields = [
+        fields: List[Field] = [
             {
                 "name": i.name,
                 "value": f"Color: {i.color.capitalize()}\nBonus: %{i.bonus}\nSpawn Date: <t:{int(time.mktime(datetime.fromisoformat(i.spawn_date).timetuple()))}:D>",

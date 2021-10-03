@@ -13,7 +13,7 @@ from discord.ext import commands
 from .. import funcs
 from ..cache import cache
 from ..env import DEBUG_TOKEN, TOKEN, __version__
-from ..ref import bot
+from ..ref import RiftContext, bot
 from ..views import (
     AlliancesPaginator,
     Colors,
@@ -48,13 +48,6 @@ async def on_message(message: discord.Message):
 
 @bot.event
 async def on_interaction(interaction: discord.Interaction):
-    # if (
-    #     interaction.guild is not None
-    #     and bot.debug
-    #     and interaction.guild.id == bot.debug_guild_id
-    #     or interaction.guild is None
-    #     or not bot.debug
-    # ):
     await bot.process_commands(interaction)
 
 
@@ -81,13 +74,13 @@ async def on_ready():
     print("Startup complete!", flush=True)
 
 
-@bot.command(
+@bot.command(  # type: ignore
     name="about",
     aliases=["version", "rift", "credits"],
     brief="Get the bot credits, version, and about.",
     type=(commands.CommandType.default, commands.CommandType.chat_input),
 )
-async def about(ctx: commands.Context):
+async def about(ctx: RiftContext):
     await ctx.reply(
         embed=funcs.get_embed_author_member(
             ctx.author,
@@ -100,7 +93,7 @@ async def about(ctx: commands.Context):
 async def main() -> None:
     with setup_logging():
         try:
-            if bot.debug:
+            if bot.debug:  # type: ignore
                 await bot.login(DEBUG_TOKEN)
             else:
                 await bot.login(TOKEN)
@@ -130,7 +123,7 @@ async def main() -> None:
                     bot.load_extension(f"src.bot.cogs.{cog}")
                 bot.unload_extension("src.bot.cogs.database")
                 bot.unload_extension("src.bot.cogs.server")
-                if bot.debug:
+                if bot.debug:  # type: ignore
                     bot.unload_extension("src.bot.cogs.logs")
                 bot.cogs_loaded = True
                 print("Loaded cogs!", flush=True)
