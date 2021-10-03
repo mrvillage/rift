@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, TypedDict
 
-__all__ = ("ColorData", "ColorDataList")
+__all__ = ("ColorData", "ColorDataList", "RawColorData")
 
 
 class ColorData(TypedDict):
@@ -12,3 +12,7 @@ class ColorData(TypedDict):
 
 
 ColorDataList = List[ColorData]
+
+
+class RawColorData(TypedDict):
+    colors: ColorDataList
