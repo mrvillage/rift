@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 import discord
-from discord import ButtonStyle, Interaction, Member, Message, User, ui
 
 from ..data.get import get_colors, get_nation_color_counts
 from ..funcs import get_embed_author_member
@@ -11,19 +10,28 @@ from ..ref import ID
 
 __all__ = ("Colors",)
 
+if TYPE_CHECKING:
+    from _typings import Field
 
-class Colors(ui.View):
+
+class Colors(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @ui.button(label="Refresh", style=ButtonStyle.gray, custom_id="COLORS_REFRESH_1")
-    async def refresh(self, button: ui.Button, interaction: Interaction):
+    @discord.ui.button(
+        label="Refresh", style=discord.ButtonStyle.gray, custom_id="COLORS_REFRESH_1"
+    )
+    async def refresh(
+        self,
+        button: discord.ui.Button[discord.ui.View],
+        interaction: discord.Interaction,
+    ):
         message = interaction.message
         if TYPE_CHECKING:
-            assert isinstance(message, Message)
-            assert isinstance(interaction.user, (Member, User))
+            assert isinstance(message, discord.Message)
+            assert isinstance(interaction.user, (discord.Member, discord.User))
         if (
-            not message.embeds[0].description.startswith("Average Bonus:")
+            not message.embeds[0].description.startswith("Average Bonus:")  # type: ignore
             or message.author.id != ID
         ):
             return
@@ -33,7 +41,7 @@ class Colors(ui.View):
             sum(i.bonus for i in colors.values() if i.color not in {"beige", "gray"})
             / len(colors)
         ) - 2
-        fields = [
+        fields: List[Field] = [
             {
                 "name": i.color.capitalize(),
                 "value": f"Name: {i.name}\nTurn Bonus: ${i.bonus:,.0f}\nNations on Color: {nations[i.color.capitalize()]:,}",

@@ -60,7 +60,7 @@ class AlliancePurposeConfirm(Confirm):
             await self.message.edit(
                 embed=funcs.get_embed_author_member(
                     self.user,
-                    description=f"The request to set the server purpose has been denied.",
+                    description="The request to set the server purpose has been denied.",
                     color=discord.Color.red(),
                 ),
                 view=None,

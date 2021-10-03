@@ -3,31 +3,28 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import discord
-from discord import ButtonStyle, Interaction, Member, Message, User, ui
 
-from ..funcs import get_embed_author_member, get_trade_prices
+from ..cache import cache
+from ..funcs import get_embed_author_member
 from ..ref import ID
 
 __all__ = ("Margins",)
 
 
-class Margins(ui.View):
+class Margins(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @ui.button(label="Refresh", style=ButtonStyle.gray, custom_id="MARGINS_REFRESH_1")
-    async def refresh(self, button: ui.Button, interaction: Interaction):
+    @discord.ui.button(label="Refresh", style=discord.ButtonStyle.gray, custom_id="MARGINS_REFRESH_1")
+    async def refresh(self, button: discord.ui.Button[discord.ui.View], interaction: discord.Interaction):
         message = interaction.message
         if TYPE_CHECKING:
-            assert isinstance(message, Message)
-        if (
-            message.embeds[0].title != "Trade Margins"
-            or message.author.id != ID
-        ):
+            assert isinstance(message, discord.Message)
+        if message.embeds[0].title != "Trade Margins" or message.author.id != ID:  # type: ignore
             return
-        prices = await get_trade_prices()
+        prices = cache.prices
         if TYPE_CHECKING:
-            assert isinstance(interaction.user, (Member, User))
+            assert isinstance(interaction.user, (discord.Member, discord.User))
         await interaction.response.edit_message(
             view=self,
             embed=get_embed_author_member(

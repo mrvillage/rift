@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import asyncio
+from typing import List
 
 import discord
 
@@ -11,21 +11,27 @@ __all__ = ("AlliancesPaginator",)
 
 
 class AlliancesPaginator(discord.ui.View):
+    children: List[discord.ui.Item[discord.ui.View]]
+
     def __init__(self, max_page: int, page: int) -> None:
         super().__init__(timeout=None)
         max_page = max_page
         if page >= max_page:
-            self.right.disabled = True
+            self.right.disabled = True  # type: ignore
         elif page == 1:
-            self.left.disabled = True
+            self.left.disabled = True  # type: ignore
 
     @discord.ui.button(
         custom_id="XMP7cqDL99UKz5UHNoPv3zuds64epgX2mD07hV6cfd3ZF9P2JWiPsFhIHYUG1yWW1AQsh1venmDXoF6k",
         label="Previous",
         style=discord.ButtonStyle.gray,
     )
-    async def left(self, button: discord.ui.Button, interaction: discord.Interaction):
-        desc = interaction.message.embeds[0].description[7:]  # type: ignore
+    async def left(
+        self,
+        button: discord.ui.Button[discord.ui.View],
+        interaction: discord.Interaction,
+    ):
+        desc: str = interaction.message.embeds[0].description[7:]  # type: ignore
         page = int(desc[: desc.index("**")].strip("*")) - 1
         max_page = await get_max_alliances_page()
         if page == 1:
@@ -35,9 +41,6 @@ class AlliancesPaginator(discord.ui.View):
                 i.disabled = False  # type: ignore
         offset = (page - 1) * 50
         alliances = await get_alliances_offset(offset=offset)
-        await asyncio.gather(*(i._make_members() for i in alliances))
-        await asyncio.gather(*(i._make_calculated_score() for i in alliances))
-        await asyncio.gather(*(i._make_member_count() for i in alliances))
         embed = funcs.get_embed_author_member(
             interaction.user,  # type: ignore
             f"Page **{page}** of **{max_page}**\n"
@@ -56,9 +59,11 @@ class AlliancesPaginator(discord.ui.View):
         style=discord.ButtonStyle.gray,
     )
     async def refresh(
-        self, button: discord.ui.Button, interaction: discord.Interaction
+        self,
+        button: discord.ui.Button[discord.ui.View],
+        interaction: discord.Interaction,
     ):
-        desc = interaction.message.embeds[0].description[7:]  # type: ignore
+        desc: str = interaction.message.embeds[0].description[7:]  # type: ignore
         page = int(desc[: desc.index("**")].strip("*"))
         max_page = await get_max_alliances_page()
         if page == max_page:
@@ -68,9 +73,6 @@ class AlliancesPaginator(discord.ui.View):
             self.right.disabled = False  # type: ignore
         offset = (page - 1) * 50
         alliances = await get_alliances_offset(offset=offset)
-        await asyncio.gather(*(i._make_members() for i in alliances))
-        await asyncio.gather(*(i._make_calculated_score() for i in alliances))
-        await asyncio.gather(*(i._make_member_count() for i in alliances))
         embed = funcs.get_embed_author_member(
             interaction.user,  # type: ignore
             f"Page **{page}** of **{max_page}**\n"
@@ -88,8 +90,12 @@ class AlliancesPaginator(discord.ui.View):
         label="Next",
         style=discord.ButtonStyle.gray,
     )
-    async def right(self, button: discord.ui.Button, interaction: discord.Interaction):
-        desc = interaction.message.embeds[0].description[7:]  # type: ignore
+    async def right(
+        self,
+        button: discord.ui.Button[discord.ui.View],
+        interaction: discord.Interaction,
+    ):
+        desc: str = interaction.message.embeds[0].description[7:]  # type: ignore
         page = int(desc[: desc.index("**")].strip("*")) + 1
         max_page = await get_max_alliances_page()
         if page == max_page:
@@ -110,9 +116,6 @@ class AlliancesPaginator(discord.ui.View):
                 i.disabled = False  # type: ignore
         offset = (page - 1) * 50
         alliances = await get_alliances_offset(offset=offset)
-        await asyncio.gather(*(i._make_members() for i in alliances))
-        await asyncio.gather(*(i._make_calculated_score() for i in alliances))
-        await asyncio.gather(*(i._make_member_count() for i in alliances))
         embed = funcs.get_embed_author_member(
             interaction.user,  # type: ignore
             f"Page **{page}** of **{max_page}**\n"
