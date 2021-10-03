@@ -1,13 +1,8 @@
 from __future__ import annotations
 
-import inspect
-import re
-import sys
-from typing import Any, Dict, List, Optional, Tuple, Type
+from typing import Dict, List, Optional
 
-from discord.ext.commands import Flag, FlagConverter, MissingFlagArgument
-from discord.ext.commands.flags import get_flags, validate_flag_name
-from discord.utils import MISSING
+from discord.ext.commands import Flag, FlagConverter
 
 
 class BaseFlagConverter(FlagConverter):
@@ -43,9 +38,9 @@ class BooleanFlagConverter(BaseFlagConverter):
                 try:
                     values = result[last_flag.name]
                 except KeyError:
-                    result[last_flag.name] = [value]
+                    result[last_flag.name] = [value]  # type: ignore
                 else:
-                    values.append(value)
+                    values.append(value)  # type: ignore
 
             last_position = end
             last_flag = flag
@@ -60,9 +55,9 @@ class BooleanFlagConverter(BaseFlagConverter):
             try:
                 values = result[last_flag.name]
             except KeyError:
-                result[last_flag.name] = [value]
+                result[last_flag.name] = [value]  # type: ignore
             else:
-                values.append(value)
+                values.append(value)  # type: ignore
 
         # Verification of values will come at a later stage
         return result
