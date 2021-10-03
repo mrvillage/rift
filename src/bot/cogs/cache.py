@@ -189,6 +189,11 @@ class Cache(commands.Cog):
                 treaty=cache.get_treaty(i["from_"], i["to_"], i["treaty_type"]),
             )
 
+    @commands.Cog.listener()
+    async def on_bulk_war_create(self, data: BulkWarListData):
+        for i in data:
+            self.bot.dispatch("war_create", alliance=War(i))
+
     @tasks.loop(hours=1)
     async def verify_cache_integrity(self):
         for key in cache.validate.__dict__.keys():
