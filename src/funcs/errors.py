@@ -16,11 +16,12 @@ from ..errors import (
     SubscriptionNotFoundError,
     TargetNotFoundError,
 )
+from ..ref import RiftContext
 from .embeds import get_embed_author_member
 from .utils import get_command_signature
 
 
-async def print_handler(ctx: commands.Context, error: Exception) -> None:
+async def print_handler(ctx: RiftContext, error: Exception) -> None:
     if hasattr(ctx.command, "on_error"):
         return
     print(
@@ -32,7 +33,7 @@ async def print_handler(ctx: commands.Context, error: Exception) -> None:
     sys.stderr.flush()
 
 
-async def handler(ctx: commands.Context, error: Exception) -> None:
+async def handler(ctx: RiftContext, error: Exception) -> None:
     # sourcery no-metrics
     try:
         if isinstance(error, commands.CommandInvokeError):
@@ -173,8 +174,8 @@ async def handler(ctx: commands.Context, error: Exception) -> None:
                 ephemeral=True,
             )
         elif isinstance(error, commands.BadUnionArgument):
-            if (error.converters[0] is Alliance or error.converters[0] is Nation) and (
-                error.converters[1] is Alliance or error.converters[1] is Nation
+            if (error.converters[0] is Alliance or error.converters[0] is Nation) and (  # type: ignore
+                error.converters[1] is Alliance or error.converters[1] is Nation  # type: ignore
             ):
                 if error.errors[0].args[1].args[0] == str(ctx.author.id):
                     await ctx.reply(
