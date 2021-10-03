@@ -6,7 +6,7 @@ import discord
 from discord.ext import commands
 
 from ... import funcs
-from ...data.classes import TradePrices
+from ...cache import cache
 from ...ref import Rift, RiftContext
 from ...views import Margins, Prices
 
@@ -22,7 +22,7 @@ class Trade(commands.Cog):
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def prices(self, ctx: RiftContext):
-        prices: TradePrices = await funcs.get_trade_prices()
+        prices = cache.prices
         await ctx.reply(
             view=Prices(),
             embed=funcs.get_embed_author_member(
@@ -173,7 +173,7 @@ class Trade(commands.Cog):
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def margins(self, ctx: RiftContext):
-        prices: TradePrices = await funcs.get_trade_prices()
+        prices = cache.prices
         await ctx.reply(
             view=Margins(),
             embed=funcs.get_embed_author_member(

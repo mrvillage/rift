@@ -7,12 +7,11 @@ import discord
 import pnwkit
 from discord.ext import commands, tasks
 
-from src.data.classes import Transaction
-from src.funcs.bank.bank import withdraw
-
 from ... import funcs
-from ...data.classes import Alliance, Nation, TradePrices
+from ...cache import cache
+from ...data.classes import Alliance, Nation, Transaction
 from ...errors import AllianceNotFoundError
+from ...funcs import withdraw
 from ...ref import Rift, RiftContext
 
 OFFSHORE_ID = 9066
@@ -207,7 +206,7 @@ class HouseStark(commands.Cog):
                 )
             )
             return
-        prices: TradePrices = await funcs.get_trade_prices()
+        prices = cache.prices
         amounts: List[str] = []
         cost = 0
         for key, needs in stockpile.items():

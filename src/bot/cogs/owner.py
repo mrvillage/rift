@@ -7,6 +7,7 @@ from discord.ext import commands
 
 from ... import funcs
 from ...cache import cache
+from ...data import get
 from ...data.classes import Nation
 from ...env import __version__
 from ...ref import Rift, RiftContext
@@ -27,8 +28,8 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command(name="unlink", aliases=["unverify", "remove-link", "removelink"])
     async def unlink(self, ctx: RiftContext, nation: Nation):
-        link = await funcs.get_link_nation(nation.id)
-        await funcs.remove_link_nation(nation.id)
+        link = await get.get_link_nation(nation.id)
+        await get.remove_link_nation(nation.id)
         user = self.bot.get_user(link["user_id"])
         if not user:
             user = await self.bot.fetch_user(link["user_id"])
@@ -48,7 +49,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     ):
         member = user or ctx.author
         try:
-            await funcs.get_link_user(member.id)
+            await get.get_link_user(member.id)
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -59,7 +60,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         except IndexError:
             pass
         try:
-            await funcs.get_link_nation(nation.id)
+            await get.get_link_nation(nation.id)
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -69,7 +70,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             )
         except IndexError:
             pass
-        await funcs.add_link(member.id, nation.id)
+        await get.add_link(member.id, nation.id)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 member,

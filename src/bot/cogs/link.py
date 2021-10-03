@@ -6,6 +6,7 @@ import discord
 from discord.ext import commands
 
 from ... import funcs
+from ...data import get
 from ...data.classes import Nation
 from ...ref import Rift, RiftContext
 
@@ -29,7 +30,7 @@ class Link(commands.Cog):
     ):
         member = user or ctx.author
         try:
-            await funcs.get_link_user(member.id)
+            await get.get_link_user(member.id)
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -41,7 +42,7 @@ class Link(commands.Cog):
         except IndexError:
             pass
         try:
-            await funcs.get_link_nation(nation.id)
+            await get.get_link_nation(nation.id)
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -57,7 +58,7 @@ class Link(commands.Cog):
             name = await nation.get_discord_page_username()
             if name != f"{member.name}#{member.discriminator}":
                 raise IndexError
-            await funcs.add_link(member.id, nation.id)
+            await get.add_link(member.id, nation.id)
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     member,
