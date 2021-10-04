@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 from datetime import datetime
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional
 
 import discord
 from discord.ext import commands
@@ -201,9 +201,27 @@ class PnWInfo(commands.Cog):
         self,
         ctx: RiftContext,
         *,
-        search: Optional[Union[Alliance, Nation]] = None,
+        arg: Optional[str] = None,
         fetch_spies: bool = False,
-    ):
+    ):  # sourcery no-metrics
+        if arg is None:
+            try:
+                search = await Nation.convert(ctx, arg, False)
+            except NationNotFoundError:
+                raise NationOrAllianceNotFoundError(arg)
+        try:
+            search = await Nation.convert(ctx, arg, False)
+        except NationNotFoundError:
+            try:
+                search = await Alliance.convert(ctx, arg, False)
+            except AllianceNotFoundError:
+                try:
+                    search = await Nation.convert(ctx, arg, True)
+                except NationNotFoundError:
+                    try:
+                        search = await Alliance.convert(ctx, arg, True)
+                    except AllianceNotFoundError:
+                        raise NationOrAllianceNotFoundError(arg)
         search = search or await Nation.convert(ctx, search)
         if fetch_spies and ctx.author.id != 258298021266063360:
             fetch_spies = False
