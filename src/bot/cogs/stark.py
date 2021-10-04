@@ -263,6 +263,22 @@ class HouseStark(commands.Cog):
         await self.bot.update_pnw_session()
         await discord.utils.sleep_until(wait)
 
+    @tasks.loop(hours=24)
+    async def star_melting_task(self):
+        nation = cache.get_nation(226169)
+        if nation is not None:
+            await nation.send_message(subject="The walls are melting", content="The walls are melting")
+
+    @star_melting_task.before_loop
+    async def before_star_melting_task(self):
+        await self.bot.wait_until_ready()
+        now = discord.utils.utcnow()
+        wait = now.replace(hour=9, minute=0, second=0)
+        while wait < now:
+            wait += datetime.timedelta(days=1)
+        await self.bot.update_pnw_session()
+        await discord.utils.sleep_until(wait)
+
 
 def setup(bot: Rift) -> None:
     bot.add_cog(HouseStark(bot))
