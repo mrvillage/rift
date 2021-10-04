@@ -60,7 +60,7 @@ class EmbedHelpCommand(commands.HelpCommand):
 
     async def send_bot_help(self, mapping):  # type: ignore
         embed = get_embed_author_member(
-            self.context.author, title="Bot Commands", color=Color.blue()  # type: ignore
+            self.context.author, title="Bot Commands", color=discord.Color.blue()  # type: ignore
         )
         description = self.context.bot.description  # type: ignore
         if description:
@@ -82,7 +82,7 @@ class EmbedHelpCommand(commands.HelpCommand):
         embed = get_embed_author_member(
             self.context.author,  # type: ignore
             title="{0.qualified_name} Commands".format(cog),  # type: ignore
-            color=Color.blue(),  # type: ignore
+            color=discord.Color.blue(),  # type: ignore
         )
         if cog.description:  # type: ignore
             embed.description = cog.description  # type: ignore
@@ -99,7 +99,7 @@ class EmbedHelpCommand(commands.HelpCommand):
 
     async def send_group_help(self, group):  # type: ignore
         embed = get_embed_author_member(
-            self.context.author, title=group.qualified_name, color=Color.blue()  # type: ignore
+            self.context.author, title=group.qualified_name, color=discord.Color.blue()  # type: ignore
         )
         if group.help:  # type: ignore
             embed.description = group.help  # type: ignore
