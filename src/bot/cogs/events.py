@@ -38,7 +38,10 @@ class Events(commands.Cog):
                             data = message.json()
                             if "event" in data:
                                 self.bot.dispatch(data["event"], **data["data"])
-            except ConnectionRefusedError:
+            except (
+                ConnectionRefusedError,
+                aiohttp.ClientConnectorError,
+            ):
                 print("rift-data socket refused", flush=True)
                 delay = backoff.delay()
                 await sleep(delay)
