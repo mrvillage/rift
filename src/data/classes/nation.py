@@ -386,6 +386,9 @@ class Nation(Makeable):
             "net_income": sum(
                 (i["net_income"] for i in revenues[1:]), revenues[0]["net_income"]
             ),
+            "upkeep": sum(
+                (i["upkeep"] for i in revenues[1:]), revenues[0]["upkeep"]
+            ),
         }
         color = await Color.fetch(self.color.lower())
         bonus = color.bonus * 12
@@ -436,6 +439,13 @@ class Nation(Makeable):
             **{
                 key: value * getattr(prices, key).lowest_sell.price
                 for key, value in revenue["net_income"].__dict__.items()
+                if key != "money"
+            }
+        )
+        revenue["upkeep_total"] = Resources(
+            **{
+                key: value * getattr(prices, key).lowest_sell.price
+                for key, value in revenue["upkeep"].__dict__.items()
                 if key != "money"
             }
         )

@@ -242,13 +242,20 @@ class PnWInfo(commands.Cog):
             assert (
                 isinstance(rev["gross_income"], Resources)
                 and isinstance(rev["net_income"], Resources)
+                and isinstance(rev["upkeep"], Resources)
                 and isinstance(rev["gross_total"], dict)
                 and isinstance(rev["net_total"], dict)
+                and isinstance(rev["upkeep_total"], dict)
             )
+        upkeeps = {
+            key: f"Upkeep: {getattr(rev['upkeep'], key):,.2f} (${rev['upkeep_total'][key]:,.2f})\n"
+            for key in rev["gross_income"].__dict__
+            if key != "credit"
+        }
         fields: List[Field] = [
             {
                 "name": key.capitalize(),
-                "value": f"Gross: {getattr(rev['gross_income'], key):,.2f} (${rev['gross_total'][key]:,.2f})\nNet: {getattr(rev['net_income'], key):,.2f} (${rev['net_total'][key]:,.2f})",
+                "value": f"Gross: {getattr(rev['gross_income'], key):,.2f} (${rev['gross_total'][key]:,.2f})\n{upkeeps.get(key, '')}Net: {getattr(rev['net_income'], key):,.2f} (${rev['net_total'][key]:,.2f})",
             }
             for key in rev["gross_income"].__dict__
             if key not in {"money", "credit"}
@@ -273,7 +280,7 @@ class PnWInfo(commands.Cog):
         fields.append(
             {
                 "name": "Total",
-                "value": f"Gross: ${sum(rev['gross_total'].__dict__.values())+rev['gross_income'].money:,.2f}\nNet: ${sum(rev['net_total'].__dict__.values())+rev['net_income'].money:,.2f}"
+                "value": f"Gross: ${sum(rev['gross_total'].__dict__.values())+rev['gross_income'].money:,.2f}\nUpkeep: ${sum(rev['upkeep_total'].__dict__.values())+rev['upkeep'].money:,.2f}\nNet: ${sum(rev['net_total'].__dict__.values())+rev['net_income'].money:,.2f}"
                 + ("" if fetch_spies else "\nNote: Spies not included"),
             }
         )
