@@ -201,38 +201,38 @@ class PnWInfo(commands.Cog):
         self,
         ctx: RiftContext,
         *,
-        arg: Optional[str] = None,
+        search: Optional[str] = None,
         fetch_spies: bool = False,
     ):  # sourcery no-metrics
-        if arg is None:
+        if search is None:
             try:
-                search = await Nation.convert(ctx, arg, False)
+                search_ = await Nation.convert(ctx, search, False)
             except NationNotFoundError:
-                raise NationOrAllianceNotFoundError(arg)
+                raise NationOrAllianceNotFoundError(search)
         try:
-            search = await Nation.convert(ctx, arg, False)
+            search_ = await Nation.convert(ctx, search, False)
         except NationNotFoundError:
             try:
-                search = await Alliance.convert(ctx, arg, False)
+                search_ = await Alliance.convert(ctx, search, False)
             except AllianceNotFoundError:
                 try:
-                    search = await Nation.convert(ctx, arg, True)
+                    search_ = await Nation.convert(ctx, search, True)
                 except NationNotFoundError:
                     try:
-                        search = await Alliance.convert(ctx, arg, True)
+                        search_ = await Alliance.convert(ctx, search, True)
                     except AllianceNotFoundError:
-                        raise NationOrAllianceNotFoundError(arg)
-        search = search or await Nation.convert(ctx, search)
+                        raise NationOrAllianceNotFoundError(search)
+        search_ = search_ or await Nation.convert(ctx, search_)
         if fetch_spies and ctx.author.id != 258298021266063360:
             fetch_spies = False
         await ctx.interaction.response.defer()
         try:
-            rev = await search.calculate_revenue(fetch_spies=fetch_spies)
+            rev = await search_.calculate_revenue(fetch_spies=fetch_spies)
         except IndexError:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    f"Something went wrong calculating {repr(search)}'s revenue. It's probably a turn, try again in a few minutes!",
+                    f"Something went wrong calculating {repr(search_)}'s revenue. It's probably a turn, try again in a few minutes!",
                     color=discord.Color.red(),
                 )
             )
@@ -280,7 +280,7 @@ class PnWInfo(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Revenue for {repr(search)}",
+                f"Revenue for {repr(search_)}",
                 fields=fields,
                 color=discord.Color.green(),
             )
