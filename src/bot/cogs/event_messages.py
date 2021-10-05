@@ -214,7 +214,7 @@ class EventMessages(commands.Cog):
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
-                    f'**War created!**\n[{repr(war.attacker)}](https://politicsandwar.com/nation/id={(war.attacker and war.attacker.id) or 0} "https://politicsandwar.com/nation/id={(war.attacker and war.attacker.id) or 0}") declared war on [{repr(war.defender)}](https://politicsandwar.com/nation/id={(war.defender and war.defender.id) or 0} "https://politicsandwar.com/nation/id={(war.defender and war.defender.id) or 0}")',
+                    f'**War created!**\n[{repr(war.attacker)}](https://politicsandwar.com/nation/id={(war.attacker and war.attacker.id) or 0} "https://politicsandwar.com/nation/id={(war.attacker and war.attacker.id) or 0}") declared war on [{repr(war.defender)}](https://politicsandwar.com/nation/id={(war.defender and war.defender.id) or 0} "https://politicsandwar.com/nation/id={(war.defender and war.defender.id) or 0}").',
                     color=discord.Color.blue(),
                 ),
                 False,
