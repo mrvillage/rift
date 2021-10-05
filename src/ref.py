@@ -81,7 +81,7 @@ bot = Rift(
     intents=intents,
     case_insensitive=True,
     allowed_mentions=discord.AllowedMentions(replied_user=False),
-    activity=discord.Game(name=__version__),
+    activity=discord.Game(name=f"/help on {__version__}"),
     strip_after_prefix=True,
     help_command=EmbedHelpCommand(
         command_attrs={
