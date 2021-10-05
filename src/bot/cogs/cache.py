@@ -207,7 +207,7 @@ class Cache(commands.Cog):
     @commands.Cog.listener()
     async def on_bulk_war_create(self, data: BulkWarListData):
         for i in data:
-            self.bot.dispatch("war_create", alliance=War(i))
+            self.bot.dispatch("war_create", war=War(i))
 
     @tasks.loop(hours=1)
     async def verify_cache_integrity(self):
