@@ -39,8 +39,8 @@ class War:
         "defender_resistance",
         "attacker_fortify",
         "defender_fortify",
-        "attacker_gas_used",
-        "defender_gas_used",
+        "attacker_gasoline_used",
+        "defender_gasoline_used",
         "attacker_munitions_used",
         "defender_munitions_used",
         "attacker_aluminum_used",
@@ -90,8 +90,8 @@ class War:
         self.defender_resistance: int = data["defender_resistance"]
         self.attacker_fortify: bool = data["attacker_fortify"]
         self.defender_fortify: bool = data["defender_fortify"]
-        self.attacker_gas_used: float = data["attacker_gas_used"]
-        self.defender_gas_used: float = data["defender_gas_used"]
+        self.attacker_gasoline_used: float = data["attacker_gasoline_used"]
+        self.defender_gasoline_used: float = data["defender_gasoline_used"]
         self.attacker_munitions_used: float = data["attacker_munitions_used"]
         self.defender_munitions_used: float = data["defender_munitions_used"]
         self.attacker_aluminum_used: int = data["attacker_aluminum_used"]
@@ -158,8 +158,8 @@ class War:
         self.defender_resistance: int = data["defender_resistance"]
         self.attacker_fortify: bool = data["attacker_fortify"]
         self.defender_fortify: bool = data["defender_fortify"]
-        self.attacker_gas_used: float = data["attacker_gas_used"]
-        self.defender_gas_used: float = data["defender_gas_used"]
+        self.attacker_gasoline_used: float = data["attacker_gasoline_used"]
+        self.defender_gasoline_used: float = data["defender_gasoline_used"]
         self.attacker_munitions_used: float = data["attacker_munitions_used"]
         self.defender_munitions_used: float = data["defender_munitions_used"]
         self.attacker_aluminum_used: int = data["attacker_aluminum_used"]
@@ -220,8 +220,8 @@ class Attack:
         "infra_destroyed_value",
         "attacker_munitions_used",
         "defender_munitions_used",
-        "attacker_gas_used",
-        "defender_gas_used",
+        "attacker_gasoline_used",
+        "defender_gasoline_used",
         "aircraft_killed_by_tanks",
     )
 
@@ -246,8 +246,8 @@ class Attack:
         self.infra_destroyed_value: float = data["infra_destroyed_value"]
         self.attacker_munitions_used: float = data["attacker_munitions_used"]
         self.defender_munitions_used: float = data["defender_munitions_used"]
-        self.attacker_gas_used: float = data["attacker_gas_used"]
-        self.defender_gas_used: float = data["defender_gas_used"]
+        self.attacker_gasoline_used: float = data["attacker_gasoline_used"]
+        self.defender_gasoline_used: float = data["defender_gasoline_used"]
         self.aircraft_killed_by_tanks: int = data["aircraft_killed_by_tanks"]
 
     @classmethod
@@ -285,6 +285,6 @@ class Attack:
         self.infra_destroyed_value: float = data["infra_destroyed_value"]
         self.attacker_munitions_used: float = data["attacker_munitions_used"]
         self.defender_munitions_used: float = data["defender_munitions_used"]
-        self.attacker_gas_used: float = data["attacker_gas_used"]
-        self.defender_gas_used: float = data["defender_gas_used"]
+        self.attacker_gasoline_used: float = data["attacker_gasoline_used"]
+        self.defender_gasoline_used: float = data["defender_gasoline_used"]
         self.aircraft_killed_by_tanks: int = data["aircraft_killed_by_tanks"]
