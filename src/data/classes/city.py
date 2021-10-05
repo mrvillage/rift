@@ -266,6 +266,16 @@ class FullCity(Makeable):
                 steel=self.calculate_net_steel_income(),
                 aluminum=self.calculate_net_aluminum_income(),
             ),
+            "upkeep": Resources(
+                money=self.calculate_money_upkeep(),
+                food=self.calculate_food_upkeep(),
+                coal=self.calculate_coal_upkeep(),
+                oil=self.calculate_oil_upkeep(),
+                uranium=self.calculate_uranium_upkeep(),
+                lead=self.calculate_lead_upkeep(),
+                iron=self.calculate_iron_upkeep(),
+                bauxite=self.calculate_bauxite_upkeep(),
+            ),
         }
 
     def calculate_money_income(self, income_modifier: float = 1) -> float:
@@ -364,97 +374,108 @@ class FullCity(Makeable):
             * (1 + (0.36 * int(self.projects.bauxitew)))
         )
 
-    def calculate_net_money_income(self, income_modifier: float = 1) -> float:
+    def calculate_money_upkeep(self):
         return (
-            self.calculate_money_income(income_modifier)
-            - (
-                (self.coal_power * 1200)
-                + (self.oil_power * 1800)
-                + (self.nuclear_power * 10500)
-                + (self.wind_power * 500)
-                + (self.coal_mines * 400)
-                + (self.oil_wells * 600)
-                + (self.iron_mines * 1600)
-                + (self.bauxite_mines * 1600)
-                + (self.lead_mines * 1500)
-                + (self.uranium_mines * 5000)
-                + (self.farms * 300)
+            (self.coal_power * 1200)
+            + (self.oil_power * 1800)
+            + (self.nuclear_power * 10500)
+            + (self.wind_power * 500)
+            + (self.coal_mines * 400)
+            + (self.oil_wells * 600)
+            + (self.iron_mines * 1600)
+            + (self.bauxite_mines * 1600)
+            + (self.lead_mines * 1500)
+            + (self.uranium_mines * 5000)
+            + (self.farms * 300)
+        ) + (
+            (
+                (self.oil_refineries * 4000)
+                + (self.steel_mills * 4000)
+                + (self.aluminum_refineries * 2500)
+                + (self.munitions_factories * 3500)
+                + (self.police_stations * 750)
+                + (self.hospitals * 1000)
+                + (self.recycling_centers * 2500)
+                + (self.subways * 3250)
+                + (self.supermarkets * 600)
+                + (self.banks * 1800)
+                + (self.shopping_malls * 5400)
+                + (self.stadiums * 12150)
             )
-            - (
-                (
-                    (self.oil_refineries * 4000)
-                    + (self.steel_mills * 4000)
-                    + (self.aluminum_refineries * 2500)
-                    + (self.munitions_factories * 3500)
-                    + (self.police_stations * 750)
-                    + (self.hospitals * 1000)
-                    + (self.recycling_centers * 2500)
-                    + (self.subways * 3250)
-                    + (self.supermarkets * 600)
-                    + (self.banks * 1800)
-                    + (self.shopping_malls * 5400)
-                    + (self.stadiums * 12150)
-                )
-                if self.powered
-                else 0
-            )
+            if self.powered
+            else 0
         )
 
-    def calculate_net_food_income(self) -> float:
-        return self.calculate_food_income() - (self.population / 1000)
+    def calculate_food_upkeep(self):
+        return self.population / 1000
 
-    def calculate_net_coal_income(self) -> float:
-        return (
-            self.calculate_coal_income()
-            - (self.coal_power * 1.2)
-            - (
-                (self.steel_mills * 3)
-                * (1 + ((0.5 * (self.steel_mills - 1)) / (5 - 1)))
-                * (1 + (0.36 * int(self.projects.ironw)))
-            )
+    def calculate_coal_upkeep(self):
+        return (self.coal_power * 1.2) + (
+            (self.steel_mills * 3)
+            * (1 + ((0.5 * (self.steel_mills - 1)) / (5 - 1)))
+            * (1 + (0.36 * int(self.projects.ironw)))
         )
 
-    def calculate_net_oil_income(self) -> float:
-        return (
-            self.calculate_oil_income()
-            - (self.oil_power * 1.2)
-            - (
-                (self.oil_refineries * 3)
-                * (1 + ((0.5 * (self.oil_refineries - 1)) / (5 - 1)))
-                * (1 + (0.36 * int(self.projects.egr)))
-            )
+    def calculate_oil_upkeep(self):
+        return (self.oil_power * 1.2) + (
+            (self.oil_refineries * 3)
+            * (1 + ((0.5 * (self.oil_refineries - 1)) / (5 - 1)))
+            * (1 + (0.36 * int(self.projects.egr)))
         )
 
-    def calculate_net_uranium_income(self) -> float:
-        return self.calculate_uranium_income() - self.calculate_uranium_usage()
-
-    def calculate_uranium_usage(self) -> float:
+    def calculate_uranium_upkeep(self) -> float:
         amount = self.infrastructure // 1000
         if amount * 1000 < self.infrastructure:
             amount += 1
         amount = min(amount, self.nuclear_power * 2)
         return amount * 1.2
 
-    def calculate_net_lead_income(self) -> float:
-        return self.calculate_lead_income() - (
+    def calculate_lead_upkeep(self) -> float:
+        return (
             (self.munitions_factories * 6)
             * (1 + ((0.5 * (self.munitions_factories - 1)) / (5 - 1)))
             * (1 + (0.34 * int(self.projects.armss)))
         )
 
-    def calculate_net_iron_income(self) -> float:
-        return self.calculate_iron_income() - (
+    def calculate_iron_upkeep(self) -> float:
+        return (
             (self.steel_mills * 3)
             * (1 + ((0.5 * (self.steel_mills - 1)) / (5 - 1)))
             * (1 + (0.36 * int(self.projects.ironw)))
         )
 
-    def calculate_net_bauxite_income(self) -> float:
-        return self.calculate_bauxite_income() - (
+    def calculate_bauxite_upkeep(self) -> float:
+        return (
             (self.aluminum_refineries * 3)
             * (1 + ((0.5 * (self.aluminum_refineries - 1)) / (5 - 1)))
             * (1 + (0.36 * int(self.projects.bauxitew)))
         )
+
+    def calculate_net_money_income(self, income_modifier: float = 1) -> float:
+        return (
+            self.calculate_money_income(income_modifier) - self.calculate_money_upkeep()
+        )
+
+    def calculate_net_food_income(self) -> float:
+        return self.calculate_food_income() - self.calculate_food_upkeep()
+
+    def calculate_net_coal_income(self) -> float:
+        return self.calculate_coal_income() - self.calculate_coal_upkeep()
+
+    def calculate_net_oil_income(self) -> float:
+        return self.calculate_oil_income() - self.calculate_oil_upkeep()
+
+    def calculate_net_uranium_income(self) -> float:
+        return self.calculate_uranium_income() - self.calculate_uranium_upkeep()
+
+    def calculate_net_lead_income(self) -> float:
+        return self.calculate_lead_income() - self.calculate_lead_upkeep()
+
+    def calculate_net_iron_income(self) -> float:
+        return self.calculate_iron_income() - self.calculate_iron_upkeep()
+
+    def calculate_net_bauxite_income(self) -> float:
+        return self.calculate_bauxite_income() - self.calculate_bauxite_upkeep()
 
     calculate_net_gasoline_income = calculate_gasoline_income
     calculate_net_munitions_income = calculate_munitions_income
