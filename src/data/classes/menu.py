@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import cached_property
 from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Sequence, Union
 
 import discord
@@ -217,7 +218,6 @@ class SelectOption(discord.SelectOption):
 
 class Menu(Makeable):
     id: int
-    items: Sequence[List[MenuItem]]
     name: Optional[str]
     description: Optional[str]
     item_ids: Sequence[Sequence[int]]
@@ -230,7 +230,6 @@ class Menu(Makeable):
         "description",
         "item_ids",
         "permissions",
-        "items",
     )
 
     def __init__(self, data: MenuData) -> None:
@@ -268,17 +267,7 @@ class Menu(Makeable):
                 "permissions": {},
             }
         )
-        menu.items = [[], [], [], [], []]
         return menu
-
-    async def _make_items(self) -> None:
-        items: List[List[MenuItem]] = []
-        for i in self.item_ids:
-            if i:
-                items.append([(await MenuItem.fetch(j, self.guild_id)) for j in i])
-            else:
-                items.append([])
-        self.items = items
 
     async def set_(self, **kwargs: Mapping[str, Any]) -> Menu:
         sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
@@ -350,6 +339,13 @@ class Menu(Makeable):
         if self.name is None:
             return f"{self.id}"
         return f"{self.id} - {self.name}"
+
+    @cached_property
+    def items(self) -> List[List[MenuItem]]:
+        return [
+            [item for j in i if (item := cache.get_menu_item(j, self.guild_id))]
+            for i in self.item_ids
+        ]
 
 
 class MenuItem:
