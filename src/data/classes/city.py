@@ -74,9 +74,6 @@ class City:
     def nation(self) -> Nation:
         return cache.get_nation(self.nation_id)  # type: ignore
 
-    async def _make_nation(self) -> None:
-        pass
-
 
 class FullCity(Makeable):
     __slots__ = (
