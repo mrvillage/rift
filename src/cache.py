@@ -558,6 +558,12 @@ class Cache:
     def add_embassy_config(self, config: EmbassyConfig, /) -> None:
         self._embassy_configs[config.id] = config
 
+    def add_guild_settings(self, settings: GuildSettings, /) -> None:
+        self._guild_settings[settings.guild_id] = settings
+
+    def add_guild_welcome_settings(self, settings: GuildWelcomeSettings, /) -> None:
+        self._guild_welcome_settings[settings.guild_id] = settings
+
     def add_menu(self, menu: Menu, /) -> None:
         self._menus[menu.id] = menu
 
