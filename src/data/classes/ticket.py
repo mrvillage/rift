@@ -8,6 +8,7 @@ from src.ref import RiftContext
 
 from ...cache import cache
 from ...errors import TicketConfigNotFoundError, TicketNotFoundError
+from ...funcs.utils import convert_int
 from ..db import execute_query, execute_read_query
 
 __all__ = ("Ticket", "TicketConfig")
@@ -76,7 +77,7 @@ class Ticket:
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str) -> Ticket:
         try:
-            ticket = cache.get_ticket(int(argument))
+            ticket = cache.get_ticket(convert_int(argument))
             if ticket:
                 return ticket
             raise TicketNotFoundError(argument)

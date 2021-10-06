@@ -7,6 +7,7 @@ from discord.utils import MISSING
 
 from ...cache import cache
 from ...errors import SubscriptionNotFoundError
+from ...funcs.utils import convert_int
 from ...ref import RiftContext, bot
 from ..db import execute_query
 
@@ -42,7 +43,7 @@ class Subscription:
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str, /) -> Subscription:
         try:
-            subscription = await cls.fetch(int(argument))
+            subscription = await cls.fetch(convert_int(argument))
             if TYPE_CHECKING:
                 assert isinstance(ctx.guild, discord.Guild)
             if subscription.guild_id != ctx.guild.id:

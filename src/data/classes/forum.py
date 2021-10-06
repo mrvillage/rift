@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from ...cache import cache
 from ...errors import ForumNotFoundError
+from ...funcs.utils import convert_int
 from ...ref import RiftContext
 from ..db import execute_query
 
@@ -27,7 +28,7 @@ class Forum:
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str) -> Forum:
         try:
-            forum = cache.get_forum(int(argument))
+            forum = cache.get_forum(convert_int(argument))
             if forum:
                 return forum
         except ValueError:

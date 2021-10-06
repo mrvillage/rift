@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Optional
 
 from ...cache import cache
 from ...errors import AttackNotFoundError, WarNotFoundError
+from ...funcs.utils import convert_int
 from ...ref import RiftContext
 from .. import query
 
@@ -124,7 +125,7 @@ class War:
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str) -> War:
         try:
-            return await cls.fetch(int(argument))
+            return await cls.fetch(convert_int(argument))
         except ValueError:
             raise WarNotFoundError(argument)
 
@@ -253,7 +254,7 @@ class Attack:
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str) -> Attack:
         try:
-            return await cls.fetch(int(argument))
+            return await cls.fetch(convert_int(argument))
         except ValueError:
             raise AttackNotFoundError(argument)
 
