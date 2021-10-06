@@ -6,6 +6,7 @@ import discord
 
 from ...cache import cache
 from ...errors import EmbassyConfigNotFoundError, EmbassyNotFoundError
+from ...funcs.utils import convert_int
 from ...ref import RiftContext
 from ..db import execute_query, execute_read_query
 
@@ -36,7 +37,7 @@ class Embassy:
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str) -> Embassy:
         try:
-            embassy = cache.get_embassy(int(argument))
+            embassy = cache.get_embassy(convert_int(argument))
             if embassy:
                 return embassy
             raise EmbassyNotFoundError(argument)
@@ -112,7 +113,7 @@ class EmbassyConfig:
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str) -> EmbassyConfig:
         try:
-            config = cache.get_embassy_config(int(argument))
+            config = cache.get_embassy_config(convert_int(argument))
             if config:
                 return config
             raise EmbassyConfigNotFoundError(argument)

@@ -6,6 +6,7 @@ import discord
 
 from ...cache import cache
 from ...errors import TargetNotFoundError
+from ...funcs.utils import convert_int
 from ...ref import RiftContext
 from ..query import add_target, remove_target
 
@@ -40,7 +41,7 @@ class Target:
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str, /) -> Target:
         try:
-            return await cls.fetch(int(argument), ctx.author.id)
+            return await cls.fetch(convert_int(argument), ctx.author.id)
         except ValueError:
             raise TargetNotFoundError(argument)
 
