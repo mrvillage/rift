@@ -61,7 +61,6 @@ class Embassies(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         data = {
-            "id": ctx.interaction.id,
             "category_id": category and category.id,
             "guild_id": ctx.guild.id,
             "start_message": start,

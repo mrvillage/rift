@@ -76,7 +76,7 @@ class Menus(commands.Cog):
         message: discord.Message
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
-        menu = Menu.default(ctx.interaction.id, ctx.guild.id)
+        menu = Menu.default(ctx.guild.id)
         menu.description = (
             description
             or "This is a menu! Someone was lazy and didn't put a description. :)"
@@ -136,7 +136,6 @@ class Menus(commands.Cog):
                     flags = await MenuItem.format_flags(ctx, flags)
                     item = MenuItem(
                         {  # type: ignore
-                            "id": message.id,
                             "guild_id": ctx.guild.id,
                             "type_": "button",
                             "data_": flags,

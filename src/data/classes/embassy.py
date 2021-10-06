@@ -104,7 +104,7 @@ class EmbassyConfig:
     )
 
     def __init__(self, data: EmbassyConfigData) -> None:
-        self.id: int = data["id"]
+        self.id: int = data.get("id")
         self.category_id: Optional[int] = data["category_id"]
         self.guild_id: int = data["guild_id"]
         self.start_message: str = data["start_message"]
@@ -130,14 +130,14 @@ class EmbassyConfig:
         return self.id
 
     async def save(self) -> None:
-        cache.add_embassy_config(self)
-        await execute_read_query(
-            """INSERT INTO embassy_configs (id, category_id, guild_id, start_message) VALUES ($1, $2, $3,$4);""",
-            self.id,
+        id = await execute_read_query(
+            """INSERT INTO embassy_configs (category_id, guild_id, start_message) VALUES ($1, $2, $3) RETURNING id;""",
             self.category_id,
             self.guild_id,
             self.start_message,
         )
+        self.id = id[0]["id"]
+        cache.add_embassy_config(self)
 
     async def set_(self, **kwargs: Union[int, bool]) -> EmbassyConfig:
         sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
