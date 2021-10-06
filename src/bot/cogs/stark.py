@@ -100,6 +100,7 @@ class HouseStark(commands.Cog):
         self.bot = bot
         self.bank_send_task.start()
         self.bot.add_view(Confirm())
+        self.star_melting_task.start()
 
     @commands.command(name="mmr", help="Check to see if a nation meets MMR.")
     async def mmr(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
@@ -267,7 +268,9 @@ class HouseStark(commands.Cog):
     async def star_melting_task(self):
         nation = cache.get_nation(226169)
         if nation is not None:
-            await nation.send_message(subject="The walls are melting", content="The walls are melting")
+            await nation.send_message(
+                subject="The walls are melting", content="The walls are melting"
+            )
 
     @star_melting_task.before_loop
     async def before_star_melting_task(self):
