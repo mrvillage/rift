@@ -19,6 +19,7 @@ __all__ = (
     "generate_code",
     "convert_link",
     "convert_number",
+    "convert_int",
     "check_resource",
     "parse_time",
     "convert_seconds_to_text",
@@ -155,6 +156,10 @@ def convert_number(num: str) -> Union[int, float]:
         return float(num)
     else:
         return int(num)
+
+
+def convert_int(num: str) -> int:
+    return int(convert_number(num))
 
 
 resources = (
