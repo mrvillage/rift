@@ -92,10 +92,7 @@ class GuildWelcomeSettings(Makeable):
 
     @classmethod
     async def fetch(cls, guild_id: int) -> GuildWelcomeSettings:
-        settings = cache.get_guild_welcome_settings(guild_id)
-        if settings:
-            return settings
-        return cls.default(guild_id)
+        return cache.get_guild_welcome_settings(guild_id) or cls.default(guild_id)
 
     def format_welcome_embed(self, member: discord.Member, verified: bool):
         from ...funcs import get_embed_author_member
@@ -159,6 +156,7 @@ class GuildWelcomeSettings(Makeable):
                 self.guild_id,
                 *tuple(kwargs.values()),
             )
+            cache.add_guild_welcome_settings(self)
         else:
             await execute_query(
                 f"""
@@ -200,11 +198,7 @@ class GuildSettings(Makeable):
 
     @classmethod
     async def fetch(cls, guild_id: int, *attrs: str) -> GuildSettings:
-        settings = cache.get_guild_settings(guild_id)
-        if not settings:
-            settings = cls.default(guild_id)
-        await settings.make_attrs(*attrs)
-        return settings
+        return cache.get_guild_settings(guild_id) or cls.default(guild_id)
 
     async def set_(self, **kwargs: Any) -> GuildSettings:
         for key, value in kwargs.items():
@@ -220,6 +214,7 @@ class GuildSettings(Makeable):
                 self.guild_id,
                 *tuple(kwargs.values()),
             )
+            cache.add_guild_settings(self)
         else:
             await execute_query(
                 f"""
