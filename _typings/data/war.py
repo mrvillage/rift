@@ -26,8 +26,8 @@ class AttackData(TypedDict):
     infra_destroyed_value: float
     attacker_munitions_used: float
     defender_munitions_used: float
-    attacker_gas_used: float
-    defender_gas_used: float
+    attacker_gasoline_used: float
+    defender_gasoline_used: float
     aircraft_killed_by_tanks: int
 
 
@@ -54,8 +54,8 @@ class WarData(TypedDict):
     defender_resistance: int
     attacker_fortify: bool
     defender_fortify: bool
-    attacker_gas_used: float
-    defender_gas_used: float
+    attacker_gasoline_used: float
+    defender_gasoline_used: float
     attacker_munitions_used: float
     defender_munitions_used: float
     attacker_aluminum_used: int
