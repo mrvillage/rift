@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import cached_property
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import discord
@@ -170,11 +171,8 @@ class GuildWelcomeSettings(Makeable):
 
 
 class GuildSettings(Makeable):
-    welcome_settings: GuildWelcomeSettings
-
     __slots__ = (
         "guild_id",
-        "welcome_settings",
         "defaulted",
         "purpose",
         "purpose_argument",
@@ -186,10 +184,11 @@ class GuildSettings(Makeable):
         self.purpose: Optional[str] = data["purpose"]
         self.purpose_argument: Optional[str] = data["purpose_argument"]
 
-    async def _make_welcome_settings(self) -> None:
-        self.welcome_settings: GuildWelcomeSettings = await GuildWelcomeSettings.fetch(
+    @cached_property
+    def welcome_settings(self) -> GuildWelcomeSettings:
+        return cache.get_guild_welcome_settings(
             self.guild_id
-        )
+        ) or GuildWelcomeSettings.default(self.guild_id)
 
     @classmethod
     def default(cls, guild_id: int) -> GuildSettings:
