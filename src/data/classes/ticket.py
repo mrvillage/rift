@@ -131,7 +131,7 @@ class TicketConfig:
     )
 
     def __init__(self, data: TicketConfigData) -> None:
-        self.id = data["id"]
+        self.id = data.get("id")
         self.category_id = data["category_id"]
         self.guild_id = data["guild_id"]
         self.start_message = data["start_message"]
@@ -147,10 +147,8 @@ class TicketConfig:
         raise TicketConfigNotFoundError(config_id)
 
     async def save(self) -> None:
-        cache.add_ticket_config(self)
-        await execute_query(
-            """INSERT INTO ticket_configs (id, category_id, guild_id, start_message, archive_category_id) VALUES ($1, $2, $3, $4, $5, $6, $7);""",
-            self.id,
+        id = await execute_read_query(
+            """INSERT INTO ticket_configs (category_id, guild_id, start_message, archive_category_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;""",
             self.category_id,
             self.guild_id,
             self.start_message,
@@ -158,6 +156,8 @@ class TicketConfig:
             self.role_mentions,
             self.user_mentions,
         )
+        self.id = id[0]["id"]
+        cache.add_ticket_config(self)
 
     async def set_(self, **kwargs: Union[int, bool]) -> TicketConfig:
         sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]

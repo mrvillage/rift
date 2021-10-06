@@ -1,14 +1,19 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Sequence, Union
 
 import discord
 from discord.ext import commands
 
 from ...cache import cache
-from ...errors import MenuItemNotFoundError, MenuNotFoundError
+from ...errors import (
+    EmbassyConfigNotFoundError,
+    MenuItemNotFoundError,
+    MenuNotFoundError,
+    TicketConfigNotFoundError,
+)
 from ...ref import Rift, RiftContext
-from ..db import execute_query
+from ..db import execute_query, execute_read_query
 from ..query import insert_interface
 from .base import Makeable
 
@@ -229,7 +234,7 @@ class Menu(Makeable):
     )
 
     def __init__(self, data: MenuData) -> None:
-        self.id = data["id"]
+        self.id = data.get("id")
         self.guild_id = data["guild_id"]
         self.name = data["name"]
         self.description = data["description"]
@@ -253,10 +258,9 @@ class Menu(Makeable):
         raise MenuNotFoundError(menu_id)
 
     @classmethod
-    def default(cls, menu_id: int, guild_id: int) -> Menu:
+    def default(cls, guild_id: int) -> Menu:
         menu = cls(
             data={  # type: ignore
-                "id": menu_id,
                 "guild_id": guild_id,
                 "name": None,
                 "description": None,
@@ -290,11 +294,10 @@ class Menu(Makeable):
         return self
 
     async def save(self) -> None:
-        await execute_query(
+        id = await execute_read_query(
             """
-        INSERT INTO menus (id, guild_id, name, description, items, permissions) VALUES ($1, $2, $3, $4, $5, $6);
+        INSERT INTO menus (guild_id, name, description, items, permissions) VALUES ($1, $2, $3, $4, $5) RETURNING id;
         """,
-            self.id,
             self.guild_id,
             self.name,
             self.description,
@@ -309,6 +312,8 @@ class Menu(Makeable):
             ],
             self.permissions or None,
         )
+        self.id = id[0]["id"]
+        cache.add_menu(self)
 
     def add_item(self, item: MenuItem, row: int) -> None:
         self.items[row].append(item)
@@ -351,10 +356,10 @@ class MenuItem:
     __slots__ = ("id", "guild_id", "type", "data")
 
     def __init__(self, data: MenuItemData) -> None:
-        self.id = data["id"]
-        self.guild_id = data["guild_id"]
-        self.type = data["type_"]
-        self.data = data["data_"] or {}
+        self.id: int = data.get("id")
+        self.guild_id: int = data["guild_id"]
+        self.type: str = data["type_"]
+        self.data: Dict[str, Any] = data["data_"] or {}
 
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str) -> MenuItem:
@@ -411,15 +416,16 @@ class MenuItem:
             raise Exception(f"Unknown item type {self.type}")
 
     async def save(self) -> None:
-        await execute_query(
+        id = await execute_read_query(
             """
-        INSERT INTO menu_items (id, guild_id, type_, data_) VALUES ($1, $2, $3, $4);
+        INSERT INTO menu_items (guild_id, type_, data_) VALUES ($1, $2, $3) RETURNING id;
         """,
-            self.id,
             self.guild_id,
             self.type,
             self.data,
         )
+        self.id = id[0]["id"]
+        cache.add_menu_item(self)
 
     @staticmethod
     def validate_flags(flags: Mapping[str, Any]) -> bool:
@@ -500,7 +506,7 @@ class MenuItem:
                                 formatted_flags["options"].add(
                                     int(await TicketConfig.fetch(int(j)))
                                 )
-                            except IndexError:
+                            except TicketConfigNotFoundError:
                                 await ctx.reply(
                                     embed=get_embed_author_member(
                                         ctx.author,
@@ -523,7 +529,7 @@ class MenuItem:
                                 formatted_flags["options"].add(
                                     int(await EmbassyConfig.fetch(int(j)))
                                 )
-                            except IndexError:
+                            except EmbassyConfigNotFoundError:
                                 await ctx.reply(
                                     embed=get_embed_author_member(
                                         ctx.author,
