@@ -31,6 +31,25 @@ class Military(commands.Cog):
         self, ctx: RiftContext, *, alliance: Optional[Alliance] = None
     ):
         alliance = alliance or await Alliance.convert(ctx, alliance)
+        await ctx.invoke(self.militarization_alliance, alliance=alliance)
+
+    @commands.command(name="militarization-nation", aliases=["mn"], hidden=True)
+    async def mn_shortcut(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
+        nation = nation or await Nation.convert(ctx, nation)
+        await ctx.invoke(self.militarization_nation, nation=nation)
+
+    @militarization.command(
+        name="alliance",
+        aliases=["m", "aa"],
+        brief="Get the militarization of an alliance.",
+        type=(commands.CommandType.default, commands.CommandType.chat_input),
+        descriptions={"alliance": "The alliance to check the militarization of."},
+    )
+    async def militarization_alliance(
+        self, ctx: RiftContext, *, alliance: Optional[Alliance] = None
+    ):
+
+        alliance = alliance or await Alliance.convert(ctx, alliance)
         if ctx.interaction:
             await ctx.interaction.response.defer()
             async with aiohttp.request(
@@ -115,24 +134,6 @@ class Military(commands.Cog):
             color=discord.Color.blue(),
         )
         await ctx.reply(file=image, embed=embed)
-
-    @commands.command(name="militarization-nation", aliases=["mn"], hidden=True)
-    async def mn_shortcut(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
-        nation = nation or await Nation.convert(ctx, nation)
-        await ctx.invoke(self.militarization_nation, nation=nation)
-
-    @militarization.command(
-        name="alliance",
-        aliases=["m", "aa"],
-        brief="Get the militarization of an alliance.",
-        type=(commands.CommandType.default, commands.CommandType.chat_input),
-        descriptions={"alliance": "The alliance to check the militarization of."},
-    )
-    async def militarization_alliance(
-        self, ctx: RiftContext, *, alliance: Optional[Alliance] = None
-    ):
-        alliance = alliance or await Alliance.convert(ctx, alliance)
-        await ctx.invoke(self.militarization, alliance=alliance)
 
     @militarization.command(
         name="nation",
