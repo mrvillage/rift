@@ -558,8 +558,14 @@ class Cache:
     def add_embassy_config(self, config: EmbassyConfig, /) -> None:
         self._embassy_configs[config.id] = config
 
+    def add_menu(self, menu: Menu, /) -> None:
+        self._menus[menu.id] = menu
+
     def add_menu_interface(self, interface: MenuInterfaceData, /) -> None:
         self._menu_interfaces.append(interface)
+
+    def add_menu_item(self, item: MenuItem, /) -> None:
+        self._menu_items[item.id] = item
 
     def add_subscription(self, subscription: Subscription, /) -> None:
         self._subscriptions[subscription.id] = subscription
