@@ -15,7 +15,6 @@ from ...errors import (
 )
 from ...funcs.utils import convert_int
 from ...ref import RiftContext
-from ...views.menu import MenuButton, MenuSelect, MenuSelectOption, MenuView
 from ..db import execute_query, execute_read_query
 from ..query import insert_interface
 from .base import Makeable
@@ -24,6 +23,8 @@ __all__ = ("Menu", "MenuItem")
 
 if TYPE_CHECKING:
     from _typings import MenuData, MenuFormattedFlags, MenuItemData
+
+    from ...views.menu import MenuButton, MenuSelect, MenuView
 
 
 class Menu(Makeable):
@@ -124,6 +125,7 @@ class Menu(Makeable):
 
     async def get_view(self) -> MenuView:
         from ...ref import bot
+        from ...views import MenuView
 
         await self.make_attrs("items")
         self.view = MenuView(bot=bot, menu_id=self.id, timeout=None)
@@ -183,6 +185,8 @@ class MenuItem:
         raise MenuItemNotFoundError(item_id)
 
     def get_item(self, menu_id: int, row: int) -> Union[MenuButton, MenuSelect]:
+        from ...views import MenuButton, MenuSelect, MenuSelectOption
+
         custom_id = f"{menu_id}-{self.id}"
         if self.type == "button":
             return MenuButton(
