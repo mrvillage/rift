@@ -425,7 +425,7 @@ class Alliance(Makeable):
                 (i["net_total"] for i in revenues[1:]), revenues[0]["net_total"]
             ),
             "upkeep": sum((i["upkeep"] for i in revenues[1:]), revenues[0]["upkeep"]),
-            "gross_total": sum(
+            "upkeep_total": sum(
                 (i["upkeep_total"] for i in revenues[1:]), revenues[0]["upkeep_total"]
             ),
         }
