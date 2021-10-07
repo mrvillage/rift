@@ -149,7 +149,7 @@ class TicketConfig:
 
     async def save(self) -> None:
         id = await execute_read_query(
-            """INSERT INTO ticket_configs (category_id, guild_id, start_message, archive_category_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;""",
+            """INSERT INTO ticket_configs (category_id, guild_id, start_message, archive_category_id, role_mentions, user_mentions) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;""",
             self.category_id,
             self.guild_id,
             self.start_message,
