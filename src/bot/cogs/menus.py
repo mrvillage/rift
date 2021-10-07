@@ -158,7 +158,7 @@ class Menus(commands.Cog):
                         )
                         lower = message.content.lower()
                         if lower.startswith(
-                            ("finish", "cancel", "complete", "done", "save")
+                            ("finish", "cancel", "complete", "done", "save", "stop")
                         ):
                             break
                         if lower.startswith("option "):
