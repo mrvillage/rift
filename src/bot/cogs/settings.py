@@ -320,7 +320,7 @@ class Settings(commands.Cog):
         )
 
     @server_settings.command(
-        name="welcome_channels",
+        name="welcome-channels",
         brief="Modify the server's welcome channels format.",
         type=commands.CommandType.chat_input,
         descriptions={
@@ -380,11 +380,11 @@ class Settings(commands.Cog):
             )
 
     @server_settings.command(
-        name="join_roles",
+        name="join-roles",
         brief="Modify the server's join roles.",
         type=commands.CommandType.chat_input,
         descriptions={
-            "channels": "The new join roles, given by space separated role mentions.",
+            "roles": "The new join roles, given by space separated role mentions.",
             "clear": "Set to True to clear the join roles.",
         },
     )
@@ -433,6 +433,63 @@ class Settings(commands.Cog):
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     description="The join roles have been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @server_settings.command(
+        name="managers",
+        brief="Modify the server's manager roles.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "roles": "The new manager roles, given by space separated role mentions.",
+            "clear": "Set to True to clear the manager roles.",
+        },
+    )
+    @has_manage_permissions(managers=False)
+    @commands.guild_only()
+    async def server_settings_managers(
+        self, ctx: RiftContext, *, roles: List[discord.Role] = None, clear: bool = False  # type: ignore
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id)
+        if roles is None and not clear:
+            if settings.manager_role_ids:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The join roles are:\n\n{''.join(f'<@&{i}>' for i in settings.manager_role_ids)}",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="This server has no manager roles.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        roles_set = None if clear else [i.id for i in roles]  # type: ignore
+        await settings.set_(manager_role_ids=roles_set)
+        if roles_set:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The manager roles are now:\n\n{''.join(f'<@&{i}>' for i in roles_set)}",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The manager roles have been cleared.",
                     color=discord.Color.green(),
                 ),
                 ephemeral=True,
