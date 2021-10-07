@@ -56,7 +56,16 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 await ctx.reply(
                     embed=get_embed_author_member(
                         ctx.author,
-                        f"The `Manage Server` or `Administrator` permission is required to run this command.",
+                        f"You need to have the `Manage Server` or `Administrator` permission or have a manager role to run this command.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            elif error.missing_permissions[0] == "manage_no_role":
+                await ctx.reply(
+                    embed=get_embed_author_member(
+                        ctx.author,
+                        f"You need to have the `Manage Server` or `Administrator` to run this command.",
                         color=discord.Color.red(),
                     ),
                     ephemeral=True,
