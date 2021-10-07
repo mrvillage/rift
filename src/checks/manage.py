@@ -9,6 +9,7 @@ from ..ref import RiftContext
 
 if TYPE_CHECKING:
     import discord
+
 __all__ = ("has_manage_permissions",)
 
 
