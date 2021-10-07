@@ -181,6 +181,7 @@ class GuildSettings(Makeable):
         self.guild_id: int = data["guild_id"]
         self.purpose: Optional[str] = data["purpose"]
         self.purpose_argument: Optional[str] = data["purpose_argument"]
+        self.manager_role_ids: Optional[List[int]] = data["manager_role_ids"]
 
     @cached_property
     def welcome_settings(self) -> GuildWelcomeSettings:
@@ -191,7 +192,12 @@ class GuildSettings(Makeable):
     @classmethod
     def default(cls, guild_id: int) -> GuildSettings:
         settings = cls(
-            {"guild_id": guild_id, "purpose": None, "purpose_argument": None}
+            {
+                "guild_id": guild_id,
+                "purpose": None,
+                "purpose_argument": None,
+                "manager_role_ids": None,
+            }
         )
         settings.defaulted = True
         return settings
