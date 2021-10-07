@@ -48,7 +48,7 @@ class Menu(Makeable):
         self.guild_id = data["guild_id"]
         self.name = data["name"]
         self.description = data["description"]
-        self.item_ids = data["items"] or []
+        self.item_ids = data["items"] or [[], [], [], [], []]
         self.permissions = data["permissions"] or {}
 
     @classmethod
@@ -74,7 +74,7 @@ class Menu(Makeable):
                 "guild_id": guild_id,
                 "name": None,
                 "description": None,
-                "items": [],
+                "items": [[], [], [], [], []],
                 "permissions": {},
             }
         )
