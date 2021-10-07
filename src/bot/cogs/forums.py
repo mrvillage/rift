@@ -16,6 +16,7 @@ class Forums(commands.Cog):
     def __init__(self, bot: Rift):
         self.bot = bot
         self.check_alliance_affairs.start()
+        self.check_orbis_central.start()
 
     @tasks.loop(minutes=1)
     async def check_alliance_affairs(self):
