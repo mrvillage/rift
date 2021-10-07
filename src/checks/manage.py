@@ -37,6 +37,8 @@ def has_manage_permissions(managers: bool = True):
             or ctx.guild.owner_id == ctx.author.id
         ):
             return True
+        if managers:
+            raise commands.MissingPermissions(["manage_no_role"])
         raise commands.MissingPermissions(["manage"])
 
     return commands.check(predicate)  # type: ignore
