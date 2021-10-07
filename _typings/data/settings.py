@@ -9,6 +9,7 @@ class GuildSettingsData(TypedDict):
     guild_id: int
     purpose: Optional[str]
     purpose_argument: Optional[str]
+    manager_role_ids: Optional[List[int]]
 
 
 class GuildWelcomeSettingsData(TypedDict):
