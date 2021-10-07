@@ -184,7 +184,11 @@ class TicketConfig:
         if TYPE_CHECKING and category is not None:
             assert isinstance(category, discord.CategoryChannel)
         number = (
-            max(i.ticket_number for i in cache.tickets if i.config_id == self.id) + 1
+            max(
+                [i.ticket_number for i in cache.tickets if i.config_id == self.id]
+                or [0]
+            )
+            + 1
         )
         if category is not None:
             overwrites = {key: value for key, value in category.overwrites.items()}
