@@ -34,7 +34,9 @@ async def get_row(
                     return index
             await message.reply(  # type: ignore
                 embed=get_embed_author_member(
-                    message.author, "There's no space for that item in the menu!"
+                    message.author,
+                    "There's no space for that item in the menu!",
+                    color=discord.Color.red(),
                 )
             )
             return None
@@ -50,6 +52,7 @@ async def get_row(
                         embed=get_embed_author_member(
                             message.author,
                             f"Row {row_num} doesn't have space for your item!",
+                            color=discord.Color.red(),
                         )
                     )
                     return
@@ -58,7 +61,9 @@ async def get_row(
     except ValueError:
         await message.reply(  # type: ignore
             embed=get_embed_author_member(
-                message.author, f"`{flags['row'][0]}` is not a valid row!"
+                message.author,
+                f"`{flags['row'][0]}` is not a valid row!",
+                color=discord.Color.red(),
             )
         )
         return
