@@ -15,7 +15,7 @@ from ...ref import Rift, RiftContext
 
 def check_after(before: float, after: float, only_buy: bool) -> bool:
     if only_buy:
-        return after < before
+        return after > before
     else:
         return True
 
@@ -379,11 +379,7 @@ class Tools(commands.Cog):
         only_buy: bool = False,
     ):
         alliance = alliance or await Alliance.convert(ctx, alliance)
-        if any(
-            after - i.infrastructure >= 1000000
-            for i in alliance.partial_cities
-            if check_after(i.land, after, only_buy)
-        ):
+        if any(after - i.infrastructure >= 1000000 for i in alliance.partial_cities):
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -403,7 +399,9 @@ class Tools(commands.Cog):
         for nation in alliance.members:
             projs = projects[nation.id]
             raw_cost = cost = sum(
-                funcs.calculate_land_value(i.land, after) for i in nation.partial_cities
+                funcs.calculate_land_value(i.land, after)
+                for i in nation.partial_cities
+                if check_after(i.land, after, only_buy)
             )
             if nation.domestic_policy == "Rapid Expansion":
                 cost -= raw_cost * 0.05
