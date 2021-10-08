@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Union
 
 import discord
 import pnwkit
@@ -11,6 +11,7 @@ from ...errors import AllianceNotFoundError
 from ...find import search_alliance
 from ...ref import RiftContext, bot
 from .base import Makeable
+from .city import City
 from .resources import Resources
 
 __all__ = ("Alliance",)
@@ -191,6 +192,11 @@ class Alliance(Makeable):
             sum(i.infrastructure for i in cache.cities if i.nation_id in ids)
             / self.cities
         )
+
+    @property
+    def partial_cities(self) -> Set[City]:
+        ids = {i.id for i in self.members}
+        return {i for i in cache.cities if i.nation_id in ids}
 
     async def get_resources(self) -> Resources:
         from ...funcs import parse_alliance_bank
