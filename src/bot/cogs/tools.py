@@ -13,6 +13,13 @@ from ...data.classes import Nation
 from ...ref import Rift, RiftContext
 
 
+def check_after(before: float, after: float, only_buy: bool) -> bool:
+    if only_buy:
+        return after < before
+    else:
+        return True
+
+
 class Tools(commands.Cog):
     def __init__(self, bot: Rift):
         self.bot = bot
@@ -164,6 +171,7 @@ class Tools(commands.Cog):
         descriptions={
             "after": "The final infrastructure.",
             "nation": "The nation to calculate for, defaults to your nation.",
+            "only_buy": "Whether to only buy as opposed to selling excess, defaults to selling.",
         },
     )
     async def tools_nation_infrastructure(
@@ -171,6 +179,7 @@ class Tools(commands.Cog):
         ctx: RiftContext,
         after: float,
         nation: Optional[Nation] = None,
+        only_buy: bool = False,
     ):
         nation = nation or await Nation.convert(ctx, nation)
         if any(after - i.infrastructure >= 1000000 for i in nation.partial_cities):
@@ -184,6 +193,7 @@ class Tools(commands.Cog):
         raw_cost = cost = sum(
             funcs.calculate_infrastructure_value(i.infrastructure, after)
             for i in nation.partial_cities
+            if check_after(i.infrastructure, after, only_buy)
         )
         projects = (
             await pnwkit.async_nation_query(
@@ -211,6 +221,7 @@ class Tools(commands.Cog):
         descriptions={
             "after": "The final land.",
             "nation": "The nation to calculate for, defaults to your nation.",
+            "only_buy": "Whether to only buy as opposed to selling excess, defaults to selling.",
         },
     )
     async def tools_nation_land(
@@ -218,6 +229,7 @@ class Tools(commands.Cog):
         ctx: RiftContext,
         after: float,
         nation: Optional[Nation] = None,
+        only_buy: bool = False,
     ):
         nation = nation or await Nation.convert(ctx, nation)
         if any(after - i.land >= 1000000 for i in nation.partial_cities):
@@ -229,7 +241,9 @@ class Tools(commands.Cog):
                 )
             )
         raw_cost = cost = sum(
-            funcs.calculate_land_value(i.land, after) for i in nation.partial_cities
+            funcs.calculate_land_value(i.land, after)
+            for i in nation.partial_cities
+            if check_after(i.land, after, only_buy)
         )
         projects = (
             await pnwkit.async_nation_query(
@@ -297,6 +311,7 @@ class Tools(commands.Cog):
         descriptions={
             "after": "The final infrastructure.",
             "alliance": "The alliance to calculate for, defaults to your alliance.",
+            "only_buy": "Whether to only buy as opposed to selling excess, defaults to selling.",
         },
     )
     async def tools_alliance_infrastructure(
@@ -304,6 +319,7 @@ class Tools(commands.Cog):
         ctx: RiftContext,
         after: float,
         alliance: Optional[Alliance] = None,
+        only_buy: bool = False,
     ):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         if any(after - i.infrastructure >= 1000000 for i in alliance.partial_cities):
@@ -328,6 +344,7 @@ class Tools(commands.Cog):
             raw_cost = cost = sum(
                 funcs.calculate_infrastructure_value(i.infrastructure, after)
                 for i in nation.partial_cities
+                if check_after(i.infrastructure, after, only_buy)
             )
             if nation.domestic_policy == "Urbanization":
                 cost -= raw_cost * 0.05
@@ -351,6 +368,7 @@ class Tools(commands.Cog):
         descriptions={
             "after": "The final land.",
             "alliance": "The alliance to calculate for, defaults to your alliance.",
+            "only_buy": "Whether to only buy as opposed to selling excess, defaults to selling.",
         },
     )
     async def tools_alliance_land(
@@ -358,9 +376,14 @@ class Tools(commands.Cog):
         ctx: RiftContext,
         after: float,
         alliance: Optional[Alliance] = None,
+        only_buy: bool = False,
     ):
         alliance = alliance or await Alliance.convert(ctx, alliance)
-        if any(after - i.infrastructure >= 1000000 for i in alliance.partial_cities):
+        if any(
+            after - i.infrastructure >= 1000000
+            for i in alliance.partial_cities
+            if check_after(i.land, after, only_buy)
+        ):
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
