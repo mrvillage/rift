@@ -19,7 +19,7 @@ class Tools(commands.Cog):
     async def tools(self, ctx: RiftContext):
         ...
 
-    @tools.command(
+    @tools.command(  # type: ignore
         name="infrastructure",
         brief="Calculates infrastructure cost.",
         type=commands.CommandType.chat_input,
@@ -63,7 +63,7 @@ class Tools(commands.Cog):
             )
         )
 
-    @tools.command(
+    @tools.command(  # type: ignore
         name="land",
         brief="Calculates land cost.",
         type=commands.CommandType.chat_input,
@@ -107,7 +107,7 @@ class Tools(commands.Cog):
             )
         )
 
-    @tools.command(
+    @tools.command(  # type: ignore
         name="city",
         brief="Calculates city cost.",
         type=commands.CommandType.chat_input,
@@ -151,11 +151,11 @@ class Tools(commands.Cog):
             )
         )
 
-    @tools.group(name="nation", type=commands.CommandType.chat_input)
+    @tools.group(name="nation", type=commands.CommandType.chat_input)  # type: ignore
     async def tools_nation(self, ctx: RiftContext):
         ...
 
-    @tools_nation.command(
+    @tools_nation.command(  # type: ignore
         name="infrastructure",
         brief="Calculate infrastructure cost for a nation.",
         type=commands.CommandType.chat_input,
@@ -202,7 +202,7 @@ class Tools(commands.Cog):
             )
         )
 
-    @tools_nation.command(
+    @tools_nation.command(  # type: ignore
         name="land",
         brief="Calculate land cost for a nation.",
         type=commands.CommandType.chat_input,
@@ -249,7 +249,7 @@ class Tools(commands.Cog):
             )
         )
 
-    @tools_nation.command(
+    @tools_nation.command(  # type: ignore
         name="city",
         brief="Calculate city cost for a nation.",
         type=commands.CommandType.chat_input,
