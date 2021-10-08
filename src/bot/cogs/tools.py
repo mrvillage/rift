@@ -6,6 +6,8 @@ import discord
 import pnwkit
 from discord.ext import commands
 
+from src.data.classes.alliance import Alliance
+
 from ... import Rift, funcs
 from ...data.classes import Nation
 from ...ref import Rift, RiftContext
@@ -128,11 +130,11 @@ class Tools(commands.Cog):
         urban_planning: bool = False,
         advanced_urban_planning: bool = False,
     ):
-        if before < 1 or after > 100:
+        if before < 1:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    "Sorry, but I can't calculate that range of cities! I can calculate from 1-100.",
+                    "Sorry, but I can't calculate that range of cities! I can only calculate numbers above 1.",
                     color=discord.Color.red(),
                 )
             )
@@ -227,8 +229,7 @@ class Tools(commands.Cog):
                 )
             )
         raw_cost = cost = sum(
-            funcs.calculate_infrastructure_value(i.infrastructure, after)
-            for i in nation.partial_cities
+            funcs.calculate_land_value(i.land, after) for i in nation.partial_cities
         )
         projects = (
             await pnwkit.async_nation_query(
@@ -254,7 +255,7 @@ class Tools(commands.Cog):
         brief="Calculate city cost for a nation.",
         type=commands.CommandType.chat_input,
         descriptions={
-            "after": "The city infrastructure.",
+            "after": "The final city.",
             "nation": "The nation to calculate for, defaults to your nation.",
         },
     )
@@ -265,14 +266,6 @@ class Tools(commands.Cog):
         nation: Optional[Nation] = None,
     ):
         nation = nation or await Nation.convert(ctx, nation)
-        if after > 100:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "Sorry, but I can't calculate that range of cities! I can calculate from 1-100.",
-                    color=discord.Color.red(),
-                )
-            )
         raw_cost = cost = funcs.calculate_city_value(nation.cities, after)
         projects = (
             await pnwkit.async_nation_query(
@@ -289,6 +282,162 @@ class Tools(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"The cost to buy {repr(nation)} to city {after} is ${cost:,.2f}.",
+                color=discord.Color.green(),
+            )
+        )
+
+    @tools.group(name="alliance", type=commands.CommandType.chat_input)  # type: ignore
+    async def tools_alliance(self, ctx: RiftContext):
+        ...
+
+    @tools_alliance.command(  # type: ignore
+        name="infrastructure",
+        brief="Calculate infrastructure cost for an alliance.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "after": "The final infrastructure.",
+            "alliance": "The alliance to calculate for, defaults to your alliance.",
+        },
+    )
+    async def tools_alliance_infrastructure(
+        self,
+        ctx: RiftContext,
+        after: float,
+        alliance: Optional[Alliance] = None,
+    ):
+        alliance = alliance or await Alliance.convert(ctx, alliance)
+        if any(after - i.infrastructure >= 1000000 for i in alliance.partial_cities):
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "Sorry, but I can't calculate that much infrastructure!",
+                    color=discord.Color.red(),
+                )
+            )
+        await ctx.interaction.response.defer()
+        projects = (
+            await pnwkit.async_alliance_query(
+                {"id": alliance.id, "first": 1},
+                {"nations": ["id", "cfce", "adv_engineering_corps"]},
+            )
+        )[0]
+        projects = {int(i.id): i for i in projects.nations}
+        total_cost = 0
+        for nation in alliance.members:
+            projs = projects[nation.id]
+            raw_cost = cost = sum(
+                funcs.calculate_infrastructure_value(i.infrastructure, after)
+                for i in nation.partial_cities
+            )
+            if nation.domestic_policy == "Urbanization":
+                cost -= raw_cost * 0.05
+            if projs.cfce:
+                cost -= raw_cost * 0.05
+            if projs.adv_engineering_corps:
+                cost -= raw_cost * 0.05
+            total_cost += cost
+        await ctx.edit(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"The cost to buy all cities of {repr(alliance)} to {after:,.2f} infrastructure is ${total_cost:,.2f}.",
+                color=discord.Color.green(),
+            )
+        )
+
+    @tools_alliance.command(  # type: ignore
+        name="land",
+        brief="Calculate land cost for an alliance.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "after": "The final land.",
+            "alliance": "The alliance to calculate for, defaults to your alliance.",
+        },
+    )
+    async def tools_alliance_land(
+        self,
+        ctx: RiftContext,
+        after: float,
+        alliance: Optional[Alliance] = None,
+    ):
+        alliance = alliance or await Alliance.convert(ctx, alliance)
+        if any(after - i.infrastructure >= 1000000 for i in alliance.partial_cities):
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "Sorry, but I can't calculate that much land!",
+                    color=discord.Color.red(),
+                )
+            )
+        await ctx.interaction.response.defer()
+        projects = (
+            await pnwkit.async_alliance_query(
+                {"id": alliance.id, "first": 1},
+                {"nations": ["id", "arable_land_agency", "adv_engineering_corps"]},
+            )
+        )[0]
+        projects = {int(i.id): i for i in projects.nations}
+        total_cost = 0
+        for nation in alliance.members:
+            projs = projects[nation.id]
+            raw_cost = cost = sum(
+                funcs.calculate_land_value(i.land, after) for i in nation.partial_cities
+            )
+            if nation.domestic_policy == "Rapid Expansion":
+                cost -= raw_cost * 0.05
+            if projs.arable_land_agency:
+                cost -= raw_cost * 0.05
+            if projs.adv_engineering_corps:
+                cost -= raw_cost * 0.05
+            total_cost += cost
+        await ctx.edit(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"The cost to buy all cities of {repr(alliance)} to {after:,.2f} land is ${total_cost:,.2f}.",
+                color=discord.Color.green(),
+            )
+        )
+
+    @tools_alliance.command(  # type: ignore
+        name="city",
+        brief="Calculate city cost for an alliance.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "after": "The final city.",
+            "alliance": "The nation to calculate for, defaults to your alliance.",
+        },
+    )
+    async def tools_alliance_city(
+        self,
+        ctx: RiftContext,
+        after: int,
+        alliance: Optional[Alliance] = None,
+    ):
+        alliance = alliance or await Alliance.convert(ctx, alliance)
+        await ctx.interaction.response.defer()
+        projects = (
+            await pnwkit.async_alliance_query(
+                {"id": alliance.id, "first": 1},
+                {"nations": ["id", "uap", "adv_city_planning"]},
+            )
+        )[0]
+        projects = {int(i.id): i for i in projects.nations}
+        total_cost = 0
+        for nation in alliance.members:
+            if nation.cities >= after:
+                continue
+            projs = projects[nation.id]
+            raw_cost = cost = funcs.calculate_city_value(nation.cities, after)
+            if projs.uap:
+                cost -= 50000000 * (after - nation.cities)
+            if projs.adv_city_planning:
+                cost -= 100000000 * (after - nation.cities)
+            if nation.domestic_policy == "Manifest Destiny":
+                cost -= raw_cost * 0.05
+            total_cost += cost
+        await ctx.edit(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"The cost to buy all nations of {repr(alliance)} to city {after} is ${total_cost:,.2f}.",
                 color=discord.Color.green(),
             )
         )
