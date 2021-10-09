@@ -157,6 +157,7 @@ class GuildWelcomeSettings(Makeable):
                 *tuple(kwargs.values()),
             )
             cache.add_guild_welcome_settings(self)
+            self.defaulted = False
         else:
             await execute_query(
                 f"""
@@ -221,6 +222,7 @@ class GuildSettings(Makeable):
                 *tuple(kwargs.values()),
             )
             cache.add_guild_settings(self)
+            self.defaulted = False
         else:
             await execute_query(
                 f"""
