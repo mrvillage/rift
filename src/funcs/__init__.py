@@ -2,6 +2,7 @@ from . import utils  # type: ignore
 from .alliance import *
 from .bank import *
 from .city import *
+from .condition import *
 from .embeds import *
 from .errors import *
 from .nation import *
