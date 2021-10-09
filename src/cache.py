@@ -435,6 +435,8 @@ class Cache:
     def hook_treaty(
         self, action: Literal["create", "update", "delete"], data: TreatyData
     ) -> None:
+        from .data.classes import Treaty
+
         alliances: Dict[int, Alliance] = {  # type: ignore
             data["from_"]: self.get_alliance(data["from_"]),
             data["to_"]: self.get_alliance(data["to_"]),
@@ -443,7 +445,8 @@ class Cache:
             treaty = next(
                 i
                 for i in self._treaties
-                if i.from_.id == data["from_"] and i.to_.id == data["to_"]
+                if (i.from_ and i.from_.id) == data["from_"]
+                or (i.to_ and i.to_.id) == data["to_"]
             )
             treaty.update(data, alliances)
         self._treaties.add(Treaty(data, alliances))
