@@ -192,7 +192,8 @@ class Cache(commands.Cog):
                 "SELECT * FROM treaties;"
             )
             for i in fetched_data:
-                cache.hook_treaty("update", i)  # type: ignore
+                if i["stopped"] is None:
+                    cache.hook_treaty("update", i)  # type: ignore
 
     @commands.Cog.listener()
     async def on_bulk_treaty_delete(self, data: BulkTreatyListData):
