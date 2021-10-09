@@ -41,7 +41,7 @@ class Settings(commands.Cog):
     async def server_settings(self, ctx: RiftContext):
         ...
 
-    @server_settings.command(
+    @server_settings.command(  # type: ignore
         name="purpose",
         aliases=["p"],
         brief="View or modify the server's purpose.",
@@ -238,7 +238,7 @@ class Settings(commands.Cog):
                 )
             )
 
-    @server_settings.command(
+    @server_settings.command(  # type: ignore
         name="welcome-message",
         aliases=["wm", "welcomemessage"],
         brief="Modify the server's welcome message.",
@@ -278,7 +278,7 @@ class Settings(commands.Cog):
             ephemeral=True,
         )
 
-    @server_settings.command(
+    @server_settings.command(  # type: ignore
         name="verified-nickname",
         aliases=["vn", "verifiednickname"],
         brief="Modify the server's verified nickname format.",
@@ -319,7 +319,7 @@ class Settings(commands.Cog):
             ephemeral=True,
         )
 
-    @server_settings.command(
+    @server_settings.command(  # type: ignore
         name="welcome-channels",
         brief="Modify the server's welcome channels format.",
         type=commands.CommandType.chat_input,
@@ -379,7 +379,7 @@ class Settings(commands.Cog):
                 ephemeral=True,
             )
 
-    @server_settings.command(
+    @server_settings.command(  # type: ignore
         name="join-roles",
         brief="Modify the server's join roles.",
         type=commands.CommandType.chat_input,
@@ -438,7 +438,7 @@ class Settings(commands.Cog):
                 ephemeral=True,
             )
 
-    @server_settings.command(
+    @server_settings.command(  # type: ignore
         name="managers",
         brief="Modify the server's manager roles.",
         type=commands.CommandType.chat_input,
