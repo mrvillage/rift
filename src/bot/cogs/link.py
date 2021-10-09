@@ -22,7 +22,7 @@ class Link(commands.Cog):
         type=commands.CommandType.chat_input,
         descriptions={
             "nation": "The nation to link.",
-            "discord": "The Discord account to link, defaults to your account.",
+            "user": "The Discord account to link, defaults to your account.",
         },
     )
     async def link(
@@ -79,6 +79,20 @@ class Link(commands.Cog):
                 ),
                 ephemeral=True,
             )
+
+    @commands.command(
+        name="verify",
+        brief="Link a nation to a Discord account.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "nation": "The nation to link.",
+            "user": "The Discord account to link, defaults to your account.",
+        },
+    )
+    async def verify(
+        self, ctx: RiftContext, nation: Nation, user: Optional[discord.User] = None
+    ):
+        await ctx.invoke(self.link, nation, user)
 
 
 def setup(bot: Rift):
