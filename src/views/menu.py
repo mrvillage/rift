@@ -171,6 +171,14 @@ class MenuButton(discord.ui.Button):
                         interaction.user, f"Embassies:\n{embassies_str}"
                     ),
                 )
+            elif len(embassies) == 0:
+                await interaction.followup.send(
+                    ephemeral=True,
+                    embed=get_embed_author_member(
+                        interaction.user, "No embassies were created."
+                    ),
+                )
+
             else:
                 await interaction.followup.send(
                     ephemeral=True,
