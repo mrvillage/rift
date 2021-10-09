@@ -17,7 +17,6 @@ class Link(commands.Cog):
 
     @commands.command(
         name="link",
-        aliases=["verify", "validate"],
         brief="Link a nation to a Discord account.",
         type=commands.CommandType.chat_input,
         descriptions={
