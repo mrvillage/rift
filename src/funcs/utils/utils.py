@@ -97,7 +97,7 @@ def get_alliance_position(position_id: int) -> str:
 
 
 def get_alliance_position_id(position: str) -> int:
-    return alliance_position_map.index(position.capitalize())
+    return alliance_position_map.index(position)
 
 
 continent_map = (
