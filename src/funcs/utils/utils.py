@@ -23,6 +23,7 @@ __all__ = (
     "check_resource",
     "parse_time",
     "convert_seconds_to_text",
+    "escape_quoted_string",
 )
 
 color_map = (
@@ -227,3 +228,7 @@ def convert_seconds_to_text(seconds: float) -> str:
     weeks = int(days // 7)
     days -= weeks * 7
     return f"{weeks} weeks, {days} days, {hours} hours, {minutes} minutes, and {seconds:,.2f} seconds"
+
+
+def escape_quoted_string(arg: str) -> str:
+    return arg[1 : len(arg) - 1]
