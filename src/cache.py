@@ -288,7 +288,8 @@ class Cache:
                     i["to_"]: self.get_alliance(i["to_"]),  # type: ignore
                 },
             )
-            self._treaties.add(i)
+            if i.stopped is None:
+                self._treaties.add(i)
         self.init = True
 
     @property
