@@ -340,7 +340,9 @@ class Tools(commands.Cog):
         projects = {int(i.id): i for i in projects.nations}
         total_cost = 0
         for nation in alliance.members:
-            projs = projects[nation.id]
+            projs = projects.get(nation.id)
+            if projs is None:
+                continue
             raw_cost = cost = sum(
                 funcs.calculate_infrastructure_value(i.infrastructure, after)
                 for i in nation.partial_cities
@@ -397,7 +399,9 @@ class Tools(commands.Cog):
         projects = {int(i.id): i for i in projects.nations}
         total_cost = 0
         for nation in alliance.members:
-            projs = projects[nation.id]
+            projs = projects.get(nation.id)
+            if projs is None:
+                continue
             raw_cost = cost = sum(
                 funcs.calculate_land_value(i.land, after)
                 for i in nation.partial_cities
@@ -446,7 +450,9 @@ class Tools(commands.Cog):
         for nation in alliance.members:
             if nation.cities >= after:
                 continue
-            projs = projects[nation.id]
+            projs = projects.get(nation.id)
+            if projs is None:
+                continue
             raw_cost = cost = funcs.calculate_city_value(nation.cities, after)
             if projs.uap:
                 cost -= 50000000 * (after - nation.cities)
