@@ -10,7 +10,7 @@ BOOLEAN_OPERATORS = ("??", "&&", "!!", "^^")
 BOOLEAN_OPERATOR_CHARACTERS = ("?", "&", "^")
 OPERATORS = ("==", "!=", ">", "<", ">=", "<=")
 OPERATOR_CHARACTERS = ("=", ">", "<")
-CHARACTERS = string.ascii_letters + string.digits + "._"
+CHARACTERS = string.ascii_letters + string.digits + "._-"
 QUOTES = ("'", '"')
 
 
@@ -103,7 +103,10 @@ def parse_condition_string(condition: str) -> Any:  # sourcery no-metrics
                     )
                 )
         if len(boolean_operator) == 2:
-            if name:
+            if name.startswith(("f", "c")):
+                arguments.append([name])
+                name = ""
+            elif name:
                 arguments.append(name)
                 name = ""
             try:
