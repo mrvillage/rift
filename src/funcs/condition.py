@@ -103,7 +103,7 @@ def parse_condition_string(condition: str) -> Any:  # sourcery no-metrics
                     )
                 )
         if len(boolean_operator) == 2:
-            if name.startswith(("f", "c")):
+            if name.startswith(("f-", "c-")):
                 arguments.append([name])
                 name = ""
             elif name:
