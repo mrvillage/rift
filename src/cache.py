@@ -13,6 +13,7 @@ if TYPE_CHECKING:
         AllianceData,
         CityData,
         ColorData,
+        ConditionData,
         EmbassyConfigData,
         EmbassyData,
         ForumData,
@@ -37,6 +38,7 @@ if TYPE_CHECKING:
         Alliance,
         City,
         Color,
+        Condition,
         Embassy,
         EmbassyConfig,
         Forum,
@@ -72,6 +74,7 @@ class Cache:
         "_alliances",
         "_cities",
         "_colors",
+        "_conditions",
         "_embassies",
         "_embassy_configs",
         "_forums",
@@ -101,6 +104,7 @@ class Cache:
         self._alliances: Dict[int, Alliance] = {}
         self._cities: Dict[int, City] = {}
         self._colors: Dict[str, Color] = {}
+        self._conditions: Dict[int, Condition] = {}
         self._embassies: Dict[int, Embassy] = {}
         self._embassy_configs: Dict[int, EmbassyConfig] = {}
         self._forums: Dict[int, Forum] = {}
@@ -130,6 +134,7 @@ class Cache:
             Alliance,
             City,
             Color,
+            Condition,
             Embassy,
             EmbassyConfig,
             Forum,
@@ -151,6 +156,7 @@ class Cache:
             "SELECT * FROM alliances;",
             "SELECT * FROM cities;",
             "SELECT * FROM colors ORDER BY datetime DESC LIMIT 1;",
+            "SELECT * FROM conditions;",
             "SELECT * FROM embassies;",
             "SELECT * FROM embassy_configs;",
             "SELECT * FROM forums;",
@@ -173,6 +179,7 @@ class Cache:
             List[AllianceData],
             List[CityData],
             List[RawColorData],
+            List[ConditionData],
             List[EmbassyData],
             List[EmbassyConfigData],
             List[ForumData],
@@ -197,6 +204,7 @@ class Cache:
             alliances,
             cities,
             colors,
+            conditions,
             embassies,
             embassy_configs,
             forums,
@@ -224,6 +232,9 @@ class Cache:
         for i in colors[0]["colors"]:
             i = Color(i)
             self._colors[i.color] = i
+        for i in conditions:
+            i = Condition(i)
+            self._conditions[i.id] = i
         for i in embassies:
             i = Embassy(i)
             self._embassies[i.id] = i
@@ -303,6 +314,10 @@ class Cache:
     @property
     def colors(self) -> Set[Color]:
         return set(self._colors.values())
+
+    @property
+    def conditions(self) -> Set[Condition]:
+        return set(self._conditions.values())
 
     @property
     def embassies(self) -> Set[Embassy]:
@@ -461,6 +476,14 @@ class Cache:
     def get_color(self, name: str, /) -> Optional[Color]:
         return self._colors.get(name)
 
+    def get_condition(self, id: int, user_id: int, /) -> Optional[Condition]:
+        con = self._conditions.get(id)
+        if con is None:
+            return
+        if con.owner_id != user_id or con.owner_id is not None:
+            return
+        return con
+
     def get_embassy(self, id: int, /) -> Optional[Embassy]:
         return self._embassies.get(id)
 
@@ -555,6 +578,9 @@ class Cache:
 
     def get_user_settings(self, id: int, /) -> Optional[UserSettings]:
         return self._user_settings.get(id)
+
+    def add_condition(self, condition: Condition, /) -> None:
+        self._conditions[condition.id] = condition
 
     def add_embassy(self, embassy: Embassy, /) -> None:
         self._embassies[embassy.id] = embassy
