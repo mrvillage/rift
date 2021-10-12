@@ -2,6 +2,7 @@ from .alliance import *
 from .bulk_events import *
 from .city import *
 from .color import *
+from .condition import *
 from .embassy import *
 from .forum import *
 from .link import *
