@@ -178,7 +178,7 @@ class EventMessages(commands.Cog):
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
-                    f"**Treaty created!**\n{treaty.treaty_type} from {repr(treaty.from_)} to {repr(treaty.to_)}.",
+                    f'**Treaty created!**\n{treaty.treaty_type} from [{repr(treaty.from_)}](https://politicsandwar.com/alliance/id={treaty.from_.id if treaty.from_ else 0} "https://politicsandwar.com/alliance/id={treaty.from_.id if treaty.from_ else 0}") to [{repr(treaty.to_)}](https://politicsandwar.com/alliance/id={treaty.to_.id if treaty.to_ else 0} "https://politicsandwar.com/alliance/id={treaty.to_.id if treaty.to_ else 0}").',
                     color=discord.Color.blue(),
                 ),
                 False,
@@ -197,7 +197,7 @@ class EventMessages(commands.Cog):
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
-                    f"**Treaty deleted!**\n{treaty.treaty_type} from {repr(treaty.from_)} to {repr(treaty.to_)}.",
+                    f'**Treaty deleted!**\n{treaty.treaty_type} from [{repr(treaty.from_)}](https://politicsandwar.com/alliance/id={treaty.from_.id if treaty.from_ else 0} "https://politicsandwar.com/alliance/id={treaty.from_.id if treaty.from_ else 0}") to [{repr(treaty.to_)}](https://politicsandwar.com/alliance/id={treaty.to_.id if treaty.to_ else 0} "https://politicsandwar.com/alliance/id={treaty.to_.id if treaty.to_ else 0}").',
                     color=discord.Color.blue(),
                 ),
                 False,
