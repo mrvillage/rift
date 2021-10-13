@@ -89,7 +89,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             )
         )
 
-    @extension.command(name="reload")
+    @extension.command(name="reload")  # type: ignore
     async def extension_reload(self, ctx: RiftContext, *, extension: str):
         try:
             self.bot.reload_extension(f"source.bot.cogs.{extension}")
@@ -117,7 +117,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                 )
             )
 
-    @extension.command(name="load")
+    @extension.command(name="load")  # type: ignore
     async def extension_load(self, ctx: RiftContext, *, extension: str):
         try:
             self.bot.load_extension(f"source.bot.cogs.{extension}")
@@ -145,7 +145,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                 )
             )
 
-    @extension.command(name="unload")
+    @extension.command(name="unload")  # type: ignore
     async def extension_unload(self, ctx: RiftContext, *, extension: str):
         try:
             self.bot.unload_extension(f"source.bot.cogs.{extension}")
