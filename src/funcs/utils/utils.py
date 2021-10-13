@@ -231,4 +231,8 @@ def convert_seconds_to_text(seconds: float) -> str:
 
 
 def escape_quoted_string(arg: str) -> str:
-    return arg[1 : len(arg) - 1]
+    from ..condition import QUOTES
+
+    if arg[0] in QUOTES and arg[-1] in QUOTES:
+        return arg[1 : len(arg) - 1]
+    return arg
