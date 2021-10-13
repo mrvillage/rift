@@ -2,20 +2,38 @@ from __future__ import annotations
 
 import inspect
 import string
-from typing import Any, List
+from typing import Any, Dict, List
 
-__all__ = ("parse_condition_string", "BOOLEAN_OPERATORS", "OPERATORS")
+from . import utils
 
-BOOLEAN_OPERATORS = ("??", "&&", "!!", "^^")
-BOOLEAN_OPERATOR_CHARACTERS = ("?", "&", "^")
-OPERATORS = ("==", "!=", ">", "<", ">=", "<=")
-OPERATOR_CHARACTERS = ("=", ">", "<")
+__all__ = (
+    "parse_condition_string",
+    "BOOLEAN_OPERATORS",
+    "OPERATORS",
+    "ALLIANCE_TYPES",
+    "NATION_TYPES",
+)
+
+BOOLEAN_OPERATORS = ("??", "&&", "!!")
+BOOLEAN_OPERATOR_CHARACTERS = ("?", "&")
+OPERATORS = ("==", "!=", ">", "<", ">=", "<=", "^^")
+OPERATOR_CHARACTERS = ("=", ">", "<", "^")
 CHARACTERS = string.ascii_letters + string.digits + "._-"
 QUOTES = ("'", '"')
+ALLIANCE_TYPES: Dict[str, Any] = {"id": lambda x: utils.convert_int(x) if isinstance(x, str) else x}  # type: ignore
+NATION_TYPES: Dict[str, Any] = {
+    "alliance": ALLIANCE_TYPES,
+    "alliance_position": lambda x: (utils.convert_int(x) if x.isdigit() else utils.get_alliance_position_id(str.capitalize(utils.escape_quoted_string(x))))  # type: ignore
+    if isinstance(x, str)
+    else x,
+    "name": utils.escape_quoted_string,
+}
 
 
 def get_quoted_string(string: str) -> str:
-    return string[: string[1:].index(string[0]) + 2]
+    if string[0] in QUOTES:
+        string = string[: string[1:].index(string[0]) + 2]
+    return string
 
 
 def find_bracket_close(condition: str, list_: List[Any]) -> int:
@@ -35,6 +53,8 @@ def strip(arg: Any) -> Any:
         return arg.strip()
     elif isinstance(arg, list):
         return [strip(i) for i in arg]  # type: ignore
+    elif isinstance(arg, tuple):
+        return tuple(strip(i) for i in arg)  # type: ignore
     else:
         return arg
 
@@ -144,6 +164,7 @@ def parse_condition_string(condition: str) -> Any:  # sourcery no-metrics
         arguments[-1][0] in OPERATOR_CHARACTERS
         or arguments[-1][0] in BOOLEAN_OPERATOR_CHARACTERS
         or arguments[-1][0] == "!"
+        and not isinstance(arguments[-1], (list, tuple))
     ):
         raise SyntaxError(f"Invalid condition: {condition}")
     return strip(arguments)
