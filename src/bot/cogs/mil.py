@@ -14,7 +14,7 @@ from ...data.classes import Alliance, Nation
 from ...ref import Rift, RiftContext
 
 
-class Military(commands.Cog):
+class Militarization(commands.Cog):
     def __init__(self, bot: Rift):
         self.bot = bot
 
@@ -31,14 +31,14 @@ class Military(commands.Cog):
         self, ctx: RiftContext, *, alliance: Optional[Alliance] = None
     ):
         alliance = alliance or await Alliance.convert(ctx, alliance)
-        await ctx.invoke(self.militarization_alliance, alliance=alliance)
+        await ctx.invoke(self.militarization_alliance, alliance=alliance)  # type: ignore
 
     @commands.command(name="militarization-nation", aliases=["mn"], hidden=True)
     async def mn_shortcut(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
         nation = nation or await Nation.convert(ctx, nation)
-        await ctx.invoke(self.militarization_nation, nation=nation)
+        await ctx.invoke(self.militarization_nation, nation=nation)  # type: ignore
 
-    @militarization.command(
+    @militarization.command(  # type: ignore
         name="alliance",
         aliases=["m", "aa"],
         brief="Get the militarization of an alliance.",
@@ -135,7 +135,7 @@ class Military(commands.Cog):
         )
         await ctx.reply(file=image, embed=embed)
 
-    @militarization.command(
+    @militarization.command(  # type: ignore
         name="nation",
         aliases=["n", "nat", "me"],
         brief="Get the militarization of a nation.",
@@ -224,4 +224,4 @@ class Military(commands.Cog):
 
 
 def setup(bot: Rift):
-    bot.add_cog(Military(bot))
+    bot.add_cog(Militarization(bot))
