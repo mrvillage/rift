@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, List, Optional
 
 from src.data.db.sql import execute_query
 
@@ -64,43 +64,36 @@ class Condition:
     def validate_attribute(attribute: str, value: str) -> Any:  # type: ignore
         from ... import funcs
 
-        ALLIANCE_TYPES: Dict[str, Any] = {"id": funcs.utils.convert_int}
-        NATION_TYPES: Dict[str, Any] = {
-            "alliance": ALLIANCE_TYPES,
-            "alliance_position": (
-                funcs.utils.escape_quoted_string,
-                str.capitalize,
-                funcs.utils.get_alliance_position_id,
-            ),
-            "name": funcs.utils.escape_quoted_string,
-        }
-
         chain = attribute.split(".")
         if len(chain) == 1:
             raise ValueError(f"Invalid attribute: {attribute}")
 
         if chain[0] == "nation":
-            converter = NATION_TYPES[chain[1]]
+            converter = funcs.NATION_TYPES[chain[1]]
             if isinstance(converter, dict):
                 converter: Any = converter[chain[2]]
         elif chain[0] == "alliance":
-            converter = ALLIANCE_TYPES[chain[1]]
+            converter = funcs.ALLIANCE_TYPES[chain[1]]
             if isinstance(converter, dict):
                 converter: Any = converter[chain[2]]
         else:
             raise ValueError(f"Invalid attribute chain {attribute}.")
+        if isinstance(value, tuple):
+            val = []
+            for i in value:
+                try:
+                    val.append(converter(i))  # type: ignore
+                except Exception:
+                    raise ValueError(f"Invalid attribute chain {attribute}.")
+            return tuple(val)  # type: ignore
         try:
-            if isinstance(converter, tuple):
-                for conv in converter:  # type: ignore
-                    value: Any = conv(value)
-            else:
-                value: Any = converter(value)
+            value: Any = converter(value)
         except Exception:
             raise ValueError(f"Invalid attribute chain {attribute}.")
         return value
 
     @classmethod
-    def validate_and_create(cls, condition: List[Any], user_id: int, /) -> Condition:
+    def validate_condition(cls, condition: List[Any], user_id: int) -> List[Any]:
         from ...funcs import BOOLEAN_OPERATORS, OPERATORS
 
         # 1 for attribute, 2 for operator, 3 for value, 4 for boolean operator, 5 for condition
@@ -117,18 +110,25 @@ class Condition:
                 last = 2
             elif i in BOOLEAN_OPERATORS:
                 last = 4
-        for u in updated_condition:
-            if isinstance(u, list) and len(u) == 1:  # type: ignore
-                if TYPE_CHECKING:
-                    assert isinstance(u[0], str)
-                if u[0].startswith(("f", "c")):
-                    u[0] = cls.sync_convert(u[0], user_id)
-        return Condition(
+        for index, u in enumerate(updated_condition):
+            if isinstance(u, list):
+                if len(u) == 1:  # type: ignore
+                    if TYPE_CHECKING:
+                        assert isinstance(u[0], str)
+                    if u[0].startswith(("f", "c")):
+                        u[0] = cls.sync_convert(u[0], user_id)
+                else:
+                    updated_condition[index] = cls.validate_condition(u, user_id)  # type: ignore
+        return updated_condition
+
+    @classmethod
+    def validate_and_create(cls, condition: List[Any], user_id: int, /) -> Condition:
+        return cls(
             {
                 "id": None,  # type: ignore
                 "name": None,
                 "owner_id": user_id,
-                "condition": updated_condition,
+                "condition": cls.validate_condition(condition, user_id),
             }
         )
 
@@ -137,3 +137,86 @@ class Condition:
         from ...funcs import parse_condition_string
 
         return cls.validate_and_create(parse_condition_string(condition), user_id)
+
+    @staticmethod
+    def convert_attribute_value(attributes: List[str], value: Any, /) -> Any:  # type: ignore
+        from ... import funcs
+
+        if attributes[0] == "nation":
+            converter = funcs.NATION_TYPES[attributes[1]]
+            if isinstance(converter, dict):
+                converter: Any = converter[attributes[2]]
+        elif attributes[0] == "alliance":
+            converter = funcs.ALLIANCE_TYPES[attributes[1]]
+            if isinstance(converter, dict):
+                converter: Any = converter[attributes[2]]
+        else:
+            return
+        return converter(value)
+
+    @classmethod
+    def evaluate_expression(
+        cls, obj: Any, attribute: str, operator: str, value: Any, /
+    ) -> bool:
+        attributes = attribute.split(".")
+        attr = obj
+        for a in attributes[1:]:
+            if a == "id" and attr is None:
+                attr = 0
+            else:
+                attr = getattr(attr, a)
+        attr = cls.convert_attribute_value(attributes, attr)
+        if operator == "==":
+            return attr == value
+        elif operator == "!=":
+            return attr != value
+        elif operator == ">":
+            return attr > value
+        elif operator == ">=":
+            return attr >= value
+        elif operator == "<":
+            return attr < value
+        elif operator == "<=":
+            return attr <= value
+        elif operator == "in":
+            return attr in value
+        raise SyntaxError(f"Invalid operator {operator}")
+
+    @staticmethod
+    def evaluate_boolean_operator(current: bool, operator: str, value: bool, /) -> bool:
+        if operator == "&&":
+            return current and value
+        elif operator == "??":
+            return current or value
+        elif operator == "!!":
+            return not current
+        raise SyntaxError(f"Invalid boolean operator {operator}")
+
+    @classmethod
+    async def evaluate_condition(cls, obj: Any, condition: List[Any], /) -> bool:
+        if isinstance(condition[0], list):
+            current = await cls.evaluate_condition(obj, condition[0])  # type: ignore
+            skip = 2
+        else:
+            current = cls.evaluate_expression(
+                obj, condition[0], condition[1], condition[2]
+            )
+            skip = 4
+        for index, i in enumerate(condition):
+            if skip > 0:
+                skip -= 1
+                continue
+            if isinstance(i, list):
+                skip = 2
+                value = await cls.evaluate_condition(obj, i)  # type: ignore
+            else:
+                skip = 3
+                value = cls.evaluate_expression(obj, condition[index], condition[index + 1], condition[index + 2])  # type: ignore
+            current = cls.evaluate_boolean_operator(current, condition[index - 1], value)  # type: ignore
+        return current
+
+    async def evaluate(self, *values: Any) -> List[bool]:
+        return [await self.evaluate_condition(i, self.condition) for i in values]
+
+    async def reduce(self, *values: Any) -> List[Any]:
+        return [i for i in values if await self.evaluate_condition(i, self.condition)]
