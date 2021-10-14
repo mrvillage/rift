@@ -22,6 +22,7 @@ CHARACTERS = string.ascii_letters + string.digits + "._-"
 QUOTES = ("'", '"')
 ALLIANCE_TYPES: Dict[str, Any] = {"id": lambda x: utils.convert_int(x) if isinstance(x, str) else x}  # type: ignore
 NATION_TYPES: Dict[str, Any] = {
+    "id": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
     "alliance": ALLIANCE_TYPES,
     "alliance_position": lambda x: (utils.convert_int(x) if x.isdigit() else utils.get_alliance_position_id(str.capitalize(utils.escape_quoted_string(x))))  # type: ignore
     if isinstance(x, str)
