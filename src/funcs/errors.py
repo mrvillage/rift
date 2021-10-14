@@ -9,6 +9,7 @@ from discord.ext import commands
 from ..data.classes import Alliance, Nation
 from ..errors import (
     AllianceNotFoundError,
+    InvalidConditionError,
     MenuItemNotFoundError,
     MenuNotFoundError,
     NationNotFoundError,
@@ -180,6 +181,15 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 embed=get_embed_author_member(
                     ctx.author,
                     f"No subscription found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif isinstance(error, InvalidConditionError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"Invalid condition `{error.args[0]}`.",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
