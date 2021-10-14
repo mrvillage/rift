@@ -2,7 +2,14 @@ from __future__ import annotations
 
 from typing import List, TypedDict
 
-__all__ = ("TargetReminderData",)
+__all__ = (
+    "TargetData",
+    "TargetReminderData",
+)
+
+
+class TargetData(TypedDict):
+    id: int
 
 
 class TargetReminderData(TypedDict):
