@@ -522,13 +522,8 @@ class Cache:
             return
         return item
 
-    def get_menu(self, id: int, guild_id: int, /) -> Optional[Menu]:
-        menu = self._menus.get(id)
-        if menu is None:
-            return
-        if menu.guild_id != guild_id:
-            return
-        return menu
+    def get_menu(self, id: int, /) -> Optional[Menu]:
+        return self._menus.get(id)
 
     def get_nation(self, id: int, /) -> Optional[Nation]:
         return self._nations.get(id)

@@ -62,10 +62,12 @@ class Menu(Makeable):
 
     @classmethod
     async def fetch(cls, menu_id: int, guild_id: int) -> Menu:
-        menu = cache.get_menu(menu_id, guild_id)
-        if menu:
-            return menu
-        raise MenuNotFoundError(menu_id)
+        menu = cache.get_menu(menu_id)
+        if menu is None:
+            raise MenuNotFoundError(menu_id)
+        if menu.guild_id != guild_id:
+            raise MenuNotFoundError(menu_id)
+        return menu
 
     @classmethod
     def default(cls, guild_id: int) -> Menu:
