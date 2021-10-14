@@ -386,15 +386,15 @@ class Nation(Makeable):
             "net_income": sum(
                 (i["net_income"] for i in revenues[1:]), revenues[0]["net_income"]
             ),
-            "upkeep": sum(
-                (i["upkeep"] for i in revenues[1:]), revenues[0]["upkeep"]
-            ),
+            "upkeep": sum((i["upkeep"] for i in revenues[1:]), revenues[0]["upkeep"]),
         }
         color = await Color.fetch(self.color.lower())
         bonus = color.bonus * 12
         if TYPE_CHECKING:
-            assert isinstance(revenue["gross_income"], Resources) and isinstance(
-                revenue["net_income"], Resources
+            assert (
+                isinstance(revenue["gross_income"], Resources)
+                and isinstance(revenue["net_income"], Resources)
+                and isinstance(revenue["upkeep"], Resources)
             )
         if self.cities <= 10:
             revenue["new_player_bonus"] = revenue["gross_income"].money * 1.1 - (
@@ -417,6 +417,16 @@ class Nation(Makeable):
                 + (52500 * self.nukes)
             )
             revenue["net_income"].food -= self.soldiers / 500
+            revenue["upkeep"].food -= self.soldiers / 500
+            revenue["upkeep"].money -= (
+                (1.88 * (self.soldiers / 500))
+                + (75 * self.tanks)
+                + (750 * self.aircraft)
+                + (5625 * self.ships)
+                + (2400 * spies)
+                + (31500 * self.missiles)
+                + (52500 * self.nukes)
+            )
         else:
             revenue["net_income"].money -= (
                 (1.25 * (self.soldiers / 750))
@@ -428,6 +438,16 @@ class Nation(Makeable):
                 + (35000 * self.nukes)
             )
             revenue["net_income"].food -= self.soldiers / 750
+            revenue["upkeep"].money -= (
+                (1.25 * (self.soldiers / 750))
+                + (50 * self.tanks)
+                + (500 * self.aircraft)
+                + (3750 * self.ships)
+                + (2400 * spies)
+                + (21000 * self.missiles)
+                + (35000 * self.nukes)
+            )
+            revenue["upkeep"].food -= self.soldiers / 750
         revenue["gross_total"] = Resources(
             **{
                 key: value * getattr(prices, key).lowest_sell.price
