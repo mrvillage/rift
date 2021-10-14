@@ -156,7 +156,11 @@ class Menu(Makeable):
     @cached_property
     def items(self) -> List[List[MenuItem]]:
         return [
-            [item for j in i if (item := cache.get_menu_item(j, self.guild_id))]
+            [
+                item
+                for j in i
+                if (item := cache.get_menu_item(j)) and item.guild_id == self.guild_id
+            ]
             for i in self.item_ids
         ]
 
@@ -181,10 +185,12 @@ class MenuItem:
 
     @classmethod
     async def fetch(cls, item_id: int, guild_id: int) -> MenuItem:
-        item = cache.get_menu_item(item_id, guild_id)
-        if item:
-            return item
-        raise MenuItemNotFoundError(item_id)
+        item = cache.get_menu_item(item_id)
+        if item is None:
+            raise MenuNotFoundError(item_id)
+        if item.guild_id != guild_id:
+            raise MenuNotFoundError(item_id)
+        return item
 
     def get_item(self, menu_id: int, row: int) -> Union[MenuButton, MenuSelect]:
         from ...views import MenuButton, MenuSelect, MenuSelectOption
