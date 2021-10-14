@@ -476,13 +476,8 @@ class Cache:
     def get_color(self, name: str, /) -> Optional[Color]:
         return self._colors.get(name)
 
-    def get_condition(self, id: int, user_id: int, /) -> Optional[Condition]:
-        con = self._conditions.get(id)
-        if con is None:
-            return
-        if con.owner_id != user_id or con.owner_id is not None:
-            return
-        return con
+    def get_condition(self, id: int, /) -> Optional[Condition]:
+        return self._conditions.get(id)
 
     def get_embassy(self, id: int, /) -> Optional[Embassy]:
         return self._embassies.get(id)
