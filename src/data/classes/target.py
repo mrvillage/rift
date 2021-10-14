@@ -10,12 +10,26 @@ from ...funcs.utils import convert_int
 from ...ref import RiftContext
 from ..query import add_target_reminder, remove_target_reminder
 
-__all__ = ("TargetReminder",)
+__all__ = (
+    "Target",
+    "TargetReminder",
+)
 
 if TYPE_CHECKING:
-    from _typings import TargetReminderData
+    from _typings import TargetData, TargetReminderData
 
     from .nation import Nation
+
+
+class Target:
+    __slots__ = ("id",)
+
+    def __init__(self, data: TargetData) -> None:
+        self.id: int = data["id"]
+
+    @property
+    def nation(self) -> Optional[Nation]:
+        return cache.get_nation(self.id)
 
 
 class TargetReminder:
@@ -47,8 +61,10 @@ class TargetReminder:
 
     @classmethod
     async def fetch(cls, reminder_id: int, owner_id: int, /) -> TargetReminder:
-        reminder = cache.get_target_reminder(reminder_id, owner_id)
+        reminder = cache.get_target_reminder(reminder_id)
         if reminder is None:
+            raise TargetNotFoundError(reminder_id)
+        if reminder.owner_id != owner_id:
             raise TargetNotFoundError(reminder_id)
         return reminder
 

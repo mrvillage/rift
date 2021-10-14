@@ -539,15 +539,8 @@ class Cache:
     def get_subscription(self, id: int, /) -> Optional[Subscription]:
         return self._subscriptions.get(id)
 
-    def get_target_reminder(
-        self, id: int, owner_id: int, /
-    ) -> Optional[TargetReminder]:
-        reminder = self._target_reminders.get(id)
-        if reminder is None:
-            return
-        if reminder.owner_id != owner_id:
-            return
-        return reminder
+    def get_target_reminder(self, id: int, /) -> Optional[TargetReminder]:
+        return self._target_reminders.get(id)
 
     def get_ticket_config(self, id: int, /) -> Optional[TicketConfig]:
         return self._ticket_configs.get(id)
