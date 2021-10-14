@@ -7,7 +7,7 @@ from discord.ext import commands
 
 from ... import funcs
 from ...cache import cache
-from ...data.classes import Nation, Target
+from ...data.classes import Nation, TargetReminder
 from ...ref import Rift, RiftContext
 
 
@@ -29,9 +29,17 @@ class Targets(commands.Cog):
     async def target(self, ctx: RiftContext):
         ...
 
-    @target.command(
+    @target.group(  # type: ignore
+        name="remind",
+        brief="A group of commands to manage target reminders",
+        type=commands.CommandType.chat_input,
+    )
+    async def target_remind(self, ctx: RiftContext):
+        ...
+
+    @target_remind.command(  # type: ignore
         name="add",
-        brief="Add a target.",
+        brief="Add a target reminder.",
         type=commands.CommandType.chat_input,
         descriptions={
             "nation": "The nation to add.",
@@ -40,7 +48,7 @@ class Targets(commands.Cog):
             "direct_message": "Whether or not to send a Direct Message as a notification.",
         },
     )
-    async def target_add(
+    async def target_remind_add(
         self,
         ctx: RiftContext,
         *,
@@ -49,7 +57,7 @@ class Targets(commands.Cog):
         mentions: List[Union[discord.Member, discord.User, discord.Role]] = [],
         direct_message: bool = False,
     ):
-        target = await Target.add(
+        reminder = await TargetReminder.add(
             nation,
             ctx.author,
             channels,
@@ -60,42 +68,46 @@ class Targets(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Target #{target.id} has been added. It will mention {target.mentions} in {' '.join(i.mention for i in channels)} and will {'' if direct_message else 'not'} Direct Message you when {repr(nation)} comes off beige.",
+                f"Target Reminder #{reminder.id} has been added. It will mention {reminder.mentions} in {' '.join(i.mention for i in channels)} and will {'' if direct_message else 'not'} Direct Message you when {repr(nation)} comes off beige.",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
         )
 
-    @target.command(
+    @target_remind.command(  # type: ignore
         name="remove",
-        brief="Remove a target.",
+        brief="Remove a target reminder.",
         type=commands.CommandType.chat_input,
-        descriptions={"target": "The target to remove."},
+        descriptions={"reminder": "The target reminder to remove."},
     )
-    async def target_remove(self, ctx: RiftContext, *, target: Target):
-        await target.remove()
+    async def target_remind_remove(self, ctx: RiftContext, *, reminder: TargetReminder):
+        await reminder.remove()
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Target #{target.id} has been removed.",
+                f"Target Reminder #{reminder.id} has been removed.",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
         )
 
-    @target.command(
+    @target_remind.command(  # type: ignore
         name="list",
-        brief="List all your targets.",
+        brief="List all your target reminders.",
         type=commands.CommandType.chat_input,
     )
-    async def target_list(self, ctx: RiftContext):
+    async def target_remind_list(self, ctx: RiftContext):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 "\n".join(
                     f"**#{i.id}**: {repr(i.nation)}"
                     for i in sorted(
-                        (i for i in cache.targets if i.owner_id == ctx.author.id),
+                        (
+                            i
+                            for i in cache.target_reminders
+                            if i.owner_id == ctx.author.id
+                        ),
                         key=lambda x: x.id,
                     )
                 ),
@@ -108,23 +120,23 @@ class Targets(commands.Cog):
     async def on_nation_update(self, before: Nation, after: Nation):
         if before.color != "Beige" or after.color == "Beige":
             return
-        targets = [i for i in cache.targets if i.nation is after]
-        if not targets:
+        reminders = [i for i in cache.target_reminders if i.nation is after]
+        if not reminders:
             return
-        for target in targets:
-            for channel_id in target.channel_ids:
+        for reminder in reminders:
+            for channel_id in reminder.channel_ids:
                 channel = self.bot.get_channel(channel_id)
                 if channel is None:
                     continue
                 if TYPE_CHECKING:
                     assert isinstance(channel, discord.TextChannel)
-                embed = await after.get_info_embed(TargetContext(self.bot.get_user(target.owner_id), channel.guild))  # type: ignore
+                embed = await after.get_info_embed(TargetContext(self.bot.get_user(reminder.owner_id), channel.guild))  # type: ignore
                 await channel.send(
-                    content=f"{repr(after)} is no longer on beige!\n{target.mentions}",
+                    content=f"{repr(after)} is no longer on beige!\n{reminder.mentions}",
                     embed=embed,
                 )
-            if target.direct_message:
-                owner = self.bot.get_user(target.owner_id)
+            if reminder.direct_message:
+                owner = self.bot.get_user(reminder.owner_id)
                 if owner is None:
                     continue
                 await owner.send(

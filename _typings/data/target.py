@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import List, TypedDict
 
-__all__ = ("TargetData",)
+__all__ = ("TargetReminderData",)
 
 
-class TargetData(TypedDict):
+class TargetReminderData(TypedDict):
     id: int
     target_id: int
     owner_id: int

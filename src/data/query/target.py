@@ -6,13 +6,13 @@ from src.data.db.sql import execute_read_query
 
 from ..db import execute_query
 
-__all__ = ("add_target", "edit_target", "remove_target")
+__all__ = ("add_target_reminder", "edit_target_reminder", "remove_target_reminder")
 
 if TYPE_CHECKING:
-    from _typings import TargetData
+    from _typings import TargetReminderData
 
 
-async def add_target(
+async def add_target_reminder(
     target_id: int,
     owner_id: int,
     channel_ids: List[int],
@@ -20,11 +20,11 @@ async def add_target(
     user_ids: List[int],
     direct_message: bool,
     /,
-) -> TargetData:
+) -> TargetReminderData:
     target = dict(
         (
             await execute_read_query(
-                "INSERT INTO targets (target_id, owner_id, channel_ids, role_ids, user_ids, direct_message) VALUES ($1, $2, $3, $4, $5, $6) RETURNING (id, target_id, owner_id, channel_ids, role_ids, user_ids, direct_message);",
+                "INSERT INTO target_reminders (target_id, owner_id, channel_ids, role_ids, user_ids, direct_message) VALUES ($1, $2, $3, $4, $5, $6) RETURNING (id);",
                 target_id,
                 owner_id,
                 channel_ids,
@@ -45,9 +45,9 @@ async def add_target(
     }
 
 
-async def edit_target(target_id: int, /) -> None:
+async def edit_target_reminder(target_id: int, /) -> None:
     ...
 
 
-async def remove_target(target_id: int, /) -> None:
-    await execute_query("DELETE FROM targets WHERE target_id = $1;", target_id)
+async def remove_target_reminder(target_id: int, /) -> None:
+    await execute_query("DELETE FROM target_reminders WHERE target_id = $1;", target_id)
