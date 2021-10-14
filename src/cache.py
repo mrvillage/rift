@@ -514,13 +514,8 @@ class Cache:
         except StopIteration:
             return
 
-    def get_menu_item(self, id: int, guild_id: int, /) -> Optional[MenuItem]:
-        item = self._menu_items.get(id)
-        if item is None:
-            return
-        if item.guild_id != guild_id:
-            return
-        return item
+    def get_menu_item(self, id: int, /) -> Optional[MenuItem]:
+        return self._menu_items.get(id)
 
     def get_menu(self, id: int, /) -> Optional[Menu]:
         return self._menus.get(id)
