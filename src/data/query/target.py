@@ -49,5 +49,5 @@ async def edit_target_reminder(target_id: int, /) -> None:
     ...
 
 
-async def remove_target_reminder(target_id: int, /) -> None:
-    await execute_query("DELETE FROM target_reminders WHERE target_id = $1;", target_id)
+async def remove_target_reminder(id: int, /) -> None:
+    await execute_query("DELETE FROM target_reminders WHERE id = $1;", id)
