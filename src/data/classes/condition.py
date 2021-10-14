@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, List, Optional
 
-from src.data.db.sql import execute_query
-
 from ...cache import cache
-from ...data.db import execute_read_query
+from ...errors import InvalidConditionError
+from ...ref import RiftContext
+from ..db import execute_query, execute_read_query
 
 __all__ = ("Condition",)
 
@@ -41,15 +41,43 @@ class Condition:
                 self.condition,
             )
 
+    async def remove(self) -> None:
+        await execute_query("DELETE FROM conditions WHERE id = $1;", self.id)
+        cache.remove_condition(self)
+
+    @classmethod
+    async def convert(cls, ctx: RiftContext, argument: str):
+        condition = cls.sync_convert(argument, ctx.author.id)
+        if condition is None:
+            try:
+                return cls.parse(argument, ctx.author.id)
+            except SyntaxError:
+                raise InvalidConditionError(argument)
+        return condition
+
+    def __repr__(self) -> str:
+        return f"c-{self.id}"
+
+    def __str__(self) -> str:
+        return self.convert_to_string(self.condition)
+
+    @classmethod
+    def convert_to_string(cls, condition: List[Any]) -> str:
+        if len(condition) == 1:
+            return condition[0]
+        return " ".join(cls.convert_to_string(i) if isinstance(i, list) else f"({str(i)[1:-1]})" if isinstance(i, tuple) else str(i) for i in condition)  # type: ignore
+
     @staticmethod
     def sync_convert(value: str, user_id: int) -> Optional[Condition]:
         from ... import funcs
 
         if value.startswith(("f-", "c-")):
-            value = value.replace("f-", "").replace("c-", "")
+            value = value[2:]
         num = funcs.utils.convert_int(value)
-        condition = cache.get_condition(num, user_id)
-        if condition is not None:
+        condition = cache.get_condition(num)
+        if condition is not None and (
+            condition.owner_id == user_id or condition.owner_id is None
+        ):
             return condition
         try:
             return next(
