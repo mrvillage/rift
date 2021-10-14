@@ -612,6 +612,9 @@ class Cache:
     def add_target_reminder(self, reminder: TargetReminder, /) -> None:
         self._target_reminders[reminder.id] = reminder
 
+    def remove_condition(self, condition: Condition, /) -> None:
+        self._conditions.pop(condition.id)
+
     def remove_embassy(self, embassy: Embassy, /) -> None:
         self._embassies.pop(embassy.id)
 
