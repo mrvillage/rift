@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 from typing import TYPE_CHECKING, List, Union
 
 import discord
@@ -30,14 +31,14 @@ class Targets(commands.Cog):
         ...
 
     @target.group(  # type: ignore
-        name="remind",
+        name="reminder",
         brief="A group of commands to manage target reminders",
         type=commands.CommandType.chat_input,
     )
-    async def target_remind(self, ctx: RiftContext):
+    async def target_reminder(self, ctx: RiftContext):
         ...
 
-    @target_remind.command(  # type: ignore
+    @target_reminder.command(  # type: ignore
         name="add",
         brief="Add a target reminder.",
         type=commands.CommandType.chat_input,
@@ -48,7 +49,7 @@ class Targets(commands.Cog):
             "direct_message": "Whether or not to send a Direct Message as a notification.",
         },
     )
-    async def target_remind_add(
+    async def target_reminder_add(
         self,
         ctx: RiftContext,
         *,
@@ -57,6 +58,15 @@ class Targets(commands.Cog):
         mentions: List[Union[discord.Member, discord.User, discord.Role]] = [],
         direct_message: bool = False,
     ):
+        if not channels and not direct_message:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You need to specify channels to send in or specify to Direct Message you!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
         reminder = await TargetReminder.add(
             nation,
             ctx.author,
@@ -74,13 +84,15 @@ class Targets(commands.Cog):
             ephemeral=True,
         )
 
-    @target_remind.command(  # type: ignore
+    @target_reminder.command(  # type: ignore
         name="remove",
         brief="Remove a target reminder.",
         type=commands.CommandType.chat_input,
         descriptions={"reminder": "The target reminder to remove."},
     )
-    async def target_remind_remove(self, ctx: RiftContext, *, reminder: TargetReminder):
+    async def target_reminder_remove(
+        self, ctx: RiftContext, *, reminder: TargetReminder
+    ):
         await reminder.remove()
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -91,25 +103,53 @@ class Targets(commands.Cog):
             ephemeral=True,
         )
 
-    @target_remind.command(  # type: ignore
+    @target_reminder.command(  # type: ignore
         name="list",
         brief="List all your target reminders.",
         type=commands.CommandType.chat_input,
     )
-    async def target_remind_list(self, ctx: RiftContext):
+    async def target_reminder_list(self, ctx: RiftContext):
+        reminders = sorted(
+            (i for i in cache.target_reminders if i.owner_id == ctx.author.id),
+            key=lambda x: x.id,
+        )
+        if not reminders:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You have no target reminders.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                "\n".join(
-                    f"**#{i.id}**: {repr(i.nation)}"
-                    for i in sorted(
-                        (
-                            i
-                            for i in cache.target_reminders
-                            if i.owner_id == ctx.author.id
-                        ),
-                        key=lambda x: x.id,
-                    )
+                "\n".join(f"**#{i.id}**: {repr(i.nation)}" for i in reminders),
+                color=discord.Color.blue(),
+            ),
+            ephemeral=True,
+        )
+
+    @target_reminder.command(  # type: ignore
+        name="info",
+        brief="Get information about a target.",
+        type=commands.CommandType.chat_input,
+    )
+    async def target_reminder_info(self, ctx: RiftContext, reminder: TargetReminder):
+        channel_mentions = " ".join(f"<#{i}>" for i in reminder.channel_ids)
+        mentions = reminder.mentions
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                inspect.cleandoc(
+                    f"""
+                Target Reminder #{reminder.id}:
+                Nation: {repr(reminder.nation)}
+                Channels: {channel_mentions or None}
+                Mentions: {mentions if len(mentions) > 1 else None}
+                Direct Message: {reminder.direct_message}
+                """
                 ),
                 color=discord.Color.blue(),
             ),
