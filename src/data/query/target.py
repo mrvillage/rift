@@ -36,12 +36,12 @@ async def add_target_reminder(
     )["row"]
     return {
         "id": target[0],
-        "target_id": target[1],
-        "owner_id": target[2],
-        "channel_ids": target[3],
-        "role_ids": target[4],
-        "user_ids": target[5],
-        "direct_message": target[6],
+        "target_id": target_id,
+        "owner_id": owner_id,
+        "channel_ids": channel_ids,
+        "role_ids": role_ids,
+        "user_ids": user_ids,
+        "direct_message": direct_message,
     }
 
 
