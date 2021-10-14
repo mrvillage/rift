@@ -27,7 +27,7 @@ if TYPE_CHECKING:
         RawColorData,
         RawTreasureData,
         SubscriptionData,
-        TargetData,
+        TargetReminderData,
         TicketConfigData,
         TicketData,
         TradePriceData,
@@ -48,7 +48,7 @@ if TYPE_CHECKING:
         MenuItem,
         Nation,
         Subscription,
-        Target,
+        TargetReminder,
         Ticket,
         TicketConfig,
         TradePrices,
@@ -87,7 +87,7 @@ class Cache:
         "_nations",
         "_prices",
         "_subscriptions",
-        "_targets",
+        "_target_reminders",
         "_ticket_configs",
         "_tickets",
         "_trades",
@@ -117,7 +117,7 @@ class Cache:
         self._nations: Dict[int, Nation] = {}
         self._prices: TradePrices
         self._subscriptions: Dict[int, Subscription] = {}
-        self._targets: Dict[int, Target] = {}
+        self._target_reminders: Dict[int, TargetReminder] = {}
         self._ticket_configs: Dict[int, TicketConfig] = {}
         self._tickets: Dict[int, Ticket] = {}
         self._trades = {}  # NO CLASS YET
@@ -144,7 +144,7 @@ class Cache:
             MenuItem,
             Nation,
             Subscription,
-            Target,
+            TargetReminder,
             Ticket,
             TicketConfig,
             TradePrices,
@@ -169,7 +169,7 @@ class Cache:
             "SELECT * FROM nations;",
             "SELECT * FROM prices ORDER BY datetime DESC LIMIT 1;",
             "SELECT * FROM subscriptions;",
-            "SELECT * FROM targets;",
+            "SELECT * FROM target_reminders;",
             "SELECT * FROM ticket_configs;",
             "SELECT * FROM tickets;",
             "SELECT * FROM treasures ORDER BY datetime DESC LIMIT 1;",
@@ -192,7 +192,7 @@ class Cache:
             List[NationData],
             List[TradePriceData],
             List[SubscriptionData],
-            List[TargetData],
+            List[TargetReminderData],
             List[TicketConfigData],
             List[TicketData],
             List[RawTreasureData],
@@ -217,7 +217,7 @@ class Cache:
             nations,
             prices,
             subscriptions,
-            targets,
+            target_reminders,
             ticket_configs,
             tickets,
             treasures,
@@ -275,9 +275,9 @@ class Cache:
         for i in subscriptions:
             i = Subscription(i)
             self._subscriptions[i.id] = i
-        for i in targets:
-            i = Target(i)
-            self._targets[i.id] = i
+        for i in target_reminders:
+            i = TargetReminder(i)
+            self._target_reminders[i.id] = i
         for i in ticket_configs:
             i = TicketConfig(i)
             self._ticket_configs[i.id] = i
@@ -368,8 +368,8 @@ class Cache:
         return set(self._subscriptions.values())
 
     @property
-    def targets(self) -> Set[Target]:
-        return set(self._targets.values())
+    def target_reminders(self) -> Set[TargetReminder]:
+        return set(self._target_reminders.values())
 
     @property
     def ticket_configs(self) -> Set[TicketConfig]:
@@ -544,13 +544,15 @@ class Cache:
     def get_subscription(self, id: int, /) -> Optional[Subscription]:
         return self._subscriptions.get(id)
 
-    def get_target(self, id: int, owner_id: int, /) -> Optional[Target]:
-        target = self._targets.get(id)
-        if target is None:
+    def get_target_reminder(
+        self, id: int, owner_id: int, /
+    ) -> Optional[TargetReminder]:
+        reminder = self._target_reminders.get(id)
+        if reminder is None:
             return
-        if target.owner_id != owner_id:
+        if reminder.owner_id != owner_id:
             return
-        return target
+        return reminder
 
     def get_ticket_config(self, id: int, /) -> Optional[TicketConfig]:
         return self._ticket_configs.get(id)
@@ -612,8 +614,8 @@ class Cache:
     def add_ticket_config(self, config: TicketConfig, /) -> None:
         self._ticket_configs[config.id] = config
 
-    def add_target(self, target: Target, /) -> None:
-        self._targets[target.id] = target
+    def add_target_reminder(self, reminder: TargetReminder, /) -> None:
+        self._target_reminders[reminder.id] = reminder
 
     def remove_embassy(self, embassy: Embassy, /) -> None:
         self._embassies.pop(embassy.id)
@@ -621,8 +623,8 @@ class Cache:
     def remove_subscription(self, subscription: Subscription, /) -> None:
         self._subscriptions.pop(subscription.id)
 
-    def remove_target(self, target: Target, /) -> None:
-        self._targets.pop(target.id)
+    def remove_target_reminder(self, reminder: TargetReminder, /) -> None:
+        self._target_reminders.pop(reminder.id)
 
 
 cache = Cache()
