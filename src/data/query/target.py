@@ -21,21 +21,17 @@ async def add_target_reminder(
     direct_message: bool,
     /,
 ) -> TargetReminderData:
-    target = dict(
-        (
-            await execute_read_query(
-                "INSERT INTO target_reminders (target_id, owner_id, channel_ids, role_ids, user_ids, direct_message) VALUES ($1, $2, $3, $4, $5, $6) RETURNING (id);",
-                target_id,
-                owner_id,
-                channel_ids,
-                role_ids,
-                user_ids,
-                direct_message,
-            )
-        )[0]
-    )["row"]
+    target = await execute_read_query(
+        "INSERT INTO target_reminders (target_id, owner_id, channel_ids, role_ids, user_ids, direct_message) VALUES ($1, $2, $3, $4, $5, $6) RETURNING (id);",
+        target_id,
+        owner_id,
+        channel_ids,
+        role_ids,
+        user_ids,
+        direct_message,
+    )
     return {
-        "id": target[0],
+        "id": target[0]["id"],
         "target_id": target_id,
         "owner_id": owner_id,
         "channel_ids": channel_ids,
