@@ -417,8 +417,8 @@ class Nation(Makeable):
                 + (52500 * self.nukes)
             )
             revenue["net_income"].food -= self.soldiers / 500
-            revenue["upkeep"].food -= self.soldiers / 500
-            revenue["upkeep"].money -= (
+            revenue["upkeep"].food += self.soldiers / 500
+            revenue["upkeep"].money += (
                 (1.88 * (self.soldiers / 500))
                 + (75 * self.tanks)
                 + (750 * self.aircraft)
@@ -438,7 +438,7 @@ class Nation(Makeable):
                 + (35000 * self.nukes)
             )
             revenue["net_income"].food -= self.soldiers / 750
-            revenue["upkeep"].money -= (
+            revenue["upkeep"].money += (
                 (1.25 * (self.soldiers / 750))
                 + (50 * self.tanks)
                 + (500 * self.aircraft)
@@ -447,7 +447,7 @@ class Nation(Makeable):
                 + (21000 * self.missiles)
                 + (35000 * self.nukes)
             )
-            revenue["upkeep"].food -= self.soldiers / 750
+            revenue["upkeep"].food += self.soldiers / 750
         revenue["gross_total"] = Resources(
             **{
                 key: value * getattr(prices, key).lowest_sell.price
