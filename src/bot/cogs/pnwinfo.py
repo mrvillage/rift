@@ -42,7 +42,7 @@ class PnWInfo(commands.Cog):
     )
     async def nation(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
         nation = nation or await Nation.convert(ctx, nation)
-        await ctx.reply(embed=await nation.get_info_embed(ctx))
+        await ctx.reply(embed=nation.get_info_embed(ctx))
 
     @commands.command(
         name="me",
