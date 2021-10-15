@@ -250,7 +250,7 @@ class PnWInfo(commands.Cog):
         upkeeps = {
             key: f"Upkeep: {getattr(rev['upkeep'], key):,.2f} (${rev['upkeep_total'][key]:,.2f})\n"
             for key in rev["gross_income"].__dict__
-            if key != "credit"
+            if key not in {"credit", "gasoline", "munitions", "steel", "aluminum"}
         }
         fields: List[Field] = [
             {
@@ -264,14 +264,14 @@ class PnWInfo(commands.Cog):
             0,
             {
                 "name": "Money",
-                "value": f"Gross: {rev['gross_income'].money:,.2f}\nNet: {rev['net_income'].money:,.2f}"
+                "value": f"Gross: ${rev['gross_income'].money:,.2f}\nupUpkeep: ${rev['upkeep'].money:,.2f}\nNet: ${rev['net_income'].money:,.2f}"
                 + (
-                    f"\nTrade Bonus: {rev['trade_bonus']:,}"
+                    f"\nTrade Bonus: ${rev['trade_bonus']:,}"
                     if "trade_bonus" in rev
                     else ""
                 )
                 + (
-                    f"\nNew Player Bonus: {rev['new_player_bonus']:,}"
+                    f"\nNew Player Bonus: ${rev['new_player_bonus']:,}"
                     if "new_player_bonus" in rev
                     else ""
                 ),
