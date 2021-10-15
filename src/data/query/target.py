@@ -41,7 +41,7 @@ async def add_target_reminder(
     }
 
 
-async def edit_target_reminder(target_id: int, /) -> None:
+async def edit_target_reminder(id: int, /) -> None:
     ...
 
 
