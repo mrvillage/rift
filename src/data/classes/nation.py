@@ -203,7 +203,7 @@ class Nation(Makeable):
                 if any("Discord Username:" in str(j) for j in i.contents)  # type: ignore
             ][0]
 
-    async def get_info_embed(self, ctx: RiftContext) -> discord.Embed:
+    def get_info_embed(self, ctx: RiftContext) -> discord.Embed:
         from ...funcs import get_embed_author_guild, get_embed_author_member
 
         fields: List[Field] = [

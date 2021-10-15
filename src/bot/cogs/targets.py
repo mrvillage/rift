@@ -170,7 +170,7 @@ class Targets(commands.Cog):
                     continue
                 if TYPE_CHECKING:
                     assert isinstance(channel, discord.TextChannel)
-                embed = await after.get_info_embed(TargetContext(self.bot.get_user(reminder.owner_id), channel.guild))  # type: ignore
+                embed = after.get_info_embed(TargetContext(self.bot.get_user(reminder.owner_id), channel.guild))  # type: ignore
                 await channel.send(
                     content=f"{repr(after)} is no longer on beige!\n{reminder.mentions}",
                     embed=embed,
@@ -181,7 +181,7 @@ class Targets(commands.Cog):
                     continue
                 await owner.send(
                     content=f"{repr(after)} is no longer on beige!",
-                    embed=await after.get_info_embed(TargetContext(owner, None)),  # type: ignore
+                    embed=after.get_info_embed(TargetContext(owner, None)),  # type: ignore
                 )
 
 
