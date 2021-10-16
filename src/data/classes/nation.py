@@ -523,3 +523,6 @@ class Nation(Makeable):
         from ...funcs import calculate_spies
 
         return await calculate_spies(self)
+
+    def check_war_range(self, nation: Nation, /) -> bool:
+        return self.score * 1.75 > nation.score > self.score * 0.75
