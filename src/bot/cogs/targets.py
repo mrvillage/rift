@@ -125,7 +125,10 @@ class Targets(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                "\n".join(f"**#{i.id}**: {repr(i.nation)}" for i in reminders),
+                "\n".join(
+                    f"**#{i.id}**: [{repr(i.nation)}](https://politicsandwar.com/nation/id={i.nation.id if i.nation else 0})"
+                    for i in reminders
+                ),
                 color=discord.Color.blue(),
             ),
             ephemeral=True,
