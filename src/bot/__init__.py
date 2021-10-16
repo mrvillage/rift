@@ -97,38 +97,33 @@ async def main() -> None:
                 await bot.login(DEBUG_TOKEN)
             else:
                 await bot.login(TOKEN)
+
             await bot.update_pnw_session()
-            if not cache.init:
-                await cache.initialize()
-                print("Cache initialized!", flush=True)
 
-            if not bot.persistent_views_loaded:
-                for menu in cache.menus:
-                    bot.add_view(await menu.get_view())
-                bot.add_view(Margins())
-                bot.add_view(Prices())
-                bot.add_view(AlliancesPaginator(1, 50))
-                bot.add_view(EventExtraInformationView())
-                bot.add_view(TreasuresView())
-                bot.add_view(Colors())
-                bot.persistent_views_loaded = True
-                print("Loaded persistent views!", flush=True)
-                async with aiohttp.request("GET", bot.user.display_avatar.url) as req:  # type: ignore
-                    bot.bytes_avatar = await req.read()
+            await cache.initialize()
+            print("Cache initialized!", flush=True)
 
-            if not bot.cogs_loaded:
-                cogPath = Path.cwd() / "src" / "bot" / "cogs"
-                cogs = [
-                    i.name.replace(".py", "")
-                    for i in cogPath.glob("*.py")
-                    if i.name not in {"server.py", "database.py"}
-                ]
-                for cog in cogs:
-                    bot.load_extension(f"src.bot.cogs.{cog}")
-                if bot.debug:  # type: ignore
-                    bot.unload_extension("src.bot.cogs.logs")
-                bot.cogs_loaded = True
-                print("Loaded cogs!", flush=True)
+            for menu in cache.menus:
+                bot.add_view(await menu.get_view())
+            views = [Margins(), Prices(), AlliancesPaginator(1, 50), EventExtraInformationView(), TreasuresView(), Colors()]
+            for view in views:
+                bot.add_view(view)
+            print("Loaded persistent views!", flush=True)
+
+            async with aiohttp.request("GET", bot.user.display_avatar.url) as req:  # type: ignore
+                bot.bytes_avatar = await req.read()
+
+            cogPath = Path.cwd() / "src" / "bot" / "cogs"
+            cogs = [
+                i.name.replace(".py", "")
+                for i in cogPath.glob("*.py")
+                if i.name not in {"server.py", "database.py"}
+            ]
+            for cog in cogs:
+                bot.load_extension(f"src.bot.cogs.{cog}")
+            if bot.debug:  # type: ignore
+                bot.unload_extension("src.bot.cogs.logs")
+            print("Loaded cogs!", flush=True)
 
             await bot.register_application_commands()
             print("Application commands registered!", flush=True)
