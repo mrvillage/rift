@@ -237,10 +237,22 @@ class Nation(Makeable):
                 if self.v_mode
                 else "False",
             },
-            {"name": "Soldiers", "value": f"{self.soldiers:,}"},
-            {"name": "Tanks", "value": f"{self.tanks:,}"},
-            {"name": "Aircraft", "value": f"{self.aircraft:,}"},
-            {"name": "Ships", "value": f"{self.ships:,}"},
+            {
+                "name": "Soldiers",
+                "value": f"{self.soldiers:,}/{self.cities *15000:,}",
+            },
+            {
+                "name": "Tanks",
+                "value": f"{self.tanks:,}/{self.cities * 1250:,}",
+            },
+            {
+                "name": "Aircraft",
+                "value": f"{self.aircraft:,}/{self.cities * 75:,}",
+            },
+            {
+                "name": "Ships",
+                "value": f"{self.ships:,}/{self.cities * 15:,}",
+            },
             {"name": "Missiles", "value": f"{self.missiles:,}"},
             {"name": "Nukes", "value": f"{self.nukes:,}"},
             {
