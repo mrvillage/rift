@@ -506,3 +506,8 @@ class Nation(Makeable):
                 "adv_engineering_corps",
             )
         )[0]
+
+    async def calculate_spies(self) -> int:
+        from ...funcs import calculate_spies
+
+        return await calculate_spies(self)
