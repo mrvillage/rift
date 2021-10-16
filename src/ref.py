@@ -19,6 +19,7 @@ from .help import EmbedHelpCommand
 
 class Rift(commands.Bot):
     bytes_avatar: bytes
+    debug: bool
 
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)  # type: ignore
@@ -27,8 +28,6 @@ class Rift(commands.Bot):
             timeout=aiohttp.ClientTimeout(total=30.0)
         )
         self.auth_token: Optional[str] = None
-        self.cogs_loaded: bool = False
-        self.persistent_views_loaded: bool = False
         self.enable_debug: bool = False
 
     async def update_pnw_session(self):
@@ -74,6 +73,7 @@ intents = discord.Intents(
     members=True,
 )
 debug = False
+debug = True
 
 ID = DEBUG_APPLICATION_ID if debug else APPLICATION_ID
 bot = Rift(
