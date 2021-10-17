@@ -195,6 +195,7 @@ class PnWInfo(commands.Cog):
         descriptions={
             "search": "The nation or alliance to get revenue of, defaults to your nation.",
             "fetch_spies": "Fetches spies for every nation being calculated. Incredibly slow, need to be whitelisted.",
+            "alliance": "Whether to only search for a matching alliance.",
         },
     )
     async def revenue(
@@ -203,25 +204,26 @@ class PnWInfo(commands.Cog):
         *,
         search: Optional[str] = None,
         fetch_spies: bool = False,
+        alliance: bool = False,
     ):  # sourcery no-metrics
         if search is None:
+            search_ = await Nation.convert(ctx, search, False)
+        elif alliance:
+            search_ = await Alliance.convert(ctx, search)
+        else:
             try:
                 search_ = await Nation.convert(ctx, search, False)
             except NationNotFoundError:
-                raise NationOrAllianceNotFoundError(search)
-        try:
-            search_ = await Nation.convert(ctx, search, False)
-        except NationNotFoundError:
-            try:
-                search_ = await Alliance.convert(ctx, search, False)
-            except AllianceNotFoundError:
                 try:
-                    search_ = await Nation.convert(ctx, search, True)
-                except NationNotFoundError:
+                    search_ = await Alliance.convert(ctx, search, False)
+                except AllianceNotFoundError:
                     try:
-                        search_ = await Alliance.convert(ctx, search, True)
-                    except AllianceNotFoundError:
-                        raise NationOrAllianceNotFoundError(search)
+                        search_ = await Nation.convert(ctx, search, True)
+                    except NationNotFoundError:
+                        try:
+                            search_ = await Alliance.convert(ctx, search, True)
+                        except AllianceNotFoundError:
+                            raise NationOrAllianceNotFoundError(search)
         search_ = search_ or await Nation.convert(ctx, search_)
         if fetch_spies and ctx.author.id != 258298021266063360:
             fetch_spies = False
@@ -264,7 +266,7 @@ class PnWInfo(commands.Cog):
             0,
             {
                 "name": "Money",
-                "value": f"Gross: ${rev['gross_income'].money:,.2f}\nupUpkeep: ${rev['upkeep'].money:,.2f}\nNet: ${rev['net_income'].money:,.2f}"
+                "value": f"Gross: ${rev['gross_income'].money:,.2f}\nUpkeep: ${rev['upkeep'].money:,.2f}\nNet: ${rev['net_income'].money:,.2f}"
                 + (
                     f"\nTrade Bonus: ${rev['trade_bonus']:,}"
                     if "trade_bonus" in rev
