@@ -17,9 +17,12 @@ from .resources import Resources
 __all__ = ("Alliance",)
 
 if TYPE_CHECKING:
+    from pnwkit.data import Alliance as PnWKitAlliance
+
     from _typings import AllianceData, Field, RevenueDict
 
     from .nation import Nation
+    from .trade import TradePrices
     from .treaty import Treaty
 
 
@@ -332,80 +335,85 @@ class Alliance(Makeable):
 
     async def calculate_revenue(
         self,
+        prices: Optional[TradePrices] = None,
+        data: Optional[PnWKitAlliance] = None,
         fetch_spies: bool = False,
     ) -> RevenueDict:
-        data = await pnwkit.async_alliance_query(
-            {"id": self.id, "first": 1},
-            {
-                "nations": (
-                    "id",
-                    "ironw",
-                    "bauxitew",
-                    "armss",
-                    "egr",
-                    "massirr",
-                    "itc",
-                    "mlp",
-                    "nrf",
-                    "irond",
-                    "vds",
-                    "cia",
-                    "cfce",
-                    "propb",
-                    "uap",
-                    "city_planning",
-                    "adv_city_planning",
-                    "space_program",
-                    "spy_satellite",
-                    "moon_landing",
-                    "pirate_economy",
-                    "recycling_initiative",
-                    "telecom_satellite",
-                    "green_tech",
-                    "arable_land_agency",
-                    "clinical_research_center",
-                    "specialized_police_training",
-                    "adv_engineering_corps",
-                    {
-                        "cities": (
-                            "id",
-                            "name",
-                            "date",
-                            "infrastructure",
-                            "land",
-                            "powered",
-                            "oilpower",
-                            "windpower",
-                            "coalpower",
-                            "nuclearpower",
-                            "coalmine",
-                            "oilwell",
-                            "uramine",
-                            "barracks",
-                            "farm",
-                            "policestation",
-                            "hospital",
-                            "recyclingcenter",
-                            "subway",
-                            "supermarket",
-                            "bank",
-                            "mall",
-                            "stadium",
-                            "leadmine",
-                            "ironmine",
-                            "bauxitemine",
-                            "gasrefinery",
-                            "aluminumrefinery",
-                            "steelmill",
-                            "munitionsfactory",
-                            "factory",
-                            "airforcebase",
-                            "drydock",
-                        )
-                    },
-                ),
-            },
-        )
+        prices = prices or cache.prices
+        if data is None:
+            raw_data = await pnwkit.async_alliance_query(
+                {"id": self.id, "first": 1},
+                {
+                    "nations": (
+                        "id",
+                        "ironw",
+                        "bauxitew",
+                        "armss",
+                        "egr",
+                        "massirr",
+                        "itc",
+                        "mlp",
+                        "nrf",
+                        "irond",
+                        "vds",
+                        "cia",
+                        "cfce",
+                        "propb",
+                        "uap",
+                        "city_planning",
+                        "adv_city_planning",
+                        "space_program",
+                        "spy_satellite",
+                        "moon_landing",
+                        "pirate_economy",
+                        "recycling_initiative",
+                        "telecom_satellite",
+                        "green_tech",
+                        "arable_land_agency",
+                        "clinical_research_center",
+                        "specialized_police_training",
+                        "adv_engineering_corps",
+                        {
+                            "cities": (
+                                "id",
+                                "name",
+                                "date",
+                                "infrastructure",
+                                "land",
+                                "powered",
+                                "oilpower",
+                                "windpower",
+                                "coalpower",
+                                "nuclearpower",
+                                "coalmine",
+                                "oilwell",
+                                "uramine",
+                                "barracks",
+                                "farm",
+                                "policestation",
+                                "hospital",
+                                "recyclingcenter",
+                                "subway",
+                                "supermarket",
+                                "bank",
+                                "mall",
+                                "stadium",
+                                "leadmine",
+                                "ironmine",
+                                "bauxitemine",
+                                "gasrefinery",
+                                "aluminumrefinery",
+                                "steelmill",
+                                "munitionsfactory",
+                                "factory",
+                                "airforcebase",
+                                "drydock",
+                            )
+                        },
+                    ),
+                },
+            )
+            data = raw_data[0]
         if TYPE_CHECKING:
             assert isinstance(data, tuple)
         prices = cache.prices
@@ -415,7 +423,7 @@ class Alliance(Makeable):
                 j,
                 fetch_spies,
             )
-            for i, j in zip(self.members, data[0]["nations"])
+            for i, j in zip(self.members, data["nations"])
         ]
         return {
             "gross_income": sum(
