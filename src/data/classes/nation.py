@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, List, Optional
 
 import aiohttp
 import discord
@@ -20,7 +20,7 @@ __all__ = ("Nation",)
 if TYPE_CHECKING:
     from pnwkit.data import Nation as PnWKitNation
 
-    from _typings import Field, NationData
+    from _typings import Field, NationData, RevenueDict
 
     from .alliance import Alliance
     from .city import City
@@ -307,7 +307,7 @@ class Nation(Makeable):
         prices: Optional[TradePrices] = None,
         data: Optional[PnWKitNation] = None,
         fetch_spies: bool = False,
-    ) -> Dict[str, Union[Resources, Dict[str, float], int, float]]:
+    ) -> RevenueDict:
         # sourcery no-metrics
         from ...funcs import calculate_spies
         from .city import FullCity
@@ -391,7 +391,7 @@ class Nation(Makeable):
             data = raw_data[0]
         cities = [FullCity(i, data) for i in data.cities]  # type: ignore
         revenues = [i.calculate_income() for i in cities]
-        revenue = {
+        revenue: RevenueDict = {  # type: ignore
             "gross_income": sum(
                 (i["gross_income"] for i in revenues[1:]), revenues[0]["gross_income"]
             ),
@@ -402,12 +402,6 @@ class Nation(Makeable):
         }
         color = await Color.fetch(self.color.lower())
         bonus = color.bonus * 12
-        if TYPE_CHECKING:
-            assert (
-                isinstance(revenue["gross_income"], Resources)
-                and isinstance(revenue["net_income"], Resources)
-                and isinstance(revenue["upkeep"], Resources)
-            )
         if self.cities <= 10:
             revenue["new_player_bonus"] = revenue["gross_income"].money * 1.1 - (
                 0.1 * self.cities
