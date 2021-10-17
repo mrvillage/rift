@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set
 
 import discord
 import pnwkit
@@ -17,7 +17,7 @@ from .resources import Resources
 __all__ = ("Alliance",)
 
 if TYPE_CHECKING:
-    from _typings import AllianceData, Field
+    from _typings import AllianceData, Field, RevenueDict
 
     from .nation import Nation
     from .treaty import Treaty
@@ -333,7 +333,7 @@ class Alliance(Makeable):
     async def calculate_revenue(
         self,
         fetch_spies: bool = False,
-    ) -> Dict[str, Union[Resources, Dict[str, float], int, float]]:
+    ) -> RevenueDict:
         data = await pnwkit.async_alliance_query(
             {"id": self.id, "first": 1},
             {
