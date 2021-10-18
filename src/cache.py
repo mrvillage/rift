@@ -610,6 +610,9 @@ class Cache:
     def add_ticket_config(self, config: TicketConfig, /) -> None:
         self._ticket_configs[config.id] = config
 
+    def add_target(self, target: Target, /) -> None:
+        self._targets[target.id] = target
+
     def add_target_reminder(self, reminder: TargetReminder, /) -> None:
         self._target_reminders[reminder.id] = reminder
 
