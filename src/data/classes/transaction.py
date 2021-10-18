@@ -97,7 +97,7 @@ class Transaction:
     async def convert(cls, ctx: RiftContext, argument: str):
         from .resources import Resources
 
-        return cls(resources=(await Resources.convert_resources(argument)))
+        return cls(resources=Resources.convert_resources(argument))
 
     def __str__(self):
         return ", ".join(

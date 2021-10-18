@@ -97,7 +97,7 @@ class Resources:
         )
 
     @classmethod
-    async def convert_resources(cls, argument: str) -> Resources:
+    def convert_resources(cls, argument: str) -> Resources:
         args = [i.strip(" ,.") for i in argument.split(" ")]
         args = [i if i.lower() != "credits" else "credit" for i in args]
         resources_dict = {}
@@ -140,7 +140,7 @@ class Resources:
 
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str) -> Resources:
-        return await cls.convert_resources(argument)
+        return cls.convert_resources(argument)
 
     def __eq__(self, other: Resources) -> bool:
         return self.__dict__ == other.__dict__
