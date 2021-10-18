@@ -73,7 +73,6 @@ intents = discord.Intents(
     members=True,
 )
 debug = False
-debug = True
 
 ID = DEBUG_APPLICATION_ID if debug else APPLICATION_ID
 bot = Rift(
