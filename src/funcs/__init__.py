@@ -7,5 +7,6 @@ from .embeds import *
 from .errors import *
 from .nation import *
 from .parse import *
+from .revenue import *
 from .spies import *
 from .tools import *
