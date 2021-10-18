@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from ...cache import cache
 from ...errors import AttackNotFoundError, WarNotFoundError
@@ -197,6 +197,9 @@ class War:
     @property
     def defender(self) -> Optional[Nation]:
         return cache.get_nation(self.defender_id)
+
+    async def fetch_attacks(self) -> List[Attack]:
+        return [Attack(i) for i in await query.query_attacks(self.id)]
 
 
 class Attack:
