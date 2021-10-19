@@ -254,7 +254,7 @@ class Condition:
         return [i for i in values if await self.evaluate_condition(i, self.condition)]
 
     @classmethod
-    async def union(cls, *conditions: Union[Condition, List[Any]]) -> Condition:
+    def union(cls, *conditions: Union[Condition, List[Any]]) -> Condition:
         conditions_: List[Condition] = []
         for index, condition in enumerate(conditions):
             if isinstance(condition, list):
