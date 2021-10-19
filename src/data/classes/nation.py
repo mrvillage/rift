@@ -521,7 +521,7 @@ class Nation(Makeable):
 
     async def find_targets(
         self,
-        condition: Condition,
+        condition: Optional[Condition] = None,
         wars: Optional[List[War]] = None,
         attacks: Optional[List[Attack]] = None,
         /,
@@ -530,8 +530,9 @@ class Nation(Makeable):
         from ...funcs import bulk_fetch_nation_revenues
         from .target import Target
 
-        valid_ = [i for i in cache.nations if self.check_war_range(i) and i is not self]
-        valid = await condition.reduce(*valid_)
+        valid = [i for i in cache.nations if self.check_war_range(i) and i is not self]
+        if condition is not None:
+            valid = await condition.reduce(*valid)
         dt = datetime.datetime.utcnow()
         revenue_valid = [
             i
