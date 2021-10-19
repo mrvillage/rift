@@ -31,7 +31,7 @@ class Menus(commands.Cog):
     async def menu(self, ctx: RiftContext, menu: Optional[Menu] = None):
         ...
 
-    @menu.command(
+    @menu.command(  # type: ignore
         name="list",
         aliases=["l", "li"],
         brief="List the menu configurations for this guild.",
@@ -61,7 +61,7 @@ class Menus(commands.Cog):
                 ephemeral=True,
             )
 
-    @menu.command(
+    @menu.command(  # type: ignore
         name="create",
         aliases=["new"],
         brief="Create a new menu configuration.",
@@ -193,7 +193,7 @@ class Menus(commands.Cog):
                 )
             )
 
-    @menu.command(
+    @menu.command(  # type: ignore
         name="send",
         aliases=["post"],
         brief="Send a menu configuration to a channel.",
@@ -221,7 +221,7 @@ class Menus(commands.Cog):
             ephemeral=True,
         )
 
-    @menu.command(
+    @menu.command(  # type: ignore
         name="info",
         aliases=["details"],
         brief="Get information about a menu configuration.",
@@ -244,7 +244,7 @@ class Menus(commands.Cog):
             )
         )
 
-    @menu.command(
+    @menu.command(  # type: ignore
         name="item",
         aliases=["items"],
         brief="Get information about a menu item.",
