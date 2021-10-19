@@ -152,7 +152,9 @@ class Condition:
         return updated_condition
 
     @classmethod
-    def validate_and_create(cls, condition: List[Any], user_id: int, /) -> Condition:
+    def validate_and_create(
+        cls, condition: List[Any], user_id: int = -1, /
+    ) -> Condition:
         return cls(
             {
                 "id": None,  # type: ignore
