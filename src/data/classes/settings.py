@@ -10,10 +10,14 @@ from ..db.sql import execute_query
 from .base import Makeable
 from .nation import Nation
 
-__all__ = ("UserSettings", "GuildWelcomeSettings", "GuildSettings")
+__all__ = ("UserSettings", "GuildWelcomeSettings", "GuildSettings", "AllianceSettings")
 
 if TYPE_CHECKING:
-    from _typings import GuildSettingsData, GuildWelcomeSettingsData
+    from _typings import (
+        AllianceSettingsData,
+        GuildSettingsData,
+        GuildWelcomeSettingsData,
+    )
 
 
 class UserSettings(Makeable):
@@ -229,6 +233,62 @@ class GuildSettings(Makeable):
             UPDATE guild_settings SET {sets} WHERE guild_id = $1;
             """,
                 self.guild_id,
+                *args,
+            )
+        return self
+
+
+class AllianceSettings:
+    __slots__ = (
+        "alliance_id",
+        "defaulted",
+        "default_raid_condition",
+    )
+
+    def __init__(self, data: AllianceSettingsData) -> None:
+        self.defaulted: bool = False
+        self.alliance_id: int = data["alliance_id"]
+        self.default_raid_condition: Optional[List[Any]] = data[
+            "default_raid_condition"
+        ]
+
+    @classmethod
+    def default(cls, alliance_id: int, /) -> AllianceSettings:
+        settings = cls(
+            {
+                "alliance_id": alliance_id,
+                "default_raid_condition": None,
+            }
+        )
+        settings.defaulted = True
+        return settings
+
+    @classmethod
+    async def fetch(cls, alliance_id: int) -> AllianceSettings:
+        return cache.get_alliance_settings(alliance_id) or cls.default(alliance_id)
+
+    async def set_(self, **kwargs: Any) -> AllianceSettings:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+        sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
+        sets = ", ".join(sets)
+        args = tuple(kwargs.values())
+        if self.defaulted:
+            await execute_query(
+                f"""
+            INSERT INTO alliance_settings (alliance_id, {', '.join(kwargs.keys())}) VALUES ({', '.join(f'${i}' for i in range(1, len(kwargs)+2))});
+            """,
+                self.alliance_id,
+                *tuple(kwargs.values()),
+            )
+            cache.add_alliance_settings(self)
+            self.defaulted = False
+        else:
+            await execute_query(
+                f"""
+            UPDATE alliance_settings SET {sets} WHERE alliance_id = $1;
+            """,
+                self.alliance_id,
                 *args,
             )
         return self
