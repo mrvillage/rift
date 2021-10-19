@@ -256,7 +256,9 @@ class Condition:
     @classmethod
     def union(cls, *conditions: Union[Condition, List[Any]]) -> Condition:
         conditions_: List[Condition] = []
-        for index, condition in enumerate(conditions):
+        for condition in conditions:
             if isinstance(condition, list):
-                conditions_[index] = cls.validate_and_create(condition)
+                conditions_.append(cls.validate_and_create(condition))
+            elif isinstance(condition, Condition):  # type: ignore
+                conditions_.append(condition)
         return Condition.parse("&&".join(str(i) for i in conditions_))
