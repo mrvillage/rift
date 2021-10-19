@@ -19,7 +19,7 @@ __all__ = (
 )
 
 if TYPE_CHECKING:
-    from _typings import TargetData, TargetReminderData
+    from _typings import Field, TargetData, TargetReminderData
 
     from .nation import Nation
     from .resources import Resources
@@ -231,6 +231,21 @@ class Target:
             rating += self.resources.food / 10_000
 
         return rating
+
+    @staticmethod
+    def field(
+        target: Target,
+        nation: Nation,
+        rating: float,
+        /,
+        include_resources: bool = False,
+    ) -> Field:
+        mil = nation.get_militarization()
+        res_string = "\nResources: "
+        return {
+            "name": f"{repr(nation)} ({rating:,.2f})",
+            "value": f"Soldiers: {nation.soldiers:,} ({mil['soldiers']:,.2%})\nTanks: {nation.tanks:,} ({mil['tanks']:,.2%})\nAircraft: {nation.aircraft:,} ({mil['aircraft']:,.2%}\nShips: {nation.ships:,} ({mil['ships']:,.2%})\nMissiles: {nation.missiles:,}\nNukes: {nation.nukes}{res_string + str(target.resources) if include_resources else ''}",
+        }
 
 
 class TargetReminder:
