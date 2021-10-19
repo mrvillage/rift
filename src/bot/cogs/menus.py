@@ -236,8 +236,10 @@ class Menus(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Menu ID: {menu.id}\n\n"
-                "\n\n".join(str(j) for i in menu.items for j in i),
+                f"Menu ID: {menu.id}\n\n{menu.description}",
+                fields=[
+                    {"name": str(j.id), "value": str(j)} for i in menu.items for j in i
+                ],
                 color=discord.Color.green(),
             )
         )
