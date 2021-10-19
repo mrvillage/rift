@@ -216,7 +216,7 @@ class Targets(commands.Cog):
                     condition = default_condition
                 else:
                     condition = Condition.union(condition, default_condition)
-        targets = await nation.find_targets(condition)
+        targets = await nation.find_targets(condition, loot=True)
         ratings = sorted(
             (
                 (i.rate(nation, count_loot=True), i)
