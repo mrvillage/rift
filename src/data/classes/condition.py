@@ -163,7 +163,7 @@ class Condition:
         )
 
     @classmethod
-    def parse(cls, condition: str, user_id: int, /) -> Condition:
+    def parse(cls, condition: str, user_id: int = -1, /) -> Condition:
         from ...funcs import parse_condition_string
 
         return cls.validate_and_create(parse_condition_string(condition), user_id)
