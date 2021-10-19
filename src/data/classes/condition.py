@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, List, Optional, TypeVar, Union
 
 from ...cache import cache
 from ...errors import InvalidConditionError
@@ -252,3 +252,11 @@ class Condition:
 
     async def reduce(self, *values: T) -> List[T]:
         return [i for i in values if await self.evaluate_condition(i, self.condition)]
+
+    @classmethod
+    async def union(cls, *conditions: Union[Condition, List[Any]]) -> Condition:
+        conditions_: List[Condition] = []
+        for index, condition in enumerate(conditions):
+            if isinstance(condition, list):
+                conditions_[index] = cls.validate_and_create(condition)
+        return Condition.parse("&&".join(str(i) for i in conditions_))
