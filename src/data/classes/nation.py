@@ -33,7 +33,6 @@ if TYPE_CHECKING:
 
 class Nation(Makeable):
     __slots__ = (
-        "data",
         "id",
         "name",
         "leader",
