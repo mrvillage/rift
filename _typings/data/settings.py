@@ -1,8 +1,13 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Any, Dict, List, Optional, TypedDict
 
-__all__ = ("GuildSettingsData", "GuildWelcomeSettingsData")
+__all__ = ("AllianceSettingsData", "GuildSettingsData", "GuildWelcomeSettingsData")
+
+
+class AllianceSettingsData(TypedDict):
+    alliance_id: int
+    default_raid_condition: Optional[List[Any]]
 
 
 class GuildSettingsData(TypedDict):
