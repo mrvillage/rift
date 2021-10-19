@@ -28,7 +28,7 @@ NATION_TYPES: Dict[str, Any] = {
     if isinstance(x, str)
     else x,
     "name": utils.escape_quoted_string,
-    "v_mode": lambda x: bool(utils.convert_int(x)) if isinstance(x, str) else x,  # type: ignore
+    "v_mode": lambda x: (bool(utils.convert_int(x)) if x not in {"True", "False"} else x == "True") if isinstance(x, str) else x,  # type: ignore
 }
 
 
