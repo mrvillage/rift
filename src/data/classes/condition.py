@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, Any, List, Optional, TypeVar
 
 from ...cache import cache
 from ...errors import InvalidConditionError
@@ -11,6 +11,8 @@ __all__ = ("Condition",)
 
 if TYPE_CHECKING:
     from _typings import ConditionData
+
+T = TypeVar("T")
 
 
 class Condition:
@@ -246,5 +248,5 @@ class Condition:
     async def evaluate(self, *values: Any) -> List[bool]:
         return [await self.evaluate_condition(i, self.condition) for i in values]
 
-    async def reduce(self, *values: Any) -> List[Any]:
+    async def reduce(self, *values: T) -> List[T]:
         return [i for i in values if await self.evaluate_condition(i, self.condition)]
