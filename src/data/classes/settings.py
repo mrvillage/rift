@@ -248,9 +248,7 @@ class AllianceSettings:
     def __init__(self, data: AllianceSettingsData) -> None:
         self.defaulted: bool = False
         self.alliance_id: int = data["alliance_id"]
-        self.default_raid_condition: Optional[List[Any]] = data[
-            "default_raid_condition"
-        ]
+        self.default_raid_condition: Optional[str] = data["default_raid_condition"]
 
     @classmethod
     def default(cls, alliance_id: int, /) -> AllianceSettings:
