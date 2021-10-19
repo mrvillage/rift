@@ -200,7 +200,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                     },
                     {
                         "name": "Unique",
-                        "value": f"{len({i.owner.id for i in self.bot.guilds if i.owner is not None})/len(self.bot.guilds):,}",
+                        "value": f"{len({i.owner.id for i in self.bot.guilds if i.owner is not None})/len(self.bot.guilds):,.2f}%",
                     },
                 ],
             )
