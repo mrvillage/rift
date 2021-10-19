@@ -6,12 +6,13 @@ from typing import TYPE_CHECKING, List, Literal, Optional
 import discord
 from discord.ext import commands
 
+from src.data.classes.condition import Condition
 from src.views.settings import AlliancePurposeConfirm
 
 from ... import funcs
-from ...checks import has_manage_permissions
+from ...checks import has_alliance_manage_permissions, has_manage_permissions
 from ...data import get
-from ...data.classes import Alliance, GuildSettings, Nation
+from ...data.classes import Alliance, AllianceSettings, GuildSettings, Nation
 from ...errors import AllianceNotFoundError
 from ...ref import Rift, RiftContext
 
@@ -28,6 +29,78 @@ class Settings(commands.Cog):
     )
     async def user_settings(self, ctx: RiftContext):
         ...
+
+    @commands.group(
+        name="alliance-settings",
+        brief="View or modify alliance settings.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_alliance_manage_permissions()
+    async def alliance_settings(self, ctx: RiftContext):
+        ...
+
+    @alliance_settings.command(  # type: ignore
+        name="default-raid-condition",
+        brief="View or modify the alliance's default condition for raid targets.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_alliance_manage_permissions()
+    async def alliance_settings_default_raid_condition(
+        self,
+        ctx: RiftContext,
+        condition: Optional[Condition] = None,
+        clear: bool = False,
+    ):
+        nation = await Nation.convert(ctx, None)
+        if nation.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "You need to be in an alliance to run this command."
+                )
+            )
+        settings = await AllianceSettings.fetch(nation.alliance.id)
+        if condition is None and not clear:
+            if settings.default_raid_condition is None:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"{repr(nation.alliance)} has no default raid condition.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The default raid condition for {repr(nation.alliance)}is:\n\n`{settings.default_raid_condition}`",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+        await settings.set_(
+            default_raid_condition=Condition.convert_to_string(condition.condition)
+            if condition
+            else None
+        )
+        if condition:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The default raid condition for {repr(nation.alliance)} is now:\n\n`{condition}`",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The default raid condition has been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
 
     @commands.group(
         name="server-settings",
