@@ -11,6 +11,7 @@ __all__ = ("cache",)
 if TYPE_CHECKING:
     from _typings import (
         AllianceData,
+        AllianceSettingsData,
         CityData,
         ColorData,
         ConditionData,
@@ -37,6 +38,7 @@ if TYPE_CHECKING:
 
     from .data.classes import (
         Alliance,
+        AllianceSettings,
         City,
         Color,
         Condition,
@@ -74,6 +76,7 @@ class Validate:
 class Cache:
     __slots__ = (
         "_alliances",
+        "_alliance_settings",
         "_cities",
         "_colors",
         "_conditions",
@@ -105,6 +108,7 @@ class Cache:
 
     def __init__(self):
         self._alliances: Dict[int, Alliance] = {}
+        self._alliance_settings: Dict[int, AllianceSettings] = {}
         self._cities: Dict[int, City] = {}
         self._colors: Dict[str, Color] = {}
         self._conditions: Dict[int, Condition] = {}
@@ -136,6 +140,7 @@ class Cache:
     async def initialize(self):  # sourcery no-metrics
         from .data.classes import (
             Alliance,
+            AllianceSettings,
             City,
             Color,
             Condition,
@@ -159,6 +164,7 @@ class Cache:
 
         queries = [
             "SELECT * FROM alliances;",
+            "SELECT * FROM alliance_settings;",
             "SELECT * FROM cities;",
             "SELECT * FROM colors ORDER BY datetime DESC LIMIT 1;",
             "SELECT * FROM conditions;",
@@ -183,6 +189,7 @@ class Cache:
         ]
         data: Tuple[  # type: ignore
             List[AllianceData],
+            List[AllianceSettingsData],
             List[CityData],
             List[RawColorData],
             List[ConditionData],
@@ -209,6 +216,7 @@ class Cache:
         )
         (
             alliances,
+            alliance_settings,
             cities,
             colors,
             conditions,
@@ -234,6 +242,9 @@ class Cache:
         for i in alliances:
             i = Alliance(i)
             self._alliances[i.id] = i
+        for i in alliance_settings:
+            i = AllianceSettings(i)
+            self._alliance_settings[i.alliance_id] = i
         for i in cities:
             i = City(i)
             self._cities[i.id] = i
@@ -485,6 +496,9 @@ class Cache:
     def get_alliance(self, id: int, /) -> Optional[Alliance]:
         return self._alliances.get(id)
 
+    def get_alliance_settings(self, id: int, /) -> Optional[AllianceSettings]:
+        return self._alliance_settings.get(id)
+
     def get_city(self, id: int, /) -> Optional[City]:
         return self._cities.get(id)
 
@@ -576,6 +590,9 @@ class Cache:
 
     def get_user_settings(self, id: int, /) -> Optional[UserSettings]:
         return self._user_settings.get(id)
+
+    def add_alliance_settings(self, settings: AllianceSettings, /) -> None:
+        self._alliance_settings[settings.alliance_id] = settings
 
     def add_condition(self, condition: Condition, /) -> None:
         self._conditions[condition.id] = condition
