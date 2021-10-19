@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+import datetime
 from typing import TYPE_CHECKING, Any, List, Optional
 
 import aiohttp
@@ -9,6 +9,7 @@ import pnwkit
 from bs4 import BeautifulSoup
 
 from ...cache import cache
+from ...data.db import execute_read_query
 from ...errors import NationNotFoundError
 from ...find import search_nation
 from ...funcs import utils
@@ -24,8 +25,10 @@ if TYPE_CHECKING:
 
     from .alliance import Alliance
     from .city import City
-    from .resources import Resources
+    from .condition import Condition
+    from .target import Target
     from .trade import TradePrices
+    from .war import Attack, War
 
 
 class Nation(Makeable):
@@ -277,7 +280,7 @@ class Nation(Makeable):
             get_embed_author_member(
                 self.user,
                 f'[Nation Page](https://politicsandwar.com/nation/id={self.id} "https://politicsandwar.com/nation/id={self.id}")',
-                timestamp=datetime.fromisoformat(self.founded),
+                timestamp=datetime.datetime.fromisoformat(self.founded),
                 footer="Nation created",
                 fields=fields,
                 color=discord.Color.blue(),
@@ -286,7 +289,7 @@ class Nation(Makeable):
             else get_embed_author_member(
                 ctx.author,
                 f'[Nation Page](https://politicsandwar.com/nation/id={self.id} "https://politicsandwar.com/nation/id={self.id}")',
-                timestamp=datetime.fromisoformat(self.founded),
+                timestamp=datetime.datetime.fromisoformat(self.founded),
                 footer="Nation created",
                 fields=fields,
                 color=discord.Color.blue(),
@@ -295,7 +298,7 @@ class Nation(Makeable):
             else get_embed_author_guild(
                 ctx.guild,
                 f'[Nation Page](https://politicsandwar.com/nation/id={self.id} "https://politicsandwar.com/nation/id={self.id}")',
-                timestamp=datetime.fromisoformat(self.founded),
+                timestamp=datetime.datetime.fromisoformat(self.founded),
                 footer="Nation created",
                 fields=fields,
                 color=discord.Color.blue(),
@@ -314,7 +317,6 @@ class Nation(Makeable):
         from .color import Color
         from .resources import Resources
 
-        revenue: Dict[str, Union[Resources, Dict[str, float], int, float]]
         spies = await calculate_spies(self) if fetch_spies else 0
         prices = prices or cache.prices
         if not data:
@@ -517,6 +519,65 @@ class Nation(Makeable):
         from ...funcs import calculate_spies
 
         return await calculate_spies(self)
+
+    async def find_targets(
+        self,
+        condition: Condition,
+        wars: Optional[List[War]] = None,
+        attacks: Optional[List[Attack]] = None,
+        /,
+        loot: bool = False,
+    ) -> List[Target]:
+        from ...funcs import bulk_fetch_nation_revenues
+        from .target import Target
+
+        valid_ = [i for i in cache.nations if self.check_war_range(i) and i is not self]
+        valid = await condition.reduce(*valid_)
+        dt = datetime.datetime.utcnow()
+        revenue_valid = [
+            i
+            for i in valid
+            if (t := cache.get_target(i.id)) is None or t and t.turn_passed(dt)
+        ]
+        revenues = await bulk_fetch_nation_revenues(revenue_valid)
+        targets: List[Target] = []
+        valid_nation_ids = {i.id for i in valid}
+        wars = wars and [j for j in wars if j.attacker_id in valid_nation_ids]
+        if wars:
+            valid_war_ids = {i.id for i in wars}
+            attacks = attacks and [j for j in attacks if j.war_id in valid_war_ids]
+        for i in valid:
+            wars_ = wars and [
+                j for j in wars if j.attacker_id == i.id and j.defender_id == i.id
+            ]
+            if wars_ is not None:
+                war_ids = {j.id for j in wars_}
+                attacks_ = attacks and [j for j in attacks if j.war_id in war_ids]
+            else:
+                attacks_ = None
+            targets.append(
+                await Target.create(
+                    i,
+                    revenues.get(i.id, {"net_income": None})["net_income"],
+                    wars_,
+                    attacks_,
+                    loot=loot,
+                )
+            )
+        return targets
+
+    async def fetch_last_wars(self) -> List[War]:
+        from .war import War
+
+        return [
+            War(i)
+            for i in (
+                await execute_read_query(
+                    "SELECT * FROM wars WHERE (attacker_id = $1 or defender_id = $1) AND winner != 0 ORDER BY date LIMIT 10;",
+                    self.id,
+                )
+            )
+        ]
 
     def check_war_range(self, nation: Nation, /) -> bool:
         return self.score * 1.75 > nation.score > self.score * 0.75
