@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, TypedDict
+from typing import List, Optional, TypedDict
 
 __all__ = (
     "TargetData",
@@ -10,6 +10,9 @@ __all__ = (
 
 class TargetData(TypedDict):
     id: int
+    resources: Optional[str]
+    last_turn_fetched: Optional[str]
+    resources_off_attack: bool
 
 
 class TargetReminderData(TypedDict):
