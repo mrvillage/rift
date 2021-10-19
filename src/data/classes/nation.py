@@ -529,6 +529,7 @@ class Nation(Makeable):
     ) -> List[Target]:
         from ...funcs import bulk_fetch_nation_revenues
         from .target import Target
+        from .war import Attack, War
 
         valid = [i for i in cache.nations if self.check_war_range(i) and i is not self]
         if condition is not None:
@@ -542,6 +543,23 @@ class Nation(Makeable):
         revenues = await bulk_fetch_nation_revenues(revenue_valid)
         targets: List[Target] = []
         valid_nation_ids = {i.id for i in valid}
+        days_ago = str(datetime.datetime.utcnow() - datetime.timedelta(days=14))
+        if wars is None:
+            wars = [
+                War(i)
+                for i in await execute_read_query(
+                    "SELECT * FROM wars WHERE date >= $1;",
+                    days_ago,
+                )
+            ]
+        if attacks is None:
+            attacks = [
+                Attack(i)
+                for i in await execute_read_query(
+                    "SELECT * FROM attacks WHERE date >= $1;",
+                    days_ago,
+                )
+            ]
         wars = wars and [j for j in wars if j.attacker_id in valid_nation_ids]
         if wars:
             valid_war_ids = {i.id for i in wars}
