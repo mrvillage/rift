@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING, List, Optional, Union
 
 import discord
+
+from src.data.db.sql import execute_query
 
 from ...cache import cache
 from ...errors import TargetNotFoundError
@@ -19,17 +22,215 @@ if TYPE_CHECKING:
     from _typings import TargetData, TargetReminderData
 
     from .nation import Nation
+    from .resources import Resources
+    from .war import Attack, War
 
 
 class Target:
-    __slots__ = ("id",)
+    __slots__ = ("id", "resources", "last_turn_fetched", "resources_off_attack")
 
     def __init__(self, data: TargetData) -> None:
+        from .resources import Resources
+
         self.id: int = data["id"]
+        resources = data["resources"]
+        self.resources: Optional[Resources] = (
+            Resources.convert_resources(resources) if resources else None
+        )
+        self.last_turn_fetched: Optional[str] = data["last_turn_fetched"]
+        self.resources_off_attack: bool = data.get("resources_off_attack", True)
 
     @property
     def nation(self) -> Optional[Nation]:
         return cache.get_nation(self.id)
+
+    @classmethod
+    async def create(
+        cls,
+        nation: Nation,
+        revenue: Optional[Resources],
+        wars: Optional[List[War]],
+        attacks: Optional[List[Attack]],
+        /,
+        loot: bool = False,
+    ) -> Target:  # sourcery no-metrics
+        from .resources import Resources
+
+        target = cache.get_target(nation.id)
+        data: TargetData = {"id": nation.id}  # type: ignore
+        if loot:
+            if wars is None:
+                wars = await nation.fetch_last_wars()
+            if attacks is None:
+                attacks_ = [await i.fetch_attacks() for i in wars]
+                attacks = []
+                for i in attacks_:
+                    attacks.extend(i)
+            dt = datetime.datetime.utcnow()
+            if target is not None and target.last_turn_fetched is not None:
+                last_turn_fetched = datetime.datetime.fromisoformat(
+                    target.last_turn_fetched
+                )
+            else:
+                last_turn_fetched = datetime.datetime.fromisoformat(
+                    "0001-01-01 01:01:01"
+                )
+
+            last_turn = dt.replace(
+                microsecond=0, second=0, minute=0, hour=dt.hour - dt.hour % 2
+            )
+            if last_turn > last_turn_fetched:
+                revenue = revenue or (await nation.calculate_revenue())["net_income"]
+                wars = [
+                    i
+                    for i in wars
+                    if i.attacker_id == nation.id or i.defender_id == nation.id
+                ]
+                war_ids = {i.id for i in wars}
+                attacks = [
+                    i for i in attacks if i.type == "victory" and i.war_id in war_ids
+                ]
+                if attacks:
+                    attack = max(attacks, key=lambda x: x.date)
+                    resources = Resources.convert_resources(attack.loot_info)
+                    difference = dt.replace(
+                        second=0, minute=0, hour=dt.hour - dt.hour % 2
+                    ) - datetime.datetime.fromisoformat(attack.date)
+                    difference
+                    days = difference.total_seconds() / 86400
+                    resources += revenue * days
+                    data["resources_off_attack"] = True
+                else:
+                    resources = revenue * min(
+                        14, (dt - datetime.datetime.fromisoformat(nation.founded)).days
+                    )
+                    data["resources_off_attack"] = False
+                resources = resources
+                updated = True
+            else:
+                resources = None
+                updated = False
+        else:
+            last_turn = None
+            resources = None
+            updated = False
+        data["resources"] = resources and str(resources)
+        data["last_turn_fetched"] = last_turn and str(last_turn)
+        if target is None:
+            target = cls(data)
+            await target.save()
+        if updated:
+            target.resources = resources
+            target.last_turn_fetched = last_turn and str(last_turn)
+            await target.save()
+        return target
+
+    def turn_passed(self, dt: datetime.datetime) -> bool:
+        if self.last_turn_fetched is not None:
+            last_turn_fetched = datetime.datetime.fromisoformat(self.last_turn_fetched)
+        else:
+            last_turn_fetched = datetime.datetime.fromisoformat("0001-01-01 01:01:01")
+
+        last_turn = dt.replace(
+            microsecond=0, second=0, minute=0, hour=dt.hour - dt.hour % 2
+        )
+        return last_turn > last_turn_fetched
+
+    async def save(self) -> None:
+        cache.add_target(self)
+        await execute_query(
+            "INSERT INTO targets (id, resources, last_turn_fetched) VALUES ($1, $2, $3) ON CONFLICT (id) DO UPDATE SET resources = $2, last_turn_fetched = $3 WHERE targets.id = $1;",
+            self.id,
+            str(self.resources),
+            self.last_turn_fetched,
+        )
+
+    def rate(
+        self,
+        nation: Nation,
+        /,
+        *,
+        count_loot: bool = False,
+        count_infrastructure: bool = False,
+    ) -> float:  # sourcery no-metrics
+        rating = 0
+        target = self.nation
+        if target is None:
+            return rating
+
+        rating += (nation.cities / target.cities) * 10
+        if nation.soldiers and target.soldiers:
+            r = (
+                (nation.soldiers - target.soldiers)
+                / 15000
+                / ((nation.cities - target.cities) or 1)
+            )
+            if nation.soldiers < target.soldiers and nation.cities < target.cities:
+                r *= -1
+            rating += r
+        elif not nation.soldiers and not target.soldiers:
+            pass
+        elif not nation.soldiers:
+            rating -= 10
+        else:
+            rating += 10
+        if nation.tanks and target.tanks:
+            r = (
+                (nation.tanks - target.tanks)
+                / 1250
+                / ((nation.cities - target.cities) or 1)
+            )
+            if nation.tanks < target.tanks and nation.cities < target.cities:
+                r *= -1
+            rating += r
+        elif not nation.tanks and not target.tanks:
+            pass
+        elif not nation.tanks:
+            rating -= 10
+        else:
+            rating += 10
+        if nation.aircraft and target.aircraft:
+            r = (
+                (nation.aircraft - target.aircraft)
+                / 75
+                / ((nation.cities - target.cities) or 1)
+            )
+            if nation.aircraft < target.aircraft and nation.cities < target.cities:
+                r *= -1
+            rating += r
+        elif not nation.aircraft and not target.aircraft:
+            pass
+        elif not nation.aircraft:
+            rating -= 10
+        else:
+            rating += 10
+        if nation.ships and target.ships:
+            r = (
+                (nation.ships - target.ships)
+                / 15
+                / ((nation.cities - target.cities) or 1)
+            )
+            if nation.ships < target.ships and nation.cities < target.cities:
+                r *= -1
+            rating += r
+        elif not nation.ships and not target.ships:
+            pass
+        elif not nation.ships:
+            rating -= 10
+        else:
+            rating += 10
+        if count_infrastructure:
+            rating += (target.get_average_infrastructure() / 500) * 5
+        if count_loot and self.resources is not None:
+            rating += sum(
+                value / 1000
+                for key, value in self.resources.__dict__.items()
+                if key not in {"credit", "money", "food"}
+            )
+            rating += self.resources.money / 5_000_000
+            rating += self.resources.food / 10_000
+
+        return rating
 
 
 class TargetReminder:
