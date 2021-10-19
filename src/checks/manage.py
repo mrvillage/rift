@@ -4,13 +4,23 @@ from typing import TYPE_CHECKING
 
 from discord.ext import commands
 
-from ..data.classes import GuildSettings
+from ..data.classes import GuildSettings, Nation
 from ..ref import RiftContext
+
+__all__ = ("has_alliance_manage_permissions", "has_manage_permissions")
 
 if TYPE_CHECKING:
     import discord
 
-__all__ = ("has_manage_permissions",)
+
+def has_alliance_manage_permissions():
+    async def predicate(ctx: RiftContext):
+        nation = await Nation.convert(ctx, None)
+        if nation.alliance_position in {"Officer", "Heir", "Leader"}:
+            return True
+        raise commands.MissingPermissions(["alliance_manage"])
+
+    return commands.check(predicate)  # type: ignore
 
 
 def has_manage_permissions(managers: bool = True):

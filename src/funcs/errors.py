@@ -71,6 +71,15 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                     ),
                     ephemeral=True,
                 )
+            elif error.missing_permissions[0] == "alliance_manage":
+                await ctx.reply(
+                    embed=get_embed_author_member(
+                        ctx.author,
+                        f"You need to have permission to manage your alliance's settings to run this command.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
         elif isinstance(error, discord.Forbidden):
             await ctx.reply(
                 'I don\'t have permission to do that! Please make sure I have the "Embed Links" permission.'
