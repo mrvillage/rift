@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import inspect
-from typing import TYPE_CHECKING, List, Union
+from typing import TYPE_CHECKING, List, Optional, Union
 
 import discord
 from discord.ext import commands
 
 from ... import funcs
 from ...cache import cache
-from ...data.classes import Nation, TargetReminder
+from ...data.classes import AllianceSettings, Condition, Nation, TargetReminder
 from ...ref import Rift, RiftContext
+
+if TYPE_CHECKING:
+    from _typings import Field
 
 
 class TargetContext:
@@ -186,6 +189,69 @@ class Targets(commands.Cog):
                     content=f"{repr(after)} is no longer on beige!",
                     embed=after.get_info_embed(TargetContext(owner, None)),  # type: ignore
                 )
+
+    @target.group(  # type: ignore
+        name="find", brief="Find war targets.", type=commands.CommandType.chat_input
+    )
+    async def target_find(self, ctx: RiftContext):
+        ...
+
+    @target_find.command(  # type: ignore
+        name="raid", brief="Find raid targets.", type=commands.CommandType.chat_input
+    )
+    async def target_find_raid(
+        self,
+        ctx: RiftContext,
+        condition: Optional[Condition] = None,
+        nation: Optional[Nation] = None,
+        evaluate_alliance_default: bool = True,
+    ):
+        await ctx.interaction.response.defer()
+        nation = nation or await Nation.convert(ctx, nation)
+        if nation.alliance is not None:
+            settings = await AllianceSettings.fetch(nation.alliance.id)
+            if settings.default_raid_condition is not None:
+                default_condition = Condition.parse(settings.default_raid_condition)
+                if condition is None:
+                    condition = default_condition
+                else:
+                    condition = Condition.union(condition, default_condition)
+        targets = await nation.find_targets(condition)
+        ratings = sorted(
+            (
+                (i.rate(nation, count_loot=True), i)
+                for i in targets
+                if i.nation is not None
+            ),
+            key=lambda x: x[0],
+            reverse=True,
+        )
+        if not ratings:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "No targets found.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        fields: List[Field] = []
+        for target in ratings:
+            if len(fields) >= 25:
+                break
+            rating = target[0]
+            target = target[1]
+            nat = target.nation
+            if nat is None:
+                continue
+            fields.append(target.field(target, nat, rating, True))
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                fields=fields,
+                color=discord.Color.green(),
+            )
+        )
 
 
 def setup(bot: Rift):
