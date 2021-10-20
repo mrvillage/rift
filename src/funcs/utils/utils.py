@@ -118,9 +118,9 @@ def get_continent(continent_id: int) -> str:
 def convert_bool(value: str) -> bool:
     from ...errors import BoolError
 
-    if value.lower() in {"true", "yes", "approve", "go", "accept"}:
+    if value.lower() in {"true", "yes", "approve", "go", "accept", "1"}:
         return True
-    if value.lower() in {"false", "no", "deny"}:
+    if value.lower() in {"false", "no", "deny", "0"}:
         return False
     raise BoolError
 
