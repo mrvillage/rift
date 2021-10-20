@@ -10,7 +10,9 @@ __all__ = (
     "get_color",
     "get_color_id",
     "get_domestic_policy",
+    "get_domestic_policy_id",
     "get_war_policy",
+    "get_war_policy_id",
     "get_alliance_position",
     "get_alliance_position_id",
     "get_continent",
@@ -71,6 +73,10 @@ def get_domestic_policy(policy_id: int) -> str:
     return domestic_policy_map[policy_id - 1]
 
 
+def get_domestic_policy_id(policy: str) -> int:
+    return domestic_policy_map.index(policy)
+
+
 war_policy_map = (
     "Attrition",
     "Turtle",
@@ -87,6 +93,10 @@ war_policy_map = (
 
 def get_war_policy(policy_id: int) -> str:
     return war_policy_map[policy_id - 1]
+
+
+def get_war_policy_id(policy: str) -> int:
+    return war_policy_map.index(policy)
 
 
 alliance_position_map = ("None", "Applicant", "Member", "Officer", "Heir", "Leader")
