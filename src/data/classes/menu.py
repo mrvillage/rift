@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from functools import cached_property
 from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Sequence, Union
 
 import discord
@@ -153,7 +152,7 @@ class Menu(Makeable):
             return f"{self.id}"
         return f"{self.id} - {self.name}"
 
-    @cached_property
+    @property
     def items(self) -> List[List[MenuItem]]:
         return [
             [
