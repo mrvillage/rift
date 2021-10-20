@@ -49,12 +49,12 @@ class Condition:
 
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str):
-        condition = cls.sync_convert(argument, ctx.author.id)
-        if condition is None:
-            try:
+        try:
+            condition = cls.sync_convert(argument, ctx.author.id)
+            if condition is None:
                 return cls.parse(argument, ctx.author.id)
-            except SyntaxError:
-                raise InvalidConditionError(argument)
+        except Exception:
+            raise InvalidConditionError(argument)
         return condition
 
     def __repr__(self) -> str:
