@@ -193,7 +193,7 @@ class Condition:
         attributes = attribute.split(".")
         attr = obj
         for a in attributes[1:]:
-            if a == "id" and attr is None:
+            if a in {"id", "rank", "member_count", "score"} and attr is None:
                 attr = 0
             else:
                 attr = getattr(attr, a)
