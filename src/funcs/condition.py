@@ -37,6 +37,23 @@ NATION_TYPES: Dict[str, Any] = {
     "war_policy": lambda x: (utils.convert_int(x) if x.isdigit() else utils.get_war_policy_id(str.capitalize(utils.escape_quoted_string(x))))  # type: ignore
     if isinstance(x, str)
     else x,
+    "domestic_policy": lambda x: (utils.convert_int(x) if x.isdigit() else utils.get_domestic_policy_id(str.capitalize(utils.escape_quoted_string(x))))  # type: ignore
+    if isinstance(x, str)
+    else x,
+    "score": lambda x: utils.convert_number(x) if isinstance(x, str) else x,  # type: ignore
+    "soldiers": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
+    "tanks": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
+    "aircraft": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
+    "ships": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
+    "missiles": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
+    "nukes": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
+    "v_mode_turns": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
+    "beige_turns": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
+    "color": lambda x: (utils.convert_int(x) if x.isdigit() else utils.get_color_id(str.capitalize(utils.escape_quoted_string(x))))  # type: ignore
+    if isinstance(x, str)
+    else x,
+    "last_active": lambda x: utils.escape_quoted_string(x),  # type: ignore
+    "founded": lambda x: utils.escape_quoted_string(x),  # type: ignore
 }
 
 
