@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List
 
-import discord
 from discord import Message
 
 from ...cache import cache
@@ -41,14 +40,15 @@ async def query_menu_item(item_id: int, guild_id: int) -> MenuItemData:
 
 
 async def insert_interface(*, menu_id: int, message: Message) -> None:
-    if TYPE_CHECKING:
-        assert isinstance(message.guild, discord.Guild)
     await execute_query(
-        "INSERT INTO menu_interfaces (menu_id, message_id) VALUES ($1, $2);",
+        "INSERT INTO menu_interfaces (menu_id, message_id, channel_id) VALUES ($1, $2, $3);",
         menu_id,
         message.id,
+        message.channel.id,
     )
-    cache.add_menu_interface({"menu_id": menu_id, "message_id": message.id})
+    cache.add_menu_interface(
+        {"menu_id": menu_id, "message_id": message.id, "channel_id": message.channel.id}
+    )
 
 
 async def query_menus() -> List[MenuData]:
