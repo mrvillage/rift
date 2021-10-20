@@ -17,6 +17,7 @@ class MenuData(TypedDict):
 class MenuInterfaceData(TypedDict):
     menu_id: int
     message_id: int
+    channel_id: int
 
 
 class MenuItemData(TypedDict):
