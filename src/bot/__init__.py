@@ -104,7 +104,7 @@ async def main() -> None:
             print("Cache initialized!", flush=True)
 
             for menu in cache.menus:
-                bot.add_view(await menu.get_view())
+                bot.add_view(menu.get_view())
             views = [
                 Margins(),
                 Prices(),
