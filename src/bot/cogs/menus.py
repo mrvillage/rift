@@ -101,11 +101,8 @@ class Menus(commands.Cog):
                     timeout=300,
                 )
                 lower = message.content.lower()
-                if (
-                    lower.startswith("finish")
-                    or lower.startswith("cancel")
-                    or lower.startswith("complete")
-                    or lower.startswith("done")
+                if lower.startswith(
+                    ("finish", "cancel", "complete", "done", "save", "stop")
                 ):
                     running = False
                     continue
