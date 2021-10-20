@@ -20,7 +20,12 @@ OPERATORS = ("==", "!=", ">>", "<<", ">=", "<=", "^^")
 OPERATOR_CHARACTERS = ("=", ">", "<", "^")
 CHARACTERS = string.ascii_letters + string.digits + "._-"
 QUOTES = ("'", '"')
-ALLIANCE_TYPES: Dict[str, Any] = {"id": lambda x: utils.convert_int(x) if isinstance(x, str) else x}  # type: ignore
+ALLIANCE_TYPES: Dict[str, Any] = {
+    "id": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
+    "member_count": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
+    "rank": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
+    "score": lambda x: utils.convert_number(x) if isinstance(x, str) else x,  # type: ignore
+}  # type: ignore
 NATION_TYPES: Dict[str, Any] = {
     "id": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
     "alliance": ALLIANCE_TYPES,
@@ -29,6 +34,9 @@ NATION_TYPES: Dict[str, Any] = {
     else x,
     "name": utils.escape_quoted_string,
     "v_mode": lambda x: (bool(utils.convert_int(x)) if x not in {"True", "False"} else x == "True") if isinstance(x, str) else x,  # type: ignore
+    "war_policy": lambda x: (utils.convert_int(x) if x.isdigit() else utils.get_war_policy_id(str.capitalize(utils.escape_quoted_string(x))))  # type: ignore
+    if isinstance(x, str)
+    else x,
 }
 
 
