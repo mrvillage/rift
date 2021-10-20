@@ -16,7 +16,7 @@ __all__ = (
 
 BOOLEAN_OPERATORS = ("??", "&&", "!!")
 BOOLEAN_OPERATOR_CHARACTERS = ("?", "&")
-OPERATORS = ("==", "!=", ">", "<", ">=", "<=", "^^")
+OPERATORS = ("==", "!=", ">>", "<<", ">=", "<=", "^^")
 OPERATOR_CHARACTERS = ("=", ">", "<", "^")
 CHARACTERS = string.ascii_letters + string.digits + "._-"
 QUOTES = ("'", '"')
