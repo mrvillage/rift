@@ -210,7 +210,10 @@ class Targets(commands.Cog):
         nation = nation or await Nation.convert(ctx, nation)
         if nation.alliance is not None:
             settings = await AllianceSettings.fetch(nation.alliance.id)
-            if settings.default_raid_condition is not None:
+            if (
+                evaluate_alliance_default
+                and settings.default_raid_condition is not None
+            ):
                 default_condition = Condition.parse(settings.default_raid_condition)
                 if condition is None:
                     condition = default_condition
