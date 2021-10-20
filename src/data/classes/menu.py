@@ -186,9 +186,9 @@ class MenuItem:
     async def fetch(cls, item_id: int, guild_id: int) -> MenuItem:
         item = cache.get_menu_item(item_id)
         if item is None:
-            raise MenuNotFoundError(item_id)
+            raise MenuItemNotFoundError(item_id)
         if item.guild_id != guild_id:
-            raise MenuNotFoundError(item_id)
+            raise MenuItemNotFoundError(item_id)
         return item
 
     def get_item(self, menu_id: int, row: int) -> Union[MenuButton, MenuSelect]:
