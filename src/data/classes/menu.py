@@ -141,11 +141,10 @@ class Menu(Makeable):
                 if j.id == item_id:
                     del j
 
-    async def get_view(self) -> MenuView:
+    def get_view(self) -> MenuView:
         from ...ref import bot
         from ...views import MenuView
 
-        await self.make_attrs("items")
         self.view = MenuView(bot=bot, menu_id=self.id, timeout=None)
         for index, item_set in enumerate(self.items):
             for item in item_set:

@@ -206,7 +206,7 @@ class Menus(commands.Cog):
     async def menu_send(
         self, ctx: RiftContext, menu: Menu, *, channel: discord.TextChannel
     ):
-        view = await menu.get_view()
+        view = menu.get_view()
         embed = menu.get_description_embed(ctx)
         message = await channel.send(embed=embed, view=view)
         await menu.new_interface(message)
