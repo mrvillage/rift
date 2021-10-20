@@ -94,26 +94,43 @@ class Menu(Makeable):
         return self
 
     async def save(self) -> None:
-        id = await execute_read_query(
-            """
-        INSERT INTO menus (guild_id, name, description, items, permissions) VALUES ($1, $2, $3, $4, $5) RETURNING id;
-        """,
-            self.guild_id,
-            self.name,
-            self.description,
-            [[i.id for i in row] for row in self.items]
-            if self.items
-            else [
-                [],
-                [],
-                [],
-                [],
-                [],
-            ],
-            self.permissions or None,
-        )
-        self.id = id[0]["id"]
-        cache.add_menu(self)
+        if self.id is None:
+            id = await execute_read_query(
+                "INSERT INTO menus (guild_id, name, description, items, permissions) VALUES ($1, $2, $3, $4, $5) RETURNING id;",
+                self.guild_id,
+                self.name,
+                self.description,
+                [[i.id for i in row] for row in self.items]
+                if self.items
+                else [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                ],
+                self.permissions or None,
+            )
+            self.id = id[0]["id"]
+            cache.add_menu(self)
+        else:
+            await execute_query(
+                "UPDATE menus SET id = $1, guild_id = $2, name = $3, description = $4, item_ids = $5, permissions = $6;",
+                self.id,
+                self.guild_id,
+                self.name,
+                self.description,
+                [[i.id for i in row] for row in self.items]
+                if self.items
+                else [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                ],
+                self.permissions or None,
+            )
 
     def add_item(self, item: MenuItem, row: int) -> None:
         self.items[row].append(item)
