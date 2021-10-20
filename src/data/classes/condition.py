@@ -202,11 +202,11 @@ class Condition:
             return attr == value
         elif operator == "!=":
             return attr != value
-        elif operator == ">":
+        elif operator == ">>":
             return attr > value
         elif operator == ">=":
             return attr >= value
-        elif operator == "<":
+        elif operator == "<<":
             return attr < value
         elif operator == "<=":
             return attr <= value
