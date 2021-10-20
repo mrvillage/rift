@@ -10,6 +10,7 @@ from ... import funcs
 from ...cache import cache
 from ...checks import has_manage_permissions
 from ...data.classes import Menu, MenuItem
+from ...errors import MenuItemNotFoundError
 from ...flags import ButtonFlags, SelectFlags, SelectOptionFlags
 from ...ref import Rift, RiftContext
 
@@ -121,7 +122,7 @@ class Menus(commands.Cog):
                             if item.guild_id == ctx.author.id:
                                 menu.add_item(item, row)
                                 continue
-                        except IndexError:
+                        except MenuItemNotFoundError:
                             pass
                     if not MenuItem.validate_flags(flags):
                         await ctx.reply(
