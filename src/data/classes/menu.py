@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Union
 
 import discord
 from discord.ext import commands
@@ -30,7 +30,7 @@ class Menu(Makeable):
     id: int
     name: Optional[str]
     description: Optional[str]
-    item_ids: Sequence[Sequence[int]]
+    item_ids: List[List[int]]
     permissions: Mapping[str, Any]
 
     __slots__ = (
@@ -133,7 +133,7 @@ class Menu(Makeable):
             )
 
     def add_item(self, item: MenuItem, row: int) -> None:
-        self.items[row].append(item)
+        self.item_ids[row].append(item.id)
 
     def remove_item(self, item_id: str) -> None:
         for i in self.items:
@@ -383,7 +383,7 @@ class MenuItem:
 
     def __str__(self) -> str:
         if self.type == "button":
-            return f"ID: {self.id} - Type: {self.type} - Style: {self.data.get('style', 'blurple').capitalize()} - Label: {self.data.get('label', None)} - Disabled: {self.data.get('disabled', False)} - URL: {self.data.get('url', None)} - Emoji: {self.data.get('emoji', None)} - Row: {self.data.get('row', None)} - Action: {self.data.get('action', None)}"
+            return f"ID: {self.id} - Type: {self.type} - Style: {self.data.get('style', 'blurple').capitalize()} - Label: {self.data.get('label', None)} - Disabled: {self.data.get('disabled', False)} - URL: {self.data.get('url', None)} - Emoji: {self.data.get('emoji', None)} - Row: {self.data.get('row', None)} - Action: {self.data.get('action', None)} - Options: {', '.join(str(option) for option in self.data.get('options') or [None])}"
         if self.type == "select":
             return f"ID: {self.id} - Type: {self.type} - Placeholder: {self.data.get('placeholder', None)} - Min Values: {self.data.get('min_values', 1)} - Max Values: {self.data.get('max_values', 1)} - Options: {', '.join(str(option) for option in self.data.get('options', [None]))}"
         return f"ID: {self.id} - Type: {self.type}"
