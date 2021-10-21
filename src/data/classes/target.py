@@ -244,7 +244,7 @@ class Target:
         res_string = "\nResources: "
         return {
             "name": f"{repr(nation)} ({rating:,.2f})",
-            "value": f"Soldiers: {nation.soldiers:,} ({mil['soldiers']:,.2%})\nTanks: {nation.tanks:,} ({mil['tanks']:,.2%})\nAircraft: {nation.aircraft:,} ({mil['aircraft']:,.2%}\nShips: {nation.ships:,} ({mil['ships']:,.2%})\nMissiles: {nation.missiles:,}\nNukes: {nation.nukes}{res_string + str(target.resources) if include_resources else ''}",
+            "value": f"[Nation Page](https://politicsandwar.com/nation/id={nation.id})\nSoldiers: {nation.soldiers:,} ({mil['soldiers']:,.2%})\nTanks: {nation.tanks:,} ({mil['tanks']:,.2%})\nAircraft: {nation.aircraft:,} ({mil['aircraft']:,.2%}\nShips: {nation.ships:,} ({mil['ships']:,.2%})\nMissiles: {nation.missiles:,}\nNukes: {nation.nukes}{res_string + str(target.resources) if include_resources else ''}",
         }
 
 
