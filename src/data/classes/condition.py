@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from typing import TYPE_CHECKING, Any, List, Optional, TypeVar, Union
 
 from ...cache import cache
@@ -248,10 +249,21 @@ class Condition:
         return current
 
     async def evaluate(self, *values: Any) -> List[bool]:
-        return [await self.evaluate_condition(i, self.condition) for i in values]
+        evaluated: List[bool] = []
+        for index, i in enumerate(values):
+            evaluated.append(await self.evaluate_condition(i, self.condition))
+            if index % 100:
+                await asyncio.sleep(0)
+        return evaluated
 
     async def reduce(self, *values: T) -> List[T]:
-        return [i for i in values if await self.evaluate_condition(i, self.condition)]
+        reduced: List[T] = []
+        for index, i in enumerate(values):
+            if await self.evaluate_condition(i, self.condition):
+                reduced.append(i)
+            if index % 100:
+                await asyncio.sleep(0)
+        return reduced
 
     @classmethod
     def union(cls, *conditions: Union[Condition, List[Any]]) -> Condition:
