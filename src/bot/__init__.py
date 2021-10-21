@@ -124,7 +124,7 @@ async def main() -> None:
             cogs = [
                 i.name.replace(".py", "")
                 for i in cogPath.glob("*.py")
-                if i.name not in {"server.py", "database.py"}
+                if i.name not in {"server.py", "documents.py"}
             ]
             for cog in cogs:
                 bot.load_extension(f"src.bot.cogs.{cog}")
