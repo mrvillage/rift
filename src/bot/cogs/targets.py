@@ -253,7 +253,8 @@ class Targets(commands.Cog):
                 ctx.author,
                 fields=fields,
                 color=discord.Color.green(),
-            )
+            ),
+            ephemeral=True,
         )
 
 
