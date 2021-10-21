@@ -206,7 +206,7 @@ class Targets(commands.Cog):
         nation: Optional[Nation] = None,
         evaluate_alliance_default: bool = True,
     ):
-        await ctx.interaction.response.defer()
+        await ctx.interaction.response.defer(ephemeral=True)
         nation = nation or await Nation.convert(ctx, nation)
         if nation.alliance is not None:
             settings = await AllianceSettings.fetch(nation.alliance.id)
