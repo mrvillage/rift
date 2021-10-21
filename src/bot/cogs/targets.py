@@ -240,7 +240,7 @@ class Targets(commands.Cog):
             )
         fields: List[Field] = []
         for target in ratings:
-            if len(fields) >= 25:
+            if len(fields) >= 15:
                 break
             rating = target[0]
             target = target[1]
