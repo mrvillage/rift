@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set
 
+import cachetools
 import discord
 import pnwkit
 
@@ -137,6 +138,7 @@ class Alliance(Makeable):
         return sum(i.score for i in self.members)
 
     @property
+    @cachetools.cached(cache=cachetools.TTLCache(1024, 30))  # type: ignore
     def member_count(self) -> int:
         return len(self.members)
 
