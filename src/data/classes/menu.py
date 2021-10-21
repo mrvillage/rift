@@ -54,10 +54,7 @@ class Menu(Makeable):
     async def convert(cls, ctx: RiftContext, argument: str) -> Menu:
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
-        try:
-            return await cls.fetch(convert_int(argument), ctx.guild.id)
-        except ValueError:
-            raise MenuNotFoundError(argument)
+        return await cls.fetch(convert_int(argument), ctx.guild.id)
 
     @classmethod
     async def fetch(cls, menu_id: int, guild_id: int) -> Menu:
