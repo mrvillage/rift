@@ -15,7 +15,7 @@ class DatabaseCache(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await funcs.fill_database_cache()
-        print("Database cache filled!")
+        print("Database cache filled!", flush=True)
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
