@@ -44,9 +44,8 @@ async def fill_database_cache() -> None:
     user_ids = [i["id"] for i in users]
     for guild in current_guilds:
         if guild["id"] not in guild_ids:
+            await execute_query("DELETE FROM guilds WHERE id = $1;", guild["id"])
             await execute_query(
-                "DELETE FROM guilds WHERE id = $1;",
-                guild["id"],
                 "DELETE FROM members WHERE guild_id = $1;",
                 guild["id"],
             )
