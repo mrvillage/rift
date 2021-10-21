@@ -6,7 +6,7 @@ from ...errors import BoolError, DocumentNotFoundError
 from ...menus import Confirm
 
 
-class Database(commands.Cog):
+class Documents(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -377,4 +377,4 @@ class Database(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Database(bot))
+    bot.add_cog(Documents(bot))
