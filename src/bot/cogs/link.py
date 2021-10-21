@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import discord
 from discord.ext import commands
+from discord.utils import MISSING
 
 from ... import funcs
 from ...data import get
@@ -25,7 +24,7 @@ class Link(commands.Cog):
         },
     )
     async def link(
-        self, ctx: RiftContext, nation: Nation, user: Optional[discord.User] = None
+        self, ctx: RiftContext, nation: Nation, user: discord.User = MISSING
     ):
         member = user or ctx.author
         try:
@@ -89,7 +88,7 @@ class Link(commands.Cog):
         },
     )
     async def verify(
-        self, ctx: RiftContext, nation: Nation, user: Optional[discord.User] = None
+        self, ctx: RiftContext, nation: Nation, user: discord.User = MISSING
     ):
         await ctx.invoke(self.link, nation, user)
 

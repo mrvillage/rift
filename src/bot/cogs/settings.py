@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, List, Literal, Optional
 
 import discord
 from discord.ext import commands
+from discord.utils import MISSING
 
 from src.data.classes.condition import Condition
 from src.views.settings import AlliancePurposeConfirm
@@ -48,7 +49,7 @@ class Settings(commands.Cog):
     async def alliance_settings_default_raid_condition(
         self,
         ctx: RiftContext,
-        condition: Optional[Condition] = None,
+        condition: Condition = MISSING,
         clear: bool = False,
     ):
         nation = await Nation.convert(ctx, None)
@@ -59,7 +60,7 @@ class Settings(commands.Cog):
                 )
             )
         settings = await AllianceSettings.fetch(nation.alliance.id)
-        if condition is None and not clear:
+        if condition is MISSING and not clear:
             if settings.default_raid_condition is None:
                 return await ctx.reply(
                     embed=funcs.get_embed_author_member(
@@ -127,25 +128,23 @@ class Settings(commands.Cog):
         self,
         ctx: RiftContext,
         *,
-        purpose: Optional[
-            Literal[  # type: ignore
-                "ALLIANCE",
-                "ALLIANCE_GOVERNMENT",
-                "ALLIANCE_MILITARY_AFFAIRS",
-                "ALLIANCE_INTERNAL_AFFAIRS",
-                "ALLIANCE_MILITARY_AFFAIRS",
-                "ALLIANCE_FOREIGN_AFFAIRS",
-                "ALLIANCE_ECONOMIC_AFFAIRS",
-                "BUSINESS",
-                "COMMUNITY",
-                "PERSONAL",
-            ]
-        ] = None,
+        purpose: Literal[  # type: ignore
+            "ALLIANCE",
+            "ALLIANCE_GOVERNMENT",
+            "ALLIANCE_MILITARY_AFFAIRS",
+            "ALLIANCE_INTERNAL_AFFAIRS",
+            "ALLIANCE_MILITARY_AFFAIRS",
+            "ALLIANCE_FOREIGN_AFFAIRS",
+            "ALLIANCE_ECONOMIC_AFFAIRS",
+            "BUSINESS",
+            "COMMUNITY",
+            "PERSONAL",
+        ] = MISSING,
     ):  # sourcery no-metrics
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id)
-        if purpose is None:
+        if purpose is MISSING:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -154,7 +153,7 @@ class Settings(commands.Cog):
                 )
             )
         if purpose.lower() == "none":
-            purpose = None
+            purpose = None  # type: ignore
         if not purpose:
             await settings.set_(purpose=purpose, purpose_argument=None)
             return await ctx.reply(
@@ -323,13 +322,12 @@ class Settings(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def server_settings_welcome_message(
-        self, ctx: RiftContext, *, message: str = None  # type: ignore
+        self, ctx: RiftContext, *, message: str = MISSING  # type: ignore
     ):
-        message: Optional[str]
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
-        if message is None:
+        if message is MISSING:
             return await ctx.send(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -340,7 +338,7 @@ class Settings(commands.Cog):
         if message:
             message = message.strip("\n ")
         if message.lower() == "none":
-            message = None
+            message = None  # type: ignore
         await settings.welcome_settings.set_(welcome_message=message)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -363,13 +361,12 @@ class Settings(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def server_settings_verified_nickname(
-        self, ctx: RiftContext, *, nickname: str = None  # type: ignore
+        self, ctx: RiftContext, *, nickname: str = MISSING  # type: ignore
     ):
-        nickname: Optional[str]
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
-        if nickname is None:
+        if nickname is MISSING:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -381,7 +378,7 @@ class Settings(commands.Cog):
         if nickname:
             nickname = nickname.strip("\n ")
         if nickname.lower() == "none":
-            nickname = None
+            nickname = None  # type: ignore
         await settings.welcome_settings.set_(verified_nickname=nickname)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -404,15 +401,18 @@ class Settings(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def server_settings_welcome_channels(
-        self, ctx: RiftContext, *, channels: List[discord.TextChannel] = None, clear: bool = False  # type: ignore
+        self,
+        ctx: RiftContext,
+        *,
+        channels: List[discord.TextChannel] = MISSING,
+        clear: bool = False,
     ):
-        channels: Optional[str]
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
         if TYPE_CHECKING:
             assert settings.welcome_settings is not None
-        if channels is None and not clear:
+        if channels is MISSING and not clear:
             if settings.welcome_settings.welcome_channels:
                 return await ctx.reply(
                     embed=funcs.get_embed_author_member(
@@ -464,14 +464,18 @@ class Settings(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def server_settings_join_roles(
-        self, ctx: RiftContext, *, roles: List[discord.Role] = None, clear: bool = False  # type: ignore
+        self,
+        ctx: RiftContext,
+        *,
+        roles: List[discord.Role] = MISSING,
+        clear: bool = False,
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
         if TYPE_CHECKING:
             assert settings.welcome_settings is not None
-        if roles is None and not clear:
+        if roles is MISSING and not clear:
             if settings.welcome_settings.join_roles:
                 return await ctx.reply(
                     embed=funcs.get_embed_author_member(
@@ -523,12 +527,12 @@ class Settings(commands.Cog):
     @has_manage_permissions(managers=False)
     @commands.guild_only()
     async def server_settings_managers(
-        self, ctx: RiftContext, *, roles: List[discord.Role] = None, clear: bool = False  # type: ignore
+        self, ctx: RiftContext, *, roles: List[discord.Role] = MISSING, clear: bool = False  # type: ignore
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id)
-        if roles is None and not clear:
+        if roles is MISSING and not clear:
             if settings.manager_role_ids:
                 return await ctx.reply(
                     embed=funcs.get_embed_author_member(
@@ -547,7 +551,7 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        roles_set = None if clear else [i.id for i in roles]  # type: ignore
+        roles_set = None if clear else [i.id for i in roles]
         await settings.set_(manager_role_ids=roles_set)
         if roles_set:
             await ctx.reply(

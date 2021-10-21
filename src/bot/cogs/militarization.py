@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import inspect
 from io import BytesIO
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import aiohttp
 import discord
 import pnwkit
 from discord.ext import commands
+from discord.utils import MISSING
 
 from ... import funcs
 from ...data.classes import Alliance, Nation
@@ -27,14 +28,12 @@ class Militarization(commands.Cog):
         type=(commands.CommandType.default, commands.CommandType.chat_input),
         descriptions={"alliance": "The alliance to check the militarization of."},
     )
-    async def militarization(
-        self, ctx: RiftContext, *, alliance: Optional[Alliance] = None
-    ):
+    async def militarization(self, ctx: RiftContext, *, alliance: Alliance = MISSING):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         await ctx.invoke(self.militarization_alliance, alliance=alliance)  # type: ignore
 
     @commands.command(name="militarization-nation", aliases=["mn"], hidden=True)
-    async def mn_shortcut(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
+    async def mn_shortcut(self, ctx: RiftContext, *, nation: Nation = MISSING):
         nation = nation or await Nation.convert(ctx, nation)
         await ctx.invoke(self.militarization_nation, nation=nation)  # type: ignore
 
@@ -46,7 +45,7 @@ class Militarization(commands.Cog):
         descriptions={"alliance": "The alliance to check the militarization of."},
     )
     async def militarization_alliance(
-        self, ctx: RiftContext, *, alliance: Optional[Alliance] = None
+        self, ctx: RiftContext, *, alliance: Alliance = MISSING
     ):
 
         alliance = alliance or await Alliance.convert(ctx, alliance)
@@ -143,7 +142,7 @@ class Militarization(commands.Cog):
         descriptions={"nation": "The nation to check the militarization of."},
     )
     async def militarization_nation(
-        self, ctx: RiftContext, *, nation: Optional[Nation] = None
+        self, ctx: RiftContext, *, nation: Nation = MISSING
     ):
         nation = nation or await Nation.convert(ctx, nation)
         author = nation.user or ctx.author

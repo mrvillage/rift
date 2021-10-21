@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands
+from discord.utils import MISSING
 
 from ... import funcs
 from ...cache import cache
@@ -45,7 +46,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         name="force-link", aliases=["forcelink", "force-verify", "forceverify"]
     )
     async def force_link(
-        self, ctx: RiftContext, nation: Nation, user: Optional[discord.User] = None
+        self, ctx: RiftContext, nation: Nation, user: discord.User = MISSING
     ):
         member = user or ctx.author
         try:

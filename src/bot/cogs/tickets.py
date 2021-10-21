@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING, List, Union
 
 import discord
 from discord.ext import commands
+from discord.utils import MISSING
 
 from ... import funcs
 from ...cache import cache
@@ -30,7 +31,7 @@ class Tickets(commands.Cog):
     async def ticket(self, ctx: RiftContext):
         ...
 
-    @ticket.command(
+    @ticket.command(  # type: ignore
         name="archive",
         brief="Archive a ticket.",
         type=commands.CommandType.chat_input,
@@ -41,7 +42,7 @@ class Tickets(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def ticket_archive(
-        self, ctx: RiftContext, channel: Optional[discord.TextChannel] = None
+        self, ctx: RiftContext, channel: discord.TextChannel = MISSING
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
@@ -79,7 +80,7 @@ class Tickets(commands.Cog):
             ephemeral=True,
         )
 
-    @ticket.group(
+    @ticket.group(  # type: ignore
         name="config",
         brief="A group of commands related to ticket configurations.",
         case_insensitive=True,
@@ -91,7 +92,7 @@ class Tickets(commands.Cog):
     async def ticket_config(self, ctx: RiftContext):
         ...
 
-    @ticket_config.command(
+    @ticket_config.command(  # type: ignore
         name="create",
         brief="Create a new ticket configuration.",
         type=commands.CommandType.chat_input,
@@ -108,8 +109,8 @@ class Tickets(commands.Cog):
         self,
         ctx: RiftContext,
         start: str,
-        category: Optional[discord.CategoryChannel] = None,
-        archive_category: Optional[discord.CategoryChannel] = None,
+        category: discord.CategoryChannel = MISSING,
+        archive_category: discord.CategoryChannel = MISSING,
         mentions: List[Union[discord.Member, discord.User, discord.Role]] = [],
     ):
         if TYPE_CHECKING:
@@ -137,7 +138,7 @@ class Tickets(commands.Cog):
             ephemeral=True,
         )
 
-    @ticket_config.command(
+    @ticket_config.command(  # type: ignore
         name="list",
         brief="List the embassy configurations in the server.",
         type=commands.CommandType.chat_input,

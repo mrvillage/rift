@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands
+from discord.utils import MISSING
 
 from ... import funcs
 from ...cache import cache
@@ -29,7 +30,7 @@ class Embassies(commands.Cog):
     async def embassy(self, ctx: RiftContext):
         ...
 
-    @embassy.group(
+    @embassy.group(  # type: ignore
         name="config",
         brief="A group of commands related to embassy configuration.",
         case_insensitive=True,
@@ -41,7 +42,7 @@ class Embassies(commands.Cog):
     async def embassy_config(self, ctx: RiftContext):
         ...
 
-    @embassy_config.command(
+    @embassy_config.command(  # type: ignore
         name="create",
         brief="Create an embassy configuration.",
         type=commands.CommandType.chat_input,
@@ -56,10 +57,11 @@ class Embassies(commands.Cog):
         self,
         ctx: RiftContext,
         start: str,
-        category: Optional[discord.CategoryChannel] = None,
+        category: discord.CategoryChannel = MISSING,
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
+        category = category or None
         data = {
             "category_id": category and category.id,
             "guild_id": ctx.guild.id,
@@ -78,7 +80,7 @@ class Embassies(commands.Cog):
             ephemeral=True,
         )
 
-    @embassy_config.command(
+    @embassy_config.command(  # type: ignore
         name="list",
         brief="List the embassy configurations in the server.",
         type=commands.CommandType.chat_input,
@@ -109,7 +111,7 @@ class Embassies(commands.Cog):
             )
         )
 
-    @embassy_config.command(
+    @embassy_config.command(  # type: ignore
         name="claim",
         brief="Claim a channel for an alliance in an embassy configuration.",
         type=commands.CommandType.chat_input,
@@ -127,7 +129,7 @@ class Embassies(commands.Cog):
         config: EmbassyConfig,
         *,
         alliance: Alliance,
-        channel: Optional[discord.TextChannel] = None,
+        channel: discord.TextChannel = MISSING,
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild) and isinstance(

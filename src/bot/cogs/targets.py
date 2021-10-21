@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import inspect
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING, List, Union
 
 import discord
 from discord.ext import commands
+from discord.utils import MISSING
 
 from ... import funcs
 from ...cache import cache
@@ -202,8 +203,8 @@ class Targets(commands.Cog):
     async def target_find_raid(
         self,
         ctx: RiftContext,
-        condition: Optional[Condition] = None,
-        nation: Optional[Nation] = None,
+        condition: Condition = MISSING,
+        nation: Nation = MISSING,
         evaluate_alliance_default: bool = True,
     ):
         await ctx.interaction.response.defer(ephemeral=True)
@@ -215,7 +216,7 @@ class Targets(commands.Cog):
                 and settings.default_raid_condition is not None
             ):
                 default_condition = Condition.parse(settings.default_raid_condition)
-                if condition is None:
+                if condition is MISSING:
                     condition = default_condition
                 else:
                     condition = Condition.union(condition, default_condition)
