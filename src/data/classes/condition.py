@@ -169,7 +169,10 @@ class Condition:
     def parse(cls, condition: str, user_id: int = -1, /) -> Condition:
         from ...funcs import parse_condition_string
 
-        return cls.validate_and_create(parse_condition_string(condition), user_id)
+        try:
+            return cls.validate_and_create(parse_condition_string(condition), user_id)
+        except Exception:
+            raise InvalidConditionError(condition)
 
     @staticmethod
     def convert_attribute_value(attributes: List[str], value: Any, /) -> Any:  # type: ignore
