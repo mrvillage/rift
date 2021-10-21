@@ -131,6 +131,7 @@ async def main() -> None:
             if bot.debug:  # type: ignore
                 bot.unload_extension("src.bot.cogs.logs")
                 bot.unload_extension("src.bot.cogs.event_messages")
+                bot.unload_extension("src.bot.cogs.database_cache")
             bot.unload_extension("src.bot.cogs.odds")
             print("Loaded cogs!", flush=True)
 
