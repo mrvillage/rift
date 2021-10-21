@@ -54,6 +54,8 @@ NATION_TYPES: Dict[str, Any] = {
     else x,
     "last_active": lambda x: utils.escape_quoted_string(x),  # type: ignore
     "founded": lambda x: utils.escape_quoted_string(x),  # type: ignore
+    "defensive_wars": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
+    "offensive_wars": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
 }
 
 
