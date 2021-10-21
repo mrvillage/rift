@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Union
 
 import discord
 from discord.ext import commands
+from discord.utils import MISSING
 
 from ... import funcs, perms
 from ...data.classes import Alliance, Nation, Transaction
@@ -25,7 +26,7 @@ class Bank(commands.Cog):
     async def bank(self, ctx: RiftContext):
         ...
 
-    @bank.command(
+    @bank.command(  # type: ignore
         name="transfer",
         aliases=["send"],
         brief="Send money from your alliance bank.",
@@ -231,7 +232,7 @@ class Bank(commands.Cog):
 
         await message.edit(embed=embed)
 
-    @bank.command(
+    @bank.command(  # type: ignore
         name="balance",
         aliases=["bal"],
         brief="Check the balance of an alliance bank.",
@@ -240,9 +241,7 @@ class Bank(commands.Cog):
             "alliance": "The alliance to check the balance of, defaults to your alliance.",
         },
     )
-    async def bank_balance(
-        self, ctx: RiftContext, *, alliance: Optional[Alliance] = None
-    ):
+    async def bank_balance(self, ctx: RiftContext, *, alliance: Alliance = MISSING):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         try:
             viewer = await funcs.search_nation(ctx, str(ctx.author.id))

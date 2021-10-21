@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, List, Optional
 import discord
 import pnwkit
 from discord.ext import commands, tasks
+from discord.utils import MISSING
 
 from ... import funcs
 from ...cache import cache
@@ -103,7 +104,7 @@ class HouseStark(commands.Cog):
         self.star_melting_task.start()
 
     @commands.command(name="mmr", help="Check to see if a nation meets MMR.")
-    async def mmr(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
+    async def mmr(self, ctx: RiftContext, *, nation: Nation = MISSING):
         nation = nation or await Nation.convert(ctx, nation)
         author_nation = await Nation.convert(ctx, None)
         if nation.alliance_id not in {3683, 8139, OFFSHORE_ID}:
@@ -155,7 +156,7 @@ class HouseStark(commands.Cog):
         aliases=["stockpiles"],
         help="Check to see if a nation meets stockpile requirements.",
     )
-    async def stockpile(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
+    async def stockpile(self, ctx: RiftContext, *, nation: Nation = MISSING):
         nation = nation or await Nation.convert(ctx, nation)
         nat = await pnwkit.async_nation_query(
             {"id": nation.id},

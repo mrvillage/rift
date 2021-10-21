@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import time
 from datetime import datetime
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List
 
 import discord
 from discord.ext import commands
+from discord.utils import MISSING
 
 from _typings import Field
 
@@ -40,7 +41,7 @@ class PnWInfo(commands.Cog):
             "nation": "The nation to get information about, defaults to your nation.",
         },
     )
-    async def nation(self, ctx: RiftContext, *, nation: Optional[Nation] = None):
+    async def nation(self, ctx: RiftContext, *, nation: Nation = MISSING):
         nation = nation or await Nation.convert(ctx, nation)
         await ctx.reply(embed=nation.get_info_embed(ctx))
 
@@ -50,7 +51,7 @@ class PnWInfo(commands.Cog):
         type=(commands.CommandType.default, commands.CommandType.chat_input),
     )
     async def me(self, ctx: RiftContext):
-        await ctx.invoke(self.nation, nation=None)
+        await ctx.invoke(self.nation, nation=MISSING)
 
     @commands.command(
         name="alliance",
@@ -62,7 +63,7 @@ class PnWInfo(commands.Cog):
             "alliance": "The alliance to get information about, defaults to your alliance.",
         },
     )
-    async def alliance(self, ctx: RiftContext, *, alliance: Optional[Alliance] = None):
+    async def alliance(self, ctx: RiftContext, *, alliance: Alliance = MISSING):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         await ctx.reply(embed=alliance.get_info_embed(ctx))
 
@@ -75,8 +76,8 @@ class PnWInfo(commands.Cog):
             "search": "The nation or alliance to get information about, defaults to your nation.",
         },
     )
-    async def who(self, ctx: RiftContext, *, search: Optional[str] = None):
-        if search is None:
+    async def who(self, ctx: RiftContext, *, search: str = MISSING):
+        if search is MISSING:
             try:
                 return await ctx.invoke(
                     self.nation,
@@ -115,7 +116,7 @@ class PnWInfo(commands.Cog):
             "nation": "The nation to get information about, defaults to your nationf.",
         },
     )
-    async def members(self, ctx: RiftContext, *, alliance: Optional[Alliance] = None):
+    async def members(self, ctx: RiftContext, *, alliance: Alliance = MISSING):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         await alliance.make_attrs("members")
         full = (
@@ -158,7 +159,7 @@ class PnWInfo(commands.Cog):
             "alliance": "The alliance to get treaties of, defaults to your alliance.",
         },
     )
-    async def treaties(self, ctx: RiftContext, *, alliance: Optional[Alliance] = None):
+    async def treaties(self, ctx: RiftContext, *, alliance: Alliance = MISSING):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         await alliance.make_attrs("treaties")
         await ctx.reply(
@@ -202,11 +203,11 @@ class PnWInfo(commands.Cog):
         self,
         ctx: RiftContext,
         *,
-        search: Optional[str] = None,
+        search: str = MISSING,
         fetch_spies: bool = False,
         alliance: bool = False,
     ):  # sourcery no-metrics
-        if search is None:
+        if search is MISSING:
             search_ = await Nation.convert(ctx, search, False)
         elif alliance:
             search_ = await Alliance.convert(ctx, search)

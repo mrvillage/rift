@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from asyncio import TimeoutError
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List
 
 import discord
 from discord.ext import commands
+from discord.utils import MISSING
 
 from ... import funcs
 from ...cache import cache
@@ -29,7 +30,7 @@ class Menus(commands.Cog):
     )
     @commands.guild_only()
     @has_manage_permissions()
-    async def menu(self, ctx: RiftContext, menu: Optional[Menu] = None):
+    async def menu(self, ctx: RiftContext):
         ...
 
     @menu.command(  # type: ignore
@@ -72,7 +73,7 @@ class Menus(commands.Cog):
     @commands.guild_only()
     @has_manage_permissions()
     async def menu_create(
-        self, ctx: RiftContext, *, description: Optional[str] = None
+        self, ctx: RiftContext, *, description: str = MISSING
     ):  # sourcery no-metrics
         message: discord.Message
         if TYPE_CHECKING:
@@ -272,7 +273,7 @@ class Menus(commands.Cog):
     @commands.guild_only()
     @has_manage_permissions()
     async def menu_edit(
-        self, ctx: RiftContext, menu: Menu, description: Optional[str] = None
+        self, ctx: RiftContext, menu: Menu, description: str = MISSING
     ):  # sourcery no-metrics
         message: discord.Message
         if TYPE_CHECKING:

@@ -3,12 +3,13 @@ from __future__ import annotations
 import sys
 import traceback
 from asyncio import sleep
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List
 
 import aiohttp
 import discord
 from discord.backoff import ExponentialBackoff
 from discord.ext import commands
+from discord.utils import MISSING
 
 from src.data.classes.forum import Forum
 
@@ -66,13 +67,13 @@ class Events(commands.Cog):
     ):
         ...
 
-    @subscribe.group(name="nation", type=commands.CommandType.chat_input)
+    @subscribe.group(name="nation", type=commands.CommandType.chat_input)  # type: ignore
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_nation(self, ctx: RiftContext):
         ...
 
-    @subscribe_nation.command(
+    @subscribe_nation.command(  # type: ignore
         name="create",
         brief="Subscribe to NATION_CREATE events in this channel.",
         type=commands.CommandType.chat_input,
@@ -93,7 +94,7 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
-    @subscribe_nation.command(
+    @subscribe_nation.command(  # type: ignore
         name="delete",
         brief="Subscribe to NATION_DELETE events in this channel.",
         type=commands.CommandType.chat_input,
@@ -114,7 +115,7 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
-    @subscribe_nation.command(
+    @subscribe_nation.command(  # type: ignore
         name="update",
         brief="Subscribe to NATION_UPDATE events in this channel.",
         type=commands.CommandType.chat_input,
@@ -166,13 +167,13 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
-    @subscribe.group(name="alliance", type=commands.CommandType.chat_input)
+    @subscribe.group(name="alliance", type=commands.CommandType.chat_input)  # type: ignore
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_alliance(self, ctx: RiftContext):
         ...
 
-    @subscribe_alliance.command(
+    @subscribe_alliance.command(  # type: ignore
         name="create",
         brief="Subscribe to ALLIANCE_CREATE events in this channel.",
         type=commands.CommandType.chat_input,
@@ -193,7 +194,7 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
-    @subscribe_alliance.command(
+    @subscribe_alliance.command(  # type: ignore
         name="delete",
         brief="Subscribe to ALLIANCE_DELETE events in this channel.",
         type=commands.CommandType.chat_input,
@@ -214,13 +215,13 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
-    @subscribe.group(name="treaty", type=commands.CommandType.chat_input)
+    @subscribe.group(name="treaty", type=commands.CommandType.chat_input)  # type: ignore
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_treaty(self, ctx: RiftContext):
         ...
 
-    @subscribe_treaty.command(
+    @subscribe_treaty.command(  # type: ignore
         name="create",
         brief="Subscribe to TREATY_CREATE events in this channel.",
         type=commands.CommandType.chat_input,
@@ -241,7 +242,7 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
-    @subscribe_treaty.command(
+    @subscribe_treaty.command(  # type: ignore
         name="delete",
         brief="Subscribe to TREATY_DELETE events in this channel.",
         type=commands.CommandType.chat_input,
@@ -262,13 +263,13 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
-    @subscribe.group(name="forum_post", type=commands.CommandType.chat_input)
+    @subscribe.group(name="forum_post", type=commands.CommandType.chat_input)  # type: ignore
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_forum_post(self, ctx: RiftContext):
         ...
 
-    @subscribe_forum_post.command(
+    @subscribe_forum_post.command(  # type: ignore
         name="create",
         brief="Subscribe to FORUM_POST_CREATE events in this channel.",
         type=commands.CommandType.chat_input,
@@ -310,13 +311,13 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
-    @subscribe.group(name="war", type=commands.CommandType.chat_input)
+    @subscribe.group(name="war", type=commands.CommandType.chat_input)  # type: ignore
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_war(self, ctx: RiftContext):
         ...
 
-    @subscribe_war.command(
+    @subscribe_war.command(  # type: ignore
         name="create",
         brief="Subscribe to WAR_CREATE events in this channel.",
         type=commands.CommandType.chat_input,
@@ -343,7 +344,7 @@ class Events(commands.Cog):
     async def subscription(self, ctx: RiftContext):
         ...
 
-    @subscription.command(
+    @subscription.command(  # type: ignore
         name="list",
         brief="List the subscriptions for this server or a channel.",
         type=commands.CommandType.chat_input,
@@ -354,11 +355,11 @@ class Events(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def subscription_list(
-        self, ctx: RiftContext, channel: Optional[discord.TextChannel] = None
+        self, ctx: RiftContext, channel: discord.TextChannel = MISSING
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
-        if channel is None:
+        if channel is MISSING:
             subscriptions = [
                 i for i in cache.subscriptions if i.guild_id == ctx.guild.id
             ]
@@ -376,7 +377,7 @@ class Events(commands.Cog):
                 i for i in cache.subscriptions if i.channel_id == channel.id
             ]
         if not subscriptions:
-            if channel is None:
+            if channel is MISSING:
                 return await ctx.reply(
                     embed=funcs.get_embed_author_member(
                         ctx.author,
@@ -393,7 +394,7 @@ class Events(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        if channel is None:
+        if channel is MISSING:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -414,7 +415,7 @@ class Events(commands.Cog):
             )
         )
 
-    @subscription.command(
+    @subscription.command(  # type: ignore
         name="info",
         brief="Get info on a subscription.",
         type=commands.CommandType.chat_input,
@@ -431,7 +432,7 @@ class Events(commands.Cog):
             )
         )
 
-    @subscription.command(
+    @subscription.command(  # type: ignore
         name="delete",
         brief="Delete a subscription.",
         type=commands.CommandType.chat_input,

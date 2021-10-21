@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import discord
 from discord.ext import commands
+from discord.utils import MISSING
 
 from ... import funcs
 from ...data.classes import Nation
@@ -30,11 +29,11 @@ class Odds(commands.Cog):
     async def odds_spies(
         self,
         ctx: RiftContext,
-        attacker: Optional[Nation] = None,
-        defender: Optional[Nation] = None,
+        attacker: Nation = MISSING,
+        defender: Nation = MISSING,
     ):
         await ctx.response.defer()  # type: ignore
-        if attacker is None and defender is None:
+        if attacker is MISSING and defender is MISSING:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,

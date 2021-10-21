@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import discord
 from discord.ext import commands
+from discord.utils import MISSING
 
 from src.errors.invalid import InvalidConditionError
 
@@ -30,7 +29,7 @@ class Conditions(commands.Cog):
         name="add", brief="Add a condition.", type=commands.CommandType.chat_input
     )
     async def condition_add(
-        self, ctx: RiftContext, condition: Condition, name: Optional[str] = None
+        self, ctx: RiftContext, condition: Condition, name: str = MISSING
     ):
         condition.name = name
         view = Confirm(timeout=3)

@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import discord
 import pnwkit
 from discord.ext import commands
+from discord.utils import MISSING
 
 from src.data.classes.alliance import Alliance
 
@@ -178,7 +177,7 @@ class Tools(commands.Cog):
         self,
         ctx: RiftContext,
         after: float,
-        nation: Optional[Nation] = None,
+        nation: Nation = MISSING,
         only_buy: bool = False,
     ):
         nation = nation or await Nation.convert(ctx, nation)
@@ -228,7 +227,7 @@ class Tools(commands.Cog):
         self,
         ctx: RiftContext,
         after: float,
-        nation: Optional[Nation] = None,
+        nation: Nation = MISSING,
         only_buy: bool = False,
     ):
         nation = nation or await Nation.convert(ctx, nation)
@@ -277,7 +276,7 @@ class Tools(commands.Cog):
         self,
         ctx: RiftContext,
         after: int,
-        nation: Optional[Nation] = None,
+        nation: Nation = MISSING,
     ):
         nation = nation or await Nation.convert(ctx, nation)
         raw_cost = cost = funcs.calculate_city_value(nation.cities, after)
@@ -318,7 +317,7 @@ class Tools(commands.Cog):
         self,
         ctx: RiftContext,
         after: float,
-        alliance: Optional[Alliance] = None,
+        alliance: Alliance = MISSING,
         only_buy: bool = False,
     ):
         alliance = alliance or await Alliance.convert(ctx, alliance)
@@ -377,7 +376,7 @@ class Tools(commands.Cog):
         self,
         ctx: RiftContext,
         after: float,
-        alliance: Optional[Alliance] = None,
+        alliance: Alliance = MISSING,
         only_buy: bool = False,
     ):
         alliance = alliance or await Alliance.convert(ctx, alliance)
@@ -435,7 +434,7 @@ class Tools(commands.Cog):
         self,
         ctx: RiftContext,
         after: int,
-        alliance: Optional[Alliance] = None,
+        alliance: Alliance = MISSING,
     ):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         await ctx.interaction.response.defer()
