@@ -9,6 +9,8 @@ from discord.ext import commands
 from ..data.classes import Alliance, Nation
 from ..errors import (
     AllianceNotFoundError,
+    EmbassyConfigNotFoundError,
+    EmbassyNotFoundError,
     InvalidConditionError,
     MenuItemNotFoundError,
     MenuNotFoundError,
@@ -16,6 +18,8 @@ from ..errors import (
     NationOrAllianceNotFoundError,
     SubscriptionNotFoundError,
     TargetNotFoundError,
+    TicketConfigNotFoundError,
+    TicketNotFoundError,
 )
 from ..ref import RiftContext
 from .embeds import get_embed_author_member
@@ -190,6 +194,42 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 embed=get_embed_author_member(
                     ctx.author,
                     f"No subscription found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif isinstance(error, TicketNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No ticket found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif isinstance(error, TicketConfigNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No ticket config found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif isinstance(error, EmbassyNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No embassy found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif isinstance(error, EmbassyConfigNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No embassy config found with argument `{error.args[0]}`.",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
