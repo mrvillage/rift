@@ -23,8 +23,8 @@ class DatabaseCache(commands.Cog):
             "INSERT INTO guilds (id, name, icon_url, owner_id) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET name = $2, icon_url = $3, owner_id = $4 WHERE guilds.id = $1;",
             guild.id,
             guild.name,
-            guild.owner_id,
             guild.icon and guild.icon.url,
+            guild.owner_id,
         )
         if not guild.chunked:
             await guild.chunk()
