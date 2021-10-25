@@ -36,36 +36,36 @@ async def fill_database_cache() -> None:
         }
         for i in bot.users
     ]
-    current_guilds = await execute_read_query("SELECT * FROM guilds;")
-    current_members = await execute_read_query("SELECT * FROM members;")
-    current_users = await execute_read_query("SELECT * FROM users;")
+    current_guilds = await execute_read_query("SELECT * FROM cache_guilds;")
+    current_members = await execute_read_query("SELECT * FROM cache_members;")
+    current_users = await execute_read_query("SELECT * FROM cache_users;")
     guild_ids = [i["id"] for i in guilds]
     member_ids = [(i["id"], i["guild_id"]) for i in members]
     user_ids = [i["id"] for i in users]
     for guild in current_guilds:
         if guild["id"] not in guild_ids:
-            await execute_query("DELETE FROM guilds WHERE id = $1;", guild["id"])
+            await execute_query("DELETE FROM cache_guilds WHERE id = $1;", guild["id"])
             await execute_query(
-                "DELETE FROM members WHERE guild_id = $1;",
+                "DELETE FROM cache_members WHERE guild_id = $1;",
                 guild["id"],
             )
     for member in current_members:
         if (member["id"], member["guild_id"]) not in member_ids:
             await execute_query(
-                "DELETE FROM members WHERE id = $1 AND guild_id = $2;",
+                "DELETE FROM cache_members WHERE id = $1 AND guild_id = $2;",
                 member["id"],
                 member["guild_id"],
             )
     for user in current_users:
         if user["id"] not in user_ids:
             await execute_query(
-                "DELETE FROM users WHERE id = $1;",
+                "DELETE FROM cache_users WHERE id = $1;",
                 user["id"],
             )
     queries = [
-        "INSERT INTO guilds (id, name, icon_url, owner_id) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET name = $2, icon_url = $3, owner_id = $4 WHERE guilds.id = $1;",
-        "INSERT INTO members (id, guild_id, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild_id) DO UPDATE SET permissions = $3 WHERE members.id = $1 AND members.guild_id = $2;",
-        "INSERT INTO users (id, name, discriminator, bot, display_avatar) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET name = $2, discriminator = $3, display_avatar = $5 WHERE users.id = $1;",
+        "INSERT INTO cache_guilds (id, name, icon_url, owner_id) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET name = $2, icon_url = $3, owner_id = $4 WHERE cache_guilds.id = $1;",
+        "INSERT INTO cache_members (id, guild_id, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild_id) DO UPDATE SET permissions = $3 WHERE members.id = $1 AND cache_members.guild_id = $2;",
+        "INSERT INTO cache_users (id, name, discriminator, bot, display_avatar) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET name = $2, discriminator = $3, display_avatar = $5 WHERE cache_users.id = $1;",
     ]
     await asyncio.gather(
         *[
