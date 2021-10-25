@@ -63,7 +63,7 @@ class Embassies(commands.Cog):
             assert isinstance(ctx.guild, discord.Guild)
         category = category or None
         data = {
-            "category_id": category and category.id,
+            "category_id": category.id if category else None,
             "guild_id": ctx.guild.id,
             "start_message": start,
         }

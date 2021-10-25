@@ -116,7 +116,7 @@ class Tickets(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         data = {
-            "category_id": category and category.id,
+            "category_id": category.id if category else None,
             "guild_id": ctx.guild.id,
             "start_message": start,
             "archive_category_id": archive_category and archive_category.id,
