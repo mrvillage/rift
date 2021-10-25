@@ -7,6 +7,7 @@ import aiohttp
 import discord
 import pnwkit
 from bs4 import BeautifulSoup
+from discord.utils import MISSING
 
 from ...cache import cache
 from ...data.db import execute_read_query
@@ -521,7 +522,7 @@ class Nation(Makeable):
 
     async def find_targets(
         self,
-        condition: Optional[Condition] = None,
+        condition: Condition = MISSING,
         wars: Optional[List[War]] = None,
         attacks: Optional[List[Attack]] = None,
         /,
@@ -532,7 +533,7 @@ class Nation(Makeable):
         from .war import Attack, War
 
         valid = [i for i in cache.nations if self.check_war_range(i) and i is not self]
-        if condition is not None:
+        if condition is not MISSING:
             valid = await condition.reduce(*valid)
         dt = datetime.datetime.utcnow()
         revenue_valid = [
