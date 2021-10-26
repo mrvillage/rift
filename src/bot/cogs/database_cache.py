@@ -54,7 +54,7 @@ class DatabaseCache(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         await execute_query(
-            "INSERT INTO cache_members (id, guild_id, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild_id) DO UPDATE SET permissions = $3 WHERE members.id = $1 AND cache_members.guild_id = $2;",
+            "INSERT INTO cache_members (id, guild_id, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild_id) DO UPDATE SET permissions = $3 WHERE cache_members.id = $1 AND cache_members.guild_id = $2;",
             member.id,
             member.guild.id,
             member.guild_permissions.value,
@@ -81,7 +81,7 @@ class DatabaseCache(commands.Cog):
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         if before.guild_permissions.value != after.guild_permissions.value:
             await execute_query(
-                "INSERT INTO cache_members (id, guild_id, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild_id) DO UPDATE SET permissions = $3 WHERE members.id = $1 AND cache_members.guild_id = $2;",
+                "INSERT INTO cache_members (id, guild_id, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild_id) DO UPDATE SET permissions = $3 WHERE cache_members.id = $1 AND cache_members.guild_id = $2;",
                 after.id,
                 after.guild.id,
                 after.guild_permissions.value,
