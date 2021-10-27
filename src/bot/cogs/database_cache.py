@@ -34,7 +34,7 @@ class DatabaseCache(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
         await execute_query("DELETE FROM cache_guilds WHERE id = $1;", guild.id)
-        await execute_query("DELETE FROM cache_members WHERE guild_id = $1;", guild.id)
+        await execute_query("DELETE FROM cache_members WHERE guild = $1;", guild.id)
 
     @commands.Cog.listener()
     async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
@@ -54,7 +54,7 @@ class DatabaseCache(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         await execute_query(
-            "INSERT INTO cache_members (id, guild_id, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild_id) DO UPDATE SET permissions = $3 WHERE cache_members.id = $1 AND cache_members.guild_id = $2;",
+            "INSERT INTO cache_members (id, guild, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild) DO UPDATE SET permissions = $3 WHERE cache_members.id = $1 AND cache_members.guild = $2;",
             member.id,
             member.guild.id,
             member.guild_permissions.value,
@@ -72,7 +72,7 @@ class DatabaseCache(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
         await execute_query(
-            "DELETE FROM cache_members WHERE id = $1 AND guild_id = $2;",
+            "DELETE FROM cache_members WHERE id = $1 AND guild = $2;",
             member.id,
             member.guild.id,
         )
@@ -81,7 +81,7 @@ class DatabaseCache(commands.Cog):
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         if before.guild_permissions.value != after.guild_permissions.value:
             await execute_query(
-                "INSERT INTO cache_members (id, guild_id, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild_id) DO UPDATE SET permissions = $3 WHERE cache_members.id = $1 AND cache_members.guild_id = $2;",
+                "INSERT INTO cache_members (id, guild, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild) DO UPDATE SET permissions = $3 WHERE cache_members.id = $1 AND cache_members.guild = $2;",
                 after.id,
                 after.guild.id,
                 after.guild_permissions.value,
