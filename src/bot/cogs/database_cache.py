@@ -61,7 +61,7 @@ class DatabaseCache(commands.Cog):
         )
         user = member._user  # type: ignore
         await execute_query(
-            "INSERT INTO cache_users (id, name, discriminator, bot, display_avatar) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET name = $2, discriminator = $3, display_avatar = $5 WHERE cache_users.id = $1;",
+            "INSERT INTO cache_users (id, name, discriminator, bot, display_avatar_url) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET name = $2, discriminator = $3, display_avatar_url = $5 WHERE cache_users.id = $1;",
             user.id,
             user.name,
             int(user.discriminator),
@@ -96,7 +96,7 @@ class DatabaseCache(commands.Cog):
             or before.display_avatar != after.display_avatar
         ):
             await execute_query(
-                "INSERT INTO cache_users (id, name, discriminator, display_avatar) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET name = $2, discriminator = $3, display_avatar = $4 WHERE cache_users.id = $1;",
+                "INSERT INTO cache_users (id, name, discriminator, display_avatar_url) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET name = $2, discriminator = $3, display_avatar_url = $4 WHERE cache_users.id = $1;",
                 after.id,
                 after.name,
                 int(after.discriminator),
