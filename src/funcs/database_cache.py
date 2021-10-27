@@ -64,7 +64,7 @@ async def fill_database_cache() -> None:
             )
     queries = [
         "INSERT INTO cache_guilds (id, name, icon_url, owner_id) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET name = $2, icon_url = $3, owner_id = $4 WHERE cache_guilds.id = $1;",
-        "INSERT INTO cache_members (id, guild_id, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild_id) DO UPDATE SET permissions = $3 WHERE members.id = $1 AND cache_members.guild_id = $2;",
+        "INSERT INTO cache_members (id, guild_id, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild_id) DO UPDATE SET permissions = $3 WHERE cache_members.id = $1 AND cache_members.guild_id = $2;",
         "INSERT INTO cache_users (id, name, discriminator, bot, display_avatar) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET name = $2, discriminator = $3, display_avatar = $5 WHERE cache_users.id = $1;",
     ]
     await asyncio.gather(
