@@ -14,10 +14,10 @@ __all__ = (
 )
 
 if TYPE_CHECKING:
-    from _typings import LinkData
+    from _typings import UserData
 
 
-async def query_links() -> List[LinkData]:
+async def query_links() -> List[UserData]:
     return await execute_read_query("SELECT * FROM links;")
 
 
@@ -40,11 +40,11 @@ async def remove_link_nation(nation_id: int, /) -> None:
     await execute_query("DELETE FROM links WHERE nation_id = $1;", nation_id)
 
 
-async def query_link_user(user_id: int, /) -> List[LinkData]:
+async def query_link_user(user_id: int, /) -> List[UserData]:
     return await execute_read_query("SELECT * FROM links WHERE user_id = $1;", user_id)
 
 
-async def query_link_nation(nation_id: int, /) -> List[LinkData]:
+async def query_link_nation(nation_id: int, /) -> List[UserData]:
     return await execute_read_query(
         "SELECT * FROM links WHERE nation_id = $1;", nation_id
     )

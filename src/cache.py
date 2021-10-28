@@ -20,7 +20,6 @@ if TYPE_CHECKING:
         ForumData,
         GuildSettingsData,
         GuildWelcomeSettingsData,
-        LinkData,
         MenuData,
         MenuInterfaceData,
         MenuItemData,
@@ -34,6 +33,7 @@ if TYPE_CHECKING:
         TicketData,
         TradePriceData,
         TreatyData,
+        UserData,
     )
 
     from .data.classes import (
@@ -85,7 +85,7 @@ class Cache:
         "_forums",
         "_guild_settings",
         "_guild_welcome_settings",
-        "_links",
+        "_users",
         "_menu_interfaces",
         "_menu_items",
         "_menus",
@@ -117,7 +117,7 @@ class Cache:
         self._forums: Dict[int, Forum] = {}
         self._guild_settings: Dict[int, GuildSettings] = {}
         self._guild_welcome_settings: Dict[int, GuildWelcomeSettings] = {}
-        self._links: List[LinkData] = list()
+        self._users: List[UserData] = list()
         self._menu_interfaces: List[MenuInterfaceData] = list()
         self._menu_items: Dict[int, MenuItem] = {}
         self._menus: Dict[int, Menu] = {}
@@ -173,7 +173,6 @@ class Cache:
             "SELECT * FROM forums;",
             "SELECT * FROM guild_settings;",
             "SELECT * FROM guild_welcome_settings;",
-            "SELECT * FROM links;",
             "SELECT * FROM menu_interfaces;",
             "SELECT * FROM menu_items;",
             "SELECT * FROM menus;",
@@ -186,6 +185,7 @@ class Cache:
             "SELECT * FROM tickets;",
             "SELECT * FROM treasures ORDER BY datetime DESC LIMIT 1;",
             "SELECT * FROM treaties;",
+            "SELECT * FROM users;",
         ]
         data: Tuple[  # type: ignore
             List[AllianceData],
@@ -198,7 +198,6 @@ class Cache:
             List[ForumData],
             List[GuildSettingsData],
             List[GuildWelcomeSettingsData],
-            List[LinkData],
             List[MenuInterfaceData],
             List[MenuItemData],
             List[MenuData],
@@ -211,6 +210,7 @@ class Cache:
             List[TicketData],
             List[RawTreasureData],
             List[TreatyData],
+            List[UserData],
         ] = tuple(  # type: ignore
             await asyncio.gather(*(execute_read_query(query) for query in queries))  # type: ignore
         )
@@ -225,7 +225,6 @@ class Cache:
             forums,
             guild_settings,
             guild_welcome_settings,
-            links,
             menu_interfaces,
             menu_items,
             menus,
@@ -238,6 +237,7 @@ class Cache:
             tickets,
             treasures,
             treaties,
+            users,
         ) = data
         for i in alliances:
             i = Alliance(i)
@@ -269,8 +269,6 @@ class Cache:
         for i in guild_welcome_settings:
             i = GuildWelcomeSettings(i)
             self._guild_welcome_settings[i.guild_id] = i
-        for i in links:
-            self._links.append(dict(i))  # type: ignore
         for i in menu_interfaces:
             self._menu_interfaces.append(dict(i))  # type: ignore
         for i in menu_items:
@@ -323,6 +321,8 @@ class Cache:
             )
             if i.stopped is None:
                 self._treaties.add(i)
+        for i in users:
+            self._users.append(dict(i))  # type: ignore
         self.init = True
 
     @property
@@ -360,10 +360,6 @@ class Cache:
     @property
     def guild_welcome_settings(self) -> Set[GuildWelcomeSettings]:
         return set(self._guild_welcome_settings.values())
-
-    @property
-    def links(self) -> List[LinkData]:
-        return self._links
 
     @property
     def menu_interfaces(self) -> List[MenuInterfaceData]:
@@ -412,6 +408,10 @@ class Cache:
     @property
     def treaties(self) -> Set[Treaty]:
         return self._treaties
+
+    @property
+    def users(self) -> List[UserData]:
+        return self._users
 
     @property
     def user_settings(self) -> Set[UserSettings]:
@@ -523,14 +523,6 @@ class Cache:
     def get_guild_welcome_settings(self, id: int, /) -> Optional[GuildWelcomeSettings]:
         return self._guild_welcome_settings.get(id)
 
-    def get_link(self, id: int, /) -> Optional[LinkData]:
-        try:
-            return next(
-                i for i in self._links if i["user_id"] == id or i["nation_id"] == id
-            )
-        except StopIteration:
-            return
-
     def get_menu_interface(
         self, menu_id: int, message_id: int, /
     ) -> Optional[MenuInterfaceData]:
@@ -584,6 +576,14 @@ class Cache:
                 if i.from_.id == from_
                 and i.to_.id == to_
                 and i.treaty_type == treaty_type
+            )
+        except StopIteration:
+            return
+
+    def get_user(self, id: int, /) -> Optional[UserData]:
+        try:
+            return next(
+                i for i in self._users if i["user_id"] == id or i["nation_id"] == id
             )
         except StopIteration:
             return

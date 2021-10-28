@@ -3,6 +3,6 @@ from __future__ import annotations
 from typing import TypedDict
 
 
-class LinkData(TypedDict):
+class UserData(TypedDict):
     user_id: int
     nation_id: int

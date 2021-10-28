@@ -153,7 +153,7 @@ class Nation(Makeable):
 
     @property
     def user(self) -> Optional[discord.User]:
-        link = cache.get_link(self.id)
+        link = cache.get_user(self.id)
         if link is None:
             return
         return bot.get_user(link["user_id"])

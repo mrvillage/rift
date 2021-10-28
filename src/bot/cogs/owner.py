@@ -194,7 +194,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                     {"name": "Guilds", "value": f"{len(self.bot.guilds):,}"},
                     {"name": "Users", "value": f"{len(self.bot.users):,}"},
                     {"name": "Latency", "value": f"{self.bot.latency:,}ms"},
-                    {"name": "Links", "value": f"{len(cache.links):,}"},
+                    {"name": "Links", "value": f"{len(cache.users):,}"},
                     {
                         "name": "Owners",
                         "value": f"{len({i.owner.id for i in self.bot.guilds if i.owner is not None}):,}",
