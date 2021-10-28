@@ -5,7 +5,6 @@ from .color import *
 from .condition import *
 from .embassy import *
 from .forum import *
-from .link import *
 from .menu import *
 from .nation import *
 from .prices import *
@@ -15,4 +14,5 @@ from .target import *
 from .ticket import *
 from .treasure import *
 from .treaty import *
+from .user import *
 from .war import *
