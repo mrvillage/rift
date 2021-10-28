@@ -18,12 +18,12 @@ if TYPE_CHECKING:
 
 
 async def query_links() -> List[UserData]:
-    return await execute_read_query("SELECT * FROM links;")
+    return await execute_read_query("SELECT * FROM users;")
 
 
 async def add_link(user_id: int, nation_id: int, /) -> None:
     await execute_query(
-        "INSERT INTO links VALUES ($1, $2);",
+        "INSERT INTO users (user_id, nation_id) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET nation_id = $2 WHERE users.user_id = $1;",
         user_id,
         nation_id,
     )
@@ -31,20 +31,23 @@ async def add_link(user_id: int, nation_id: int, /) -> None:
 
 async def remove_link_user(user_id: int, /) -> None:
     await execute_query(
-        "DELETE FROM links WHERE user_id = $1;",
+        "UPDATE users SET nation_id = $1 WHERE user_id = $2;",
+        None,
         user_id,
     )
 
 
 async def remove_link_nation(nation_id: int, /) -> None:
-    await execute_query("DELETE FROM links WHERE nation_id = $1;", nation_id)
+    await execute_query(
+        "UPDATE users SET nation_id = $1 WHERE nation_id = $2;", None, nation_id
+    )
 
 
 async def query_link_user(user_id: int, /) -> List[UserData]:
-    return await execute_read_query("SELECT * FROM links WHERE user_id = $1;", user_id)
+    return await execute_read_query("SELECT * FROM users WHERE user_id = $1;", user_id)
 
 
 async def query_link_nation(nation_id: int, /) -> List[UserData]:
     return await execute_read_query(
-        "SELECT * FROM links WHERE nation_id = $1;", nation_id
+        "SELECT * FROM users WHERE nation_id = $1;", nation_id
     )
