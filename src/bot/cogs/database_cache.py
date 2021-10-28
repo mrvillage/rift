@@ -53,12 +53,6 @@ class DatabaseCache(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        await execute_query(
-            "INSERT INTO cache_members (id, guild, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild) DO UPDATE SET permissions = $3 WHERE cache_members.id = $1 AND cache_members.guild = $2;",
-            member.id,
-            member.guild.id,
-            member.guild_permissions.value,
-        )
         user = member._user  # type: ignore
         await execute_query(
             "INSERT INTO cache_users (id, name, discriminator, bot, display_avatar_url) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET name = $2, discriminator = $3, display_avatar_url = $5 WHERE cache_users.id = $1;",
@@ -67,6 +61,12 @@ class DatabaseCache(commands.Cog):
             int(user.discriminator),
             user.bot,
             user.display_avatar.url,
+        )
+        await execute_query(
+            "INSERT INTO cache_members (id, guild, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild) DO UPDATE SET permissions = $3 WHERE cache_members.id = $1 AND cache_members.guild = $2;",
+            member.id,
+            member.guild.id,
+            member.guild_permissions.value,
         )
 
     @commands.Cog.listener()
