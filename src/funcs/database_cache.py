@@ -67,15 +67,23 @@ async def fill_database_cache() -> None:
         "INSERT INTO cache_members (id, guild, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild) DO UPDATE SET permissions = $3 WHERE cache_members.id = $1 AND cache_members.guild = $2;",
         "INSERT INTO cache_users (id, name, discriminator, bot, display_avatar_url) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET name = $2, discriminator = $3, display_avatar_url = $5 WHERE cache_users.id = $1;",
     ]
+    current_guilds_dict = {i["id"]: dict(i) for i in current_guilds}
+    current_members_dict = {(i["id"], i["guild"]): dict(i) for i in current_members}
+    current_users_dict = {i["id"]: dict(i) for i in current_users}
+    guilds_purged = [i for i in guilds if i != current_guilds_dict[i["id"]]]
+    members_purged = [
+        i for i in members if i != current_members_dict[(i["id"], i["guild"])]
+    ]
+    users_purged = [i for i in users if i != current_users_dict[i["id"]]]
     await asyncio.gather(
         *[
             execute_query_many(query, data)  # type: ignore
             for query, data in zip(
                 queries,
                 [
-                    [tuple(i.values()) for i in guilds],
-                    [tuple(i.values()) for i in members],
-                    [tuple(i.values()) for i in users],
+                    [tuple(i.values()) for i in guilds_purged],
+                    [tuple(i.values()) for i in members_purged],
+                    [tuple(i.values()) for i in users_purged],
                 ],
             )
         ]
