@@ -58,7 +58,7 @@ class DatabaseCache(commands.Cog):
             "INSERT INTO cache_users (id, name, discriminator, bot, display_avatar_url) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET name = $2, discriminator = $3, display_avatar_url = $5 WHERE cache_users.id = $1;",
             user.id,
             user.name,
-            int(user.discriminator),
+            user.discriminator,
             user.bot,
             user.display_avatar.url,
         )
@@ -99,7 +99,7 @@ class DatabaseCache(commands.Cog):
                 "INSERT INTO cache_users (id, name, discriminator, display_avatar_url) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET name = $2, discriminator = $3, display_avatar_url = $4 WHERE cache_users.id = $1;",
                 after.id,
                 after.name,
-                int(after.discriminator),
+                after.discriminator,
                 after.display_avatar.url,
             )
 
