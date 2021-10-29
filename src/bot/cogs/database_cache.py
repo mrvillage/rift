@@ -14,6 +14,7 @@ class DatabaseCache(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        print("Filling database cache!", flush=True)
         await funcs.fill_database_cache()
         print("Database cache filled!", flush=True)
 
