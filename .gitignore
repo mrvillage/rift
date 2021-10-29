@@ -3,4 +3,4 @@ __pycache__
 .*
 *.log
 *.crt
-*.pem
+private.pem
