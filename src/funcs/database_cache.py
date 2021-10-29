@@ -30,7 +30,7 @@ async def fill_database_cache() -> None:
         {
             "id": i.id,
             "name": i.name,
-            "discriminator": int(i.discriminator),
+            "discriminator": i.discriminator,
             "bot": i.bot,
             "display_avatar_url": i.display_avatar.url,
         }
@@ -43,21 +43,29 @@ async def fill_database_cache() -> None:
     member_ids = [(i["id"], i["guild"]) for i in members]
     user_ids = [i["id"] for i in users]
     for guild in current_guilds:
-        if guild["id"] not in guild_ids:
+        if (
+            guild["id"] not in guild_ids
+            or dict(guild) != guilds[guild_ids.index(guild["id"])]
+        ):
             await execute_query("DELETE FROM cache_guilds WHERE id = $1;", guild["id"])
             await execute_query(
                 "DELETE FROM cache_members WHERE guild = $1;",
                 guild["id"],
             )
     for member in current_members:
-        if (member["id"], member["guild"]) not in member_ids:
+        if (member["id"], member["guild"]) not in member_ids or dict(member) != members[
+            member_ids.index((member["id"]), member["guild"])
+        ]:
             await execute_query(
                 "DELETE FROM cache_members WHERE id = $1 AND guild = $2;",
                 member["id"],
                 member["guild"],
             )
     for user in current_users:
-        if user["id"] not in user_ids:
+        if (
+            user["id"] not in user_ids
+            or dict(user) != users[user_ids.index(user["id"])]
+        ):
             await execute_query(
                 "DELETE FROM cache_users WHERE id = $1;",
                 user["id"],
