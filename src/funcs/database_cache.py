@@ -41,7 +41,6 @@ async def fill_database_cache() -> None:
     current_users = await execute_read_query("SELECT * FROM cache_users;")
     guild_ids = [i["id"] for i in guilds]
     member_ids = [(i["id"], i["guild"]) for i in members]
-    user_ids = [i["id"] for i in users]
     for guild in current_guilds:
         if guild["id"] not in guild_ids:
             await execute_query("DELETE FROM cache_guilds WHERE id = $1;", guild["id"])
@@ -56,12 +55,6 @@ async def fill_database_cache() -> None:
                 member["id"],
                 member["guild"],
             )
-    for user in current_users:
-        if user["id"] not in user_ids:
-            await execute_query(
-                "DELETE FROM cache_users WHERE id = $1;",
-                user["id"],
-            )
     queries = [
         "INSERT INTO cache_guilds (id, name, icon_url, owner_id) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET name = $2, icon_url = $3, owner_id = $4 WHERE cache_guilds.id = $1;",
         "INSERT INTO cache_members (id, guild, permissions) VALUES ($1, $2, $3) ON CONFLICT (id, guild) DO UPDATE SET permissions = $3 WHERE cache_members.id = $1 AND cache_members.guild = $2;",
@@ -70,11 +63,11 @@ async def fill_database_cache() -> None:
     current_guilds_dict = {i["id"]: dict(i) for i in current_guilds}
     current_members_dict = {(i["id"], i["guild"]): dict(i) for i in current_members}
     current_users_dict = {i["id"]: dict(i) for i in current_users}
-    guilds_purged = [i for i in guilds if i != current_guilds_dict[i["id"]]]
+    guilds_purged = [i for i in guilds if i != current_guilds_dict.get(i["id"])]
     members_purged = [
-        i for i in members if i != current_members_dict[(i["id"], i["guild"])]
+        i for i in members if i != current_members_dict.get((i["id"], i["guild"]))
     ]
-    users_purged = [i for i in users if i != current_users_dict[i["id"]]]
+    users_purged = [i for i in users if i != current_users_dict.get(i["id"])]
     await asyncio.gather(
         *[
             execute_query_many(query, data)  # type: ignore
