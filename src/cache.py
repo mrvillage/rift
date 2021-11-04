@@ -639,6 +639,12 @@ class Cache:
     def remove_embassy(self, embassy: Embassy, /) -> None:
         self._embassies.pop(embassy.id)
 
+    def remove_menu_interface(self, message_id: int, /) -> None:
+        for index, i in enumerate(self.menu_interfaces):
+            if i["message_id"] == message_id:
+                self._menu_interfaces.pop(index)
+                break
+
     def remove_subscription(self, subscription: Subscription, /) -> None:
         self._subscriptions.pop(subscription.id)
 
