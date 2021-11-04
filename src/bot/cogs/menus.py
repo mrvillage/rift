@@ -11,6 +11,7 @@ from ... import funcs
 from ...cache import cache
 from ...checks import has_manage_permissions
 from ...data.classes import Menu, MenuItem
+from ...data.query import delete_interface
 from ...errors import MenuItemNotFoundError
 from ...flags import ButtonFlags, SelectFlags, SelectOptionFlags
 from ...ref import Rift, RiftContext
@@ -391,7 +392,10 @@ class Menus(commands.Cog):
                     partial_message = channel.get_partial_message(
                         interface["message_id"]
                     )
-                    await partial_message.edit(embed=embed, view=view)
+                    try:
+                        await partial_message.edit(embed=embed, view=view)
+                    except discord.NotFound:
+                        await delete_interface(menu.id, partial_message)
                 await main_message.reply(  # type: ignore
                     embed=funcs.get_embed_author_member(
                         ctx.author,

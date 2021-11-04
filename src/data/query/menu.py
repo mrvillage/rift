@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Union
 
-from discord import Message
+import discord
 
 from ...cache import cache
 from ..db import execute_query, execute_read_query
@@ -11,6 +11,7 @@ __all__ = (
     "query_menu",
     "query_menu_item",
     "insert_interface",
+    "delete_interface",
     "query_menus",
     "query_menus_guild",
 )
@@ -39,7 +40,7 @@ async def query_menu_item(item_id: int, guild_id: int) -> MenuItemData:
     )[0]
 
 
-async def insert_interface(*, menu_id: int, message: Message) -> None:
+async def insert_interface(menu_id: int, message: discord.Message) -> None:
     await execute_query(
         "INSERT INTO menu_interfaces (menu_id, message_id, channel_id) VALUES ($1, $2, $3);",
         menu_id,
@@ -49,6 +50,18 @@ async def insert_interface(*, menu_id: int, message: Message) -> None:
     cache.add_menu_interface(
         {"menu_id": menu_id, "message_id": message.id, "channel_id": message.channel.id}
     )
+
+
+async def delete_interface(
+    menu_id: int, message: Union[discord.PartialMessage, discord.Message]
+) -> None:
+    await execute_query(
+        "DELETE FROM menu_interfaces WHERE menu_id = $1 AND message_id = $2 AND channel_id = $3;",
+        menu_id,
+        message.id,
+        message.channel.id,
+    )
+    cache.remove_menu_interface(message.id)
 
 
 async def query_menus() -> List[MenuData]:
