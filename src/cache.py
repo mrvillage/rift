@@ -423,7 +423,9 @@ class Cache:
         from .data.classes import Alliance
 
         if action == "delete":
-            del self._alliances[data["id"]]
+            i = self._alliances.get(data["id"])
+            if i:
+                del i
             return
         try:
             self._alliances[data["id"]].update(data)
@@ -436,7 +438,9 @@ class Cache:
         from .data.classes import City
 
         if action == "delete":
-            del self._cities[data["id"]]
+            i = self._cities.get(data["id"])
+            if i:
+                del i
             return
         try:
             self._cities[data["id"]].update(data)
@@ -457,7 +461,9 @@ class Cache:
         from .data.classes import Nation
 
         if action == "delete":
-            del self._nations[data["id"]]
+            i = self._nations.get(data["id"])
+            if i:
+                del i
             return
         try:
             self._nations[data["id"]].update(data)
