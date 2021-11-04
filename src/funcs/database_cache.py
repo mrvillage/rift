@@ -43,11 +43,11 @@ async def fill_database_cache() -> None:
     member_ids = [(i["id"], i["guild"]) for i in members]
     for guild in current_guilds:
         if guild["id"] not in guild_ids:
-            await execute_query("DELETE FROM cache_guilds WHERE id = $1;", guild["id"])
             await execute_query(
                 "DELETE FROM cache_members WHERE guild = $1;",
                 guild["id"],
             )
+            await execute_query("DELETE FROM cache_guilds WHERE id = $1;", guild["id"])
     for member in current_members:
         if (member["id"], member["guild"]) not in member_ids:
             await execute_query(
