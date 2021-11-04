@@ -265,6 +265,8 @@ class MenuItem:
             "REMOVE_ROLE",
             "ADD_ROLES",
             "REMOVE_ROLES",
+            "TOGGLE_ROLE",
+            "TOGGLE_ROLES",
             "CREATE_TICKET",
             "CLOSE_TICKET",
             "CREATE_TICKETS",
@@ -313,6 +315,8 @@ class MenuItem:
                         "REMOVE_ROLE",
                         "ADD_ROLES",
                         "REMOVE_ROLES",
+                        "TOGGLE_ROLE",
+                        "TOGGLE_ROLES",
                     }:
                         try:
                             formatted_flags["options"].add(

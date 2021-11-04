@@ -101,6 +101,37 @@ class MenuButton(discord.ui.Button):
                         "No roles were removed since you you don't have any of them.",
                     ),
                 )
+        elif self.action in {"TOGGLE_ROLE", "TOGGLE_ROLES"}:
+            add_roles: List[discord.Role] = []
+            remove_roles: List[discord.Role] = []
+            for role in self.options:
+                role = interaction.guild.get_role(role)
+                if role is None:
+                    continue
+                if role < highest_role and role not in interaction.user.roles:
+                    add_roles.append(role)
+                elif role < highest_role:
+                    remove_roles.append(role)
+            if add_roles:
+                await interaction.user.add_roles(*add_roles)
+            if remove_roles:
+                await interaction.user.remove_roles(*remove_roles)
+            if add_roles or remove_roles:
+                await interaction.response.send_message(
+                    ephemeral=True,
+                    embed=get_embed_author_member(
+                        interaction.user,
+                        f"Toggled the following roles: {', '.join(role.mention for role in add_roles + remove_roles)}",
+                    ),
+                )
+            else:
+                await interaction.response.send_message(
+                    ephemeral=True,
+                    embed=get_embed_author_member(
+                        interaction.user,
+                        "No roles were toggled since you have them all already.",
+                    ),
+                )
         elif self.action in {"CREATE_TICKET", "CREATE_TICKETS"}:
             await interaction.response.defer()
             configs = [await TicketConfig.fetch(opt) for opt in self.options]
