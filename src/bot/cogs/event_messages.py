@@ -28,7 +28,7 @@ class EventMessages(commands.Cog):
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
-                    f'**Alliance created!**\n[{repr(alliance)}](https://politicsandwar.com/alliance/id={alliance.id} "https://politicsandwar.com/alliance/id={alliance.id}")',
+                    f"**Alliance created!**\n[{repr(alliance)}](https://politicsandwar.com/alliance/id={alliance.id})",
                     color=discord.Color.blue(),
                 )
             )
@@ -46,7 +46,7 @@ class EventMessages(commands.Cog):
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
-                    f'**Alliance deleted!**\n[{repr(alliance)}](https://politicsandwar.com/alliance/id={alliance.id} "https://politicsandwar.com/alliance/id={alliance.id}")',
+                    f"**Alliance deleted!**\n[{repr(alliance)}](https://politicsandwar.com/alliance/id={alliance.id})",
                     color=discord.Color.blue(),
                 ),
                 False,
@@ -86,7 +86,7 @@ class EventMessages(commands.Cog):
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
-                    f'**Nation created!**\n[{repr(nation)}](https://politicsandwar.com/nation/id={nation.id} "https://politicsandwar.com/nation/id={nation.id}")',
+                    f"**Nation created!**\n[{repr(nation)}](https://politicsandwar.com/nation/id={nation.id})",
                     color=discord.Color.blue(),
                 )
             )
@@ -114,7 +114,7 @@ class EventMessages(commands.Cog):
                 or "ALLIANCE_POSITION_ALL" in sub.sub_types
             ) and before.alliance != after.alliance:
                 changes.append(
-                    f'- Alliance changed from [{repr(before.alliance)}](https://politicsandwar.com/alliance/id={(before.alliance and before.alliance.id) or 0} "https://politicsandwar.com/alliance/id={(before.alliance and before.alliance.id) or 0}") to [{repr(after.alliance)}](https://politicsandwar.com/alliance/id={(after.alliance and after.alliance.id) or 0} "https://politicsandwar.com/alliance/id={(after.alliance and after.alliance.id) or 0}").'
+                    f"- Alliance changed from [{repr(before.alliance)}](https://politicsandwar.com/alliance/id={(before.alliance and before.alliance.id) or 0}) to [{repr(after.alliance)}](https://politicsandwar.com/alliance/id={(after.alliance and after.alliance.id) or 0})."
                 )
             if (
                 (
@@ -141,7 +141,7 @@ class EventMessages(commands.Cog):
                 await sub.send(
                     funcs.get_embed_author_member(
                         bot.user,
-                        f'**Nation updated!**\n[{repr(after)}](https://politicsandwar.com/nation/id={after.id} "https://politicsandwar.com/nation/id={after.id}")\n\n**Changes**\n{str_changes}',
+                        f"**Nation updated!**\n[{repr(after)}](https://politicsandwar.com/nation/id={after.id})\n\n**Changes**\n{str_changes}",
                         color=discord.Color.blue(),
                     ),
                 )
@@ -159,7 +159,7 @@ class EventMessages(commands.Cog):
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
-                    f'**Nation deleted!**\n[{repr(nation)}](https://politicsandwar.com/nation/id={nation.id} "https://politicsandwar.com/nation/id={nation.id}")',
+                    f"**Nation deleted!**\n[{repr(nation)}](https://politicsandwar.com/nation/id={nation.id})",
                     color=discord.Color.blue(),
                 ),
                 False,
@@ -178,7 +178,7 @@ class EventMessages(commands.Cog):
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
-                    f'**Treaty created!**\n{treaty.treaty_type} from [{repr(treaty.from_)}](https://politicsandwar.com/alliance/id={treaty.from_.id if treaty.from_ else 0} "https://politicsandwar.com/alliance/id={treaty.from_.id if treaty.from_ else 0}") to [{repr(treaty.to_)}](https://politicsandwar.com/alliance/id={treaty.to_.id if treaty.to_ else 0} "https://politicsandwar.com/alliance/id={treaty.to_.id if treaty.to_ else 0}").',
+                    f"**Treaty created!**\n{treaty.treaty_type} from [{repr(treaty.from_)}](https://politicsandwar.com/alliance/id={treaty.from_.id if treaty.from_ else 0}) to [{repr(treaty.to_)}](https://politicsandwar.com/alliance/id={treaty.to_.id if treaty.to_ else 0}).",
                     color=discord.Color.blue(),
                 ),
                 False,
@@ -197,7 +197,7 @@ class EventMessages(commands.Cog):
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
-                    f'**Treaty deleted!**\n{treaty.treaty_type} from [{repr(treaty.from_)}](https://politicsandwar.com/alliance/id={treaty.from_.id if treaty.from_ else 0} "https://politicsandwar.com/alliance/id={treaty.from_.id if treaty.from_ else 0}") to [{repr(treaty.to_)}](https://politicsandwar.com/alliance/id={treaty.to_.id if treaty.to_ else 0} "https://politicsandwar.com/alliance/id={treaty.to_.id if treaty.to_ else 0}").',
+                    f"**Treaty deleted!**\n{treaty.treaty_type} from [{repr(treaty.from_)}](https://politicsandwar.com/alliance/id={treaty.from_.id if treaty.from_ else 0}) to [{repr(treaty.to_)}](https://politicsandwar.com/alliance/id={treaty.to_.id if treaty.to_ else 0}).",
                     color=discord.Color.blue(),
                 ),
                 False,
@@ -214,7 +214,7 @@ class EventMessages(commands.Cog):
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
-                    f'**War created!**\n[{repr(war.attacker)}](https://politicsandwar.com/nation/id={(war.attacker and war.attacker.id) or 0} "https://politicsandwar.com/nation/id={(war.attacker and war.attacker.id) or 0}") declared war on [{repr(war.defender)}](https://politicsandwar.com/nation/id={(war.defender and war.defender.id) or 0} "https://politicsandwar.com/nation/id={(war.defender and war.defender.id) or 0}").',
+                    f"**War created!**\n[{repr(war.attacker)}](https://politicsandwar.com/nation/id={(war.attacker and war.attacker.id) or 0}) declared war on [{repr(war.defender)}](https://politicsandwar.com/nation/id={(war.defender and war.defender.id) or 0}).",
                     color=discord.Color.blue(),
                 ),
                 False,

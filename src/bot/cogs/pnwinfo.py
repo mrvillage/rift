@@ -121,7 +121,7 @@ class PnWInfo(commands.Cog):
         await alliance.make_attrs("members")
         full = (
             "\n".join(
-                f'[{i+1}. {member.id} | {member.name} | {member.score:,.2f}](https://politicsandwar.com/nation/id={member.id} "https://politicsandwar.com/nation/id={member.id}")'
+                f"[{i+1}. {member.id} | {member.name} | {member.score:,.2f}](https://politicsandwar.com/nation/id={member.id})"
                 for i, member in enumerate(alliance.members)
             )
             + "\n"
@@ -131,7 +131,7 @@ class PnWInfo(commands.Cog):
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    f"There's too many members to display! You can find the full list [here](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\").",
+                    f"There's too many members to display! You can find the full list [here](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true).",
                     title=alliance.name,
                     color=discord.Color.orange(),
                 )
@@ -143,7 +143,7 @@ class PnWInfo(commands.Cog):
             full = full[i + 1 :]
         embed = funcs.get_embed_author_member(
             ctx.author,
-            f"You can find the full list [here](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\").",
+            f"You can find the full list [here](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(alliance.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true).",
             fields=fields,
             title=alliance.name,
             color=discord.Color.blue(),

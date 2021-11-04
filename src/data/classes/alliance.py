@@ -233,7 +233,7 @@ class Alliance(Makeable):
             {"name": "Rank", "value": f"#{self.rank}"},
             {
                 "name": "Members",
-                "value": f"[{member_count:,}](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true \"https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true\")",
+                "value": f"[{member_count:,}](https://politicsandwar.com/index.php?id=15&keyword={'+'.join(self.name.split(' '))}&cat=alliance&ob=score&od=DESC&maximum=50&minimum=0&search=Go&memberview=true)",
             },
             {"name": "Score", "value": f"{score:,.2f}"},
             {
@@ -247,7 +247,7 @@ class Alliance(Makeable):
             {
                 "name": "Leaders",
                 "value": "\n".join(
-                    f'[{repr(i)}](https://politicsandwar.com/nation/id={i.id} "https://politicsandwar.com/nation/id={i.id}")'
+                    f'[{repr(i)}](https://politicsandwar.com/nation/id={i.id})'
                     for i in leaders
                 )
                 if leaders and not short
@@ -258,7 +258,7 @@ class Alliance(Makeable):
             {
                 "name": "Heirs",
                 "value": "\n".join(
-                    f'[{repr(i)}](https://politicsandwar.com/nation/id={i.id} "https://politicsandwar.com/nation/id={i.id}")'
+                    f"[{repr(i)}](https://politicsandwar.com/nation/id={i.id})"
                     for i in heirs
                 )
                 if heirs and not short
@@ -269,7 +269,7 @@ class Alliance(Makeable):
             {
                 "name": "Officers",
                 "value": "\n".join(
-                    f'[{repr(i)}](https://politicsandwar.com/nation/id={i.id} "https://politicsandwar.com/nation/id={i.id}")'
+                    f"[{repr(i)}](https://politicsandwar.com/nation/id={i.id})"
                     for i in officers
                 )
                 if officers and not short
@@ -315,7 +315,7 @@ class Alliance(Makeable):
         embed = (
             get_embed_author_guild(
                 ctx,  # this is here if it ever gets passed as a Guild for some reason
-                f'[Alliance Page](https://politicsandwar.com/alliance/id={self.id} "https://politicsandwar.com/alliance/id={self.id}")\n[War Activity](https://politicsandwar.com/alliance/id={self.id}&display=war "https://politicsandwar.com/alliance/id={self.id}&display=war")',
+                f"[Alliance Page](https://politicsandwar.com/alliance/id={self.id})\n[War Activity](https://politicsandwar.com/alliance/id={self.id}&display=war)",
                 timestamp=datetime.fromisoformat(self.found_date),
                 footer="Alliance created",
                 fields=fields,
@@ -324,7 +324,7 @@ class Alliance(Makeable):
             if isinstance(ctx, discord.Guild)
             else get_embed_author_member(
                 ctx.author,
-                f'[Alliance Page](https://politicsandwar.com/alliance/id={self.id} "https://politicsandwar.com/alliance/id={self.id}")\n[War Activity](https://politicsandwar.com/alliance/id={self.id}&display=war "https://politicsandwar.com/alliance/id={self.id}&display=war")',
+                f"[Alliance Page](https://politicsandwar.com/alliance/id={self.id})\n[War Activity](https://politicsandwar.com/alliance/id={self.id}&display=war)",
                 timestamp=datetime.fromisoformat(self.found_date),
                 footer="Alliance created",
                 fields=fields,
