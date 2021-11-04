@@ -224,14 +224,14 @@ class Nation(Makeable):
             },
             {
                 "name": "Alliance",
-                "value": f'[{repr(self.alliance)}](https://politicsandwar.com/alliance/id={self.alliance.id} "https://politicsandwar.com/alliance/id={self.alliance.id}")'
+                "value": f"[{repr(self.alliance)}](https://politicsandwar.com/alliance/id={self.alliance.id})"
                 if self.alliance is not None
                 else "None",
             },
             {"name": "Alliance Position", "value": self.alliance_position},
             {
                 "name": "Cities",
-                "value": f"[{self.cities}](https://politicsandwar.com/?id=62&n={'+'.join(self.name.split(' '))} \"https://politicsandwar.com/?id=62&n={'+'.join(self.name.split(' '))}\")",
+                "value": f"[{self.cities}](https://politicsandwar.com/?id=62&n={'+'.join(self.name.split(' '))})",
             },
             {"name": "Score", "value": f"{self.score:,.2f}"},
             {
@@ -260,26 +260,26 @@ class Nation(Makeable):
             {"name": "Nukes", "value": f"{self.nukes:,}"},
             {
                 "name": "Offensive Wars",
-                "value": f'[{self.offensive_wars}](https://politicsandwar.com/nation/id={self.id}&display=war "https://politicsandwar.com/nation/id={self.id}&display=war")',
+                "value": f"[{self.offensive_wars}](https://politicsandwar.com/nation/id={self.id}&display=war)",
             },
             {
                 "name": "Defensive Wars",
-                "value": f'[{self.defensive_wars}](https://politicsandwar.com/nation/id={self.id}&display=war "https://politicsandwar.com/nation/id={self.id}&display=war")',
+                "value": f"[{self.defensive_wars}](https://politicsandwar.com/nation/id={self.id}&display=war)",
             },
             {"name": "Average Infrastructure", "value": f"{self.avg_infra():,.2f}"},
             {
                 "name": "Actions",
-                "value": f"[\U0001f4e7](https://politicsandwar.com/inbox/message/receiver={'+'.join(self.leader.split(' '))} \"https://politicsandwar.com/inbox/message/receiver={'+'.join(self.leader.split(' '))}\") "
-                f"[\U0001f4e4](https://politicsandwar.com/nation/trade/create/nation={'+'.join(self.name.split(' '))} \"https://politicsandwar.com/nation/trade/create/nation={'+'.join(self.name.split(' '))}\") "
-                f"[\U000026d4](https://politicsandwar.com/index.php?id=68&name={'+'.join(self.name.split(' '))}&type=n \"https://politicsandwar.com/index.php?id=68&name={'+'.join(self.name.split(' '))}&type=n\") "
-                f'[\U00002694](https://politicsandwar.com/nation/war/declare/id={self.id} "https://politicsandwar.com/nation/war/declare/id={self.id}") '
-                f'[\U0001f575](https://politicsandwar.com/nation/espionage/eid={self.id} "https://politicsandwar.com/nation/espionage/eid={self.id}") ',
+                "value": f"[\U0001f4e7](https://politicsandwar.com/inbox/message/receiver={'+'.join(self.leader.split(' '))})"
+                f"[\U0001f4e4](https://politicsandwar.com/nation/trade/create/nation={'+'.join(self.name.split(' '))})"
+                f"[\U000026d4](https://politicsandwar.com/index.php?id=68&name={'+'.join(self.name.split(' '))}&type=n)"
+                f"[\U00002694](https://politicsandwar.com/nation/war/declare/id={self.id})"
+                f"[\U0001f575](https://politicsandwar.com/nation/espionage/eid={self.id})",
             },
         ]
         return (
             get_embed_author_member(
                 self.user,
-                f'[Nation Page](https://politicsandwar.com/nation/id={self.id} "https://politicsandwar.com/nation/id={self.id}")',
+                f"[Nation Page](https://politicsandwar.com/nation/id={self.id})",
                 timestamp=datetime.datetime.fromisoformat(self.founded),
                 footer="Nation created",
                 fields=fields,
@@ -288,7 +288,7 @@ class Nation(Makeable):
             if self.user is not None
             else get_embed_author_member(
                 ctx.author,
-                f'[Nation Page](https://politicsandwar.com/nation/id={self.id} "https://politicsandwar.com/nation/id={self.id}")',
+                f"[Nation Page](https://politicsandwar.com/nation/id={self.id})",
                 timestamp=datetime.datetime.fromisoformat(self.founded),
                 footer="Nation created",
                 fields=fields,
@@ -297,7 +297,7 @@ class Nation(Makeable):
             if ctx.guild is None
             else get_embed_author_guild(
                 ctx.guild,
-                f'[Nation Page](https://politicsandwar.com/nation/id={self.id} "https://politicsandwar.com/nation/id={self.id}")',
+                f"[Nation Page](https://politicsandwar.com/nation/id={self.id})",
                 timestamp=datetime.datetime.fromisoformat(self.founded),
                 footer="Nation created",
                 fields=fields,
