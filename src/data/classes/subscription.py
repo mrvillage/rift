@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Type
+from typing import TYPE_CHECKING, List, Optional, Type
 
 import discord
 from discord.utils import MISSING
 
 from ...cache import cache
+from ...data.classes import Condition
 from ...errors import SubscriptionNotFoundError
 from ...funcs.utils import convert_int
 from ...ref import RiftContext, bot
@@ -26,7 +27,7 @@ class Subscription:
         "category",
         "type",
         "sub_types",
-        "arguments",
+        "condition",
         "_webhook",
     )
 
@@ -38,7 +39,9 @@ class Subscription:
         self.category: EventCategoryLiteral = data["category"]
         self.type: EventTypeLiteral = data["type"]
         self.sub_types: List[str] = data["sub_types"]
-        self.arguments: List[int] = data["arguments"]
+        self.condition: Optional[Condition] = (
+            Condition.parse(data["condition"]) if data["condition"] else None
+        )
 
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str, /) -> Subscription:
@@ -84,8 +87,8 @@ class Subscription:
         category: EventCategoryLiteral,
         type: EventTypeLiteral,
         sub_types: List[str] = [],
-        arguments: List[int] = [],
         /,
+        condition: Condition = MISSING,
     ) -> Subscription:
         target = channel.parent if isinstance(channel, discord.Thread) else channel
         if TYPE_CHECKING:
@@ -103,7 +106,7 @@ class Subscription:
             "category": category,
             "type": type,
             "sub_types": sub_types,
-            "arguments": arguments,
+            "condition": str(condition) or None,
         }
         subscription = cls(data)
         cache.add_subscription(subscription)
@@ -124,7 +127,7 @@ class Subscription:
 
     async def save(self) -> None:
         await execute_query(
-            "INSERT INTO subscriptions (id, token, guild_id, channel_id, category, type, sub_types, arguments) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
+            "INSERT INTO subscriptions (id, token, guild_id, channel_id, category, type, sub_types, condition) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
             self.id,
             self.token,
             self.guild_id,
@@ -132,7 +135,7 @@ class Subscription:
             self.category,
             self.type,
             self.sub_types,
-            self.arguments,
+            self.condition and str(self.condition),
         )
 
     async def send(

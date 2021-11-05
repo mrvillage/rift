@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Literal, TypedDict
+from typing import List, Literal, Optional, TypedDict
 
 __all__ = ("SubscriptionData", "EventCategoryLiteral", "EventTypeLiteral")
 
@@ -18,4 +18,4 @@ class SubscriptionData(TypedDict):
     category: EventCategoryLiteral
     type: EventTypeLiteral
     sub_types: List[str]
-    arguments: List[int]
+    condition: Optional[str]
