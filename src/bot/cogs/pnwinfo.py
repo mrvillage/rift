@@ -391,6 +391,51 @@ class PnWInfo(commands.Cog):
             view=TreasuresView(page),
         )
 
+    @commands.command(  # type: ignore
+        name="projects",
+        brief="Get a nations projects.",
+        type=commands.CommandType.chat_input,
+    )
+    async def projects(self, ctx: RiftContext, nation: Nation = MISSING):
+        nation = nation or await Nation.convert(ctx, nation)
+        projs = await nation.fetch_projects()
+        projects = {
+            "Advanced Engineering Corps": projs.adv_engineering_corps,
+            "Advanced Urban Planning": projs.adv_city_planning,
+            "Arable Land Agency": projs.arable_land_agency,
+            "Arms Stockpile": projs.armss,
+            "Bauxiteworks": projs.bauxitew,
+            "Center for Civil Engineering": projs.cfce,
+            "Clinical Research Center": projs.clinical_research_center,
+            "Emergency Gasoline Reserve": projs.egr,
+            "Green Technologies": projs.green_tech,
+            "Intelligence Agency": projs.cia,
+            "International Trade Center": projs.itc,
+            "Iron Dome": projs.irond,
+            "Ironworks": projs.ironw,
+            "Mass Irrigation": projs.massirr,
+            "Missile Launch Pad": projs.mlp,
+            "Moon Landing": projs.moon_landing,
+            "Nuclear Research Facility": projs.nrf,
+            "Pirate Economy": projs.pirate_economy,
+            "Propaganda Bureau": projs.propb,
+            "Recycling Initiative": projs.recycling_initiative,
+            "Space Program": projs.space_program,
+            "Specialized Police Training Program": projs.specialized_police_training,
+            "Spy Satellite": projs.spy_satellite,
+            "Telecommunication Satellite": projs.telecom_satellite,
+            "Uranium Enrichment Program": projs.uap,
+            "Urban Planning": projs.city_planning,
+            "Vital Defense System": projs.vds,
+        }
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"[{repr(nation)}](https://politicsandwar.com/nation/id={nation.id}) has {sum(projects.values()):,}/{len(projects.keys()):,} projects.\n\n{', '.join(key for key, value in projects.items() if value)}",
+                color=discord.Color.blue(),
+            )
+        )
+
 
 def setup(bot: Rift):
     bot.add_cog(PnWInfo(bot))
