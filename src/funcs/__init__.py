@@ -10,4 +10,5 @@ from .nation import *
 from .parse import *
 from .revenue import *
 from .spies import *
+from .targets import *
 from .tools import *

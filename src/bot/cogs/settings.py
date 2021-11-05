@@ -103,6 +103,132 @@ class Settings(commands.Cog):
                 ephemeral=True,
             )
 
+    @alliance_settings.command(  # type: ignore
+        name="default-nuke-condition",
+        brief="View or modify the alliance's default condition for nuke targets.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_alliance_manage_permissions()
+    async def alliance_settings_default_nuke_condition(
+        self,
+        ctx: RiftContext,
+        condition: Condition = MISSING,
+        clear: bool = False,
+    ):
+        nation = await Nation.convert(ctx, None)
+        if nation.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "You need to be in an alliance to run this command."
+                )
+            )
+        settings = await AllianceSettings.fetch(nation.alliance.id)
+        if condition is MISSING and not clear:
+            if settings.default_nuke_condition is None:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"{repr(nation.alliance)} has no default nuke condition.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The default nuke condition for {repr(nation.alliance)}is:\n\n`{settings.default_nuke_condition}`",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+        await settings.set_(
+            default_nuke_condition=Condition.convert_to_string(condition.condition)
+            if condition
+            else None
+        )
+        if condition:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The default nuke condition for {repr(nation.alliance)} is now:\n\n`{condition}`",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The default nuke condition has been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @alliance_settings.command(  # type: ignore
+        name="default-military-condition",
+        brief="View or modify the alliance's default condition for military targets.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_alliance_manage_permissions()
+    async def alliance_settings_default_military_condition(
+        self,
+        ctx: RiftContext,
+        condition: Condition = MISSING,
+        clear: bool = False,
+    ):
+        nation = await Nation.convert(ctx, None)
+        if nation.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "You need to be in an alliance to run this command."
+                )
+            )
+        settings = await AllianceSettings.fetch(nation.alliance.id)
+        if condition is MISSING and not clear:
+            if settings.default_military_condition is None:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"{repr(nation.alliance)} has no default military condition.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The default military condition for {repr(nation.alliance)}is:\n\n`{settings.default_military_condition}`",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+        await settings.set_(
+            default_nuke_condition=Condition.convert_to_string(condition.condition)
+            if condition
+            else None
+        )
+        if condition:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The default military condition for {repr(nation.alliance)} is now:\n\n`{condition}`",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The default military condition has been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
     @commands.group(
         name="server-settings",
         aliases=["ss", "serversettings", "settings"],

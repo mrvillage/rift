@@ -9,11 +9,8 @@ from discord.utils import MISSING
 
 from ... import funcs
 from ...cache import cache
-from ...data.classes import AllianceSettings, Condition, Nation, TargetReminder
+from ...data.classes import Condition, Nation, TargetReminder
 from ...ref import Rift, RiftContext
-
-if TYPE_CHECKING:
-    from _typings import Field
 
 
 class TargetContext:
@@ -198,64 +195,159 @@ class Targets(commands.Cog):
         ...
 
     @target_find.command(  # type: ignore
-        name="raid", brief="Find raid targets.", type=commands.CommandType.chat_input
+        name="custom",
+        brief="Find war targets.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "condition": "The condition to evaluate to determine target validity.",
+            "nation": "The nation to find targets for, defaults to yourself.",
+            "count_cities": "Whether to count cities when rating, defaults to true.",
+            "count_loot": "Whether to count the nation's estimated loot when rating, defaults to false.",
+            "count_infrastructure": "Whether to count the nation's infrastructure when rating, defaults to false.",
+            "count_military": "Whether to count the nation's military when rating, defaults to false.",
+            "count_activity": "Whether to count the nation's last activity when rating, defaults to false.",
+            "evaluate_alliance_raid_default": "Whether to evaluate your alliance's default raid condition, defaults to false.",
+            "evaluate_alliance_nuke_default": "Whether to evaluate your alliance's default nuke condition, defaults to false.",
+            "eval_alliance_military_default": "Whether to evaluate your alliance's default military condition, defaults to false.",
+            "offset": "The offset of targets to display, defaults to 0 (starts at the top target).",
+        },
+    )
+    async def target_find_custom(
+        self,
+        ctx: RiftContext,
+        condition: Condition = MISSING,
+        nation: Nation = MISSING,
+        count_cities: bool = True,
+        count_loot: bool = False,
+        count_infrastructure: bool = False,
+        count_military: bool = False,
+        count_activity: bool = False,
+        evaluate_alliance_raid_default: bool = False,
+        offset: int = 0,
+    ):
+        await funcs.find_targets(
+            ctx,
+            condition,
+            nation,
+            count_cities=count_cities,
+            count_loot=count_loot,
+            count_infrastructure=count_infrastructure,
+            count_military=count_military,
+            count_activity=count_activity,
+            evaluate_alliance_raid_default=evaluate_alliance_raid_default,
+            offset=offset,
+        )
+
+    @target_find.command(  # type: ignore
+        name="raid",
+        brief="Find raid targets.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "condition": "The condition to evaluate to determine target validity.",
+            "nation": "The nation to find targets for, defaults to yourself.",
+            "count_infrastructure": "Whether to count the nation's infrastructure when rating, defaults to false.",
+            "evaluate_alliance_raid_default": "Whether to evaluate your alliance's default raid condition, defaults to true.",
+            "offset": "The offset of targets to display, defaults to 0 (starts at the top target).",
+        },
     )
     async def target_find_raid(
         self,
         ctx: RiftContext,
         condition: Condition = MISSING,
         nation: Nation = MISSING,
-        evaluate_alliance_default: bool = True,
+        count_infrastructure: bool = False,
+        evaluate_alliance_raid_default: bool = True,
+        offset: int = 0,
     ):
-        await ctx.interaction.response.defer(ephemeral=True)
-        nation = nation or await Nation.convert(ctx, nation)
-        if nation.alliance is not None:
-            settings = await AllianceSettings.fetch(nation.alliance.id)
-            if (
-                evaluate_alliance_default
-                and settings.default_raid_condition is not None
-            ):
-                default_condition = Condition.parse(settings.default_raid_condition)
-                if condition is MISSING:
-                    condition = default_condition
-                else:
-                    condition = Condition.union(condition, default_condition)
-        targets = await nation.find_targets(condition, loot=True)
-        ratings = sorted(
-            (
-                (i.rate(nation, count_loot=True), i)
-                for i in targets
-                if i.nation is not None
-            ),
-            key=lambda x: x[0],
-            reverse=True,
+        await funcs.find_targets(
+            ctx,
+            condition,
+            nation,
+            count_cities=True,
+            count_loot=True,
+            count_infrastructure=count_infrastructure,
+            count_military=True,
+            count_activity=True,
+            evaluate_alliance_raid_default=evaluate_alliance_raid_default,
+            offset=offset,
         )
-        if not ratings:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "No targets found.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
-            )
-        fields: List[Field] = []
-        for target in ratings:
-            if len(fields) >= 15:
-                break
-            rating = target[0]
-            target = target[1]
-            nat = target.nation
-            if nat is None:
-                continue
-            fields.append(target.field(target, nat, rating, True))
-        await ctx.reply(
-            embed=funcs.get_embed_author_member(
-                ctx.author,
-                fields=fields,
-                color=discord.Color.green(),
-            ),
-            ephemeral=True,
+
+    @target_find.command(  # type: ignore
+        name="nuke",
+        brief="Find nuke targets.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "condition": "The condition to evaluate to determine target validity.",
+            "nation": "The nation to find targets for, defaults to yourself.",
+            "count_loot": "Whether to count the nation's estimated loot when rating, defaults to false.",
+            "count_military": "Whether to count the nation's military when rating, defaults to false.",
+            "count_activity": "Whether to count the nation's last activity when rating, defaults to false.",
+            "evaluate_alliance_nuke_default": "Whether to evaluate your alliance's default nuke condition, defaults to true.",
+            "offset": "The offset of targets to display, defaults to 0 (starts at the top target).",
+        },
+    )
+    async def target_find_nuke(
+        self,
+        ctx: RiftContext,
+        condition: Condition = MISSING,
+        nation: Nation = MISSING,
+        count_loot: bool = False,
+        count_military: bool = False,
+        count_activity: bool = False,
+        evaluate_alliance_nuke_default: bool = True,
+        offset: int = 0,
+    ):
+        await funcs.find_targets(
+            ctx,
+            condition,
+            nation,
+            count_cities=False,
+            count_loot=count_loot,
+            count_infrastructure=True,
+            count_military=count_military,
+            count_activity=count_activity,
+            evaluate_alliance_nuke_default=evaluate_alliance_nuke_default,
+            offset=offset,
+        )
+
+    @target_find.command(  # type: ignore
+        name="military",
+        brief="Find military war targets.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "condition": "The condition to evaluate to determine target validity.",
+            "nation": "The nation to find targets for, defaults to yourself.",
+            "count_cities": "Whether to count cities when rating, defaults to true.",
+            "count_loot": "Whether to count the nation's estimated loot when rating, defaults to false.",
+            "count_infrastructure": "Whether to count the nation's infrastructure when rating, defaults to false.",
+            "count_activity": "Whether to count the nation's last activity when rating, defaults to false.",
+            "eval_alliance_military_default": "Whether to evaluate your alliance's default military condition, defaults to true.",
+            "offset": "The offset of targets to display, defaults to 0 (starts at the top target).",
+        },
+    )
+    async def target_find_military(
+        self,
+        ctx: RiftContext,
+        condition: Condition = MISSING,
+        nation: Nation = MISSING,
+        count_cities: bool = True,
+        count_loot: bool = False,
+        count_infrastructure: bool = False,
+        count_activity: bool = False,
+        eval_alliance_military_default: bool = True,
+        offset: int = 0,
+    ):
+        await funcs.find_targets(
+            ctx,
+            condition,
+            nation,
+            count_cities=count_cities,
+            count_loot=count_loot,
+            count_infrastructure=count_infrastructure,
+            count_military=True,
+            count_activity=count_activity,
+            evaluate_alliance_military_default=eval_alliance_military_default,
+            offset=offset,
         )
 
 
