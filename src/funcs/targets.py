@@ -130,9 +130,9 @@ async def find_targets(
         defaults.append("military")
     if len(defaults) == 1:
         defaults_str = f"{defaults[0]}.\n"
-    elif len(counting) == 2:
+    elif len(defaults) == 2:
         defaults_str = f"{defaults[0]} and {defaults[1]}.\n"
-    elif len(counting) >= 3:
+    elif len(defaults) >= 3:
         defaults_str = ", ".join(defaults[:-1]) + f", and {defaults[-1]}.\n"
     else:
         defaults_str = ""
