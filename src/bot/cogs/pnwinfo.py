@@ -252,7 +252,7 @@ class PnWInfo(commands.Cog):
             )
         upkeeps = {
             key: f"Upkeep: {getattr(rev['upkeep'], key):,.2f} (${rev['upkeep_total'][key]:,.2f})\n"
-            for key in rev["gross_income"].__dict__
+            for key in rev["gross_income"].to_dict()
             if key not in {"credit", "gasoline", "munitions", "steel", "aluminum"}
         }
         fields: List[Field] = [
@@ -260,7 +260,7 @@ class PnWInfo(commands.Cog):
                 "name": key.capitalize(),
                 "value": f"Gross: {getattr(rev['gross_income'], key):,.2f} (${rev['gross_total'][key]:,.2f})\n{upkeeps.get(key, '')}Net: {getattr(rev['net_income'], key):,.2f} (${rev['net_total'][key]:,.2f})",
             }
-            for key in rev["gross_income"].__dict__
+            for key in rev["gross_income"].to_dict()
             if key not in {"money", "credit"}
         ]
         fields.insert(
@@ -283,7 +283,7 @@ class PnWInfo(commands.Cog):
         fields.append(
             {
                 "name": "Total",
-                "value": f"Gross: ${sum(rev['gross_total'].__dict__.values())+rev['gross_income'].money:,.2f}\nUpkeep: ${sum(rev['upkeep_total'].__dict__.values())+rev['upkeep'].money:,.2f}\nNet: ${sum(rev['net_total'].__dict__.values())+rev['net_income'].money:,.2f}"
+                "value": f"Gross: ${sum(rev['gross_total'].to_dict().values())+rev['gross_income'].money:,.2f}\nUpkeep: ${sum(rev['upkeep_total'].to_dict().values())+rev['upkeep'].money:,.2f}\nNet: ${sum(rev['net_total'].to_dict().values())+rev['net_income'].money:,.2f}"
                 + ("" if fetch_spies else "\nNote: Spies not included"),
             }
         )
