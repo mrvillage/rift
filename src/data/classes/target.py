@@ -229,7 +229,7 @@ class Target:
         if count_loot and self.resources is not None:
             rating += sum(
                 value / 1000
-                for key, value in self.resources.__dict__.items()
+                for key, value in self.resources.to_dict().items()
                 if key not in {"credit", "money", "food"}
             )
             rating += self.resources.money / 5_000_000

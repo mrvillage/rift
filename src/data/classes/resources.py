@@ -9,19 +9,21 @@ __all__ = ("Resources",)
 
 
 class Resources:
-    credit: Union[float, int]
-    money: Union[float, int]
-    food: Union[float, int]
-    coal: Union[float, int]
-    oil: Union[float, int]
-    uranium: Union[float, int]
-    lead: Union[float, int]
-    iron: Union[float, int]
-    bauxite: Union[float, int]
-    gasoline: Union[float, int]
-    munitions: Union[float, int]
-    steel: Union[float, int]
-    aluminum: Union[float, int]
+    __slots__ = (
+        "credit",
+        "money",
+        "food",
+        "coal",
+        "oil",
+        "uranium",
+        "lead",
+        "iron",
+        "bauxite",
+        "gasoline",
+        "munitions",
+        "steel",
+        "aluminum",
+    )
 
     def __init__(
         self,
@@ -74,6 +76,23 @@ class Resources:
             )
             if value > 0
         )
+
+    def to_dict(self) -> Dict[str, Union[float, int]]:
+        return {
+            "credit": self.credit,
+            "money": self.money,
+            "food": self.food,
+            "coal": self.coal,
+            "oil": self.oil,
+            "uranium": self.uranium,
+            "lead": self.lead,
+            "iron": self.iron,
+            "bauxite": self.bauxite,
+            "gasoline": self.gasoline,
+            "munitions": self.munitions,
+            "steel": self.steel,
+            "aluminum": self.aluminum,
+        }
 
     def newline(self) -> str:
         return "\n".join(
@@ -143,7 +162,7 @@ class Resources:
         return cls.convert_resources(argument)
 
     def __eq__(self, other: Resources) -> bool:
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other: Resources) -> bool:
         return not self.__eq__(other)
@@ -152,52 +171,60 @@ class Resources:
         if isinstance(other, Resources):
             return Resources(
                 **{
-                    key: value + other.__dict__[key]
-                    for key, value in self.__dict__.items()
+                    key: value + other.to_dict()[key]
+                    for key, value in self.to_dict().items()
                 }
             )
-        return Resources(**{key: value + other for key, value in self.__dict__.items()})
+        return Resources(
+            **{key: value + other for key, value in self.to_dict().items()}
+        )
 
     def __sub__(self, other: Union[float, int, Resources]) -> Resources:
         if isinstance(other, Resources):
             return Resources(
                 **{
-                    key: value - other.__dict__[key]
-                    for key, value in self.__dict__.items()
+                    key: value - other.to_dict()[key]
+                    for key, value in self.to_dict().items()
                 }
             )
-        return Resources(**{key: value - other for key, value in self.__dict__.items()})
+        return Resources(
+            **{key: value - other for key, value in self.to_dict().items()}
+        )
 
     def __mul__(self, other: Union[float, int, Resources]) -> Resources:
         if isinstance(other, Resources):
             return Resources(
                 **{
-                    key: value * other.__dict__[key]
-                    for key, value in self.__dict__.items()
+                    key: value * other.to_dict()[key]
+                    for key, value in self.to_dict().items()
                 }
             )
-        return Resources(**{key: value * other for key, value in self.__dict__.items()})
+        return Resources(
+            **{key: value * other for key, value in self.to_dict().items()}
+        )
 
     def __truediv__(self, other: Union[float, int, Resources]) -> Resources:
         if isinstance(other, Resources):
             return Resources(
                 **{
-                    key: value / other.__dict__[key]
-                    for key, value in self.__dict__.items()
+                    key: value / other.to_dict()[key]
+                    for key, value in self.to_dict().items()
                 }
             )
-        return Resources(**{key: value / other for key, value in self.__dict__.items()})
+        return Resources(
+            **{key: value / other for key, value in self.to_dict().items()}
+        )
 
     def __pow__(self, other: Union[float, int, Resources]) -> Resources:
         if isinstance(other, Resources):
             return Resources(
                 **{
-                    key: value ** other.__dict__[key]
-                    for key, value in self.__dict__.items()
+                    key: value ** other.to_dict()[key]
+                    for key, value in self.to_dict().items()
                 }
             )
         return Resources(
-            **{key: value ** other for key, value in self.__dict__.items()}
+            **{key: value ** other for key, value in self.to_dict().items()}
         )
 
     def __iadd__(self, other: Union[float, int]) -> Resources:

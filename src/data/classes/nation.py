@@ -459,21 +459,21 @@ class Nation(Makeable):
         revenue["gross_total"] = Resources(
             **{
                 key: value * getattr(prices, key).lowest_sell.price
-                for key, value in revenue["gross_income"].__dict__.items()
+                for key, value in revenue["gross_income"].to_dict().items()
                 if key != "money"
             }
         )
         revenue["net_total"] = Resources(
             **{
                 key: value * getattr(prices, key).lowest_sell.price
-                for key, value in revenue["net_income"].__dict__.items()
+                for key, value in revenue["net_income"].to_dict().items()
                 if key != "money"
             }
         )
         revenue["upkeep_total"] = Resources(
             **{
                 key: value * getattr(prices, key).lowest_sell.price
-                for key, value in revenue["upkeep"].__dict__.items()
+                for key, value in revenue["upkeep"].to_dict().items()
                 if key != "money"
             }
         )
