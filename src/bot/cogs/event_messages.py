@@ -25,6 +25,9 @@ class EventMessages(commands.Cog):
             if i.category == "ALLIANCE" and i.type == "CREATE"
         ]
         for sub in subscriptions:
+            send = sub.condition and sub.condition.evaluate(alliance)
+            if not send:
+                continue
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
@@ -43,6 +46,9 @@ class EventMessages(commands.Cog):
             if i.category == "ALLIANCE" and i.type == "DELETE"
         ]
         for sub in subscriptions:
+            send = sub.condition and sub.condition.evaluate(alliance)
+            if not send:
+                continue
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
@@ -83,6 +89,9 @@ class EventMessages(commands.Cog):
             if i.category == "NATION" and i.type == "CREATE"
         ]
         for sub in subscriptions:
+            send = sub.condition and sub.condition.evaluate(nation)
+            if not send:
+                continue
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
@@ -102,10 +111,10 @@ class EventMessages(commands.Cog):
             if i.category == "NATION" and i.type == "UPDATE"
         ]
         for sub in subscriptions:
-            if sub.arguments and (
-                after.alliance_id not in sub.arguments
-                and before.alliance_id not in sub.arguments
-            ):
+            send = sub.condition and (
+                sub.condition.evaluate(before) or sub.condition.evaluate(after)
+            )
+            if not send:
                 continue
             changes: List[str] = []
             if (
@@ -156,6 +165,9 @@ class EventMessages(commands.Cog):
             if i.category == "NATION" and i.type == "DELETE"
         ]
         for sub in subscriptions:
+            send = sub.condition and sub.condition.evaluate(nation)
+            if not send:
+                continue
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
@@ -211,6 +223,9 @@ class EventMessages(commands.Cog):
             i for i in cache.subscriptions if i.category == "WAR" and i.type == "CREATE"
         ]
         for sub in subscriptions:
+            send = sub.condition and sub.condition.evaluate(war)
+            if not send:
+                continue
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,

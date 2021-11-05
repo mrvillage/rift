@@ -11,12 +11,10 @@ from discord.backoff import ExponentialBackoff
 from discord.ext import commands
 from discord.utils import MISSING
 
-from src.data.classes.forum import Forum
-
 from ... import funcs
 from ...cache import cache
 from ...checks import has_manage_permissions
-from ...data.classes import Alliance, Subscription
+from ...data.classes import Condition, Forum, Subscription
 from ...env import SOCKET_IP, SOCKET_PORT
 from ...ref import Rift, RiftContext
 
@@ -77,18 +75,25 @@ class Events(commands.Cog):
         name="create",
         brief="Subscribe to NATION_CREATE events in this channel.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "condition": "The condition to evaluate to determine whether to send the event or not."
+        },
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_nation_create(self, ctx: RiftContext):
+    async def subscribe_nation_create(
+        self, ctx: RiftContext, condition: Condition = MISSING
+    ):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
-        subscription = await Subscription.subscribe(ctx.channel, "NATION", "CREATE")
+        subscription = await Subscription.subscribe(
+            ctx.channel, "NATION", "CREATE", condition=condition
+        )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Successfully subscribed to `NATION_CREATE` events.\nSubscription ID: {subscription.id}",
+                f"Successfully subscribed to `NATION_CREATE` events with {'' if condition else 'no'} condition{' ' + str(condition) if condition else ''}.\nSubscription ID: {subscription.id}",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
@@ -98,10 +103,15 @@ class Events(commands.Cog):
         name="delete",
         brief="Subscribe to NATION_DELETE events in this channel.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "condition": "The condition to evaluate to determine whether to send the event or not."
+        },
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_nation_delete(self, ctx: RiftContext):
+    async def subscribe_nation_delete(
+        self, ctx: RiftContext, condition: Condition = MISSING
+    ):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
@@ -109,7 +119,7 @@ class Events(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Successfully subscribed to `NATION_DELETE` events.\nSubscription ID: {subscription.id}",
+                f"Successfully subscribed to `NATION_DELETE` events with {'' if condition else 'no'} condition{' ' + str(condition) if condition else ''}.\nSubscription ID: {subscription.id}",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
@@ -122,6 +132,7 @@ class Events(commands.Cog):
         descriptions={
             "changes": "A space separated list of changes. ALLIANCE_POSITION, ALLIANCE_POSITION_ALL, ALLIANCE, VACATION_MODE",
             "alliances": "A space separated list of alliances to get updates of, defaults to all alliances if not provided.",
+            "condition": "The condition to evaluate to determine whether to send the event or not.",
         },
     )
     @has_manage_permissions()
@@ -130,7 +141,7 @@ class Events(commands.Cog):
         self,
         ctx: RiftContext,
         changes: List[str],
-        alliances: List[Alliance] = [],
+        condition: Condition = MISSING,
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
@@ -156,12 +167,12 @@ class Events(commands.Cog):
                 ephemeral=True,
             )
         subscription = await Subscription.subscribe(
-            ctx.channel, "NATION", "UPDATE", changes, [i.id for i in alliances]
+            ctx.channel, "NATION", "UPDATE", changes, condition
         )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Successfully subscribed to `NATION_UPDATE` events for the following changes: {', '.join('`' + i + '`' for i in changes)} for {'the following' if alliances else 'all'} alliances{(': ' + ', '.join(repr(i) for i in alliances)) if alliances else ''}.\nSubscription ID: {subscription.id}",
+                f"Successfully subscribed to `NATION_UPDATE` events for the following changes: {', '.join('`' + i + '`' for i in changes)} with {'' if condition else 'no'} condition{' ' + str(condition) if condition else ''}.\nSubscription ID: {subscription.id}",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
@@ -177,10 +188,15 @@ class Events(commands.Cog):
         name="create",
         brief="Subscribe to ALLIANCE_CREATE events in this channel.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "condition": "The condition to evaluate to determine whether to send the event or not."
+        },
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_alliance_create(self, ctx: RiftContext):
+    async def subscribe_alliance_create(
+        self, ctx: RiftContext, condition: Condition = MISSING
+    ):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
@@ -188,7 +204,7 @@ class Events(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Successfully subscribed to `ALLIANCE_CREATE` events.\nSubscription ID: {subscription.id}",
+                f"Successfully subscribed to `ALLIANCE_CREATE` events with {'' if condition else 'no'} condition{' ' + str(condition) if condition else ''}.\nSubscription ID: {subscription.id}",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
@@ -198,10 +214,15 @@ class Events(commands.Cog):
         name="delete",
         brief="Subscribe to ALLIANCE_DELETE events in this channel.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "condition": "The condition to evaluate to determine whether to send the event or not."
+        },
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_alliance_delete(self, ctx: RiftContext):
+    async def subscribe_alliance_delete(
+        self, ctx: RiftContext, condition: Condition = MISSING
+    ):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
@@ -209,7 +230,7 @@ class Events(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Successfully subscribed to `ALLIANCE_DELETE` events.\nSubscription ID: {subscription.id}",
+                f"Successfully subscribed to `ALLIANCE_DELETE` events with {'' if condition else 'no'} condition{' ' + str(condition) if condition else ''}.\nSubscription ID: {subscription.id}",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
@@ -321,10 +342,15 @@ class Events(commands.Cog):
         name="create",
         brief="Subscribe to WAR_CREATE events in this channel.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "condition": "The condition to evaluate to determine whether to send the event or not."
+        },
     )
     @has_manage_permissions()
     @commands.guild_only()
-    async def subscribe_war_create(self, ctx: RiftContext):
+    async def subscribe_war_create(
+        self, ctx: RiftContext, condition: Condition = MISSING
+    ):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
@@ -332,7 +358,7 @@ class Events(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Successfully subscribed to `WAR_CREATE` events.\nSubscription ID: {subscription.id}",
+                f"Successfully subscribed to `WAR_CREATE` events with {'' if condition else 'no'} condition{' ' + str(condition) if condition else ''}.\nSubscription ID: {subscription.id}",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
@@ -427,7 +453,7 @@ class Events(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Subscription ID: {subscription.id}\nEvent: {subscription.category}_{subscription.type}\nSubtypes: {', '.join(subscription.sub_types) if subscription.sub_types else 'None'}\nArguments: {', '.join(str(i) for i in subscription.arguments) if subscription.arguments else 'None'}",
+                f"Subscription ID: {subscription.id}\nEvent: {subscription.category}_{subscription.type}\nSubtypes: {', '.join(subscription.sub_types) if subscription.sub_types else 'None'}\nCondition: {subscription.condition}",
                 color=discord.Color.blue(),
             )
         )
