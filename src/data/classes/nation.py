@@ -535,13 +535,16 @@ class Nation(Makeable):
         valid = [i for i in cache.nations if self.check_war_range(i) and i is not self]
         if condition is not MISSING:
             valid = await condition.reduce(*valid)
-        dt = datetime.datetime.utcnow()
-        revenue_valid = [
-            i
-            for i in valid
-            if (t := cache.get_target(i.id)) is None or t and t.turn_passed(dt)
-        ]
-        revenues = await bulk_fetch_nation_revenues(revenue_valid)
+        if loot:
+            dt = datetime.datetime.utcnow()
+            revenue_valid = [
+                i
+                for i in valid
+                if (t := cache.get_target(i.id)) is None or t and t.turn_passed(dt)
+            ]
+            revenues = await bulk_fetch_nation_revenues(revenue_valid)
+        else:
+            revenues = {}
         targets: List[Target] = []
         valid_nation_ids = {i.id for i in valid}
         days_ago = str(datetime.datetime.utcnow() - datetime.timedelta(days=14))

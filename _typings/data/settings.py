@@ -8,6 +8,8 @@ __all__ = ("AllianceSettingsData", "GuildSettingsData", "GuildWelcomeSettingsDat
 class AllianceSettingsData(TypedDict):
     alliance_id: int
     default_raid_condition: Optional[str]
+    default_nuke_condition: Optional[str]
+    default_military_condition: Optional[str]
 
 
 class GuildSettingsData(TypedDict):

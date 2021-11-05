@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import datetime
+import time
 from typing import TYPE_CHECKING, List, Optional, Union
 
 import discord
 
-from src.data.db.sql import execute_query
-
 from ...cache import cache
+from ...data.db import execute_query
 from ...errors import TargetNotFoundError
 from ...funcs.utils import convert_int
 from ...ref import RiftContext
@@ -150,75 +150,80 @@ class Target:
         nation: Nation,
         /,
         *,
+        count_cities: bool = False,
         count_loot: bool = False,
         count_infrastructure: bool = False,
+        count_military: bool = False,
+        count_activity: bool = False,
     ) -> float:  # sourcery no-metrics
         rating = 0
         target = self.nation
         if target is None:
             return rating
 
-        rating += (nation.cities / target.cities) * 10
-        if nation.soldiers and target.soldiers:
-            r = (
-                (nation.soldiers - target.soldiers)
-                / 15000
-                / ((nation.cities - target.cities) or 1)
-            )
-            if nation.soldiers < target.soldiers and nation.cities < target.cities:
-                r *= -1
-            rating += r
-        elif not nation.soldiers and not target.soldiers:
-            pass
-        elif not nation.soldiers:
-            rating -= 10
-        else:
-            rating += 10
-        if nation.tanks and target.tanks:
-            r = (
-                (nation.tanks - target.tanks)
-                / 1250
-                / ((nation.cities - target.cities) or 1)
-            )
-            if nation.tanks < target.tanks and nation.cities < target.cities:
-                r *= -1
-            rating += r
-        elif not nation.tanks and not target.tanks:
-            pass
-        elif not nation.tanks:
-            rating -= 10
-        else:
-            rating += 10
-        if nation.aircraft and target.aircraft:
-            r = (
-                (nation.aircraft - target.aircraft)
-                / 75
-                / ((nation.cities - target.cities) or 1)
-            )
-            if nation.aircraft < target.aircraft and nation.cities < target.cities:
-                r *= -1
-            rating += r
-        elif not nation.aircraft and not target.aircraft:
-            pass
-        elif not nation.aircraft:
-            rating -= 10
-        else:
-            rating += 10
-        if nation.ships and target.ships:
-            r = (
-                (nation.ships - target.ships)
-                / 15
-                / ((nation.cities - target.cities) or 1)
-            )
-            if nation.ships < target.ships and nation.cities < target.cities:
-                r *= -1
-            rating += r
-        elif not nation.ships and not target.ships:
-            pass
-        elif not nation.ships:
-            rating -= 10
-        else:
-            rating += 10
+        if count_cities:
+            rating += (nation.cities / target.cities) * 10
+        if count_military:
+            if nation.soldiers and target.soldiers:
+                r = (
+                    (nation.soldiers - target.soldiers)
+                    / 15000
+                    / ((nation.cities - target.cities) or 1)
+                )
+                if nation.soldiers < target.soldiers and nation.cities < target.cities:
+                    r *= -1
+                rating += r
+            elif not nation.soldiers and not target.soldiers:
+                pass
+            elif not nation.soldiers:
+                rating -= 10
+            else:
+                rating += 10
+            if nation.tanks and target.tanks:
+                r = (
+                    (nation.tanks - target.tanks)
+                    / 1250
+                    / ((nation.cities - target.cities) or 1)
+                )
+                if nation.tanks < target.tanks and nation.cities < target.cities:
+                    r *= -1
+                rating += r
+            elif not nation.tanks and not target.tanks:
+                pass
+            elif not nation.tanks:
+                rating -= 10
+            else:
+                rating += 10
+            if nation.aircraft and target.aircraft:
+                r = (
+                    (nation.aircraft - target.aircraft)
+                    / 75
+                    / ((nation.cities - target.cities) or 1)
+                )
+                if nation.aircraft < target.aircraft and nation.cities < target.cities:
+                    r *= -1
+                rating += r
+            elif not nation.aircraft and not target.aircraft:
+                pass
+            elif not nation.aircraft:
+                rating -= 10
+            else:
+                rating += 10
+            if nation.ships and target.ships:
+                r = (
+                    (nation.ships - target.ships)
+                    / 15
+                    / ((nation.cities - target.cities) or 1)
+                )
+                if nation.ships < target.ships and nation.cities < target.cities:
+                    r *= -1
+                rating += r
+            elif not nation.ships and not target.ships:
+                pass
+            elif not nation.ships:
+                rating -= 10
+            else:
+                rating += 10
         if count_infrastructure:
             rating += (target.get_average_infrastructure() / 500) * 5
         if count_loot and self.resources is not None:
@@ -229,6 +234,11 @@ class Target:
             )
             rating += self.resources.money / 5_000_000
             rating += self.resources.food / 10_000
+        if count_activity:
+            dt = datetime.datetime.utcnow()
+            last_active = datetime.datetime.fromisoformat(target.last_active)
+            delta = dt - last_active
+            rating += min(delta.days, 10)
 
         return rating
 
@@ -239,12 +249,16 @@ class Target:
         rating: float,
         /,
         include_resources: bool = False,
+        include_infrastructure: bool = False,
     ) -> Field:
         mil = nation.get_militarization()
         res_string = "\nResources: "
+        infra_string = (
+            f"\nAverage Infrastructure: {nation.get_average_infrastructure():,.2f}"
+        )
         return {
             "name": f"{repr(nation)} ({rating:,.2f})",
-            "value": f"[Nation Page](https://politicsandwar.com/nation/id={nation.id})\nSoldiers: {nation.soldiers:,} ({mil['soldiers']:,.2%})\nTanks: {nation.tanks:,} ({mil['tanks']:,.2%})\nAircraft: {nation.aircraft:,} ({mil['aircraft']:,.2%}\nShips: {nation.ships:,} ({mil['ships']:,.2%})\nMissiles: {nation.missiles:,}\nNukes: {nation.nukes}{res_string + str(target.resources) if include_resources else ''}",
+            "value": f"[Nation Page](https://politicsandwar.com/nation/id={nation.id})\nLast active <t:{int(time.mktime(datetime.datetime.fromisoformat(nation.last_active).timetuple()))}:R>\nCities: {nation.cities:,}\nSoldiers: {nation.soldiers:,} ({mil['soldiers']:,.2%})\nTanks: {nation.tanks:,} ({mil['tanks']:,.2%})\nAircraft: {nation.aircraft:,} ({mil['aircraft']:,.2%}\nShips: {nation.ships:,} ({mil['ships']:,.2%})\nMissiles: {nation.missiles:,}\nNukes: {nation.nukes}{res_string + str(target.resources) if include_resources else ''}{infra_string if include_infrastructure else ''}",
         }
 
 

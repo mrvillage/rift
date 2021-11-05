@@ -243,12 +243,18 @@ class AllianceSettings:
         "alliance_id",
         "defaulted",
         "default_raid_condition",
+        "default_nuke_condition",
+        "default_military_condition",
     )
 
     def __init__(self, data: AllianceSettingsData) -> None:
         self.defaulted: bool = False
         self.alliance_id: int = data["alliance_id"]
         self.default_raid_condition: Optional[str] = data["default_raid_condition"]
+        self.default_nuke_condition: Optional[str] = data["default_nuke_condition"]
+        self.default_military_condition: Optional[str] = data[
+            "default_military_condition"
+        ]
 
     @classmethod
     def default(cls, alliance_id: int, /) -> AllianceSettings:
@@ -256,6 +262,8 @@ class AllianceSettings:
             {
                 "alliance_id": alliance_id,
                 "default_raid_condition": None,
+                "default_nuke_condition": None,
+                "default_military_condition": None,
             }
         )
         settings.defaulted = True
