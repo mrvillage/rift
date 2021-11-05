@@ -195,8 +195,8 @@ class PnWInfo(commands.Cog):
         type=commands.CommandType.chat_input,
         descriptions={
             "search": "The nation or alliance to get revenue of, defaults to your nation.",
-            "fetch_spies": "Fetches spies for every nation being calculated. Incredibly slow, need to be whitelisted.",
             "alliance": "Whether to only search for a matching alliance.",
+            "fetch_spies": "Fetches spies for every nation being calculated. Incredibly slow, need to be whitelisted.",
         },
     )
     async def revenue(
@@ -204,10 +204,12 @@ class PnWInfo(commands.Cog):
         ctx: RiftContext,
         *,
         search: str = MISSING,
-        fetch_spies: bool = False,
         alliance: bool = False,
+        fetch_spies: bool = False,
     ):  # sourcery no-metrics
-        if search is MISSING:
+        if search is MISSING and alliance:
+            search_ = await Alliance.convert(ctx, search, False)
+        elif search is MISSING:
             search_ = await Nation.convert(ctx, search, False)
         elif alliance:
             search_ = await Alliance.convert(ctx, search)
