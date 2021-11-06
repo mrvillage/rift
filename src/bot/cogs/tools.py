@@ -427,7 +427,7 @@ class Tools(commands.Cog):
         type=commands.CommandType.chat_input,
         descriptions={
             "after": "The final city.",
-            "alliance": "The nation to calculate for, defaults to your alliance.",
+            "alliance": "The alliance to calculate for, defaults to your alliance.",
         },
     )
     async def tools_alliance_city(
