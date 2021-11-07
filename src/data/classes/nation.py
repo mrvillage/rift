@@ -577,15 +577,19 @@ class Nation(Makeable):
                 attacks_ = attacks and [j for j in attacks if j.war_id in war_ids]
             else:
                 attacks_ = None
-            targets.append(
-                await Target.create(
-                    i,
-                    revenues.get(i.id, {"net_income": None})["net_income"],
-                    wars_,
-                    attacks_,
-                    loot=loot,
+            try:
+                targets.append(
+                    await Target.create(
+                        i,
+                        revenues.get(i.id, {"net_income": None})["net_income"],
+                        wars_,
+                        attacks_,
+                        loot=loot,
+                    )
                 )
-            )
+            # nation does not exist but is still in cache
+            except IndexError:
+                continue
         return targets
 
     async def fetch_last_wars(self) -> List[War]:
