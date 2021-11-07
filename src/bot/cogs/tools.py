@@ -1,15 +1,19 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Dict, List, Tuple
+
 import discord
 import pnwkit
 from discord.ext import commands
 from discord.utils import MISSING
 
-from src.data.classes.alliance import Alliance
-
 from ... import Rift, funcs
-from ...data.classes import Nation
+from ...cache import cache
+from ...data.classes import Alliance, Nation, Resources
 from ...ref import Rift, RiftContext
+
+if TYPE_CHECKING:
+    from _typings import Field
 
 
 def check_after(before: float, after: float, only_buy: bool) -> bool:
@@ -159,6 +163,49 @@ class Tools(commands.Cog):
             )
         )
 
+    @tools.command(  # type: ignore
+        name="projects",
+        brief="Calculates project costs.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "technological_advancement": "Whether or not the Technological Advancement policy should be accounted for.",
+            "page": "The page of projects to show (projects ordered alphabetically, can be 1 or 2).",
+        },
+    )
+    async def tools_projects(
+        self,
+        ctx: RiftContext,
+        technological_advancement: bool = False,
+        page: int = 1,
+    ):
+        if page not in {1, 2}:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"`{page}` is not a valid page!",
+                    color=discord.Color.red(),
+                )
+            )
+        prices = cache.prices
+        fields: List[Field] = [
+            {
+                "name": key,
+                "value": f"Resources: {value[1]*(0.95 if technological_advancement else 1)}\nCost: ${value[1].calculate_value(prices)*(0.95 if technological_advancement else 1):,.2f}",
+            }
+            for key, value in funcs.PROJECTS.items()
+        ]
+        field_count = len(fields)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Page **{page}** of **2**\n{'' if technological_advancement else 'No'} Technological Advancement",
+                fields=fields[
+                    field_count // 2 * (page - 1) : field_count // 2 * (page)
+                ],
+                color=discord.Color.blue(),
+            )
+        )
+
     @tools.group(name="nation", type=commands.CommandType.chat_input)  # type: ignore
     async def tools_nation(self, ctx: RiftContext):
         ...
@@ -296,6 +343,59 @@ class Tools(commands.Cog):
                 ctx.author,
                 f"The cost to buy {repr(nation)} to city {after} is ${cost:,.2f}.",
                 color=discord.Color.green(),
+            )
+        )
+
+    @tools_nation.command(  # type: ignore
+        name="projects",
+        brief="Calculate city cost for a nation.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "after": "The final city.",
+            "nation": "The nation to calculate for, defaults to your nation.",
+            "page": "The page of projects to show (projects ordered alphabetically, can be 1 or 2).",
+        },
+    )
+    async def tools_nation_projects(
+        self,
+        ctx: RiftContext,
+        nation: Nation = MISSING,
+        page: int = 1,
+    ):
+        if page not in {1, 2}:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"`{page}` is not a valid page!",
+                    color=discord.Color.red(),
+                )
+            )
+        nation = nation or await Nation.convert(ctx, nation)
+        prices = cache.prices
+        fields: List[Field] = []
+        projs = await nation.fetch_projects()
+        technological_advancement = (
+            nation.domestic_policy == "Technological Advancement"
+        )
+        for key, value in funcs.PROJECTS.items():
+            if getattr(projs, value[0]):
+                fields.append({"name": key, "value": "Owned."})
+            else:
+                fields.append(
+                    {
+                        "name": key,
+                        "value": f"Resources: {value[1]*(0.95 if technological_advancement else 1)}\nCost: ${value[1].calculate_value(prices)*(0.95 if technological_advancement else 1):,.2f}",
+                    }
+                )
+        field_count = len(fields)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Page **{page}** of **2**\n{'' if technological_advancement else 'No'} Technological Advancement",
+                fields=fields[
+                    field_count // 2 * (page - 1) : field_count // 2 * (page)
+                ],
+                color=discord.Color.blue(),
             )
         )
 
@@ -465,6 +565,121 @@ class Tools(commands.Cog):
                 ctx.author,
                 f"The cost to buy all nations of {repr(alliance)} to city {after} is ${total_cost:,.2f}.",
                 color=discord.Color.green(),
+            )
+        )
+
+    @tools_alliance.command(  # type: ignore
+        name="projects",
+        brief="Calculate city cost for an alliance.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "alliance": "The alliance to calculate for, defaults to your alliance.",
+            "page": "The page of projects to show (projects ordered alphabetically, can be 1 or 2).",
+        },
+    )
+    async def tools_alliance_projects(
+        self,
+        ctx: RiftContext,
+        alliance: Alliance = MISSING,
+        page: int = 1,
+    ):  # sourcery no-metrics
+        if page not in {1, 2}:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"`{page}` is not a valid page!",
+                    color=discord.Color.red(),
+                )
+            )
+        alliance = alliance or await Alliance.convert(ctx, alliance)
+        await ctx.interaction.response.defer()
+        prices = cache.prices
+        fields: List[Field] = []
+        nation_projects = (
+            await pnwkit.async_alliance_query(
+                {"id": alliance.id, "first": 1},
+                {
+                    "nations": [
+                        "id",
+                        "ironw",
+                        "bauxitew",
+                        "armss",
+                        "egr",
+                        "massirr",
+                        "itc",
+                        "mlp",
+                        "nrf",
+                        "irond",
+                        "vds",
+                        "cia",
+                        "cfce",
+                        "propb",
+                        "uap",
+                        "city_planning",
+                        "adv_city_planning",
+                        "space_program",
+                        "spy_satellite",
+                        "moon_landing",
+                        "pirate_economy",
+                        "recycling_initiative",
+                        "telecom_satellite",
+                        "green_tech",
+                        "arable_land_agency",
+                        "clinical_research_center",
+                        "specialized_police_training",
+                        "adv_engineering_corps",
+                    ]
+                },
+            )
+        )[0]
+        nation_projects = {int(i.id): i for i in nation_projects.nations}
+        projects: Dict[str, Tuple[str, Resources, int, int]] = {
+            key: (value[0], Resources(), 0, 0) for key, value in funcs.PROJECTS.items()
+        }
+        for nation in alliance.members:
+            projs = nation_projects.get(nation.id)
+            if projs is None:
+                continue
+            for key, value in projects.items():
+                if not getattr(projs, value[0]):
+                    updated = list(value)
+                    if TYPE_CHECKING:
+                        assert (
+                            isinstance(updated[0], str)
+                            and isinstance(updated[1], Resources)
+                            and isinstance(updated[2], int)
+                            and isinstance(updated[3], int)
+                        )
+                    technological_advancement = (
+                        nation.domestic_policy == "Technological Advancement"
+                    )
+                    updated[3] += technological_advancement
+                    updated[2] += 1
+                    updated[1].update(
+                        updated[1]
+                        + funcs.PROJECTS[key][1]
+                        * (0.95 if technological_advancement else 1)
+                    )
+                    projects[key] = tuple(updated)  # type: ignore
+        for key, value in projects.items():
+            if value[2] == 0:
+                fields.append({"name": key, "value": "Owned by all members."})
+            else:
+                fields.append(
+                    {
+                        "name": key,
+                        "value": f"Not owned by {value[2]:,}/{alliance.member_count:,} members, {value[3]:,}/{value[2]:,} members have Technological Advancement\nResources: {value[1]}\nCost: ${value[1].calculate_value(prices):,.2f}",
+                    }
+                )
+        field_count = len(fields)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Page **{page}** of **2**",
+                fields=fields[
+                    field_count // 2 * (page - 1) : field_count // 2 * (page)
+                ],
+                color=discord.Color.blue(),
             )
         )
 

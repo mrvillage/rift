@@ -8,6 +8,7 @@ from .embeds import *
 from .errors import *
 from .nation import *
 from .parse import *
+from .projects import *
 from .revenue import *
 from .spies import *
 from .targets import *
