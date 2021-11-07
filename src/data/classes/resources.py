@@ -4,6 +4,7 @@ from typing import Dict, Union
 
 from ...funcs.utils import check_resource, convert_number
 from ...ref import RiftContext
+from .trade import TradePrices
 
 __all__ = ("Resources",)
 
@@ -57,9 +58,9 @@ class Resources:
         self.aluminum: Union[float, int] = aluminum
 
     def __str__(self) -> str:
-        return ", ".join(
-            f"{value:,.2f} {name}"
-            for name, value in (
+        resources = [
+            i
+            for i in (
                 ("Credit" if self.credit == 1 else "Credits", self.credit),
                 ("Money", self.money),
                 ("Food", self.food),
@@ -74,7 +75,11 @@ class Resources:
                 ("Steel", self.steel),
                 ("Aluminum", self.aluminum),
             )
-            if value > 0
+            if i[1] != 0
+        ]
+        return ", ".join(
+            f"{value:,.2f} {name}" if name != "Money" else f"${value:,.2f}"
+            for name, value in resources
         )
 
     def to_dict(self) -> Dict[str, Union[float, int]]:
@@ -161,6 +166,27 @@ class Resources:
     async def convert(cls, ctx: RiftContext, argument: str) -> Resources:
         return cls.convert_resources(argument)
 
+    def calculate_value(self, prices: TradePrices) -> float:
+        return (
+            self.money
+            + self.food * prices.food.lowest_sell.price
+            + self.coal * prices.coal.lowest_sell.price
+            + self.oil * prices.oil.lowest_sell.price
+            + self.uranium * prices.uranium.lowest_sell.price
+            + self.lead * prices.lead.lowest_sell.price
+            + self.iron * prices.iron.lowest_sell.price
+            + self.bauxite * prices.bauxite.lowest_sell.price
+            + self.gasoline * prices.gasoline.lowest_sell.price
+            + self.munitions * prices.munitions.lowest_sell.price
+            + self.steel * prices.steel.lowest_sell.price
+            + self.aluminum * prices.aluminum.lowest_sell.price
+        )
+
+    def update(self, other: Resources, /) -> Resources:
+        for key, value in other.to_dict().items():
+            setattr(self, key, value)
+        return self
+
     def __eq__(self, other: Resources) -> bool:
         return self.to_dict() == other.to_dict()
 
@@ -171,7 +197,7 @@ class Resources:
         if isinstance(other, Resources):
             return Resources(
                 **{
-                    key: value + other.to_dict()[key]
+                    key: value + getattr(other, key)
                     for key, value in self.to_dict().items()
                 }
             )
@@ -183,7 +209,7 @@ class Resources:
         if isinstance(other, Resources):
             return Resources(
                 **{
-                    key: value - other.to_dict()[key]
+                    key: value - getattr(other, key)
                     for key, value in self.to_dict().items()
                 }
             )
@@ -195,7 +221,7 @@ class Resources:
         if isinstance(other, Resources):
             return Resources(
                 **{
-                    key: value * other.to_dict()[key]
+                    key: value * getattr(other, key)
                     for key, value in self.to_dict().items()
                 }
             )
@@ -207,7 +233,7 @@ class Resources:
         if isinstance(other, Resources):
             return Resources(
                 **{
-                    key: value / other.to_dict()[key]
+                    key: value / getattr(other, key)
                     for key, value in self.to_dict().items()
                 }
             )
@@ -219,7 +245,7 @@ class Resources:
         if isinstance(other, Resources):
             return Resources(
                 **{
-                    key: value ** other.to_dict()[key]
+                    key: value ** getattr(other, key)
                     for key, value in self.to_dict().items()
                 }
             )
