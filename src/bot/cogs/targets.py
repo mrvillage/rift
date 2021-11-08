@@ -223,6 +223,8 @@ class Targets(commands.Cog):
         count_military: bool = False,
         count_activity: bool = False,
         evaluate_alliance_raid_default: bool = False,
+        evaluate_alliance_nuke_default: bool = False,
+        eval_alliance_military_default: bool = False,
         offset: int = 0,
     ):
         await funcs.find_targets(
@@ -235,6 +237,8 @@ class Targets(commands.Cog):
             count_military=count_military,
             count_activity=count_activity,
             evaluate_alliance_raid_default=evaluate_alliance_raid_default,
+            evaluate_alliance_nuke_default=evaluate_alliance_nuke_default,
+            evaluate_alliance_military_default=eval_alliance_military_default,
             offset=offset,
         )
 
