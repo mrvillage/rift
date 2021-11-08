@@ -295,6 +295,8 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                         color=discord.Color.red(),
                     )
                 )
+            elif error.code == 50027:
+                pass
             else:
                 await print_handler(ctx, error)
                 await ctx.reply(
