@@ -150,6 +150,8 @@ class Condition:
                         u[0] = cls.sync_convert(u[0], user_id)
                 else:
                     updated_condition[index] = cls.validate_condition(u, user_id)  # type: ignore
+        if len(condition) < 3 and not isinstance(condition[0], list):
+            raise InvalidConditionError(cls.convert_to_string(condition))
         return updated_condition
 
     @classmethod
