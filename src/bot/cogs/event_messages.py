@@ -25,8 +25,9 @@ class EventMessages(commands.Cog):
             if i.category == "ALLIANCE" and i.type == "CREATE"
         ]
         for sub in subscriptions:
-            send = sub.condition and sub.condition.evaluate(alliance)
-            if not send:
+            if sub.condition is None:
+                pass
+            elif sum(await sub.condition.evaluate(alliance)) == 0:
                 continue
             await sub.send(
                 funcs.get_embed_author_member(
@@ -46,8 +47,9 @@ class EventMessages(commands.Cog):
             if i.category == "ALLIANCE" and i.type == "DELETE"
         ]
         for sub in subscriptions:
-            send = sub.condition and sub.condition.evaluate(alliance)
-            if not send:
+            if sub.condition is None:
+                pass
+            elif sum(await sub.condition.evaluate(alliance)) == 0:
                 continue
             await sub.send(
                 funcs.get_embed_author_member(
@@ -89,8 +91,9 @@ class EventMessages(commands.Cog):
             if i.category == "NATION" and i.type == "CREATE"
         ]
         for sub in subscriptions:
-            send = sub.condition and sub.condition.evaluate(nation)
-            if not send:
+            if sub.condition is None:
+                pass
+            elif sum(await sub.condition.evaluate(nation)) == 0:
                 continue
             await sub.send(
                 funcs.get_embed_author_member(
@@ -111,10 +114,9 @@ class EventMessages(commands.Cog):
             if i.category == "NATION" and i.type == "UPDATE"
         ]
         for sub in subscriptions:
-            send = sub.condition and (
-                sub.condition.evaluate(before) or sub.condition.evaluate(after)
-            )
-            if not send:
+            if sub.condition is None:
+                pass
+            elif sum(await sub.condition.evaluate(before, after)) == 0:
                 continue
             changes: List[str] = []
             if (
@@ -165,8 +167,9 @@ class EventMessages(commands.Cog):
             if i.category == "NATION" and i.type == "DELETE"
         ]
         for sub in subscriptions:
-            send = sub.condition and sub.condition.evaluate(nation)
-            if not send:
+            if sub.condition is None:
+                pass
+            elif sum(await sub.condition.evaluate(nation)) == 0:
                 continue
             await sub.send(
                 funcs.get_embed_author_member(
@@ -223,8 +226,9 @@ class EventMessages(commands.Cog):
             i for i in cache.subscriptions if i.category == "WAR" and i.type == "CREATE"
         ]
         for sub in subscriptions:
-            send = sub.condition and sub.condition.evaluate(war)
-            if not send:
+            if sub.condition is None:
+                pass
+            elif sum(await sub.condition.evaluate(war)) == 0:
                 continue
             await sub.send(
                 funcs.get_embed_author_member(
