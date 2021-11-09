@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import contextlib
-import datetime
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import aiohttp
 import discord
@@ -49,24 +47,6 @@ async def on_message(message: discord.Message):
 @bot.event
 async def on_interaction(interaction: discord.Interaction):
     await bot.process_commands(interaction)
-
-
-@bot.event
-async def on_raw_message_edit(payload: discord.RawMessageUpdateEvent):
-    channel = bot.get_channel(payload.channel_id)
-    if TYPE_CHECKING:
-        assert isinstance(channel, (discord.TextChannel, discord.DMChannel))
-    try:
-        message = await channel.fetch_message(payload.message_id)
-    except discord.NotFound:
-        return
-    if TYPE_CHECKING:
-        assert isinstance(message.edited_at, datetime.datetime)
-    try:
-        if message.created_at + datetime.timedelta(minutes=10) >= message.edited_at:
-            await bot.process_commands(message)
-    except TypeError:
-        pass
 
 
 @bot.event
