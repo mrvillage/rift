@@ -431,7 +431,7 @@ class PnWInfo(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"[{repr(nation)}](https://politicsandwar.com/nation/id={nation.id}) has {sum(projects.values()):,}/{len(projects.keys()):,} projects and is using {sum(projects.values())}/{sum(i.infrastructure for i in nation.partial_cities)//5000} project slots.\n\n{', '.join(key for key, value in projects.items() if value)}",
+                f"[{repr(nation)}](https://politicsandwar.com/nation/id={nation.id}) has {sum(projects.values()):,}/{len(projects.keys()):,} projects and is using {sum(projects.values())}/{sum(i.infrastructure for i in nation.partial_cities)//5000 + 1:,.0f} project slots.\n\n{', '.join(key for key, value in projects.items() if value)}",
                 color=discord.Color.blue(),
             )
         )
