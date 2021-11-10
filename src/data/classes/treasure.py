@@ -23,7 +23,7 @@ class Treasure:
         self._continent: str = data["continent"]
         self.bonus: int = data["bonus"]
         self.spawn_date: str = data["spawndate"]
-        self.nation_id: int = int(data["nation"])
+        self.nation_id: int = int(data["nation"] or 0)
 
     @classmethod
     async def fetch(cls, ctx: RiftContext, name: str, /):
