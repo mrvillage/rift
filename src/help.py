@@ -108,8 +108,11 @@ class EmbedHelpCommand(commands.HelpCommand):
         if isinstance(group, commands.Group):
             filtered = await self.filter_commands(group.commands, sort=True)  # type: ignore
             for command in filtered:  # type: ignore
+                signature = self.get_command_signature(command)  # type: ignore
+                if len(signature) > 256:
+                    signature = signature[:253] + "..."
                 embed.add_field(
-                    name=self.get_command_signature(command),  # type: ignore
+                    name=signature,
                     value=command.short_doc or "...",  # type: ignore
                     inline=False,
                 )
