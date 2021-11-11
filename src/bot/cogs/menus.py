@@ -13,8 +13,8 @@ from ...checks import has_manage_permissions
 from ...data.classes import Menu, MenuItem
 from ...data.query import delete_interface
 from ...errors import MenuItemNotFoundError
-from ...flags import ButtonFlags, SelectFlags, SelectOptionFlags
 from ...ref import Rift, RiftContext
+from ...text_flags import ButtonFlags, SelectFlags, SelectOptionFlags
 
 
 class Menus(commands.Cog):
