@@ -1,4 +1,6 @@
-version: '2'
+version: "2"
 services:
   rift:
     build: .
+    volumes:
+      - /home/host/rift/.env:.env
