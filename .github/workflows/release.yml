@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: "Release update to server"
     steps:
+      - uses: actions/checkout@v2
       - uses: arwynfr/actions-docker-context@v2
         with:
           docker_host: "ssh://host@${{ secrets.SSH_HOST }}"
