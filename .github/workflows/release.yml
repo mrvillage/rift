@@ -9,8 +9,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     name: "Release update to server"
-    env:
-      working-directory: /github/workspace
     steps:
       - uses: arwynfr/actions-docker-context@v2
         with:
