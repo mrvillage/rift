@@ -3,16 +3,19 @@ name: Release Update
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     name: "Release update to server"
     steps:
-      - uses: arwynfr/actions-docker-context@v2
-        with:
-          docker_host: "ssh://host@${{ secrets.SSH_HOST }}"
-          context_name: "production-server"
-          ssh_cert: ${{ secrets.SSH_PUBLIC_KEY }}
-          ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - run: docker --context production-server up -d
+    - uses: actions/checkout@v2
+
+    - uses: alex-ac/github-action-ssh-docker-compose@v1.0.2
+      name: Docker-Compose Remote Deployment
+      with:
+        ssh_host: ${{ secrets.SSH_HOST }}
+        ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        ssh_user: ${{ secrets.SSH_USER }}
+        docker_compose_prefix: example_com
