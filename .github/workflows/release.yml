@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: alex-ac/github-action-ssh-docker-compose@v1.0.2
+    - uses: mrvillage/github-action-ssh-docker-compose@master
       name: Docker-Compose Remote Deployment
       with:
         ssh_host: ${{ secrets.SSH_HOST }}
