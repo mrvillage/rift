@@ -3,4 +3,4 @@ services:
   rift:
     build: .
     volumes:
-      - /home/host/rift/.env:.env
+      - /home/host/rift/.env:/.env
