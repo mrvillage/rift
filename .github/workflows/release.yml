@@ -16,4 +16,4 @@ jobs:
           context_name: "production-server"
           ssh_cert: ${{ secrets.SSH_PUBLIC_KEY }}
           ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - run: docker --context production-server up -d
+      - run: docker-compose --context production-server up -d
