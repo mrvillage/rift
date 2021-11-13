@@ -8,9 +8,11 @@ from discord.ext import commands
 from discord.utils import MISSING
 
 from src.data.classes.condition import Condition
+from src.data.classes.settings import GuildWelcomeSettings
 from src.views.settings import AlliancePurposeConfirm
 
 from ... import funcs
+from ...cache import cache
 from ...checks import has_alliance_manage_permissions, has_manage_permissions
 from ...data import get
 from ...data.classes import Alliance, AllianceSettings, GuildSettings, Nation
@@ -642,6 +644,250 @@ class Settings(commands.Cog):
             )
 
     @server_settings.command(  # type: ignore
+        name="verified-roles",
+        brief="Modify the server's verified roles.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "roles": "The new verified roles, given by space separated role mentions.",
+            "clear": "Set to True to clear the join roles.",
+        },
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_verified_roles(
+        self,
+        ctx: RiftContext,
+        *,
+        roles: List[discord.Role] = MISSING,
+        clear: bool = False,
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
+        if TYPE_CHECKING:
+            assert settings.welcome_settings is not None
+        if roles is MISSING and not clear:
+            if settings.welcome_settings.verified_roles:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The verified roles are:\n\n{''.join(f'<@&{i}>' for i in settings.welcome_settings.verified_roles)}",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="This server has no verified roles.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        roles_set = None if clear else [i.id for i in roles]  # type: ignore
+        await settings.welcome_settings.set_(verified_roles=roles_set)
+        if roles_set:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The verified roles are now:\n\n{''.join(f'<@&{i}>' for i in roles_set)}",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The verified roles have been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @server_settings.command(  # type: ignore
+        name="member-roles",
+        brief="Modify the server's alliance member roles.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "roles": "The new alliance member roles, given by space separated role mentions.",
+            "clear": "Set to True to clear the join roles.",
+        },
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_member_roles(
+        self,
+        ctx: RiftContext,
+        *,
+        roles: List[discord.Role] = MISSING,
+        clear: bool = False,
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
+        if TYPE_CHECKING:
+            assert settings.welcome_settings is not None
+        if roles is MISSING and not clear:
+            if settings.welcome_settings.member_roles:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The member roles are:\n\n{''.join(f'<@&{i}>' for i in settings.welcome_settings.member_roles)}",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="This server has no member roles.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        roles_set = None if clear else [i.id for i in roles]  # type: ignore
+        await settings.welcome_settings.set_(member_roles=roles_set)
+        if roles_set:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The member roles are now:\n\n{''.join(f'<@&{i}>' for i in roles_set)}",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The member roles have been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @server_settings.command(  # type: ignore
+        name="diplomat-roles",
+        brief="Modify the server's diplomat roles.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "roles": "The new diplomat roles, given by space separated role mentions.",
+            "clear": "Set to True to clear the diplomat roles.",
+        },
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_diplomat_roles(
+        self,
+        ctx: RiftContext,
+        *,
+        roles: List[discord.Role] = MISSING,
+        clear: bool = False,
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
+        if TYPE_CHECKING:
+            assert settings.welcome_settings is not None
+        if roles is MISSING and not clear:
+            if settings.welcome_settings.diplomat_roles:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The diplomat roles are:\n\n{''.join(f'<@&{i}>' for i in settings.welcome_settings.diplomat_roles)}",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="This server has no diplomat roles.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        roles_set = None if clear else [i.id for i in roles]  # type: ignore
+        await settings.welcome_settings.set_(diplomat_roles=roles_set)
+        if roles_set:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The diplomat roles are now:\n\n{''.join(f'<@&{i}>' for i in roles_set)}",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The diplomat roles have been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @server_settings.command(  # type: ignore
+        name="enforce-verified-nickname",
+        brief="Whether or not to enforce verified nicknames.",
+        type=commands.CommandType.chat_input,
+        descriptions={"enforce": "Whether or not to enforce verified nicknames."},
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_enforce_verified_nickname(
+        self, ctx: RiftContext, enforce: bool = MISSING
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
+        if TYPE_CHECKING:
+            assert settings.welcome_settings is not None
+        if enforce is MISSING:
+            if settings.welcome_settings.enforce_verified_nickname:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="Verified nicknames are enforced.",
+                        color=discord.Color.blue(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="Verified nicknames are not enforced.",
+                        color=discord.Color.blue(),
+                    ),
+                    ephemeral=True,
+                )
+        await settings.set_(enforce_verified_nickname=enforce)
+        if enforce:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="Verified nicknames are now enforced.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="Verified nicknames are no longer enforced.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @server_settings.command(  # type: ignore
         name="managers",
         brief="Modify the server's manager roles.",
         type=commands.CommandType.chat_input,
@@ -709,8 +955,8 @@ class Settings(commands.Cog):
             await nation.make_attrs("alliance")
         except IndexError:
             nation = None
-        settings = await GuildSettings.fetch(member.guild.id, "welcome_settings")
-        settings = settings.welcome_settings
+        guild_settings = await GuildSettings.fetch(member.guild.id, "welcome_settings")
+        settings = guild_settings.welcome_settings
         if settings.welcome_channels:
             for channel in settings.welcome_channels:
                 channel = self.bot.get_channel(channel)
@@ -735,9 +981,6 @@ class Settings(commands.Cog):
                     continue
                 if highest_role > role:
                     roles.append(role)
-            if roles:
-                await member.add_roles(*roles)
-            roles = []
         if nation:
             if settings.verified_nickname:
                 if member.guild.get_member(
@@ -751,15 +994,51 @@ class Settings(commands.Cog):
                         continue
                     if highest_role > role:
                         roles.append(role)
-                if roles:
-                    await member.add_roles(*roles)
-                roles = []
-            ...  # implement the rest of the welcome stuff below, will need to set up alliance settings and embassies first though
+            # implement the rest of the welcome stuff below, will need to set up alliance settings and embassies first though
+            if (
+                settings.member_roles is not None
+                and guild_settings.purpose is not None
+                and nation.alliance is not None
+                and guild_settings.purpose_argument is not None
+            ):
+                if (
+                    guild_settings.purpose.startswith("ALLIANCE")
+                    and nation.alliance.id == int(guild_settings.purpose_argument)
+                    and nation.alliance_position
+                    in {"Member", "Officer", "Heir", "Leader"}
+                ):
+                    for role_id in settings.member_roles:
+                        role: Optional[discord.Role] = member.guild.get_role(role_id)
+                        if role is None:
+                            continue
+                        if highest_role > role:
+                            roles.append(role)
+            if settings.diplomat_roles is not None and nation.alliance_position in {
+                "Officer",
+                "Heir",
+                "Leader",
+            }:
+                for role_id in settings.diplomat_roles:
+                    role: Optional[discord.Role] = member.guild.get_role(role_id)
+                    if role is None:
+                        continue
+                    if highest_role > role:
+                        roles.append(role)
+        if roles:
+            await member.add_roles(*roles)
+        roles = []
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         if before.pending and not after.pending:
             await self.on_member_join(after)
+        settings = await GuildWelcomeSettings.fetch(before.guild.id)
+        if before.nick != after.nick and settings.enforce_verified_nickname:
+            link = cache.get_user(after.id)
+            if link is not None:
+                nation = cache.get_nation(link["nation_id"])
+                if nation is not None:
+                    await settings.set_verified_nickname(after, nation)
 
 
 def setup(bot: Rift):

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, TypedDict
+from typing import List, Optional, TypedDict
 
 __all__ = ("AllianceSettingsData", "GuildSettingsData", "GuildWelcomeSettingsData")
 
@@ -26,9 +26,6 @@ class GuildWelcomeSettingsData(TypedDict):
     join_roles: Optional[List[int]]
     verified_roles: Optional[List[int]]
     member_roles: Optional[List[int]]
-    global_city_roles: Optional[Dict[str, List[int]]]
-    member_city_roles: Optional[Dict[str, List[int]]]
-    diplomat_roles: Optional[Dict[str, List[int]]]
-    alliance_roles: Optional[Dict[str, List[int]]]
-    alliance_gov_roles: Optional[Dict[str, List[int]]]
+    diplomat_roles: Optional[List[int]]
     verified_nickname: Optional[str]
+    enforce_verified_nickname: Optional[bool]
