@@ -165,10 +165,9 @@ class GuildWelcomeSettings(Makeable):
             message += "\n\nIt doesn't look like you're linked! Be sure to run `/link` and provide your nation to get linked."
         return get_embed_author_member(member, message, color=discord.Color.blue())
 
-    async def set_verified_nickname(
+    def format_verified_nickname(
         self, member: discord.Member, nation: Nation
-    ) -> None:
-        await nation.make_attrs("alliance")
+    ) -> Optional[str]:
         if not self.verified_nickname:
             return
         if nation.alliance:
@@ -195,6 +194,13 @@ class GuildWelcomeSettings(Makeable):
             member_discriminator=member.discriminator,
         )
         nickname = nickname[:32]
+
+    async def set_verified_nickname(
+        self, member: discord.Member, nation: Nation
+    ) -> None:
+        nickname = self.format_verified_nickname(member, nation)
+        if nickname is None:
+            return
         await member.edit(nick=nickname)
 
     async def set_(self, **kwargs: Any) -> GuildWelcomeSettings:
