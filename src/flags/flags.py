@@ -1,36 +1,26 @@
 from __future__ import annotations
 
-from typing import Any, Callable, ClassVar, Dict, Optional, Type, TypeVar, overload
+from typing import Any, Callable, Optional, Type, TypeVar, overload
 
 __all__ = ("Flags",)
 
 T = TypeVar("T", bound="Flags")
-# base class for binary flags
-class Flags:
-    VALID_FLAGS: ClassVar[Dict[str, Any]]
 
-    __slots__ = "flags"
+
+class Flags:
+    __slots__ = ("flags",)
 
     def __init__(self, flags: int = 0) -> None:
         self.flags = flags
 
     @classmethod
     def from_kwargs(cls, **kwargs: bool) -> Flags:
-        flags = 0
+        flags = cls(0)
         for flag, value in kwargs.items():
-            if value is not False:
-                flags |= cls.VALID_FLAGS[flag]
-        return cls(flags)
-
-    @classmethod
-    def all(cls) -> Flags:
-        flags = 0
-        for value in cls.VALID_FLAGS.values():
-            flags |= value
-        return cls(flags)
+            setattr(flags, flag, value)
+        return flags
 
 
-# descriptor for flag values
 class flag:
     def __init__(self, func: Callable[[Any], int]):
         self.flag = func(None)
