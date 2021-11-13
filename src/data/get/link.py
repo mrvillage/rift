@@ -5,6 +5,7 @@ from typing import List
 from _typings import UserData
 
 from ...cache import cache
+from ...ref import bot
 from ..query import link
 
 __all__ = (
@@ -24,6 +25,7 @@ async def get_links() -> List[UserData]:
 async def add_link(user_id: int, nation_id: int, /) -> None:
     cache.users.append({"user_id": user_id, "nation_id": nation_id})
     await link.add_link(user_id, nation_id)
+    bot.dispatch("link_create", {"user_id": user_id, "nation_id": nation_id})
 
 
 async def remove_link_user(user_id: int, /) -> None:
