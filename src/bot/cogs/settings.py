@@ -538,8 +538,6 @@ class Settings(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
-        if TYPE_CHECKING:
-            assert settings.welcome_settings is not None
         if channels is MISSING and not clear:
             if settings.welcome_settings.welcome_channels:
                 return await ctx.reply(
@@ -601,8 +599,6 @@ class Settings(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
-        if TYPE_CHECKING:
-            assert settings.welcome_settings is not None
         if roles is MISSING and not clear:
             if settings.welcome_settings.join_roles:
                 return await ctx.reply(
@@ -664,8 +660,6 @@ class Settings(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
-        if TYPE_CHECKING:
-            assert settings.welcome_settings is not None
         if roles is MISSING and not clear:
             if settings.welcome_settings.verified_roles:
                 return await ctx.reply(
@@ -727,8 +721,6 @@ class Settings(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
-        if TYPE_CHECKING:
-            assert settings.welcome_settings is not None
         if roles is MISSING and not clear:
             if settings.welcome_settings.member_roles:
                 return await ctx.reply(
@@ -790,8 +782,6 @@ class Settings(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
-        if TYPE_CHECKING:
-            assert settings.welcome_settings is not None
         if roles is MISSING and not clear:
             if settings.welcome_settings.diplomat_roles:
                 return await ctx.reply(
@@ -846,8 +836,6 @@ class Settings(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
-        if TYPE_CHECKING:
-            assert settings.welcome_settings is not None
         if enforce is MISSING:
             if settings.welcome_settings.enforce_verified_nickname:
                 return await ctx.reply(
