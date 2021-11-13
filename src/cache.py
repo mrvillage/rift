@@ -10,6 +10,7 @@ __all__ = ("cache",)
 
 if TYPE_CHECKING:
     from _typings import (
+        AllianceAutoRoleData,
         AllianceData,
         AllianceSettingsData,
         CityData,
@@ -38,6 +39,7 @@ if TYPE_CHECKING:
 
     from .data.classes import (
         Alliance,
+        AllianceAutoRole,
         AllianceSettings,
         City,
         Color,
@@ -76,6 +78,7 @@ class Validate:
 class Cache:
     __slots__ = (
         "_alliances",
+        "_alliance_auto_roles",
         "_alliance_settings",
         "_cities",
         "_colors",
@@ -108,6 +111,7 @@ class Cache:
 
     def __init__(self):
         self._alliances: Dict[int, Alliance] = {}
+        self._alliance_auto_roles: Set[AllianceAutoRole] = set()
         self._alliance_settings: Dict[int, AllianceSettings] = {}
         self._cities: Dict[int, City] = {}
         self._colors: Dict[str, Color] = {}
@@ -140,6 +144,7 @@ class Cache:
     async def initialize(self):  # sourcery no-metrics
         from .data.classes import (
             Alliance,
+            AllianceAutoRole,
             AllianceSettings,
             City,
             Color,
@@ -164,6 +169,7 @@ class Cache:
 
         queries = [
             "SELECT * FROM alliances;",
+            "SELECT * FROM alliance_auto_roles;",
             "SELECT * FROM alliance_settings;",
             "SELECT * FROM cities;",
             "SELECT * FROM colors ORDER BY datetime DESC LIMIT 1;",
@@ -189,6 +195,7 @@ class Cache:
         ]
         data: Tuple[  # type: ignore
             List[AllianceData],
+            List[AllianceAutoRoleData],
             List[AllianceSettingsData],
             List[CityData],
             List[RawColorData],
@@ -216,6 +223,7 @@ class Cache:
         )
         (
             alliances,
+            alliance_auto_roles,
             alliance_settings,
             cities,
             colors,
@@ -242,6 +250,9 @@ class Cache:
         for i in alliances:
             i = Alliance(i)
             self._alliances[i.id] = i
+        for i in alliance_auto_roles:
+            i = AllianceAutoRole(i)
+            self._alliance_auto_roles.add(i)
         for i in alliance_settings:
             i = AllianceSettings(i)
             self._alliance_settings[i.alliance_id] = i
@@ -328,6 +339,10 @@ class Cache:
     @property
     def alliances(self) -> Set[Alliance]:
         return set(self._alliances.values())
+
+    @property
+    def alliance_auto_roles(self) -> Set[AllianceAutoRole]:
+        return self._alliance_auto_roles
 
     @property
     def cities(self) -> Set[City]:
@@ -597,6 +612,9 @@ class Cache:
     def get_user_settings(self, id: int, /) -> Optional[UserSettings]:
         return self._user_settings.get(id)
 
+    def add_alliance_auto_role(self, role: AllianceAutoRole, /) -> None:
+        self._alliance_auto_roles.add(role)
+
     def add_alliance_settings(self, settings: AllianceSettings, /) -> None:
         self._alliance_settings[settings.alliance_id] = settings
 
@@ -638,6 +656,9 @@ class Cache:
 
     def add_target_reminder(self, reminder: TargetReminder, /) -> None:
         self._target_reminders[reminder.id] = reminder
+
+    def remove_alliance_auto_role(self, role: AllianceAutoRole, /) -> None:
+        self._alliance_auto_roles.remove(role)
 
     def remove_condition(self, condition: Condition, /) -> None:
         self._conditions.pop(condition.id)

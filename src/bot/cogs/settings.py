@@ -8,7 +8,7 @@ from discord.ext import commands
 from discord.utils import MISSING
 
 from src.data.classes.condition import Condition
-from src.data.classes.settings import GuildWelcomeSettings
+from src.data.classes.settings import AllianceAutoRole, GuildWelcomeSettings
 from src.views.settings import AlliancePurposeConfirm
 
 from ... import funcs
@@ -932,6 +932,276 @@ class Settings(commands.Cog):
                 ephemeral=True,
             )
 
+    @server_settings.group(  # type: ignore
+        name="alliance-auto-roles",
+        brief="Configure alliance auto roles.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles(self, ctx: RiftContext):
+        ...
+
+    @server_settings_alliance_auto_roles.command(  # type: ignore
+        name="info",
+        brief="Get information about the current alliance auto roles configuration.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles_info(self, ctx: RiftContext):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                description=f"Alliance auto roles are currently **{'enabled' if settings.welcome_settings.alliance_auto_roles_enabled else 'disabled'}** and automatic alliance auto role creation is currently **{'enabled' if settings.welcome_settings.alliance_auto_role_creation_enabled else 'disabled'}**.",
+                color=discord.Color.blue(),
+            ),
+            ephemeral=True,
+        )
+
+    @server_settings_alliance_auto_roles.command(  # type: ignore
+        name="toggle",
+        brief="Toggle alliance auto roles on and off.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles_toggle(
+        self, ctx: RiftContext, enable: bool
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id)
+        if enable is settings.welcome_settings.alliance_auto_roles_enabled:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"Alliance auto roles are already **{'enabled' if enable else 'disabled'}**.",
+                    color=discord.Color.blue(),
+                ),
+                ephemeral=True,
+            )
+        await settings.welcome_settings.set_(alliance_auto_roles_enabled=enable)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                description=f"Alliance auto roles are now **{'enabled' if enable else 'disabled'}**.",
+                color=discord.Color.blue(),
+            ),
+            ephemeral=True,
+        )
+
+    @server_settings_alliance_auto_roles.command(  # type: ignore
+        name="toggle-create",
+        brief="Toggle automatically creating alliance auto roles on and off.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles_toggle_create(
+        self, ctx: RiftContext, enable: bool
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id)
+        if enable is settings.welcome_settings.alliance_auto_role_creation_enabled:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"Automatic alliance auto role creation is already **{'enabled' if enable else 'disabled'}**.",
+                    color=discord.Color.blue(),
+                ),
+                ephemeral=True,
+            )
+        await settings.welcome_settings.set_(alliance_auto_role_creation_enabled=enable)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                description=f"Alliance auto role creation is now **{'enabled' if enable else 'disabled'}**.",
+                color=discord.Color.blue(),
+            ),
+            ephemeral=True,
+        )
+
+    @server_settings_alliance_auto_roles.command(  # type: ignore
+        name="list",
+        brief="List the current alliance auto roles.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles_list(self, ctx: RiftContext):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id)
+        if settings.welcome_settings.alliance_auto_roles_enabled:
+            if settings.welcome_settings.alliance_auto_roles:
+                roles_str = "\n".join(
+                    str(i) for i in settings.welcome_settings.alliance_auto_roles
+                )
+                if len(roles_str) >= 4000:
+                    roles_str = "\n".join(
+                        f"<@&{i.role_id}> - {i.alliance_id}"
+                        for i in settings.welcome_settings.alliance_auto_roles
+                    )
+                if len(roles_str) >= 4000:
+                    await ctx.reply(
+                        embed=funcs.get_embed_author_member(
+                            ctx.author,
+                            description="There are too alliance auto roles to display.",
+                            color=discord.Color.red(),
+                        ),
+                        ephemeral=True,
+                    )
+                else:
+                    await ctx.reply(
+                        embed=funcs.get_embed_author_member(
+                            ctx.author,
+                            description=f"The alliance auto roles are:\n\n{roles_str}",
+                            color=discord.Color.blue(),
+                        ),
+                        ephemeral=True,
+                    )
+            else:
+                await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="This server has no alliance auto roles.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="Alliance auto roles are disabled.",
+                    color=discord.Color.blue(),
+                ),
+                ephemeral=True,
+            )
+
+    @server_settings_alliance_auto_roles.command(  # type: ignore
+        name="add",
+        brief="Add a role to an alliance.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles_add(
+        self, ctx: RiftContext, role: discord.Role, alliance: Alliance
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        await AllianceAutoRole.create(role, alliance)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                description=f"Added {role.mention} to the {alliance.name}'s auto roles.",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @server_settings_alliance_auto_roles.command(  # type: ignore
+        name="remove",
+        brief="Remove a role from an alliance.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles_remove(
+        self, ctx: RiftContext, role: discord.Role, alliance: Alliance
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        roles = [
+            i
+            for i in cache.alliance_auto_roles
+            if i.role_id == role.id and i.alliance_id == alliance.id
+        ]
+        for r in roles:
+            await r.delete()
+        if roles:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"Removed {role.mention} from the {alliance.name}'s auto roles.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="No alliance auto roles removed.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+
+    @server_settings_alliance_auto_roles.command(  # type: ignore
+        name="run",
+        brief="Check and add/remove alliance auto roles.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles_run(self, ctx: RiftContext):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        await ctx.interaction.response.defer(ephemeral=True)
+        guild = ctx.guild
+        settings = await GuildSettings.fetch(guild.id)
+        if not settings.welcome_settings.alliance_auto_roles_enabled:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="Alliance auto roles are disabled.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        auto_roles = [i for i in cache.alliance_auto_roles if i.guild_id == guild.id]
+        highest_role: discord.Role = guild.get_member(self.bot.user.id).top_role  # type: ignore
+        for member in guild.members:
+            link = cache.get_user(member.id)
+            if link is None:
+                continue
+            nation = cache.get_nation(link["nation_id"])
+            if nation is None:
+                continue
+            alliance_id = nation.alliance.id if nation.alliance else None
+            roles: List[discord.Role] = []
+            role_ids = [i for i in auto_roles if i.alliance_id == alliance_id]
+            if role_ids:
+                for role_id in role_ids:
+                    role = guild.get_role(role_id.role_id)
+                    if role is None:
+                        continue
+                    if highest_role > role and role not in member.roles:
+                        roles.append(role)
+            elif settings.welcome_settings.alliance_auto_role_creation_enabled:
+                role = await guild.create_role(
+                    reason="Automatic alliance auto role creation.",
+                    name=repr(nation.alliance),
+                )
+                roles.append(role)
+            if roles:
+                await member.add_roles(*roles)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                description="Alliance auto roles have been updated.",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         # sourcery no-metrics skip: merge-nested-ifs
@@ -1012,6 +1282,27 @@ class Settings(commands.Cog):
                         continue
                     if highest_role > role:
                         roles.append(role)
+            if settings.alliance_auto_roles_enabled:
+                alliance_id = nation.alliance.id if nation.alliance else None
+                auto_roles = [
+                    i
+                    for i in cache.alliance_auto_roles
+                    if i.guild_id == member.guild.id and i.alliance_id == alliance_id
+                ]
+                role_ids = [i for i in auto_roles if i.alliance_id == alliance_id]
+                if role_ids:
+                    for role_id in role_ids:
+                        role = member.guild.get_role(role_id.role_id)
+                        if role is None:
+                            continue
+                        if highest_role > role:
+                            roles.append(role)
+                elif settings.alliance_auto_role_creation_enabled:
+                    role = await member.guild.create_role(
+                        reason="Automatic alliance auto role creation.",
+                        name=repr(nation.alliance),
+                    )
+                    roles.append(role)
         if roles:
             await member.add_roles(*roles)
         roles = []
