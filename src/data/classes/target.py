@@ -35,7 +35,9 @@ class Target:
         self.id: int = data["id"]
         resources = data["resources"]
         self.resources: Optional[Resources] = (
-            Resources.convert_resources(resources) if resources else None
+            Resources.convert_resources(resources)
+            if resources and resources != "None"
+            else None
         )
         self.last_turn_fetched: Optional[str] = data["last_turn_fetched"]
         self.resources_off_attack: bool = data.get("resources_off_attack", True)
