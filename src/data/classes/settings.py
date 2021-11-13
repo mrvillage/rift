@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, List, Optional
 
 import discord
 
@@ -43,11 +43,7 @@ class GuildWelcomeSettings(Makeable):
         "join_roles",
         "verified_roles",
         "member_roles",
-        "global_city_roles",
-        "member_city_roles",
         "diplomat_roles",
-        "alliance_roles",
-        "alliance_gov_roles",
         "verified_nickname",
         "defaulted",
     )
@@ -60,18 +56,13 @@ class GuildWelcomeSettings(Makeable):
         self.join_roles: Optional[List[int]] = data["join_roles"]
         self.verified_roles: Optional[List[int]] = data["verified_roles"]
         self.member_roles: Optional[List[int]] = data["member_roles"]
-        self.global_city_roles: Optional[Dict[str, List[int]]] = data[
-            "global_city_roles"
-        ]
-        self.member_city_roles: Optional[Dict[str, List[int]]] = data[
-            "member_city_roles"
-        ]
-        self.diplomat_roles: Optional[Dict[str, List[int]]] = data["diplomat_roles"]
-        self.alliance_roles: Optional[Dict[str, List[int]]] = data["alliance_roles"]
-        self.alliance_gov_roles: Optional[Dict[str, List[int]]] = data[
-            "alliance_gov_roles"
-        ]
+        self.diplomat_roles: Optional[List[int]] = data["diplomat_roles"]
         self.verified_nickname: Optional[str] = data["verified_nickname"]
+        self.enforce_verified_nickname: bool = (
+            data["enforce_verified_nickname"]
+            if data["enforce_verified_nickname"] is not None
+            else False
+        )
 
     @classmethod
     def default(cls, guild_id: int) -> GuildWelcomeSettings:
@@ -83,12 +74,9 @@ class GuildWelcomeSettings(Makeable):
                 "join_roles": None,
                 "verified_roles": None,
                 "member_roles": None,
-                "global_city_roles": None,
-                "member_city_roles": None,
                 "diplomat_roles": None,
-                "alliance_roles": None,
-                "alliance_gov_roles": None,
                 "verified_nickname": None,
+                "enforce_verified_nickname": None,
             }
         )
         settings.defaulted = True
