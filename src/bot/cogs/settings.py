@@ -7,17 +7,25 @@ import discord
 from discord.ext import commands
 from discord.utils import MISSING
 
-from src.data.classes.condition import Condition
-from src.data.classes.settings import AllianceAutoRole, GuildWelcomeSettings
-from src.views.settings import AlliancePurposeConfirm
-
 from ... import funcs
 from ...cache import cache
 from ...checks import has_alliance_manage_permissions, has_manage_permissions
 from ...data import get
-from ...data.classes import Alliance, AllianceSettings, GuildSettings, Nation
+from ...data.classes import (
+    Alliance,
+    AllianceAutoRole,
+    AllianceSettings,
+    Condition,
+    GuildSettings,
+    GuildWelcomeSettings,
+    Nation,
+)
 from ...errors import AllianceNotFoundError
 from ...ref import Rift, RiftContext
+from ...views import AlliancePurposeConfirm
+
+if TYPE_CHECKING:
+    from _typings import UserData
 
 
 class Settings(commands.Cog):
@@ -1318,6 +1326,232 @@ class Settings(commands.Cog):
                 nation = cache.get_nation(link["nation_id"])
                 if nation is not None:
                     await settings.set_verified_nickname(after, nation)
+
+    @commands.Cog.listener()
+    async def on_link_create(self, link: UserData):
+        # sourcery skip: merge-nested-ifs
+        nation = cache.get_nation(link["nation_id"])
+        if nation is None:
+            return
+        for guild in self.bot.guilds:
+            if link["user_id"] not in {i.id for i in guild.members}:
+                continue
+            guild_settings = await GuildSettings.fetch(guild.id)
+            settings = guild_settings.welcome_settings
+            roles: list[discord.Role] = []
+            highest_role: discord.Role = member.guild.get_member(self.bot.user.id).top_role  # type: ignore
+            member = guild.get_member(link["user_id"])
+            if member is None:
+                continue
+            if settings.verified_nickname and settings.enforce_verified_nickname:
+                if member.guild.get_member(
+                    self.bot.user.id  # type: ignore
+                ).guild_permissions.manage_nicknames:  # type: ignore
+                    await settings.set_verified_nickname(member, nation)
+            if settings.verified_roles is not None:
+                for role_id in settings.verified_roles:
+                    role: Optional[discord.Role] = member.guild.get_role(role_id)
+                    if role is None:
+                        continue
+                    if highest_role > role and role not in member.roles:
+                        roles.append(role)
+            if (
+                settings.member_roles is not None
+                and guild_settings.purpose is not None
+                and nation.alliance is not None
+                and guild_settings.purpose_argument is not None
+            ):
+                if (
+                    guild_settings.purpose.startswith("ALLIANCE")
+                    and nation.alliance.id == int(guild_settings.purpose_argument)
+                    and nation.alliance_position
+                    in {"Member", "Officer", "Heir", "Leader"}
+                ):
+                    for role_id in settings.member_roles:
+                        role: Optional[discord.Role] = member.guild.get_role(role_id)
+                        if role is None:
+                            continue
+                        if highest_role > role and role not in member.roles:
+                            roles.append(role)
+            if settings.diplomat_roles is not None and nation.alliance_position in {
+                "Officer",
+                "Heir",
+                "Leader",
+            }:
+                for role_id in settings.diplomat_roles:
+                    role: Optional[discord.Role] = member.guild.get_role(role_id)
+                    if role is None:
+                        continue
+                    if highest_role > role and role not in member.roles:
+                        roles.append(role)
+            if settings.alliance_auto_roles_enabled:
+                alliance_id = nation.alliance.id if nation.alliance else None
+                auto_roles = [
+                    i
+                    for i in cache.alliance_auto_roles
+                    if i.guild_id == member.guild.id and i.alliance_id == alliance_id
+                ]
+                role_ids = [i for i in auto_roles if i.alliance_id == alliance_id]
+                if role_ids:
+                    for role_id in role_ids:
+                        role = member.guild.get_role(role_id.role_id)
+                        if role is None:
+                            continue
+                        if highest_role > role and role not in member.roles:
+                            roles.append(role)
+                elif settings.alliance_auto_role_creation_enabled:
+                    role = await member.guild.create_role(
+                        reason="Automatic alliance auto role creation.",
+                        name=repr(nation.alliance),
+                    )
+                    roles.append(role)
+            if roles:
+                await member.add_roles(*roles)
+
+    @commands.Cog.listener()
+    async def on_nation_update(self, before: Nation, after: Nation):
+        # sourcery skip: merge-nested-ifs
+        link = after.user
+        if link is None:
+            return
+        for guild in self.bot.guilds:
+            if link.id not in {i.id for i in guild.members}:
+                continue
+            guild_settings = await GuildSettings.fetch(guild.id)
+            settings = guild_settings.welcome_settings
+            add_roles: List[discord.Role] = []
+            remove_roles: List[discord.Role] = []
+            highest_role: discord.Role = member.guild.get_member(self.bot.user.id).top_role  # type: ignore
+            member = guild.get_member(link.id)
+            if member is None:
+                continue
+            if settings.verified_nickname and settings.enforce_verified_nickname:
+                if settings.format_verified_nickname(
+                    member, before
+                ) != settings.format_verified_nickname(member, after):
+                    if member.guild.get_member(
+                        self.bot.user.id  # type: ignore
+                    ).guild_permissions.manage_nicknames:  # type: ignore
+                        await settings.set_verified_nickname(member, after)
+            if before.alliance != after.alliance:
+                if settings.alliance_auto_roles_enabled:
+                    # add new roles
+                    alliance_id = after.alliance.id if after.alliance else None
+                    auto_roles = [
+                        i
+                        for i in cache.alliance_auto_roles
+                        if i.guild_id == member.guild.id
+                        and i.alliance_id == alliance_id
+                    ]
+                    role_ids = [i for i in auto_roles if i.alliance_id == alliance_id]
+                    if role_ids:
+                        for role_id in role_ids:
+                            role = member.guild.get_role(role_id.role_id)
+                            if role is None:
+                                continue
+                            if highest_role > role and role not in member.roles:
+                                add_roles.append(role)
+                    elif settings.alliance_auto_role_creation_enabled:
+                        role = await member.guild.create_role(
+                            reason="Automatic alliance auto role creation.",
+                            name=repr(after.alliance),
+                        )
+                        add_roles.append(role)
+                    # remove old roles
+                    auto_roles = [
+                        i
+                        for i in cache.alliance_auto_roles
+                        if i.guild_id == member.guild.id
+                        and i.alliance_id == alliance_id
+                    ]
+                    role_ids = [i for i in auto_roles if i.alliance_id == alliance_id]
+                    if role_ids:
+                        for role_id in role_ids:
+                            role = member.guild.get_role(role_id.role_id)
+                            if role is None:
+                                continue
+                            if highest_role > role and role in member.roles:
+                                remove_roles.append(role)
+                    if (
+                        settings.member_roles is not None
+                        and guild_settings.purpose is not None
+                        and after.alliance is not None
+                        and guild_settings.purpose_argument is not None
+                    ):
+                        if (
+                            guild_settings.purpose.startswith("ALLIANCE")
+                            and after.alliance.id
+                            == int(guild_settings.purpose_argument)
+                            and after.alliance_position
+                            in {"Member", "Officer", "Heir", "Leader"}
+                        ):
+                            for role_id in settings.member_roles:
+                                role: Optional[discord.Role] = member.guild.get_role(
+                                    role_id
+                                )
+                                if role is None:
+                                    continue
+                                if highest_role > role and role not in member.roles:
+                                    add_roles.append(role)
+                    if (
+                        settings.member_roles is not None
+                        and guild_settings.purpose is not None
+                        and before.alliance is not None
+                        and guild_settings.purpose_argument is not None
+                    ):
+                        if (
+                            guild_settings.purpose.startswith("ALLIANCE")
+                            and before.alliance.id
+                            == int(guild_settings.purpose_argument)
+                            and before.alliance_position
+                            in {"Member", "Officer", "Heir", "Leader"}
+                        ):
+                            for role_id in settings.member_roles:
+                                role: Optional[discord.Role] = member.guild.get_role(
+                                    role_id
+                                )
+                                if role is None:
+                                    continue
+                                if highest_role > role and role in member.roles:
+                                    remove_roles.append(role)
+                    if (
+                        settings.diplomat_roles is not None
+                        and after.alliance_position
+                        in {
+                            "Officer",
+                            "Heir",
+                            "Leader",
+                        }
+                    ):
+                        for role_id in settings.diplomat_roles:
+                            role: Optional[discord.Role] = member.guild.get_role(
+                                role_id
+                            )
+                            if role is None:
+                                continue
+                            if highest_role > role and role not in member.roles:
+                                add_roles.append(role)
+                    if (
+                        settings.diplomat_roles is not None
+                        and before.alliance_position
+                        in {
+                            "Officer",
+                            "Heir",
+                            "Leader",
+                        }
+                    ):
+                        for role_id in settings.diplomat_roles:
+                            role: Optional[discord.Role] = member.guild.get_role(
+                                role_id
+                            )
+                            if role is None:
+                                continue
+                            if highest_role > role and role in member.roles:
+                                remove_roles.append(role)
+            if add_roles:
+                await member.add_roles(*add_roles)
+            if remove_roles:
+                await member.remove_roles(*remove_roles)
 
 
 def setup(bot: Rift):
