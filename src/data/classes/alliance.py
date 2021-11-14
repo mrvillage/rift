@@ -419,7 +419,7 @@ class Alliance(Makeable):
         if TYPE_CHECKING:
             assert isinstance(data, tuple)
         prices = cache.prices
-        nations = {i.id: i for i in data["nations"]}
+        nations = {int(i.id): i for i in data["nations"]}
         revenues = [
             await i.calculate_revenue(
                 prices,
