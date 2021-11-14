@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from ...cache import cache
+from ...errors import NationNotFoundError
 from ...flags import CredentialsPermissions
 from ...funcs import credentials
 from .nation import Nation
@@ -38,8 +39,11 @@ class Credentials:
         return credentials.decrypt_credential(bytes.fromhex(self._api_key))
 
     @property
-    def nation(self) -> Optional[Nation]:
-        return cache.get_nation(self.nation_id)
+    def nation(self) -> Nation:
+        nation = cache.get_nation(self.nation_id)
+        if nation is None:
+            raise NationNotFoundError(self.nation_id)
+        return nation
 
     def has_permission(self, permission: str) -> bool:
         return getattr(self.permissions, permission, False)
