@@ -436,6 +436,116 @@ class PnWInfo(commands.Cog):
             )
         )
 
+    @commands.group(
+        name="top-revenue",
+        brief="Get top revenue information.",
+        type=commands.CommandType.chat_input,
+    )
+    async def top_revenue(self, ctx: RiftContext):
+        ...
+
+    @top_revenue.command(  # type: ignore
+        name="alliances",
+        brief="Get top alliance revenue information.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "top_fifty": "Calculate top fifty alliances instead of the top twenty-five, adds about two minutes of wait time."
+        },
+    )
+    async def top_revenue_alliances(self, ctx: RiftContext, top_fifty: bool = False):
+        await ctx.interaction.response.defer()
+        top_alliances = sorted(
+            [
+                (i, await i.calculate_revenue())
+                for i in sorted(cache.alliances, key=lambda x: x.score, reverse=True)[
+                    : 25 + (25 * top_fifty)
+                ]
+            ],
+            key=lambda x: sum(x[1]["net_total"].to_dict().values())
+            + x[1]["net_income"].money,
+            reverse=True,
+        )[:10]
+        fields: List[Field] = [
+            {
+                "name": f"#{index+1}",
+                "value": f"[{repr(i[0])}](https://politicsandwar.com/alliance/id={i[0].id})\nGross: ${sum(i[1]['gross_total'].to_dict().values())+i[1]['gross_income'].money:,.2f}\nUpkeep: ${sum(i[1]['upkeep_total'].to_dict().values())+i[1]['upkeep'].money:,.2f}\nNet: ${sum(i[1]['net_total'].to_dict().values())+i[1]['net_income'].money:,.2f}",
+            }
+            for index, i in enumerate(top_alliances)
+        ]
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Note: For performance, only the top {'fifty' if top_fifty else 'twenty-five'} alliances are taken into account.",
+                title="Top Alliance Revenues:",
+                fields=fields,
+                color=discord.Color.green(),
+            ),
+        )
+
+    @top_revenue.command(  # type: ignore
+        name="nations",
+        brief="Get top nation revenue information.",
+        type=commands.CommandType.chat_input,
+    )
+    async def top_revenue_nations(self, ctx: RiftContext):
+        await ctx.interaction.response.defer()
+        top_alliances = sorted(
+            [
+                (i, await i.calculate_revenue())
+                for i in sorted(cache.nations, key=lambda x: x.score, reverse=True)[:50]
+            ],
+            key=lambda x: sum(x[1]["net_total"].to_dict().values())
+            + x[1]["net_income"].money,
+            reverse=True,
+        )[:10]
+        fields: List[Field] = [
+            {
+                "name": f"#{index+1}",
+                "value": f"[{repr(i[0])}](https://politicsandwar.com/alliance/id={i[0].id})\nGross: ${sum(i[1]['gross_total'].to_dict().values())+i[1]['gross_income'].money:,.2f}\nUpkeep: ${sum(i[1]['upkeep_total'].to_dict().values())+i[1]['upkeep'].money:,.2f}\nNet: ${sum(i[1]['net_total'].to_dict().values())+i[1]['net_income'].money:,.2f}",
+            }
+            for index, i in enumerate(top_alliances)
+        ]
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                title="Top Nation Revenues:",
+                fields=fields,
+                color=discord.Color.green(),
+            ),
+        )
+
+    @top_revenue.command(  # type: ignore
+        name="alliance",
+        brief="Get top nation revenue information of an alliance.",
+        type=commands.CommandType.chat_input,
+    )
+    async def top_revenue_alliance(
+        self, ctx: RiftContext, alliance: Alliance = MISSING
+    ):
+        alliance = alliance or await Alliance.convert(ctx, alliance)
+        await ctx.interaction.response.defer()
+        top_alliances = sorted(
+            [(i, await i.calculate_revenue()) for i in alliance.members],
+            key=lambda x: sum(x[1]["net_total"].to_dict().values())
+            + x[1]["net_income"].money,
+            reverse=True,
+        )[:10]
+        fields: List[Field] = [
+            {
+                "name": f"#{index+1}",
+                "value": f"[{repr(i[0])}](https://politicsandwar.com/alliance/id={i[0].id})\nGross: ${sum(i[1]['gross_total'].to_dict().values())+i[1]['gross_income'].money:,.2f}\nUpkeep: ${sum(i[1]['upkeep_total'].to_dict().values())+i[1]['upkeep'].money:,.2f}\nNet: ${sum(i[1]['net_total'].to_dict().values())+i[1]['net_income'].money:,.2f}",
+            }
+            for index, i in enumerate(top_alliances)
+        ]
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                title=f"Top Nation Revenues for {repr(alliance)}:",
+                fields=fields,
+                color=discord.Color.green(),
+            ),
+        )
+
 
 def setup(bot: Rift):
     bot.add_cog(PnWInfo(bot))
