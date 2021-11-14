@@ -2,6 +2,7 @@ from .alliance import *
 from .city import *
 from .color import *
 from .condition import *
+from .credentials import *
 from .embassy import *
 from .forum import *
 from .menu import *
