@@ -1421,7 +1421,7 @@ class Settings(commands.Cog):
             settings = guild_settings.welcome_settings
             add_roles: List[discord.Role] = []
             remove_roles: List[discord.Role] = []
-            highest_role: discord.Role = member.guild.get_member(self.bot.user.id).top_role  # type: ignore
+            highest_role: discord.Role = guild.get_member(self.bot.user.id).top_role  # type: ignore
             member = guild.get_member(link.id)
             if member is None:
                 continue
