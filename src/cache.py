@@ -16,6 +16,7 @@ if TYPE_CHECKING:
         CityData,
         ColorData,
         ConditionData,
+        CredentialsData,
         EmbassyConfigData,
         EmbassyData,
         ForumData,
@@ -44,6 +45,7 @@ if TYPE_CHECKING:
         City,
         Color,
         Condition,
+        Credentials,
         Embassy,
         EmbassyConfig,
         Forum,
@@ -83,6 +85,7 @@ class Cache:
         "_cities",
         "_colors",
         "_conditions",
+        "_credentials",
         "_embassies",
         "_embassy_configs",
         "_forums",
@@ -116,6 +119,7 @@ class Cache:
         self._cities: Dict[int, City] = {}
         self._colors: Dict[str, Color] = {}
         self._conditions: Dict[int, Condition] = {}
+        self._credentials: Dict[int, Credentials] = {}
         self._embassies: Dict[int, Embassy] = {}
         self._embassy_configs: Dict[int, EmbassyConfig] = {}
         self._forums: Dict[int, Forum] = {}
@@ -149,6 +153,7 @@ class Cache:
             City,
             Color,
             Condition,
+            Credentials,
             Embassy,
             EmbassyConfig,
             Forum,
@@ -174,6 +179,7 @@ class Cache:
             "SELECT * FROM cities;",
             "SELECT * FROM colors ORDER BY datetime DESC LIMIT 1;",
             "SELECT * FROM conditions;",
+            "SELECT * FROM credentials;",
             "SELECT * FROM embassies;",
             "SELECT * FROM embassy_configs;",
             "SELECT * FROM forums;",
@@ -200,6 +206,7 @@ class Cache:
             List[CityData],
             List[RawColorData],
             List[ConditionData],
+            List[CredentialsData],
             List[EmbassyData],
             List[EmbassyConfigData],
             List[ForumData],
@@ -228,6 +235,7 @@ class Cache:
             cities,
             colors,
             conditions,
+            credentials,
             embassies,
             embassy_configs,
             forums,
@@ -265,6 +273,9 @@ class Cache:
         for i in conditions:
             i = Condition(i)
             self._conditions[i.id] = i
+        for i in credentials:
+            i = Credentials(i)
+            self._credentials[i.nation_id] = i
         for i in embassies:
             i = Embassy(i)
             self._embassies[i.id] = i
@@ -355,6 +366,10 @@ class Cache:
     @property
     def conditions(self) -> Set[Condition]:
         return set(self._conditions.values())
+
+    @property
+    def credentials(self) -> Set[Credentials]:
+        return set(self._credentials.values())
 
     @property
     def embassies(self) -> Set[Embassy]:
@@ -528,6 +543,9 @@ class Cache:
 
     def get_condition(self, id: int, /) -> Optional[Condition]:
         return self._conditions.get(id)
+
+    def get_credentials(self, id: int, /) -> Optional[Credentials]:
+        return self._credentials.get(id)
 
     def get_embassy(self, id: int, /) -> Optional[Embassy]:
         return self._embassies.get(id)
