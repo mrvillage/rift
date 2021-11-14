@@ -141,6 +141,18 @@ class TicketConfig:
         self.user_mentions = data["user_mentions"]
 
     @classmethod
+    async def convert(cls, ctx: RiftContext, argument: str) -> TicketConfig:
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        try:
+            config = cache.get_ticket_config(convert_int(argument))
+            if config and config.guild_id == ctx.guild.id:
+                return config
+            raise TicketConfigNotFoundError(argument)
+        except ValueError:
+            raise TicketConfigNotFoundError(argument)
+
+    @classmethod
     async def fetch(cls, config_id: int) -> TicketConfig:
         config = cache.get_ticket_config(config_id)
         if config:
