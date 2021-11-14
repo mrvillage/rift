@@ -40,3 +40,6 @@ class Credentials:
     @property
     def nation(self) -> Optional[Nation]:
         return cache.get_nation(self.nation_id)
+
+    def has_permission(self, permission: str) -> bool:
+        return getattr(self.permissions, permission, False)
