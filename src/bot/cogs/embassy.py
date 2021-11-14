@@ -9,7 +9,7 @@ from discord.utils import MISSING
 from ... import funcs
 from ...cache import cache
 from ...checks import has_manage_permissions
-from ...data.classes import Alliance, Embassy, EmbassyConfig
+from ...data.classes import Alliance, Embassy, EmbassyConfig, Nation
 from ...ref import Rift, RiftContext
 
 if TYPE_CHECKING:
@@ -154,6 +154,43 @@ class Embassies(commands.Cog):
             ),
             ephemeral=True,
         )
+
+    @embassy.command(  # type: ignore
+        name="open", brief="Open an embassy.", type=commands.CommandType.chat_input
+    )
+    @commands.guild_only()
+    async def embassy_open(self, ctx: RiftContext, config: EmbassyConfig):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.author, discord.Member)
+        await ctx.interaction.response.defer()
+        nation = await Nation.convert(ctx, None)
+        if nation.alliance_position not in {"Officer", "Heir", "Leader"}:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You must be an Officer or higher to create an embassy.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if nation.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You must be in an alliance to create an embassy.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        embassy, start = await config.create(ctx.author, nation.alliance)
+        if start:
+            await embassy.start(ctx.author, config)
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, f"Embassy:\n<#{embassy.id}>"
+                ),
+                ephemeral=True,
+            )
 
 
 def setup(bot: Rift) -> None:

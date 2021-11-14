@@ -169,6 +169,23 @@ class Tickets(commands.Cog):
             )
         )
 
+    @ticket.command(  # type: ignore
+        name="open", brief="Open a ticket.", type=commands.CommandType.chat_input
+    )
+    @commands.guild_only()
+    async def ticket_open(self, ctx: RiftContext, config: TicketConfig):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.author, discord.Member)
+        await ctx.interaction.response.defer()
+        ticket = await config.create(ctx.author)
+        await ticket.start(ctx.author, config)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author, f"Ticket Created!\n<#{ticket.id}>"
+            ),
+            ephemeral=True,
+        )
+
 
 def setup(bot: Rift) -> None:
     bot.add_cog(Tickets(bot))
