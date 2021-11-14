@@ -247,7 +247,7 @@ class Alliance(Makeable):
             {
                 "name": "Leaders",
                 "value": "\n".join(
-                    f'[{repr(i)}](https://politicsandwar.com/nation/id={i.id})'
+                    f"[{repr(i)}](https://politicsandwar.com/nation/id={i.id})"
                     for i in leaders
                 )
                 if leaders and not short
@@ -419,13 +419,15 @@ class Alliance(Makeable):
         if TYPE_CHECKING:
             assert isinstance(data, tuple)
         prices = cache.prices
+        nations = {i.id: i for i in data["nations"]}
         revenues = [
             await i.calculate_revenue(
                 prices,
-                j,
+                nations.get(i.id),
                 fetch_spies,
             )
-            for i, j in zip(self.members, data["nations"])
+            for i in self.members
+            if nations.get(i.id) is not None
         ]
         return {
             "gross_income": sum(
