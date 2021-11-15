@@ -118,7 +118,7 @@ class GuildWelcomeSettings(Makeable):
         self.alliance_auto_role_creation_enabled: bool = (
             data["alliance_auto_role_creation_enabled"]
             if data["alliance_auto_role_creation_enabled"] is not None
-            else False
+            else True
         )
 
     @classmethod
