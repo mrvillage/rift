@@ -10,11 +10,13 @@ __all__ = ("cache",)
 
 if TYPE_CHECKING:
     from _typings import (
+        AllianceAutoRoleData,
         AllianceData,
         AllianceSettingsData,
         CityData,
         ColorData,
         ConditionData,
+        CredentialsData,
         EmbassyConfigData,
         EmbassyData,
         ForumData,
@@ -38,10 +40,12 @@ if TYPE_CHECKING:
 
     from .data.classes import (
         Alliance,
+        AllianceAutoRole,
         AllianceSettings,
         City,
         Color,
         Condition,
+        Credentials,
         Embassy,
         EmbassyConfig,
         Forum,
@@ -76,10 +80,12 @@ class Validate:
 class Cache:
     __slots__ = (
         "_alliances",
+        "_alliance_auto_roles",
         "_alliance_settings",
         "_cities",
         "_colors",
         "_conditions",
+        "_credentials",
         "_embassies",
         "_embassy_configs",
         "_forums",
@@ -108,10 +114,12 @@ class Cache:
 
     def __init__(self):
         self._alliances: Dict[int, Alliance] = {}
+        self._alliance_auto_roles: Set[AllianceAutoRole] = set()
         self._alliance_settings: Dict[int, AllianceSettings] = {}
         self._cities: Dict[int, City] = {}
         self._colors: Dict[str, Color] = {}
         self._conditions: Dict[int, Condition] = {}
+        self._credentials: Dict[int, Credentials] = {}
         self._embassies: Dict[int, Embassy] = {}
         self._embassy_configs: Dict[int, EmbassyConfig] = {}
         self._forums: Dict[int, Forum] = {}
@@ -140,10 +148,12 @@ class Cache:
     async def initialize(self):  # sourcery no-metrics
         from .data.classes import (
             Alliance,
+            AllianceAutoRole,
             AllianceSettings,
             City,
             Color,
             Condition,
+            Credentials,
             Embassy,
             EmbassyConfig,
             Forum,
@@ -164,10 +174,12 @@ class Cache:
 
         queries = [
             "SELECT * FROM alliances;",
+            "SELECT * FROM alliance_auto_roles;",
             "SELECT * FROM alliance_settings;",
             "SELECT * FROM cities;",
             "SELECT * FROM colors ORDER BY datetime DESC LIMIT 1;",
             "SELECT * FROM conditions;",
+            "SELECT * FROM credentials;",
             "SELECT * FROM embassies;",
             "SELECT * FROM embassy_configs;",
             "SELECT * FROM forums;",
@@ -189,10 +201,12 @@ class Cache:
         ]
         data: Tuple[  # type: ignore
             List[AllianceData],
+            List[AllianceAutoRoleData],
             List[AllianceSettingsData],
             List[CityData],
             List[RawColorData],
             List[ConditionData],
+            List[CredentialsData],
             List[EmbassyData],
             List[EmbassyConfigData],
             List[ForumData],
@@ -216,10 +230,12 @@ class Cache:
         )
         (
             alliances,
+            alliance_auto_roles,
             alliance_settings,
             cities,
             colors,
             conditions,
+            credentials,
             embassies,
             embassy_configs,
             forums,
@@ -242,6 +258,9 @@ class Cache:
         for i in alliances:
             i = Alliance(i)
             self._alliances[i.id] = i
+        for i in alliance_auto_roles:
+            i = AllianceAutoRole(i)
+            self._alliance_auto_roles.add(i)
         for i in alliance_settings:
             i = AllianceSettings(i)
             self._alliance_settings[i.alliance_id] = i
@@ -254,6 +273,9 @@ class Cache:
         for i in conditions:
             i = Condition(i)
             self._conditions[i.id] = i
+        for i in credentials:
+            i = Credentials(i)
+            self._credentials[i.nation_id] = i
         for i in embassies:
             i = Embassy(i)
             self._embassies[i.id] = i
@@ -330,6 +352,10 @@ class Cache:
         return set(self._alliances.values())
 
     @property
+    def alliance_auto_roles(self) -> Set[AllianceAutoRole]:
+        return self._alliance_auto_roles
+
+    @property
     def cities(self) -> Set[City]:
         return set(self._cities.values())
 
@@ -340,6 +366,10 @@ class Cache:
     @property
     def conditions(self) -> Set[Condition]:
         return set(self._conditions.values())
+
+    @property
+    def credentials(self) -> Set[Credentials]:
+        return set(self._credentials.values())
 
     @property
     def embassies(self) -> Set[Embassy]:
@@ -514,6 +544,9 @@ class Cache:
     def get_condition(self, id: int, /) -> Optional[Condition]:
         return self._conditions.get(id)
 
+    def get_credentials(self, id: int, /) -> Optional[Credentials]:
+        return self._credentials.get(id)
+
     def get_embassy(self, id: int, /) -> Optional[Embassy]:
         return self._embassies.get(id)
 
@@ -597,6 +630,9 @@ class Cache:
     def get_user_settings(self, id: int, /) -> Optional[UserSettings]:
         return self._user_settings.get(id)
 
+    def add_alliance_auto_role(self, role: AllianceAutoRole, /) -> None:
+        self._alliance_auto_roles.add(role)
+
     def add_alliance_settings(self, settings: AllianceSettings, /) -> None:
         self._alliance_settings[settings.alliance_id] = settings
 
@@ -638,6 +674,9 @@ class Cache:
 
     def add_target_reminder(self, reminder: TargetReminder, /) -> None:
         self._target_reminders[reminder.id] = reminder
+
+    def remove_alliance_auto_role(self, role: AllianceAutoRole, /) -> None:
+        self._alliance_auto_roles.remove(role)
 
     def remove_condition(self, condition: Condition, /) -> None:
         self._conditions.pop(condition.id)

@@ -206,6 +206,21 @@ class Tools(commands.Cog):
             )
         )
 
+    @tools.command(  # type: ignore
+        name="calculate-value",
+        brief="Calculates the value of a set of resources.",
+        type=commands.CommandType.chat_input,
+        descriptions={"resources": "The resources to calculate the value of."},
+    )
+    async def tools_calculate_value(self, ctx: RiftContext, *, resources: Resources):
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"The value of {resources} is ${resources.calculate_value(cache.prices):,.2f}.",
+                color=discord.Color.green(),
+            )
+        )
+
     @tools.group(name="nation", type=commands.CommandType.chat_input)  # type: ignore
     async def tools_nation(self, ctx: RiftContext):
         ...

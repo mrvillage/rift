@@ -1,8 +1,13 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, TypedDict
+from typing import List, Optional, TypedDict
 
-__all__ = ("AllianceSettingsData", "GuildSettingsData", "GuildWelcomeSettingsData")
+__all__ = (
+    "AllianceSettingsData",
+    "GuildSettingsData",
+    "GuildWelcomeSettingsData",
+    "AllianceAutoRoleData",
+)
 
 
 class AllianceSettingsData(TypedDict):
@@ -10,6 +15,9 @@ class AllianceSettingsData(TypedDict):
     default_raid_condition: Optional[str]
     default_nuke_condition: Optional[str]
     default_military_condition: Optional[str]
+    default_attack_raid_condition: Optional[str]
+    default_attack_nuke_condition: Optional[str]
+    default_attack_military_condition: Optional[str]
 
 
 class GuildSettingsData(TypedDict):
@@ -26,9 +34,14 @@ class GuildWelcomeSettingsData(TypedDict):
     join_roles: Optional[List[int]]
     verified_roles: Optional[List[int]]
     member_roles: Optional[List[int]]
-    global_city_roles: Optional[Dict[str, List[int]]]
-    member_city_roles: Optional[Dict[str, List[int]]]
-    diplomat_roles: Optional[Dict[str, List[int]]]
-    alliance_roles: Optional[Dict[str, List[int]]]
-    alliance_gov_roles: Optional[Dict[str, List[int]]]
+    diplomat_roles: Optional[List[int]]
     verified_nickname: Optional[str]
+    enforce_verified_nickname: Optional[bool]
+    alliance_auto_roles_enabled: Optional[bool]
+    alliance_auto_role_creation_enabled: Optional[bool]
+
+
+class AllianceAutoRoleData(TypedDict):
+    role_id: int
+    guild_id: int
+    alliance_id: int

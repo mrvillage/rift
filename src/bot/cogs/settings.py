@@ -7,15 +7,25 @@ import discord
 from discord.ext import commands
 from discord.utils import MISSING
 
-from src.data.classes.condition import Condition
-from src.views.settings import AlliancePurposeConfirm
-
 from ... import funcs
+from ...cache import cache
 from ...checks import has_alliance_manage_permissions, has_manage_permissions
 from ...data import get
-from ...data.classes import Alliance, AllianceSettings, GuildSettings, Nation
+from ...data.classes import (
+    Alliance,
+    AllianceAutoRole,
+    AllianceSettings,
+    Condition,
+    GuildSettings,
+    GuildWelcomeSettings,
+    Nation,
+)
 from ...errors import AllianceNotFoundError
 from ...ref import Rift, RiftContext
+from ...views import AlliancePurposeConfirm
+
+if TYPE_CHECKING:
+    from _typings import UserData
 
 
 class Settings(commands.Cog):
@@ -206,7 +216,7 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         await settings.set_(
-            default_nuke_condition=Condition.convert_to_string(condition.condition)
+            default_military_condition=Condition.convert_to_string(condition.condition)
             if condition
             else None
         )
@@ -224,6 +234,201 @@ class Settings(commands.Cog):
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     description="The default military condition has been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @alliance_settings.command(  # type: ignore
+        name="default-raid-attack-condition",
+        brief="View or modify the alliance's default condition for attacking raid targets.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_alliance_manage_permissions()
+    async def alliance_settings_default_attack_raid_condition(
+        self,
+        ctx: RiftContext,
+        condition: Condition = MISSING,
+        clear: bool = False,
+    ):
+        nation = await Nation.convert(ctx, None)
+        if nation.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "You need to be in an alliance to run this command."
+                )
+            )
+        settings = await AllianceSettings.fetch(nation.alliance.id)
+        if condition is MISSING and not clear:
+            if settings.default_attack_raid_condition is None:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"{repr(nation.alliance)} has no default attacking raid condition.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The default attacking raid condition for {repr(nation.alliance)}is:\n\n`{settings.default_attack_raid_condition}`",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+        await settings.set_(
+            default_attack_raid_condition=Condition.convert_to_string(
+                condition.condition
+            )
+            if condition
+            else None
+        )
+        if condition:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The default attacking raid condition for {repr(nation.alliance)} is now:\n\n`{condition}`",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The default attacking raid condition has been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @alliance_settings.command(  # type: ignore
+        name="default-nuke-attack-condition",
+        brief="View or modify the alliance's default condition for attacking nuke targets.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_alliance_manage_permissions()
+    async def alliance_settings_default_attack_nuke_condition(
+        self,
+        ctx: RiftContext,
+        condition: Condition = MISSING,
+        clear: bool = False,
+    ):
+        nation = await Nation.convert(ctx, None)
+        if nation.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "You need to be in an alliance to run this command."
+                )
+            )
+        settings = await AllianceSettings.fetch(nation.alliance.id)
+        if condition is MISSING and not clear:
+            if settings.default_attack_nuke_condition is None:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"{repr(nation.alliance)} has no default attacking nuke condition.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The default attacking nuke condition for {repr(nation.alliance)}is:\n\n`{settings.default_attack_nuke_condition}`",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+        await settings.set_(
+            default_attack_nuke_condition=Condition.convert_to_string(
+                condition.condition
+            )
+            if condition
+            else None
+        )
+        if condition:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The default attacking nuke condition for {repr(nation.alliance)} is now:\n\n`{condition}`",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The default attacking nuke condition has been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @alliance_settings.command(  # type: ignore
+        name="default-military-attack-condition",
+        brief="View or modify the alliance's default condition for attacking military targets.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_alliance_manage_permissions()
+    async def alliance_settings_default_attack_military_condition(
+        self,
+        ctx: RiftContext,
+        condition: Condition = MISSING,
+        clear: bool = False,
+    ):
+        nation = await Nation.convert(ctx, None)
+        if nation.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "You need to be in an alliance to run this command."
+                )
+            )
+        settings = await AllianceSettings.fetch(nation.alliance.id)
+        if condition is MISSING and not clear:
+            if settings.default_attack_military_condition is None:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"{repr(nation.alliance)} has no default attacking military condition.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The default attacking military condition for {repr(nation.alliance)}is:\n\n`{settings.default_attack_military_condition}`",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+        await settings.set_(
+            default_attack_military_condition=Condition.convert_to_string(
+                condition.condition
+            )
+            if condition
+            else None
+        )
+        if condition:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The default attacking military condition for {repr(nation.alliance)} is now:\n\n`{condition}`",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The default attacking military condition has been cleared.",
                     color=discord.Color.green(),
                 ),
                 ephemeral=True,
@@ -536,8 +741,6 @@ class Settings(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
-        if TYPE_CHECKING:
-            assert settings.welcome_settings is not None
         if channels is MISSING and not clear:
             if settings.welcome_settings.welcome_channels:
                 return await ctx.reply(
@@ -599,8 +802,6 @@ class Settings(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
-        if TYPE_CHECKING:
-            assert settings.welcome_settings is not None
         if roles is MISSING and not clear:
             if settings.welcome_settings.join_roles:
                 return await ctx.reply(
@@ -636,6 +837,242 @@ class Settings(commands.Cog):
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     description="The join roles have been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @server_settings.command(  # type: ignore
+        name="verified-roles",
+        brief="Modify the server's verified roles.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "roles": "The new verified roles, given by space separated role mentions.",
+            "clear": "Set to True to clear the join roles.",
+        },
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_verified_roles(
+        self,
+        ctx: RiftContext,
+        *,
+        roles: List[discord.Role] = MISSING,
+        clear: bool = False,
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
+        if roles is MISSING and not clear:
+            if settings.welcome_settings.verified_roles:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The verified roles are:\n\n{''.join(f'<@&{i}>' for i in settings.welcome_settings.verified_roles)}",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="This server has no verified roles.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        roles_set = None if clear else [i.id for i in roles]  # type: ignore
+        await settings.welcome_settings.set_(verified_roles=roles_set)
+        if roles_set:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The verified roles are now:\n\n{''.join(f'<@&{i}>' for i in roles_set)}",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The verified roles have been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @server_settings.command(  # type: ignore
+        name="member-roles",
+        brief="Modify the server's alliance member roles.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "roles": "The new alliance member roles, given by space separated role mentions.",
+            "clear": "Set to True to clear the join roles.",
+        },
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_member_roles(
+        self,
+        ctx: RiftContext,
+        *,
+        roles: List[discord.Role] = MISSING,
+        clear: bool = False,
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
+        if roles is MISSING and not clear:
+            if settings.welcome_settings.member_roles:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The member roles are:\n\n{''.join(f'<@&{i}>' for i in settings.welcome_settings.member_roles)}",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="This server has no member roles.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        roles_set = None if clear else [i.id for i in roles]  # type: ignore
+        await settings.welcome_settings.set_(member_roles=roles_set)
+        if roles_set:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The member roles are now:\n\n{''.join(f'<@&{i}>' for i in roles_set)}",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The member roles have been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @server_settings.command(  # type: ignore
+        name="diplomat-roles",
+        brief="Modify the server's diplomat roles.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "roles": "The new diplomat roles, given by space separated role mentions.",
+            "clear": "Set to True to clear the diplomat roles.",
+        },
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_diplomat_roles(
+        self,
+        ctx: RiftContext,
+        *,
+        roles: List[discord.Role] = MISSING,
+        clear: bool = False,
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
+        if roles is MISSING and not clear:
+            if settings.welcome_settings.diplomat_roles:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The diplomat roles are:\n\n{''.join(f'<@&{i}>' for i in settings.welcome_settings.diplomat_roles)}",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="This server has no diplomat roles.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        roles_set = None if clear else [i.id for i in roles]  # type: ignore
+        await settings.welcome_settings.set_(diplomat_roles=roles_set)
+        if roles_set:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The diplomat roles are now:\n\n{''.join(f'<@&{i}>' for i in roles_set)}",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The diplomat roles have been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @server_settings.command(  # type: ignore
+        name="enforce-verified-nickname",
+        brief="Whether or not to enforce verified nicknames.",
+        type=commands.CommandType.chat_input,
+        descriptions={"enforce": "Whether or not to enforce verified nicknames."},
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_enforce_verified_nickname(
+        self, ctx: RiftContext, enforce: bool = MISSING
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id, "welcome_settings")
+        if enforce is MISSING:
+            if settings.welcome_settings.enforce_verified_nickname:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="Verified nicknames are enforced.",
+                        color=discord.Color.blue(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="Verified nicknames are not enforced.",
+                        color=discord.Color.blue(),
+                    ),
+                    ephemeral=True,
+                )
+        await settings.set_(enforce_verified_nickname=enforce)
+        if enforce:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="Verified nicknames are now enforced.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="Verified nicknames are no longer enforced.",
                     color=discord.Color.green(),
                 ),
                 ephemeral=True,
@@ -698,6 +1135,276 @@ class Settings(commands.Cog):
                 ephemeral=True,
             )
 
+    @server_settings.group(  # type: ignore
+        name="alliance-auto-roles",
+        brief="Configure alliance auto roles.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles(self, ctx: RiftContext):
+        ...
+
+    @server_settings_alliance_auto_roles.command(  # type: ignore
+        name="info",
+        brief="Get information about the current alliance auto roles configuration.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles_info(self, ctx: RiftContext):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                description=f"Alliance auto roles are currently **{'enabled' if settings.welcome_settings.alliance_auto_roles_enabled else 'disabled'}** and automatic alliance auto role creation is currently **{'enabled' if settings.welcome_settings.alliance_auto_role_creation_enabled else 'disabled'}**.",
+                color=discord.Color.blue(),
+            ),
+            ephemeral=True,
+        )
+
+    @server_settings_alliance_auto_roles.command(  # type: ignore
+        name="toggle",
+        brief="Toggle alliance auto roles on and off.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles_toggle(
+        self, ctx: RiftContext, enable: bool
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id)
+        if enable is settings.welcome_settings.alliance_auto_roles_enabled:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"Alliance auto roles are already **{'enabled' if enable else 'disabled'}**.",
+                    color=discord.Color.blue(),
+                ),
+                ephemeral=True,
+            )
+        await settings.welcome_settings.set_(alliance_auto_roles_enabled=enable)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                description=f"Alliance auto roles are now **{'enabled' if enable else 'disabled'}**.",
+                color=discord.Color.blue(),
+            ),
+            ephemeral=True,
+        )
+
+    @server_settings_alliance_auto_roles.command(  # type: ignore
+        name="toggle-create",
+        brief="Toggle automatically creating alliance auto roles on and off.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles_toggle_create(
+        self, ctx: RiftContext, enable: bool
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id)
+        if enable is settings.welcome_settings.alliance_auto_role_creation_enabled:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"Automatic alliance auto role creation is already **{'enabled' if enable else 'disabled'}**.",
+                    color=discord.Color.blue(),
+                ),
+                ephemeral=True,
+            )
+        await settings.welcome_settings.set_(alliance_auto_role_creation_enabled=enable)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                description=f"Alliance auto role creation is now **{'enabled' if enable else 'disabled'}**.",
+                color=discord.Color.blue(),
+            ),
+            ephemeral=True,
+        )
+
+    @server_settings_alliance_auto_roles.command(  # type: ignore
+        name="list",
+        brief="List the current alliance auto roles.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles_list(self, ctx: RiftContext):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        settings = await GuildSettings.fetch(ctx.guild.id)
+        if settings.welcome_settings.alliance_auto_roles_enabled:
+            if settings.welcome_settings.alliance_auto_roles:
+                roles_str = "\n".join(
+                    str(i) for i in settings.welcome_settings.alliance_auto_roles
+                )
+                if len(roles_str) >= 4000:
+                    roles_str = "\n".join(
+                        f"<@&{i.role_id}> - {i.alliance_id}"
+                        for i in settings.welcome_settings.alliance_auto_roles
+                    )
+                if len(roles_str) >= 4000:
+                    await ctx.reply(
+                        embed=funcs.get_embed_author_member(
+                            ctx.author,
+                            description="There are too alliance auto roles to display.",
+                            color=discord.Color.red(),
+                        ),
+                        ephemeral=True,
+                    )
+                else:
+                    await ctx.reply(
+                        embed=funcs.get_embed_author_member(
+                            ctx.author,
+                            description=f"The alliance auto roles are:\n\n{roles_str}",
+                            color=discord.Color.blue(),
+                        ),
+                        ephemeral=True,
+                    )
+            else:
+                await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="This server has no alliance auto roles.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="Alliance auto roles are disabled.",
+                    color=discord.Color.blue(),
+                ),
+                ephemeral=True,
+            )
+
+    @server_settings_alliance_auto_roles.command(  # type: ignore
+        name="add",
+        brief="Add a role to an alliance.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles_add(
+        self, ctx: RiftContext, role: discord.Role, alliance: Alliance
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        await AllianceAutoRole.create(role, alliance)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                description=f"Added {role.mention} to the {alliance.name}'s auto roles.",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @server_settings_alliance_auto_roles.command(  # type: ignore
+        name="remove",
+        brief="Remove a role from an alliance.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles_remove(
+        self, ctx: RiftContext, role: discord.Role, alliance: Alliance
+    ):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        roles = [
+            i
+            for i in cache.alliance_auto_roles
+            if i.role_id == role.id and i.alliance_id == alliance.id
+        ]
+        for r in roles:
+            await r.delete()
+        if roles:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"Removed {role.mention} from the {alliance.name}'s auto roles.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="No alliance auto roles removed.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+
+    @server_settings_alliance_auto_roles.command(  # type: ignore
+        name="run",
+        brief="Check and add/remove alliance auto roles.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_manage_permissions()
+    @commands.guild_only()
+    async def server_settings_alliance_auto_roles_run(self, ctx: RiftContext):
+        if TYPE_CHECKING:
+            assert isinstance(ctx.guild, discord.Guild)
+        await ctx.interaction.response.defer(ephemeral=True)
+        guild = ctx.guild
+        settings = await GuildSettings.fetch(guild.id)
+        if not settings.welcome_settings.alliance_auto_roles_enabled:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="Alliance auto roles are disabled.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        auto_roles = [i for i in cache.alliance_auto_roles if i.guild_id == guild.id]
+        highest_role: discord.Role = guild.get_member(self.bot.user.id).top_role  # type: ignore
+        for member in guild.members:
+            link = cache.get_user(member.id)
+            if link is None:
+                continue
+            nation = cache.get_nation(link["nation_id"])
+            if nation is None:
+                continue
+            alliance_id = nation.alliance.id if nation.alliance else None
+            roles: List[discord.Role] = []
+            role_ids = [i for i in auto_roles if i.alliance_id == alliance_id]
+            if role_ids:
+                for role_id in role_ids:
+                    role = guild.get_role(role_id.role_id)
+                    if role is None:
+                        continue
+                    if highest_role > role and role not in member.roles:
+                        roles.append(role)
+            elif settings.welcome_settings.alliance_auto_role_creation_enabled:
+                role = await guild.create_role(
+                    reason="Automatic alliance auto role creation.",
+                    name=repr(nation.alliance),
+                )
+                roles.append(role)
+            if roles:
+                await member.add_roles(*roles)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                description="Alliance auto roles have been updated.",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         # sourcery no-metrics skip: merge-nested-ifs
@@ -709,8 +1416,8 @@ class Settings(commands.Cog):
             await nation.make_attrs("alliance")
         except IndexError:
             nation = None
-        settings = await GuildSettings.fetch(member.guild.id, "welcome_settings")
-        settings = settings.welcome_settings
+        guild_settings = await GuildSettings.fetch(member.guild.id, "welcome_settings")
+        settings = guild_settings.welcome_settings
         if settings.welcome_channels:
             for channel in settings.welcome_channels:
                 channel = self.bot.get_channel(channel)
@@ -735,9 +1442,6 @@ class Settings(commands.Cog):
                     continue
                 if highest_role > role:
                     roles.append(role)
-            if roles:
-                await member.add_roles(*roles)
-            roles = []
         if nation:
             if settings.verified_nickname:
                 if member.guild.get_member(
@@ -751,15 +1455,298 @@ class Settings(commands.Cog):
                         continue
                     if highest_role > role:
                         roles.append(role)
-                if roles:
-                    await member.add_roles(*roles)
-                roles = []
-            ...  # implement the rest of the welcome stuff below, will need to set up alliance settings and embassies first though
+            # implement the rest of the welcome stuff below, will need to set up alliance settings and embassies first though
+            if (
+                settings.member_roles is not None
+                and guild_settings.purpose is not None
+                and nation.alliance is not None
+                and guild_settings.purpose_argument is not None
+            ):
+                if (
+                    guild_settings.purpose.startswith("ALLIANCE")
+                    and nation.alliance.id == int(guild_settings.purpose_argument)
+                    and nation.alliance_position
+                    in {"Member", "Officer", "Heir", "Leader"}
+                ):
+                    for role_id in settings.member_roles:
+                        role: Optional[discord.Role] = member.guild.get_role(role_id)
+                        if role is None:
+                            continue
+                        if highest_role > role:
+                            roles.append(role)
+            if settings.diplomat_roles is not None and nation.alliance_position in {
+                "Officer",
+                "Heir",
+                "Leader",
+            }:
+                for role_id in settings.diplomat_roles:
+                    role: Optional[discord.Role] = member.guild.get_role(role_id)
+                    if role is None:
+                        continue
+                    if highest_role > role:
+                        roles.append(role)
+            if settings.alliance_auto_roles_enabled:
+                alliance_id = nation.alliance.id if nation.alliance else None
+                auto_roles = [
+                    i
+                    for i in cache.alliance_auto_roles
+                    if i.guild_id == member.guild.id and i.alliance_id == alliance_id
+                ]
+                role_ids = [i for i in auto_roles if i.alliance_id == alliance_id]
+                if role_ids:
+                    for role_id in role_ids:
+                        role = member.guild.get_role(role_id.role_id)
+                        if role is None:
+                            continue
+                        if highest_role > role:
+                            roles.append(role)
+                elif settings.alliance_auto_role_creation_enabled:
+                    role = await member.guild.create_role(
+                        reason="Automatic alliance auto role creation.",
+                        name=repr(nation.alliance),
+                    )
+                    roles.append(role)
+        if roles:
+            await member.add_roles(*roles)
+        roles = []
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         if before.pending and not after.pending:
             await self.on_member_join(after)
+        settings = await GuildWelcomeSettings.fetch(before.guild.id)
+        if before.nick != after.nick and settings.enforce_verified_nickname:
+            link = cache.get_user(after.id)
+            if link is not None:
+                nation = cache.get_nation(link["nation_id"])
+                if nation is not None:
+                    await settings.set_verified_nickname(after, nation)
+
+    @commands.Cog.listener()
+    async def on_link_create(self, link: UserData):
+        # sourcery skip: merge-nested-ifs
+        nation = cache.get_nation(link["nation_id"])
+        if nation is None:
+            return
+        for guild in self.bot.guilds:
+            if link["user_id"] not in {i.id for i in guild.members}:
+                continue
+            guild_settings = await GuildSettings.fetch(guild.id)
+            settings = guild_settings.welcome_settings
+            roles: list[discord.Role] = []
+            highest_role: discord.Role = member.guild.get_member(self.bot.user.id).top_role  # type: ignore
+            member = guild.get_member(link["user_id"])
+            if member is None:
+                continue
+            if settings.verified_nickname and settings.enforce_verified_nickname:
+                if member.guild.get_member(
+                    self.bot.user.id  # type: ignore
+                ).guild_permissions.manage_nicknames:  # type: ignore
+                    await settings.set_verified_nickname(member, nation)
+            if settings.verified_roles is not None:
+                for role_id in settings.verified_roles:
+                    role: Optional[discord.Role] = member.guild.get_role(role_id)
+                    if role is None:
+                        continue
+                    if highest_role > role and role not in member.roles:
+                        roles.append(role)
+            if (
+                settings.member_roles is not None
+                and guild_settings.purpose is not None
+                and nation.alliance is not None
+                and guild_settings.purpose_argument is not None
+            ):
+                if (
+                    guild_settings.purpose.startswith("ALLIANCE")
+                    and nation.alliance.id == int(guild_settings.purpose_argument)
+                    and nation.alliance_position
+                    in {"Member", "Officer", "Heir", "Leader"}
+                ):
+                    for role_id in settings.member_roles:
+                        role: Optional[discord.Role] = member.guild.get_role(role_id)
+                        if role is None:
+                            continue
+                        if highest_role > role and role not in member.roles:
+                            roles.append(role)
+            if settings.diplomat_roles is not None and nation.alliance_position in {
+                "Officer",
+                "Heir",
+                "Leader",
+            }:
+                for role_id in settings.diplomat_roles:
+                    role: Optional[discord.Role] = member.guild.get_role(role_id)
+                    if role is None:
+                        continue
+                    if highest_role > role and role not in member.roles:
+                        roles.append(role)
+            if settings.alliance_auto_roles_enabled:
+                alliance_id = nation.alliance.id if nation.alliance else None
+                auto_roles = [
+                    i
+                    for i in cache.alliance_auto_roles
+                    if i.guild_id == member.guild.id and i.alliance_id == alliance_id
+                ]
+                role_ids = [i for i in auto_roles if i.alliance_id == alliance_id]
+                if role_ids:
+                    for role_id in role_ids:
+                        role = member.guild.get_role(role_id.role_id)
+                        if role is None:
+                            continue
+                        if highest_role > role and role not in member.roles:
+                            roles.append(role)
+                elif settings.alliance_auto_role_creation_enabled:
+                    role = await member.guild.create_role(
+                        reason="Automatic alliance auto role creation.",
+                        name=repr(nation.alliance),
+                    )
+                    roles.append(role)
+            if roles:
+                await member.add_roles(*roles)
+
+    @commands.Cog.listener()
+    async def on_nation_update(self, before: Nation, after: Nation):
+        # sourcery skip: merge-nested-ifs
+        link = after.user
+        if link is None:
+            return
+        for guild in self.bot.guilds:
+            if link.id not in {i.id for i in guild.members}:
+                continue
+            guild_settings = await GuildSettings.fetch(guild.id)
+            settings = guild_settings.welcome_settings
+            add_roles: List[discord.Role] = []
+            remove_roles: List[discord.Role] = []
+            highest_role: discord.Role = guild.get_member(self.bot.user.id).top_role  # type: ignore
+            member = guild.get_member(link.id)
+            if member is None:
+                continue
+            if settings.verified_nickname and settings.enforce_verified_nickname:
+                if settings.format_verified_nickname(
+                    member, before
+                ) != settings.format_verified_nickname(member, after):
+                    if member.guild.get_member(
+                        self.bot.user.id  # type: ignore
+                    ).guild_permissions.manage_nicknames:  # type: ignore
+                        await settings.set_verified_nickname(member, after)
+            if before.alliance != after.alliance:
+                if settings.alliance_auto_roles_enabled:
+                    # add new roles
+                    alliance_id = after.alliance.id if after.alliance else None
+                    auto_roles = [
+                        i
+                        for i in cache.alliance_auto_roles
+                        if i.guild_id == member.guild.id
+                        and i.alliance_id == alliance_id
+                    ]
+                    role_ids = [i for i in auto_roles if i.alliance_id == alliance_id]
+                    if role_ids:
+                        for role_id in role_ids:
+                            role = member.guild.get_role(role_id.role_id)
+                            if role is None:
+                                continue
+                            if highest_role > role and role not in member.roles:
+                                add_roles.append(role)
+                    elif settings.alliance_auto_role_creation_enabled:
+                        role = await member.guild.create_role(
+                            reason="Automatic alliance auto role creation.",
+                            name=repr(after.alliance),
+                        )
+                        add_roles.append(role)
+                    # remove old roles
+                    auto_roles = [
+                        i
+                        for i in cache.alliance_auto_roles
+                        if i.guild_id == member.guild.id
+                        and i.alliance_id == alliance_id
+                    ]
+                    role_ids = [i for i in auto_roles if i.alliance_id == alliance_id]
+                    if role_ids:
+                        for role_id in role_ids:
+                            role = member.guild.get_role(role_id.role_id)
+                            if role is None:
+                                continue
+                            if highest_role > role and role in member.roles:
+                                remove_roles.append(role)
+                    if (
+                        settings.member_roles is not None
+                        and guild_settings.purpose is not None
+                        and after.alliance is not None
+                        and guild_settings.purpose_argument is not None
+                    ):
+                        if (
+                            guild_settings.purpose.startswith("ALLIANCE")
+                            and after.alliance.id
+                            == int(guild_settings.purpose_argument)
+                            and after.alliance_position
+                            in {"Member", "Officer", "Heir", "Leader"}
+                        ):
+                            for role_id in settings.member_roles:
+                                role: Optional[discord.Role] = member.guild.get_role(
+                                    role_id
+                                )
+                                if role is None:
+                                    continue
+                                if highest_role > role and role not in member.roles:
+                                    add_roles.append(role)
+                    if (
+                        settings.member_roles is not None
+                        and guild_settings.purpose is not None
+                        and before.alliance is not None
+                        and guild_settings.purpose_argument is not None
+                    ):
+                        if (
+                            guild_settings.purpose.startswith("ALLIANCE")
+                            and before.alliance.id
+                            == int(guild_settings.purpose_argument)
+                            and before.alliance_position
+                            in {"Member", "Officer", "Heir", "Leader"}
+                        ):
+                            for role_id in settings.member_roles:
+                                role: Optional[discord.Role] = member.guild.get_role(
+                                    role_id
+                                )
+                                if role is None:
+                                    continue
+                                if highest_role > role and role in member.roles:
+                                    remove_roles.append(role)
+                    if (
+                        settings.diplomat_roles is not None
+                        and after.alliance_position
+                        in {
+                            "Officer",
+                            "Heir",
+                            "Leader",
+                        }
+                    ):
+                        for role_id in settings.diplomat_roles:
+                            role: Optional[discord.Role] = member.guild.get_role(
+                                role_id
+                            )
+                            if role is None:
+                                continue
+                            if highest_role > role and role not in member.roles:
+                                add_roles.append(role)
+                    if (
+                        settings.diplomat_roles is not None
+                        and before.alliance_position
+                        in {
+                            "Officer",
+                            "Heir",
+                            "Leader",
+                        }
+                    ):
+                        for role_id in settings.diplomat_roles:
+                            role: Optional[discord.Role] = member.guild.get_role(
+                                role_id
+                            )
+                            if role is None:
+                                continue
+                            if highest_role > role and role in member.roles:
+                                remove_roles.append(role)
+            if add_roles:
+                await member.add_roles(*add_roles)
+            if remove_roles:
+                await member.remove_roles(*remove_roles)
 
 
 def setup(bot: Rift):

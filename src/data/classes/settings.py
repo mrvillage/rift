@@ -1,19 +1,27 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, List, Optional, Set
 
 import discord
 
 from ...cache import cache
 from ..db.sql import execute_query
+from .alliance import Alliance
 from .base import Makeable
 from .nation import Nation
 
-__all__ = ("UserSettings", "GuildWelcomeSettings", "GuildSettings", "AllianceSettings")
+__all__ = (
+    "UserSettings",
+    "AllianceAutoRole",
+    "GuildWelcomeSettings",
+    "GuildSettings",
+    "AllianceSettings",
+)
 
 if TYPE_CHECKING:
     from _typings import (
+        AllianceAutoRoleData,
         AllianceSettingsData,
         GuildSettingsData,
         GuildWelcomeSettingsData,
@@ -35,6 +43,45 @@ class UserSettings(Makeable):
         ...
 
 
+class AllianceAutoRole:
+    __slots__ = ("role_id", "guild_id", "alliance_id")
+
+    def __init__(self, data: AllianceAutoRoleData) -> None:
+        self.role_id: int = data["role_id"]
+        self.guild_id: int = data["guild_id"]
+        self.alliance_id: int = data["alliance_id"]
+
+    @classmethod
+    async def create(cls, role: discord.Role, alliance: Alliance) -> AllianceAutoRole:
+        await execute_query(
+            "INSERT INTO alliance_auto_roles (role_id, guild_id, alliance_id) VALUES ($1, $2, $3);",
+            role.id,
+            role.guild.id,
+            alliance.id,
+        )
+        auto = cls(
+            {"role_id": role.id, "guild_id": role.guild.id, "alliance_id": alliance.id}
+        )
+        cache.add_alliance_auto_role(auto)
+        return auto
+
+    async def delete(self) -> None:
+        cache.remove_alliance_auto_role(self)
+        await execute_query(
+            "DELETE FROM alliance_auto_roles WHERE role_id = $1 AND guild_id = $2 AND alliance_id = $3;",
+            self.role_id,
+            self.guild_id,
+            self.alliance_id,
+        )
+
+    @property
+    def alliance(self) -> Optional[Alliance]:
+        return cache.get_alliance(self.alliance_id)
+
+    def __str__(self) -> str:
+        return f"<@&{self.role_id}> - {self.alliance}"
+
+
 class GuildWelcomeSettings(Makeable):
     __slots__ = (
         "guild_id",
@@ -43,11 +90,7 @@ class GuildWelcomeSettings(Makeable):
         "join_roles",
         "verified_roles",
         "member_roles",
-        "global_city_roles",
-        "member_city_roles",
         "diplomat_roles",
-        "alliance_roles",
-        "alliance_gov_roles",
         "verified_nickname",
         "defaulted",
     )
@@ -60,18 +103,23 @@ class GuildWelcomeSettings(Makeable):
         self.join_roles: Optional[List[int]] = data["join_roles"]
         self.verified_roles: Optional[List[int]] = data["verified_roles"]
         self.member_roles: Optional[List[int]] = data["member_roles"]
-        self.global_city_roles: Optional[Dict[str, List[int]]] = data[
-            "global_city_roles"
-        ]
-        self.member_city_roles: Optional[Dict[str, List[int]]] = data[
-            "member_city_roles"
-        ]
-        self.diplomat_roles: Optional[Dict[str, List[int]]] = data["diplomat_roles"]
-        self.alliance_roles: Optional[Dict[str, List[int]]] = data["alliance_roles"]
-        self.alliance_gov_roles: Optional[Dict[str, List[int]]] = data[
-            "alliance_gov_roles"
-        ]
+        self.diplomat_roles: Optional[List[int]] = data["diplomat_roles"]
         self.verified_nickname: Optional[str] = data["verified_nickname"]
+        self.enforce_verified_nickname: bool = (
+            data["enforce_verified_nickname"]
+            if data["enforce_verified_nickname"] is not None
+            else False
+        )
+        self.alliance_auto_roles_enabled: bool = (
+            data["alliance_auto_roles_enabled"]
+            if data["alliance_auto_roles_enabled"] is not None
+            else False
+        )
+        self.alliance_auto_role_creation_enabled: bool = (
+            data["alliance_auto_role_creation_enabled"]
+            if data["alliance_auto_role_creation_enabled"] is not None
+            else False
+        )
 
     @classmethod
     def default(cls, guild_id: int) -> GuildWelcomeSettings:
@@ -83,12 +131,11 @@ class GuildWelcomeSettings(Makeable):
                 "join_roles": None,
                 "verified_roles": None,
                 "member_roles": None,
-                "global_city_roles": None,
-                "member_city_roles": None,
                 "diplomat_roles": None,
-                "alliance_roles": None,
-                "alliance_gov_roles": None,
                 "verified_nickname": None,
+                "enforce_verified_nickname": None,
+                "alliance_auto_roles_enabled": None,
+                "alliance_auto_role_creation_enabled": None,
             }
         )
         settings.defaulted = True
@@ -97,6 +144,10 @@ class GuildWelcomeSettings(Makeable):
     @classmethod
     async def fetch(cls, guild_id: int) -> GuildWelcomeSettings:
         return cache.get_guild_welcome_settings(guild_id) or cls.default(guild_id)
+
+    @property
+    def alliance_auto_roles(self) -> Set[AllianceAutoRole]:
+        return {i for i in cache.alliance_auto_roles if i.guild_id == self.guild_id}
 
     def format_welcome_embed(self, member: discord.Member, verified: bool):
         from ...funcs import get_embed_author_member
@@ -114,10 +165,9 @@ class GuildWelcomeSettings(Makeable):
             message += "\n\nIt doesn't look like you're linked! Be sure to run `/link` and provide your nation to get linked."
         return get_embed_author_member(member, message, color=discord.Color.blue())
 
-    async def set_verified_nickname(
+    def format_verified_nickname(
         self, member: discord.Member, nation: Nation
-    ) -> None:
-        await nation.make_attrs("alliance")
+    ) -> Optional[str]:
         if not self.verified_nickname:
             return
         if nation.alliance:
@@ -144,6 +194,13 @@ class GuildWelcomeSettings(Makeable):
             member_discriminator=member.discriminator,
         )
         nickname = nickname[:32]
+
+    async def set_verified_nickname(
+        self, member: discord.Member, nation: Nation
+    ) -> None:
+        nickname = self.format_verified_nickname(member, nation)
+        if nickname is None:
+            return
         await member.edit(nick=nickname)
 
     async def set_(self, **kwargs: Any) -> GuildWelcomeSettings:
@@ -245,6 +302,9 @@ class AllianceSettings:
         "default_raid_condition",
         "default_nuke_condition",
         "default_military_condition",
+        "default_attack_raid_condition",
+        "default_attack_nuke_condition",
+        "default_attack_military_condition",
     )
 
     def __init__(self, data: AllianceSettingsData) -> None:
@@ -255,6 +315,15 @@ class AllianceSettings:
         self.default_military_condition: Optional[str] = data[
             "default_military_condition"
         ]
+        self.default_attack_raid_condition: Optional[str] = data[
+            "default_attack_raid_condition"
+        ]
+        self.default_attack_nuke_condition: Optional[str] = data[
+            "default_attack_nuke_condition"
+        ]
+        self.default_attack_military_condition: Optional[str] = data[
+            "default_attack_military_condition"
+        ]
 
     @classmethod
     def default(cls, alliance_id: int, /) -> AllianceSettings:
@@ -264,6 +333,9 @@ class AllianceSettings:
                 "default_raid_condition": None,
                 "default_nuke_condition": None,
                 "default_military_condition": None,
+                "default_attack_raid_condition": None,
+                "default_attack_nuke_condition": None,
+                "default_attack_military_condition": None,
             }
         )
         settings.defaulted = True

@@ -592,6 +592,28 @@ class Nation(Makeable):
                 continue
         return targets
 
+    async def find_attackers(
+        self,
+        condition: Condition = MISSING,
+        /,
+    ) -> List[Target]:
+        from .target import Target
+
+        valid = [i for i in cache.nations if i.check_war_range(self) and i is not self]
+        if condition is not MISSING:
+            valid = await condition.reduce(*valid)
+        targets: List[Target] = []
+        for i in valid:
+            targets.append(
+                await Target.create(
+                    i,
+                    None,
+                    None,
+                    None,
+                )
+            )
+        return targets
+
     async def fetch_last_wars(self) -> List[War]:
         from .war import War
 

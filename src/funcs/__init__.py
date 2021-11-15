@@ -1,9 +1,8 @@
-from . import utils  # type: ignore
+from . import credentials, utils  # type: ignore
 from .alliance import *
 from .bank import *
 from .city import *
 from .condition import *
-from .credentials import *
 from .database_cache import *
 from .embeds import *
 from .errors import *
