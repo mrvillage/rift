@@ -370,7 +370,7 @@ class Settings(commands.Cog):
             )
 
     @alliance_settings.command(  # type: ignore
-        name="default-military-attack-condition",
+        name="default-mil-attack-condition",
         brief="View or modify the alliance's default condition for attacking military targets.",
         type=commands.CommandType.chat_input,
     )
