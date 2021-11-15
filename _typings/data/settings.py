@@ -15,6 +15,9 @@ class AllianceSettingsData(TypedDict):
     default_raid_condition: Optional[str]
     default_nuke_condition: Optional[str]
     default_military_condition: Optional[str]
+    default_attack_raid_condition: Optional[str]
+    default_attack_nuke_condition: Optional[str]
+    default_attack_military_condition: Optional[str]
 
 
 class GuildSettingsData(TypedDict):

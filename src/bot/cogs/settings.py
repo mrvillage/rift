@@ -216,7 +216,7 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         await settings.set_(
-            default_nuke_condition=Condition.convert_to_string(condition.condition)
+            default_military_condition=Condition.convert_to_string(condition.condition)
             if condition
             else None
         )
@@ -234,6 +234,201 @@ class Settings(commands.Cog):
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     description="The default military condition has been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @alliance_settings.command(  # type: ignore
+        name="default-raid-attack-condition",
+        brief="View or modify the alliance's default condition for attacking raid targets.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_alliance_manage_permissions()
+    async def alliance_settings_default_attack_raid_condition(
+        self,
+        ctx: RiftContext,
+        condition: Condition = MISSING,
+        clear: bool = False,
+    ):
+        nation = await Nation.convert(ctx, None)
+        if nation.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "You need to be in an alliance to run this command."
+                )
+            )
+        settings = await AllianceSettings.fetch(nation.alliance.id)
+        if condition is MISSING and not clear:
+            if settings.default_attack_raid_condition is None:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"{repr(nation.alliance)} has no default attacking raid condition.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The default attacking raid condition for {repr(nation.alliance)}is:\n\n`{settings.default_attack_raid_condition}`",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+        await settings.set_(
+            default_attack_raid_condition=Condition.convert_to_string(
+                condition.condition
+            )
+            if condition
+            else None
+        )
+        if condition:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The default attacking raid condition for {repr(nation.alliance)} is now:\n\n`{condition}`",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The default attacking raid condition has been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @alliance_settings.command(  # type: ignore
+        name="default-nuke-attack-condition",
+        brief="View or modify the alliance's default condition for attacking nuke targets.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_alliance_manage_permissions()
+    async def alliance_settings_default_attack_nuke_condition(
+        self,
+        ctx: RiftContext,
+        condition: Condition = MISSING,
+        clear: bool = False,
+    ):
+        nation = await Nation.convert(ctx, None)
+        if nation.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "You need to be in an alliance to run this command."
+                )
+            )
+        settings = await AllianceSettings.fetch(nation.alliance.id)
+        if condition is MISSING and not clear:
+            if settings.default_attack_nuke_condition is None:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"{repr(nation.alliance)} has no default attacking nuke condition.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The default attacking nuke condition for {repr(nation.alliance)}is:\n\n`{settings.default_attack_nuke_condition}`",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+        await settings.set_(
+            default_attack_nuke_condition=Condition.convert_to_string(
+                condition.condition
+            )
+            if condition
+            else None
+        )
+        if condition:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The default attacking nuke condition for {repr(nation.alliance)} is now:\n\n`{condition}`",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The default attacking nuke condition has been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @alliance_settings.command(  # type: ignore
+        name="default-military-attack-condition",
+        brief="View or modify the alliance's default condition for attacking military targets.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_alliance_manage_permissions()
+    async def alliance_settings_default_attack_military_condition(
+        self,
+        ctx: RiftContext,
+        condition: Condition = MISSING,
+        clear: bool = False,
+    ):
+        nation = await Nation.convert(ctx, None)
+        if nation.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "You need to be in an alliance to run this command."
+                )
+            )
+        settings = await AllianceSettings.fetch(nation.alliance.id)
+        if condition is MISSING and not clear:
+            if settings.default_attack_military_condition is None:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"{repr(nation.alliance)} has no default attacking military condition.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The default attacking military condition for {repr(nation.alliance)}is:\n\n`{settings.default_attack_military_condition}`",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+        await settings.set_(
+            default_attack_military_condition=Condition.convert_to_string(
+                condition.condition
+            )
+            if condition
+            else None
+        )
+        if condition:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The default attacking military condition for {repr(nation.alliance)} is now:\n\n`{condition}`",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The default attacking military condition has been cleared.",
                     color=discord.Color.green(),
                 ),
                 ephemeral=True,

@@ -210,6 +210,7 @@ class Targets(commands.Cog):
             "evaluate_alliance_nuke_default": "Whether to evaluate your alliance's default nuke condition, defaults to false.",
             "eval_alliance_military_default": "Whether to evaluate your alliance's default military condition, defaults to false.",
             "offset": "The offset of targets to display, defaults to 0 (starts at the top target).",
+            "attack": "Whether to attack the nation rather than find attacks for it (ignores loot), defaults to false.",
         },
     )
     async def target_find_custom(
@@ -226,21 +227,37 @@ class Targets(commands.Cog):
         evaluate_alliance_nuke_default: bool = False,
         eval_alliance_military_default: bool = False,
         offset: int = 0,
+        attack: bool = False,
     ):
-        await funcs.find_targets(
-            ctx,
-            condition,
-            nation,
-            count_cities=count_cities,
-            count_loot=count_loot,
-            count_infrastructure=count_infrastructure,
-            count_military=count_military,
-            count_activity=count_activity,
-            evaluate_alliance_raid_default=evaluate_alliance_raid_default,
-            evaluate_alliance_nuke_default=evaluate_alliance_nuke_default,
-            evaluate_alliance_military_default=eval_alliance_military_default,
-            offset=offset,
-        )
+        if attack:
+            await funcs.find_attackers(
+                ctx,
+                condition,
+                nation,
+                count_cities=count_cities,
+                count_infrastructure=count_infrastructure,
+                count_military=count_military,
+                count_activity=count_activity,
+                evaluate_alliance_raid_default=evaluate_alliance_raid_default,
+                evaluate_alliance_nuke_default=evaluate_alliance_nuke_default,
+                evaluate_alliance_military_default=eval_alliance_military_default,
+                offset=offset,
+            )
+        else:
+            await funcs.find_targets(
+                ctx,
+                condition,
+                nation,
+                count_cities=count_cities,
+                count_loot=count_loot,
+                count_infrastructure=count_infrastructure,
+                count_military=count_military,
+                count_activity=count_activity,
+                evaluate_alliance_raid_default=evaluate_alliance_raid_default,
+                evaluate_alliance_nuke_default=evaluate_alliance_nuke_default,
+                evaluate_alliance_military_default=eval_alliance_military_default,
+                offset=offset,
+            )
 
     @target_find.command(  # type: ignore
         name="raid",
@@ -252,6 +269,7 @@ class Targets(commands.Cog):
             "count_infrastructure": "Whether to count the nation's infrastructure when rating, defaults to false.",
             "evaluate_alliance_raid_default": "Whether to evaluate your alliance's default raid condition, defaults to true.",
             "offset": "The offset of targets to display, defaults to 0 (starts at the top target).",
+            "attack": "Whether to attack the nation rather than find attacks for it (ignores loot), defaults to false.",
         },
     )
     async def target_find_raid(
@@ -262,19 +280,33 @@ class Targets(commands.Cog):
         count_infrastructure: bool = False,
         evaluate_alliance_raid_default: bool = True,
         offset: int = 0,
+        attack: bool = False,
     ):
-        await funcs.find_targets(
-            ctx,
-            condition,
-            nation,
-            count_cities=True,
-            count_loot=True,
-            count_infrastructure=count_infrastructure,
-            count_military=True,
-            count_activity=True,
-            evaluate_alliance_raid_default=evaluate_alliance_raid_default,
-            offset=offset,
-        )
+        if attack:
+            await funcs.find_attackers(
+                ctx,
+                condition,
+                nation,
+                count_cities=True,
+                count_infrastructure=count_infrastructure,
+                count_military=True,
+                count_activity=True,
+                evaluate_alliance_raid_default=evaluate_alliance_raid_default,
+                offset=offset,
+            )
+        else:
+            await funcs.find_targets(
+                ctx,
+                condition,
+                nation,
+                count_cities=True,
+                count_loot=True,
+                count_infrastructure=count_infrastructure,
+                count_military=True,
+                count_activity=True,
+                evaluate_alliance_raid_default=evaluate_alliance_raid_default,
+                offset=offset,
+            )
 
     @target_find.command(  # type: ignore
         name="nuke",
@@ -288,6 +320,7 @@ class Targets(commands.Cog):
             "count_activity": "Whether to count the nation's last activity when rating, defaults to false.",
             "evaluate_alliance_nuke_default": "Whether to evaluate your alliance's default nuke condition, defaults to true.",
             "offset": "The offset of targets to display, defaults to 0 (starts at the top target).",
+            "attack": "Whether to attack the nation rather than find attacks for it (ignores loot), defaults to false.",
         },
     )
     async def target_find_nuke(
@@ -300,19 +333,33 @@ class Targets(commands.Cog):
         count_activity: bool = False,
         evaluate_alliance_nuke_default: bool = True,
         offset: int = 0,
+        attack: bool = False,
     ):
-        await funcs.find_targets(
-            ctx,
-            condition,
-            nation,
-            count_cities=False,
-            count_loot=count_loot,
-            count_infrastructure=True,
-            count_military=count_military,
-            count_activity=count_activity,
-            evaluate_alliance_nuke_default=evaluate_alliance_nuke_default,
-            offset=offset,
-        )
+        if attack:
+            await funcs.find_attackers(
+                ctx,
+                condition,
+                nation,
+                count_cities=False,
+                count_infrastructure=True,
+                count_military=count_military,
+                count_activity=count_activity,
+                evaluate_alliance_nuke_default=evaluate_alliance_nuke_default,
+                offset=offset,
+            )
+        else:
+            await funcs.find_targets(
+                ctx,
+                condition,
+                nation,
+                count_cities=False,
+                count_loot=count_loot,
+                count_infrastructure=True,
+                count_military=count_military,
+                count_activity=count_activity,
+                evaluate_alliance_nuke_default=evaluate_alliance_nuke_default,
+                offset=offset,
+            )
 
     @target_find.command(  # type: ignore
         name="military",
@@ -327,6 +374,7 @@ class Targets(commands.Cog):
             "count_activity": "Whether to count the nation's last activity when rating, defaults to false.",
             "eval_alliance_military_default": "Whether to evaluate your alliance's default military condition, defaults to true.",
             "offset": "The offset of targets to display, defaults to 0 (starts at the top target).",
+            "attack": "Whether to attack the nation rather than find attacks for it (ignores loot), defaults to false.",
         },
     )
     async def target_find_military(
@@ -340,19 +388,33 @@ class Targets(commands.Cog):
         count_activity: bool = False,
         eval_alliance_military_default: bool = True,
         offset: int = 0,
+        attack: bool = False,
     ):
-        await funcs.find_targets(
-            ctx,
-            condition,
-            nation,
-            count_cities=count_cities,
-            count_loot=count_loot,
-            count_infrastructure=count_infrastructure,
-            count_military=True,
-            count_activity=count_activity,
-            evaluate_alliance_military_default=eval_alliance_military_default,
-            offset=offset,
-        )
+        if attack:
+            await funcs.find_attackers(
+                ctx,
+                condition,
+                nation,
+                count_cities=count_cities,
+                count_infrastructure=count_infrastructure,
+                count_military=True,
+                count_activity=count_activity,
+                evaluate_alliance_military_default=eval_alliance_military_default,
+                offset=offset,
+            )
+        else:
+            await funcs.find_targets(
+                ctx,
+                condition,
+                nation,
+                count_cities=count_cities,
+                count_loot=count_loot,
+                count_infrastructure=count_infrastructure,
+                count_military=True,
+                count_activity=count_activity,
+                evaluate_alliance_military_default=eval_alliance_military_default,
+                offset=offset,
+            )
 
 
 def setup(bot: Rift):
