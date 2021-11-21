@@ -14,7 +14,15 @@ if TYPE_CHECKING:
 
 
 class GovernmentDepartment:
-    __slots__ = ("id", "name", "description", "alliance_id", "role_ids", "role_rankings", "parent_id")
+    __slots__ = (
+        "id",
+        "name",
+        "description",
+        "alliance_id",
+        "role_ids",
+        "role_rankings",
+        "parent_id",
+    )
 
     def __init__(self, data: GovernmentDepartmentData) -> None:
         self.id: int = data["id"]
@@ -31,8 +39,10 @@ class GovernmentDepartment:
 
     @property
     def roles(self) -> List[Role]:
-        return [r for i in self.role_ids if r := cache.get_role(i)]
+        return [r for i in self.role_ids if (r := cache.get_role(i))]
 
     @property
     def parent(self) -> Optional[GovernmentDepartment]:
-        return cache.get_government_department(self.parent_id) if self.parent_id else None
+        return (
+            cache.get_government_department(self.parent_id) if self.parent_id else None
+        )
