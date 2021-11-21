@@ -187,10 +187,12 @@ class Resources:
             setattr(self, key, value)
         return self
 
-    def __eq__(self, other: Resources) -> bool:
-        return self.to_dict() == other.to_dict()
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Resources):
+            return self.to_dict() == other.to_dict()
+        return False
 
-    def __ne__(self, other: Resources) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
     def __add__(self, other: Union[float, int, Resources]) -> Resources:
