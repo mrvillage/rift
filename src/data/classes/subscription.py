@@ -106,7 +106,7 @@ class Subscription:
             "category": category,
             "type": type,
             "sub_types": sub_types,
-            "condition": str(condition) or None,
+            "condition": None if condition is MISSING else str(condition),
         }
         subscription = cls(data)
         cache.add_subscription(subscription)

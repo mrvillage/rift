@@ -93,7 +93,7 @@ class Events(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Successfully subscribed to `NATION_CREATE` events with {'' if condition else 'no'} condition{' ' + str(condition) if condition else ''}.\nSubscription ID: {subscription.id}",
+                f"Successfully subscribed to `NATION_CREATE` events with {'' if condition else 'no '}condition{' `' + str(condition) + '`' if condition else ''}.\nSubscription ID: {subscription.id}",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
@@ -115,11 +115,13 @@ class Events(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
-        subscription = await Subscription.subscribe(ctx.channel, "NATION", "DELETE")
+        subscription = await Subscription.subscribe(
+            ctx.channel, "NATION", "DELETE", condition=condition
+        )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Successfully subscribed to `NATION_DELETE` events with {'' if condition else 'no'} condition{' ' + str(condition) if condition else ''}.\nSubscription ID: {subscription.id}",
+                f"Successfully subscribed to `NATION_DELETE` events with {'' if condition else 'no '}condition{' `' + str(condition) + '`' if condition else ''}.\nSubscription ID: {subscription.id}",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
@@ -167,12 +169,12 @@ class Events(commands.Cog):
                 ephemeral=True,
             )
         subscription = await Subscription.subscribe(
-            ctx.channel, "NATION", "UPDATE", changes, condition
+            ctx.channel, "NATION", "UPDATE", changes, condition=condition
         )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Successfully subscribed to `NATION_UPDATE` events for the following changes: {', '.join('`' + i + '`' for i in changes)} with {'' if condition else 'no'} condition{' ' + str(condition) if condition else ''}.\nSubscription ID: {subscription.id}",
+                f"Successfully subscribed to `NATION_UPDATE` events for the following changes: {', '.join('`' + i + '`' for i in changes)} with {'' if condition else 'no '}condition{' `' + str(condition) + '`' if condition else ''}.\nSubscription ID: {subscription.id}",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
@@ -200,11 +202,13 @@ class Events(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
-        subscription = await Subscription.subscribe(ctx.channel, "ALLIANCE", "CREATE")
+        subscription = await Subscription.subscribe(
+            ctx.channel, "ALLIANCE", "CREATE", condition=condition
+        )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Successfully subscribed to `ALLIANCE_CREATE` events with {'' if condition else 'no'} condition{' ' + str(condition) if condition else ''}.\nSubscription ID: {subscription.id}",
+                f"Successfully subscribed to `ALLIANCE_CREATE` events with {'' if condition else 'no '}condition{' `' + str(condition) + '`' if condition else ''}.\nSubscription ID: {subscription.id}",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
@@ -226,11 +230,13 @@ class Events(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
-        subscription = await Subscription.subscribe(ctx.channel, "ALLIANCE", "DELETE")
+        subscription = await Subscription.subscribe(
+            ctx.channel, "ALLIANCE", "DELETE", condition=condition
+        )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Successfully subscribed to `ALLIANCE_DELETE` events with {'' if condition else 'no'} condition{' ' + str(condition) if condition else ''}.\nSubscription ID: {subscription.id}",
+                f"Successfully subscribed to `ALLIANCE_DELETE` events with {'' if condition else 'no '}condition{' `' + str(condition) + '`' if condition else ''}.\nSubscription ID: {subscription.id}",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
@@ -354,11 +360,13 @@ class Events(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
-        subscription = await Subscription.subscribe(ctx.channel, "WAR", "CREATE")
+        subscription = await Subscription.subscribe(
+            ctx.channel, "WAR", "CREATE", condition=condition
+        )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Successfully subscribed to `WAR_CREATE` events with {'' if condition else 'no'} condition{' ' + str(condition) if condition else ''}.\nSubscription ID: {subscription.id}",
+                f"Successfully subscribed to `WAR_CREATE` events with {'' if condition else 'no '}condition{' `' + str(condition) + '`' if condition else ''}.\nSubscription ID: {subscription.id}",
                 color=discord.Color.green(),
             ),
             ephemeral=True,
