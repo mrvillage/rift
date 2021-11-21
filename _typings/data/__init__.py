@@ -6,9 +6,11 @@ from .condition import *
 from .credentials import *
 from .embassy import *
 from .forum import *
+from .government import *
 from .menu import *
 from .nation import *
 from .prices import *
+from .role import *
 from .settings import *
 from .subscription import *
 from .target import *

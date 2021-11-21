@@ -20,6 +20,7 @@ if TYPE_CHECKING:
         EmbassyConfigData,
         EmbassyData,
         ForumData,
+        GovernmentDepartmentData,
         GuildSettingsData,
         GuildWelcomeSettingsData,
         MenuData,
@@ -28,6 +29,7 @@ if TYPE_CHECKING:
         NationData,
         RawColorData,
         RawTreasureData,
+        RoleData,
         SubscriptionData,
         TargetData,
         TargetReminderData,
@@ -49,11 +51,13 @@ if TYPE_CHECKING:
         Embassy,
         EmbassyConfig,
         Forum,
+        GovernmentDepartment,
         GuildSettings,
         GuildWelcomeSettings,
         Menu,
         MenuItem,
         Nation,
+        Role,
         Subscription,
         Target,
         TargetReminder,
@@ -89,6 +93,7 @@ class Cache:
         "_embassies",
         "_embassy_configs",
         "_forums",
+        "_government_departments",
         "_guild_settings",
         "_guild_welcome_settings",
         "_users",
@@ -97,6 +102,7 @@ class Cache:
         "_menus",
         "_nations",
         "_prices",
+        "_roles",
         "_subscriptions",
         "_targets",
         "_target_reminders",
@@ -123,6 +129,7 @@ class Cache:
         self._embassies: Dict[int, Embassy] = {}
         self._embassy_configs: Dict[int, EmbassyConfig] = {}
         self._forums: Dict[int, Forum] = {}
+        self._government_departments: Dict[int, GovernmentDepartment] = {}
         self._guild_settings: Dict[int, GuildSettings] = {}
         self._guild_welcome_settings: Dict[int, GuildWelcomeSettings] = {}
         self._users: List[UserData] = list()
@@ -131,6 +138,7 @@ class Cache:
         self._menus: Dict[int, Menu] = {}
         self._nations: Dict[int, Nation] = {}
         self._prices: TradePrices
+        self._roles: Dict[int, Role] = {}
         self._subscriptions: Dict[int, Subscription] = {}
         self._targets: Dict[int, Target] = {}
         self._target_reminders: Dict[int, TargetReminder] = {}
@@ -157,11 +165,13 @@ class Cache:
             Embassy,
             EmbassyConfig,
             Forum,
+            GovernmentDepartment,
             GuildSettings,
             GuildWelcomeSettings,
             Menu,
             MenuItem,
             Nation,
+            Role,
             Subscription,
             Target,
             TargetReminder,
@@ -183,6 +193,7 @@ class Cache:
             "SELECT * FROM embassies;",
             "SELECT * FROM embassy_configs;",
             "SELECT * FROM forums;",
+            "SELECT * FROM government_departments;",
             "SELECT * FROM guild_settings;",
             "SELECT * FROM guild_welcome_settings;",
             "SELECT * FROM menu_interfaces;",
@@ -190,6 +201,7 @@ class Cache:
             "SELECT * FROM menus;",
             "SELECT * FROM nations;",
             "SELECT * FROM prices ORDER BY datetime DESC LIMIT 1;",
+            "SELECT * FROM roles;",
             "SELECT * FROM subscriptions;",
             "SELECT * FROM targets;",
             "SELECT * FROM target_reminders;",
@@ -210,6 +222,7 @@ class Cache:
             List[EmbassyData],
             List[EmbassyConfigData],
             List[ForumData],
+            List[GovernmentDepartmentData],
             List[GuildSettingsData],
             List[GuildWelcomeSettingsData],
             List[MenuInterfaceData],
@@ -217,6 +230,7 @@ class Cache:
             List[MenuData],
             List[NationData],
             List[TradePriceData],
+            List[RoleData],
             List[SubscriptionData],
             List[TargetData],
             List[TargetReminderData],
@@ -239,6 +253,7 @@ class Cache:
             embassies,
             embassy_configs,
             forums,
+            government_departments,
             guild_settings,
             guild_welcome_settings,
             menu_interfaces,
@@ -246,6 +261,7 @@ class Cache:
             menus,
             nations,
             prices,
+            roles,
             subscriptions,
             targets,
             target_reminders,
@@ -285,6 +301,10 @@ class Cache:
         for i in forums:
             i = Forum(i)
             self._forums[i.id] = i
+        for i in government_departments:
+            i = GovernmentDepartment(i)
+            self._government_departments[i.id] = i
+            self._government_departments[i.id] = i
         for i in guild_settings:
             i = GuildSettings(i)
             self._guild_settings[i.guild_id] = i
@@ -311,6 +331,8 @@ class Cache:
                 for key, value in dict(prices[0]).items()
             }
         )
+        for i in roles:
+            i = Role(i)
         for i in subscriptions:
             i = Subscription(i)
             self._subscriptions[i.id] = i
@@ -384,6 +406,10 @@ class Cache:
         return set(self._forums.values())
 
     @property
+    def government_departments(self) -> Set[GovernmentDepartment]:
+        return set(self._government_departments.values())
+
+    @property
     def guild_settings(self) -> Set[GuildSettings]:
         return set(self._guild_settings.values())
 
@@ -410,6 +436,10 @@ class Cache:
     @property
     def prices(self) -> TradePrices:
         return self._prices
+
+    @property
+    def roles(self) -> Set[Role]:
+        return set(self._roles.values())
 
     @property
     def subscriptions(self) -> Set[Subscription]:
@@ -556,6 +586,9 @@ class Cache:
     def get_forum(self, id: int, /) -> Optional[Forum]:
         return self._forums.get(id)
 
+    def get_government_department(self, id: int, /) -> Optional[GovernmentDepartment]:
+        return self._government_departments.get(id)
+
     def get_guild_settings(self, id: int, /) -> Optional[GuildSettings]:
         return self._guild_settings.get(id)
 
@@ -585,6 +618,9 @@ class Cache:
 
     def get_prices(self) -> Optional[TradePrices]:
         return self._prices
+
+    def get_role(self, id: int, /) -> Optional[Role]:
+        return self._roles.get(id)
 
     def get_subscription(self, id: int, /) -> Optional[Subscription]:
         return self._subscriptions.get(id)
