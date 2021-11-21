@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from .flags import Flags, flag
 
-__all__ = ("CredentialsPermissions",)
+__all__ = ("CredentialsPermissions", "RolePermissions")
 
 
 class CredentialsPermissions(Flags):
@@ -61,3 +61,7 @@ class CredentialsPermissions(Flags):
     @flag
     def manage_wars(self):
         return 1 << 14
+
+
+class RolePermissions(Flags):
+    ...
