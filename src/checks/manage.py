@@ -4,13 +4,37 @@ from typing import TYPE_CHECKING
 
 from discord.ext import commands
 
+from ..cache import cache
 from ..data.classes import GuildSettings, Nation
 from ..ref import RiftContext
 
-__all__ = ("has_alliance_manage_permissions", "has_manage_permissions")
+__all__ = (
+    "can_manage_alliance_roles",
+    "has_alliance_manage_permissions",
+    "has_manage_permissions",
+)
 
 if TYPE_CHECKING:
+    from typing import Optional
+
     import discord
+
+    from ..data.classes import Alliance
+
+
+async def can_manage_alliance_roles(nation: Nation, alliance: Optional[Alliance]):
+    if alliance is None:
+        return False
+    if nation.alliance_position in {"Officer", "Heir", "Leader"}:
+        return True
+    roles = [i for i in cache.roles if i.alliance_id == alliance.id]
+    if any(
+        role.permissions.manage_roles or role.permissions.leadership
+        for role in roles
+        if nation.id in role.member_ids
+    ):
+        return True
+    raise commands.MissingPermissions(["alliance_manage_roles"])
 
 
 def has_alliance_manage_permissions():
