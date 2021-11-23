@@ -54,7 +54,10 @@ class PermissionsSelect(discord.ui.Select[PermissionsSelector]):
             max_values=len(permissions),
             options=[
                 discord.SelectOption(
-                    label=p["name"], value=p["value"], description=p["description"]
+                    label=p["name"],
+                    value=p["value"],
+                    description=p["description"],
+                    default=getattr(flags, p["value"]),
                 )
                 for p in permissions
             ],
