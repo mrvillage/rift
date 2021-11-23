@@ -16,6 +16,7 @@ __all__ = (
     "NationNotFoundError",
     "NationOrAllianceNotFoundError",
     "RecipientNotFoundError",
+    "RoleNotFoundError",
     "ServerNotFoundError",
     "SubscriptionNotFoundError",
     "TargetNotFoundError",
@@ -87,6 +88,10 @@ class NationOrAllianceNotFoundError(NotFoundError):
 
 
 class RecipientNotFoundError(NotFoundError):
+    ...
+
+
+class RoleNotFoundError(NotFoundError):
     ...
 
 
