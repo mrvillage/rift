@@ -696,6 +696,9 @@ class Cache:
     def add_menu_item(self, item: MenuItem, /) -> None:
         self._menu_items[item.id] = item
 
+    def add_role(self, role: Role, /) -> None:
+        self._roles[role.id] = role
+
     def add_subscription(self, subscription: Subscription, /) -> None:
         self._subscriptions[subscription.id] = subscription
 
@@ -725,6 +728,9 @@ class Cache:
             if i["message_id"] == message_id:
                 self._menu_interfaces.pop(index)
                 break
+
+    def remove_role(self, role: Role, /) -> None:
+        self._roles.pop(role.id)
 
     def remove_subscription(self, subscription: Subscription, /) -> None:
         self._subscriptions.pop(subscription.id)
