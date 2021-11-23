@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Coroutine, List, Optional
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, List, Optional, Tuple, Union
 
 import discord
 from discord.ext import commands
+from discord.utils import MISSING
 
 from ... import funcs
+from ...cache import cache
 from ...checks import can_manage_alliance_roles
 from ...data.classes import Alliance, Nation, Role
 from ...flags import Flags
@@ -140,6 +142,35 @@ def save_role_permissions(role: Role) -> Callable[[Flags], Coroutine[Any, Any, N
     return save
 
 
+async def manage_roles_command_check(
+    ctx: RiftContext, alliance: Optional[Alliance] = None
+) -> Tuple[Nation, Optional[Alliance], bool]:
+    nation = await Nation.convert(ctx, None)
+    if alliance is None:
+        alliance = nation.alliance
+    if alliance is None:
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                "You're not in an alliance and didn't specify one so I don't know where to manage! Please try again with an alliance.",
+                color=discord.Color.red(),
+            ),
+            ephemeral=True,
+        )
+        return nation, alliance, False
+    if not await can_manage_alliance_roles(nation, alliance):
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"You don't have permission to manage roles for {repr(alliance)}!",
+                color=discord.Color.red(),
+            ),
+            ephemeral=True,
+        )
+        return nation, alliance, False
+    return nation, alliance, True
+
+
 class Roles(commands.Cog):
     def __init__(self, bot: Rift):
         self.bot = bot
@@ -166,27 +197,9 @@ class Roles(commands.Cog):
         description: Optional[str] = None,
         alliance: Optional[Alliance] = None,
     ):
-        nation = await Nation.convert(ctx, None)
-        if alliance is None:
-            alliance = nation.alliance
-        if alliance is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You're not in an alliance and didn't specify one so I don't know where to manage! Please try again with an alliance.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
-            )
-        if not await can_manage_alliance_roles(nation, alliance):
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"You don't have permission to manage roles for {repr(alliance)}!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
-            )
+        _, alliance, can = await manage_roles_command_check(ctx, alliance)
+        if not can or alliance is None:
+            return
         role = Role.create(name, description, alliance, rank, starting_members)
         view = PermissionsSelector(
             ctx.author.id,
@@ -222,6 +235,242 @@ class Roles(commands.Cog):
                 color=discord.Color.green(),
             ),
             view=None,
+        )
+
+    @roles.command(  # type: ignore
+        name="delete",
+        brief="Delete an alliance role.",
+        type=commands.CommandType.chat_input,
+    )
+    async def roles_delete(self, ctx: RiftContext, role: Role):
+        if role.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "This role doesn't belong to an alliance!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        _, alliance, can = await manage_roles_command_check(ctx, role.alliance)
+        if not can or alliance is None:
+            return
+        await role.delete()
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Role `{role.name}` of alliance {repr(alliance)} deleted.",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @roles.command(  # type: ignore
+        name="list",
+        brief="List alliance roles.",
+        type=commands.CommandType.chat_input,
+    )
+    async def roles_list(self, ctx: RiftContext, alliance: Optional[Alliance] = None):
+        _, alliance, can = await manage_roles_command_check(ctx, alliance)
+        if not can or alliance is None:
+            return
+        roles = [i for i in cache.roles if i.alliance_id == alliance.id]
+        if roles:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "\n".join(f"#{i.rank} - {i.id} - {i.name}" for i in roles),
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "There are no roles for that alliance!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+
+    @roles.command(  # type: ignore
+        name="info",
+        brief="Get information about an alliance role.",
+        type=commands.CommandType.chat_input,
+    )
+    async def roles_info(self, ctx: RiftContext, role: Role):
+        if role.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "This role doesn't belong to an alliance!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        _, alliance, can = await manage_roles_command_check(ctx, role.alliance)
+        if not can or alliance is None:
+            return
+        enabled_permissions = ", ".join(
+            f"`{i['name']}`"
+            for i in ROLE_PERMISSIONS
+            if getattr(role.permissions, i["value"])
+        )
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"ID: {role.id}\nName: {role.name}\nRank: {role.rank:,}\nAlliance: {repr(role.alliance)}\nMembers: {' '.join(f'<@{i}>' for i in role.member_ids) or 'None'}\nDescription: {role.description}\nPermissions: {enabled_permissions}",
+                color=discord.Color.blue(),
+            ),
+            ephemeral=True,
+        )
+
+    @roles.command(  # type: ignore
+        name="edit",
+        brief="Edit an alliance role.",
+        type=commands.CommandType.chat_input,
+    )
+    async def roles_edit(
+        self,
+        ctx: RiftContext,
+        role: Role,
+        name: str = MISSING,
+        rank: int = MISSING,
+        description: str = MISSING,
+    ):
+        if role.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "This role doesn't belong to an alliance!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        _, alliance, can = await manage_roles_command_check(ctx, role.alliance)
+        if not can or alliance is None:
+            return
+        if name is not MISSING:
+            role.name = name
+        if rank is not MISSING:
+            role.rank = rank
+        if description is not MISSING:
+            role.description = description
+        view = PermissionsSelector(
+            ctx.author.id,
+            save_role_permissions(role),
+            role.permissions,
+            ROLE_PERMISSIONS,
+        )
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                "Please select the permissions you want for the role.",
+                color=discord.Color.blue(),
+            ),
+            view=view,
+            ephemeral=True,
+        )
+        if await view.wait():
+            return await ctx.interaction.edit_original_message(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "Role editing timed out."
+                ),
+                view=None,
+            )
+        enabled_permissions = ", ".join(
+            f"`{i['name']}`"
+            for i in ROLE_PERMISSIONS
+            if getattr(role.permissions, i["value"])
+        )
+        await ctx.interaction.edit_original_message(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Role edited!\n\nID: {role.id}\nName: {role.name}\nRank: {role.rank:,}\nAlliance: {repr(role.alliance)}\nMembers: {' '.join(i.mention for i in role.members) or 'None'}\nDescription: {role.description}\nPermissions: {enabled_permissions}",
+                color=discord.Color.green(),
+            ),
+            view=None,
+        )
+
+    @roles.command(  # type: ignore
+        name="add-member",
+        brief="Add a new member to an alliance role.",
+        type=commands.CommandType.chat_input,
+    )
+    async def roles_add_member(
+        self, ctx: RiftContext, role: Role, member: Union[discord.Member, discord.User]
+    ):
+        if role.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "This role doesn't belong to an alliance!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        _, alliance, can = await manage_roles_command_check(ctx, role.alliance)
+        if not can or alliance is None:
+            return
+        if member.id in role.member_ids:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"{member.mention} is already a member of this role!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        role.member_ids.append(member.id)
+        await role.save()
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"{member.mention} has been added to this role!",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @roles.command(  # type: ignore
+        name="remove-member",
+        brief="Removes a member from an alliance role.",
+        type=commands.CommandType.chat_input,
+    )
+    async def roles_remove_member(
+        self, ctx: RiftContext, role: Role, member: Union[discord.Member, discord.User]
+    ):
+        if role.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "This role doesn't belong to an alliance!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        _, alliance, can = await manage_roles_command_check(ctx, role.alliance)
+        if not can or alliance is None:
+            return
+        if member.id not in role.member_ids:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"{member.mention} is not a member of this role!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        role.member_ids.remove(member.id)
+        await role.save()
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"{member.mention} has been removed from this role!",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
         )
 
 
