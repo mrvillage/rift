@@ -2,11 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import discord
 from discord.abc import Snowflake
 
 from ...cache import cache
 from ...data.db import execute_query, execute_read_query
+from ...errors import RoleNotFoundError
 from ...flags import RolePermissions
+from ...ref import bot
+from .nation import Nation
 
 __all__ = ("Role",)
 
@@ -15,8 +19,8 @@ if TYPE_CHECKING:
 
     from _typings import RoleData
 
+    from ...ref import RiftContext
     from .alliance import Alliance
-    from .nation import Nation
 
 
 class Role:
@@ -39,9 +43,33 @@ class Role:
         self.permissions: RolePermissions = RolePermissions(data["permissions"])
         self.member_ids: List[int] = data["members"]
 
+    @classmethod
+    async def convert(cls, ctx: RiftContext, argument: str) -> Role:
+        from ...funcs.utils import convert_int
+
+        try:
+            role = cache.get_role(convert_int(argument))
+            if role:
+                return role
+        except ValueError:
+            pass
+        try:
+            nation = await Nation.convert(ctx, None)
+            roles = [i for i in cache.roles if i.alliance_id == nation.alliance_id]
+            roles = [i for i in roles if i.name.lower() == argument.lower()]
+            if len(roles) == 1:
+                return roles[0]
+        except StopIteration:
+            pass
+        raise RoleNotFoundError(argument)
+
     @property
     def alliance(self) -> Optional[Alliance]:
         return cache.get_alliance(self.alliance_id)
+
+    @property
+    def members(self) -> List[discord.User]:
+        return [u for i in self.member_ids if (u := bot.get_user(i)) is not None]
 
     async def save(self) -> None:
         if self.id:
@@ -98,3 +126,7 @@ class Role:
                 "permissions": 0,
             }
         )
+
+    async def delete(self) -> None:
+        await execute_query("DELETE FROM roles WHERE id = $1;", self.id)
+        cache.remove_role(self)
