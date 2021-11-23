@@ -16,6 +16,7 @@ from ..errors import (
     MenuNotFoundError,
     NationNotFoundError,
     NationOrAllianceNotFoundError,
+    RoleNotFoundError,
     SubscriptionNotFoundError,
     TargetNotFoundError,
     TicketConfigNotFoundError,
@@ -240,6 +241,15 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 embed=get_embed_author_member(
                     ctx.author,
                     f"No embassy config found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif isinstance(error, RoleNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No role found with argument `{error.args[0]}`.",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
