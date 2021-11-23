@@ -410,9 +410,39 @@ class Roles(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        _, alliance, can = await manage_roles_command_check(ctx, role.alliance)
+        nation, alliance, can = await manage_roles_command_check(ctx, role.alliance)
         if not can or alliance is None:
             return
+        if (
+            nation.alliance_position in {"Heir", "Leader"}
+            and nation.alliance_id != alliance.id
+        ) or nation.alliance_position not in {"Heir", "Leader"}:
+            roles = [
+                i
+                for i in cache.roles
+                if i.alliance_id == alliance.id
+                and (i.permissions.manage_roles or i.permissions.leadership)
+                and nation.id in role.member_ids
+            ]
+            if not roles:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "You don't have permission to add members to this role!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            max_role = max(roles, key=lambda x: x.rank)
+            if max_role.rank < role.rank and not max_role.permissions.leadership:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "You don't have permission to add members to this role!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
         if member.id in role.member_ids:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -450,9 +480,39 @@ class Roles(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        _, alliance, can = await manage_roles_command_check(ctx, role.alliance)
+        nation, alliance, can = await manage_roles_command_check(ctx, role.alliance)
         if not can or alliance is None:
             return
+        if (
+            nation.alliance_position in {"Heir", "Leader"}
+            and nation.alliance_id != alliance.id
+        ) or nation.alliance_position not in {"Heir", "Leader"}:
+            roles = [
+                i
+                for i in cache.roles
+                if i.alliance_id == alliance.id
+                and (i.permissions.manage_roles or i.permissions.leadership)
+                and nation.id in role.member_ids
+            ]
+            if not roles:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "You don't have permission to add members to this role!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            max_role = max(roles, key=lambda x: x.rank)
+            if max_role.rank < role.rank and not max_role.permissions.leadership:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "You don't have permission to add members to this role!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
         if member.id not in role.member_ids:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
