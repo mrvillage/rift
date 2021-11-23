@@ -333,6 +333,7 @@ class Cache:
         )
         for i in roles:
             i = Role(i)
+            self._roles[i.id] = i
         for i in subscriptions:
             i = Subscription(i)
             self._subscriptions[i.id] = i
