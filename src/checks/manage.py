@@ -27,7 +27,10 @@ async def can_manage_alliance_roles(
 ):
     if alliance is None:
         return False
-    if nation.alliance_position in {"Heir", "Leader"}:
+    if (
+        nation.alliance_position in {"Officer", "Heir", "Leader"}
+        and nation.alliance_id == alliance.id
+    ):
         return True
     roles = [i for i in cache.roles if i.alliance_id == alliance.id]
     if any(
