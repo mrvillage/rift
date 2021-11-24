@@ -196,6 +196,8 @@ class Alliance(Makeable):
         return (
             sum(i.infrastructure for i in cache.cities if i.nation_id in ids)
             / self.cities
+            if self.cities
+            else 0
         )
 
     @property
@@ -295,7 +297,7 @@ class Alliance(Makeable):
             },
             {
                 "name": "Average Cities",
-                "value": f"{self.cities/member_count:,.2f}",
+                "value": f"{self.cities/member_count if member_count else 0:,.2f}",
             },
             {
                 "name": "Average Infrastructure",
