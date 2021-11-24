@@ -242,7 +242,7 @@ class Roles(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                "Please select the permissions you want for the new role.",
+                f"Please select the permissions you want for the new role for alliance {repr(alliance)}.",
                 color=discord.Color.blue(),
             ),
             view=view,
