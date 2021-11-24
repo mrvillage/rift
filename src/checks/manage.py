@@ -22,7 +22,9 @@ if TYPE_CHECKING:
     from ..data.classes import Alliance
 
 
-async def can_manage_alliance_roles(nation: Nation, alliance: Optional[Alliance]):
+async def can_manage_alliance_roles(
+    nation: Nation, alliance: Optional[Alliance], suppress: bool = False
+):
     if alliance is None:
         return False
     if nation.alliance_position in {"Heir", "Leader"}:
@@ -34,6 +36,8 @@ async def can_manage_alliance_roles(nation: Nation, alliance: Optional[Alliance]
         if nation.id in role.member_ids
     ):
         return True
+    if suppress:
+        return False
     raise commands.MissingPermissions(["alliance_manage_roles"])
 
 
