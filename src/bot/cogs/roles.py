@@ -222,7 +222,9 @@ class Roles(commands.Cog):
         alliance: Optional[Alliance] = None,
         privacy_level: Literal["PUBLIC", "PRIVATE", "PROTECTED"] = "PUBLIC",
     ):
-        _, alliance, can = await manage_roles_command_check_with_message(ctx, alliance)
+        nation, alliance, can = await manage_roles_command_check_with_message(
+            ctx, alliance
+        )
         if not can or alliance is None:
             return
         role = Role.create(
@@ -233,11 +235,34 @@ class Roles(commands.Cog):
             starting_members,
             getattr(PrivacyLevel, privacy_level),
         )
+        roles = [
+            i
+            for i in cache.roles
+            if i.alliance_id == alliance.id and ctx.author.id in i.member_ids
+        ]
+        max_rank = max(i.rank for i in roles)
+        leadership = any(i.permissions.leadership for i in roles) or (
+            nation.alliance_id == alliance.id
+            and nation.alliance_position in {"Heir", "Leader"}
+        )
+        if rank >= max_rank and not leadership:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You can't create a role with a rank higher than the highest rank you have!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
         view = PermissionsSelector(
             ctx.author.id,
             save_role_permissions(role),
             role.permissions,
-            ROLE_PERMISSIONS,
+            [
+                i
+                for i in ROLE_PERMISSIONS
+                if leadership or any(getattr(r.permissions, i["value"]) for r in roles)
+            ],
         )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -251,7 +276,9 @@ class Roles(commands.Cog):
         if await view.wait():
             return await ctx.interaction.edit_original_message(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, "Role creation timed out."
+                    ctx.author,
+                    "Role creation timed out.",
+                    color=discord.Color.red(),
                 ),
                 view=None,
             )
@@ -418,7 +445,7 @@ class Roles(commands.Cog):
         rank: int = MISSING,
         description: str = MISSING,
         privacy_level: Literal["PUBLIC", "PRIVATE", "PROTECTED"] = MISSING,
-    ):
+    ):  # sourcery no-metrics
         if role.alliance is None:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -428,11 +455,39 @@ class Roles(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        _, alliance, can = await manage_roles_command_check_with_message(
+        nation, alliance, can = await manage_roles_command_check_with_message(
             ctx, role.alliance
         )
         if not can or alliance is None:
             return
+        roles = [
+            i
+            for i in cache.roles
+            if i.alliance_id == alliance.id and ctx.author.id in i.member_ids
+        ]
+        leadership = any(i.permissions.leadership for i in roles) or (
+            nation.alliance_id == alliance.id
+            and nation.alliance_position in {"Heir", "Leader"}
+        )
+        max_rank = max(i.rank for i in roles)
+        if rank >= max_rank and not leadership:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You can't edit a role to have a rank higher than the highest rank you have!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if role.rank >= max_rank and not leadership:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You can't edit a role with a higher rank than the highest rank you have!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
         if name is not MISSING:
             role.name = name
         if rank is not MISSING:
@@ -445,7 +500,11 @@ class Roles(commands.Cog):
             ctx.author.id,
             save_role_permissions(role),
             role.permissions,
-            ROLE_PERMISSIONS,
+            [
+                i
+                for i in ROLE_PERMISSIONS
+                if leadership or any(getattr(r.permissions, i["value"]) for r in roles)
+            ],
         )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -508,7 +567,7 @@ class Roles(commands.Cog):
                 for i in cache.roles
                 if i.alliance_id == alliance.id
                 and (i.permissions.manage_roles or i.permissions.leadership)
-                and nation.id in role.member_ids
+                and ctx.author.id in role.member_ids
             ]
             if not roles:
                 return await ctx.reply(
@@ -519,8 +578,12 @@ class Roles(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-            max_role = max(roles, key=lambda x: x.rank)
-            if max_role.rank < role.rank and not max_role.permissions.leadership:
+            max_rank = max(i.rank for i in roles)
+            leadership = any(i.permissions.leadership for i in roles) or (
+                nation.alliance_id == alliance.id
+                and nation.alliance_position in {"Heir", "Leader"}
+            )
+            if role.rank >= max_rank and not leadership:
                 return await ctx.reply(
                     embed=funcs.get_embed_author_member(
                         ctx.author,
@@ -580,7 +643,7 @@ class Roles(commands.Cog):
                 for i in cache.roles
                 if i.alliance_id == alliance.id
                 and (i.permissions.manage_roles or i.permissions.leadership)
-                and nation.id in role.member_ids
+                and ctx.author.id in role.member_ids
             ]
             if not roles:
                 return await ctx.reply(
@@ -591,8 +654,12 @@ class Roles(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-            max_role = max(roles, key=lambda x: x.rank)
-            if max_role.rank < role.rank and not max_role.permissions.leadership:
+            max_rank = max(i.rank for i in roles)
+            leadership = any(i.permissions.leadership for i in roles) or (
+                nation.alliance_id == alliance.id
+                and nation.alliance_position in {"Heir", "Leader"}
+            )
+            if role.rank >= max_rank and not leadership:
                 return await ctx.reply(
                     embed=funcs.get_embed_author_member(
                         ctx.author,
@@ -677,7 +744,7 @@ class Roles(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Privacy Level: `{max(privacy_levels, key=lambda x: x.value).name}`\n\nRank: {max(roles, key=lambda x: x.rank).rank:,}\nAlliance: {repr(alliance)}\nRoles: {' '.join(f'{i.id} - {i.name}' for i in roles) or 'None'}\nPermissions: {enabled_permissions}",
+                f"Privacy Level: `{max(privacy_levels, key=lambda x: x.value).name}`\n\nRank: {max(roles, key=lambda x: x.rank).rank:,}\nAlliance: {repr(alliance)}\nRoles: {', '.join(f'{i.id} - {i.name}' for i in roles) or 'None'}\nPermissions: {enabled_permissions}",
                 color=discord.Color.blue(),
             ),
             ephemeral=True,
