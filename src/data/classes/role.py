@@ -7,6 +7,7 @@ from discord.abc import Snowflake
 
 from ...cache import cache
 from ...data.db import execute_query, execute_read_query
+from ...enums import PrivacyLevel
 from ...errors import RoleNotFoundError
 from ...flags import RolePermissions
 from ...ref import bot
@@ -32,6 +33,7 @@ class Role:
         "rank",
         "permissions",
         "member_ids",
+        "privacy_level",
     )
 
     def __init__(self, data: RoleData) -> None:
@@ -42,6 +44,7 @@ class Role:
         self.rank: int = data["rank"]
         self.permissions: RolePermissions = RolePermissions(data["permissions"])
         self.member_ids: List[int] = data["members"]
+        self.privacy_level: PrivacyLevel = PrivacyLevel(data["privacy_level"])
 
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str) -> Role:
@@ -74,7 +77,7 @@ class Role:
     async def save(self) -> None:
         if self.id:
             await execute_query(
-                "UPDATE roles SET name = $2, description = $3, alliance = $4, rank = $5, permissions = $6, members = $7 WHERE id = $1;",
+                "UPDATE roles SET name = $2, description = $3, alliance = $4, rank = $5, permissions = $6, members = $7, privacy_level = $8 WHERE id = $1;",
                 self.id,
                 self.name,
                 self.description,
@@ -82,16 +85,18 @@ class Role:
                 self.rank,
                 self.permissions.flags,
                 self.member_ids,
+                self.privacy_level.value,
             )
         else:
             id = await execute_read_query(
-                "INSERT INTO roles (name, description, alliance, rank, permissions, members) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;",
+                "INSERT INTO roles (name, description, alliance, rank, permissions, members, privacy_level) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;",
                 self.name,
                 self.description,
                 self.alliance_id,
                 self.rank,
                 self.permissions.flags,
                 self.member_ids,
+                self.privacy_level.value,
             )
             self.id = id[0]["id"]
             cache.add_role(self)
@@ -114,6 +119,7 @@ class Role:
         alliance: Alliance,
         rank: int,
         starting_members: List[Snowflake],
+        privacy: PrivacyLevel,
     ) -> Role:
         return cls(
             {
@@ -124,6 +130,7 @@ class Role:
                 "rank": rank,
                 "members": [i.id for i in starting_members],
                 "permissions": 0,
+                "privacy_level": privacy.value,
             }
         )
 
