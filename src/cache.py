@@ -649,7 +649,9 @@ class Cache:
             return next(
                 i
                 for i in self._treaties
-                if i.from_.id == from_
+                if i.from_ is not None
+                and i.to_ is not None
+                and i.from_.id == from_
                 and i.to_.id == to_
                 and i.treaty_type == treaty_type
             )
