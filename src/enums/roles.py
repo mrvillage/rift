@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from enum import Enum
 
-__all__ = ("Privacy",)
+__all__ = ("PrivacyLevel",)
 
 
-class Privacy(Enum):
+class PrivacyLevel(Enum):
     PUBLIC = 0
     PRIVATE = 1
     PROTECTED = 2
