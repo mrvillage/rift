@@ -1,15 +1,28 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Coroutine, List, Optional, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Coroutine,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    Union,
+)
 
 import discord
 from discord.ext import commands
 from discord.utils import MISSING
 
+from src.errors.notfound import RoleNotFoundError
+
 from ... import funcs
 from ...cache import cache
 from ...checks import can_manage_alliance_roles
 from ...data.classes import Alliance, Nation, Role
+from ...enums import PrivacyLevel
 from ...flags import Flags
 from ...ref import Rift, RiftContext
 from ...views import PermissionsSelector
@@ -142,12 +155,10 @@ def save_role_permissions(role: Role) -> Callable[[Flags], Coroutine[Any, Any, N
     return save
 
 
-async def manage_roles_command_check(
+async def manage_roles_command_check_with_message(
     ctx: RiftContext, alliance: Optional[Alliance] = None
 ) -> Tuple[Nation, Optional[Alliance], bool]:
-    nation = await Nation.convert(ctx, None)
-    if alliance is None:
-        alliance = nation.alliance
+    nation, alliance, can = await manage_roles_command_check(ctx, alliance)
     if alliance is None:
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -158,7 +169,7 @@ async def manage_roles_command_check(
             ephemeral=True,
         )
         return nation, alliance, False
-    if not await can_manage_alliance_roles(nation, alliance):
+    if not can:
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
@@ -167,6 +178,19 @@ async def manage_roles_command_check(
             ),
             ephemeral=True,
         )
+        return nation, alliance, False
+    return nation, alliance, True
+
+
+async def manage_roles_command_check(
+    ctx: RiftContext, alliance: Optional[Alliance] = None, suppress: bool = False
+) -> Tuple[Nation, Optional[Alliance], bool]:
+    nation = await Nation.convert(ctx, None)
+    if alliance is None:
+        alliance = nation.alliance
+    if alliance is None:
+        return nation, alliance, False
+    if not await can_manage_alliance_roles(nation, alliance, suppress):
         return nation, alliance, False
     return nation, alliance, True
 
@@ -196,11 +220,19 @@ class Roles(commands.Cog):
         starting_members: List[discord.Member] = [],
         description: Optional[str] = None,
         alliance: Optional[Alliance] = None,
+        privacy_level: Literal["PUBLIC", "PRIVATE", "PROTECTED"] = "PUBLIC",
     ):
-        _, alliance, can = await manage_roles_command_check(ctx, alliance)
+        _, alliance, can = await manage_roles_command_check_with_message(ctx, alliance)
         if not can or alliance is None:
             return
-        role = Role.create(name, description, alliance, rank, starting_members)
+        role = Role.create(
+            name,
+            description,
+            alliance,
+            rank,
+            starting_members,
+            getattr(PrivacyLevel, privacy_level),
+        )
         view = PermissionsSelector(
             ctx.author.id,
             save_role_permissions(role),
@@ -231,7 +263,7 @@ class Roles(commands.Cog):
         await ctx.interaction.edit_original_message(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Role created!\n\nID: {role.id}\nName: {role.name}\nRank: {role.rank:,}\nAlliance: {repr(role.alliance)}\nMembers: {' '.join(i.mention for i in starting_members) or 'None'}\nDescription: {role.description}\nPermissions: {enabled_permissions}",
+                f"Role created!\n\nID: {role.id}\nName: {role.name}\nRank: {role.rank:,}\nAlliance: {repr(role.alliance)}\nMembers: {' '.join(i.mention for i in starting_members) or 'None'}\nDescription: {role.description}\nPermissions: {enabled_permissions}\nPrivacy Level: `{role.privacy_level.name}`",
                 color=discord.Color.green(),
             ),
             view=None,
@@ -252,7 +284,9 @@ class Roles(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        _, alliance, can = await manage_roles_command_check(ctx, role.alliance)
+        _, alliance, can = await manage_roles_command_check_with_message(
+            ctx, role.alliance
+        )
         if not can or alliance is None:
             return
         await role.delete()
@@ -271,15 +305,37 @@ class Roles(commands.Cog):
         type=commands.CommandType.chat_input,
     )
     async def roles_list(self, ctx: RiftContext, alliance: Optional[Alliance] = None):
-        _, alliance, can = await manage_roles_command_check(ctx, alliance)
-        if not can or alliance is None:
-            return
-        roles = [i for i in cache.roles if i.alliance_id == alliance.id]
+        nation, alliance, can = await manage_roles_command_check(ctx, alliance, True)
+        if alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You're not in an alliance and didn't specify one so I don't know where to look! Please try again with an alliance.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if can:
+            privacy_levels = {
+                PrivacyLevel.PUBLIC,
+                PrivacyLevel.PRIVATE,
+                PrivacyLevel.PROTECTED,
+            }
+        elif nation.alliance_id == alliance.id:
+            privacy_levels = {PrivacyLevel.PUBLIC, PrivacyLevel.PRIVATE}
+        else:
+            privacy_levels = {PrivacyLevel.PUBLIC}
+        roles = [
+            i
+            for i in cache.roles
+            if i.alliance_id == alliance.id and i.privacy_level in privacy_levels
+        ]
         if roles:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    "\n".join(f"#{i.rank} - {i.id} - {i.name}" for i in roles),
+                    f"Privacy Level: `{max(privacy_levels, key=lambda x: x.value).name}`\n\n"
+                    + "\n".join(f"#{i.rank} - {i.id} - {i.name}" for i in roles),
                     color=discord.Color.green(),
                 ),
                 ephemeral=True,
@@ -288,7 +344,7 @@ class Roles(commands.Cog):
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    "There are no roles for that alliance!",
+                    "You can't view any roles for that alliance!",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
@@ -309,9 +365,32 @@ class Roles(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        _, alliance, can = await manage_roles_command_check(ctx, role.alliance)
-        if not can or alliance is None:
-            return
+        nation, alliance, can = await manage_roles_command_check(
+            ctx, role.alliance, True
+        )
+        if alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You're not in an alliance and didn't specify one so I don't know where to look! Please try again with an alliance.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if can:
+            privacy_levels = {
+                PrivacyLevel.PUBLIC,
+                PrivacyLevel.PRIVATE,
+                PrivacyLevel.PROTECTED,
+            }
+        elif nation.alliance_id == alliance.id:
+            privacy_levels = {PrivacyLevel.PUBLIC, PrivacyLevel.PRIVATE}
+        else:
+            privacy_levels = {PrivacyLevel.PUBLIC}
+        if role.privacy_level not in privacy_levels:
+            raise RoleNotFoundError(
+                [i for i in ctx.options if i["name"] == "role"][0]["value"]  # type: ignore
+            )
         enabled_permissions = ", ".join(
             f"`{i['name']}`"
             for i in ROLE_PERMISSIONS
@@ -320,7 +399,7 @@ class Roles(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"ID: {role.id}\nName: {role.name}\nRank: {role.rank:,}\nAlliance: {repr(role.alliance)}\nMembers: {' '.join(f'<@{i}>' for i in role.member_ids) or 'None'}\nDescription: {role.description}\nPermissions: {enabled_permissions}",
+                f"ID: {role.id}\nName: {role.name}\nRank: {role.rank:,}\nAlliance: {repr(role.alliance)}\nMembers: {' '.join(f'<@{i}>' for i in role.member_ids) or 'None'}\nDescription: {role.description}\nPermissions: {enabled_permissions}\nPrivacy Level: `{role.privacy_level.name}`",
                 color=discord.Color.blue(),
             ),
             ephemeral=True,
@@ -338,6 +417,7 @@ class Roles(commands.Cog):
         name: str = MISSING,
         rank: int = MISSING,
         description: str = MISSING,
+        privacy_level: Literal["PUBLIC", "PRIVATE", "PROTECTED"] = MISSING,
     ):
         if role.alliance is None:
             return await ctx.reply(
@@ -348,7 +428,9 @@ class Roles(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        _, alliance, can = await manage_roles_command_check(ctx, role.alliance)
+        _, alliance, can = await manage_roles_command_check_with_message(
+            ctx, role.alliance
+        )
         if not can or alliance is None:
             return
         if name is not MISSING:
@@ -357,6 +439,8 @@ class Roles(commands.Cog):
             role.rank = rank
         if description is not MISSING:
             role.description = description
+        if privacy_level is not MISSING:
+            role.privacy_level = getattr(PrivacyLevel, privacy_level)
         view = PermissionsSelector(
             ctx.author.id,
             save_role_permissions(role),
@@ -387,7 +471,7 @@ class Roles(commands.Cog):
         await ctx.interaction.edit_original_message(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Role edited!\n\nID: {role.id}\nName: {role.name}\nRank: {role.rank:,}\nAlliance: {repr(role.alliance)}\nMembers: {' '.join(i.mention for i in role.members) or 'None'}\nDescription: {role.description}\nPermissions: {enabled_permissions}",
+                f"Role edited!\n\nID: {role.id}\nName: {role.name}\nRank: {role.rank:,}\nAlliance: {repr(role.alliance)}\nMembers: {' '.join(i.mention for i in role.members) or 'None'}\nDescription: {role.description}\nPermissions: {enabled_permissions}\nPrivacy Level: `{role.privacy_level.name}`",
                 color=discord.Color.green(),
             ),
             view=None,
@@ -410,7 +494,9 @@ class Roles(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        nation, alliance, can = await manage_roles_command_check(ctx, role.alliance)
+        nation, alliance, can = await manage_roles_command_check_with_message(
+            ctx, role.alliance
+        )
         if not can or alliance is None:
             return
         if (
@@ -480,7 +566,9 @@ class Roles(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        nation, alliance, can = await manage_roles_command_check(ctx, role.alliance)
+        nation, alliance, can = await manage_roles_command_check_with_message(
+            ctx, role.alliance
+        )
         if not can or alliance is None:
             return
         if (
@@ -529,6 +617,68 @@ class Roles(commands.Cog):
                 ctx.author,
                 f"{member.mention} has been removed from this role!",
                 color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @roles.command(  # type: ignore
+        name="summary",
+        brief="Shows a summary of a users roles in an alliance.",
+        type=commands.CommandType.chat_input,
+    )
+    async def roles_summary(
+        self,
+        ctx: RiftContext,
+        member: Union[discord.Member, discord.User] = MISSING,
+        alliance: Optional[Alliance] = None,
+    ):
+        member = member or ctx.author
+        nation, alliance, can = await manage_roles_command_check(ctx, alliance, True)
+        if alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You're not in an alliance and didn't specify one so I don't know where to look! Please try again with an alliance.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if can:
+            privacy_levels = {
+                PrivacyLevel.PUBLIC,
+                PrivacyLevel.PRIVATE,
+                PrivacyLevel.PROTECTED,
+            }
+        elif nation.alliance_id == alliance.id:
+            privacy_levels = {PrivacyLevel.PUBLIC, PrivacyLevel.PRIVATE}
+        else:
+            privacy_levels = {PrivacyLevel.PUBLIC}
+        roles = {
+            i
+            for i in cache.roles
+            if i.alliance_id == alliance.id
+            and i.privacy_level in privacy_levels
+            and member.id in i.member_ids
+        }
+        if not roles:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"{member.mention} doesn't have any roles in this alliance!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        enabled_permissions = ", ".join(
+            f"`{i['name']}`"
+            for i in ROLE_PERMISSIONS
+            if any(getattr(role.permissions, i["value"]) for role in roles)
+        )
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Privacy Level: `{max(privacy_levels, key=lambda x: x.value).name}`\n\nRank: {max(roles, key=lambda x: x.rank).rank:,}\nAlliance: {repr(alliance)}\nRoles: {' '.join(f'{i.id} - {i.name}' for i in roles) or 'None'}\nPermissions: {enabled_permissions}",
+                color=discord.Color.blue(),
             ),
             ephemeral=True,
         )
