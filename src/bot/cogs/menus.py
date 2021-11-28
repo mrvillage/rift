@@ -378,20 +378,16 @@ class Menus(commands.Cog):
                             await item.save()
                         menu.add_item(item, index)
                 await menu.save()
-                interfaces = [
-                    i for i in cache.menu_interfaces if i["menu_id"] == menu.id
-                ]
+                interfaces = [i for i in cache.menu_interfaces if i.menu_id == menu.id]
                 view = menu.get_view()
                 embed = menu.get_description_embed(ctx)
                 for interface in interfaces:
-                    channel = self.bot.get_channel(interface["channel_id"])
+                    channel = self.bot.get_channel(interface.channel_id)
                     if channel is None:
                         continue
                     if TYPE_CHECKING:
                         assert isinstance(channel, discord.TextChannel)
-                    partial_message = channel.get_partial_message(
-                        interface["message_id"]
-                    )
+                    partial_message = channel.get_partial_message(interface.message_id)
                     try:
                         await partial_message.edit(embed=embed, view=view)
                     except discord.NotFound:
