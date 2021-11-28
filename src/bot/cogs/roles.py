@@ -16,13 +16,12 @@ import discord
 from discord.ext import commands
 from discord.utils import MISSING
 
-from src.errors.notfound import RoleNotFoundError
-
 from ... import funcs
 from ...cache import cache
 from ...checks import can_manage_alliance_roles
 from ...data.classes import Alliance, Nation, Role
 from ...enums import PrivacyLevel
+from ...errors import RoleNotFoundError
 from ...flags import Flags
 from ...ref import Rift, RiftContext
 from ...views import PermissionsSelector
