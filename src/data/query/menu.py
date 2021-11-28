@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, List, Union
 import discord
 
 from ...cache import cache
-from ...data.classes import MenuInterface
 from ..db import execute_query, execute_read_query
 
 __all__ = (
@@ -42,6 +41,8 @@ async def query_menu_item(item_id: int, guild_id: int) -> MenuItemData:
 
 
 async def insert_interface(menu_id: int, message: discord.Message) -> None:
+    from ...data.classes import MenuInterface
+
     await execute_query(
         "INSERT INTO menu_interfaces (menu_id, message_id, channel_id) VALUES ($1, $2, $3);",
         menu_id,
