@@ -213,6 +213,14 @@ class Tools(commands.Cog):
         descriptions={"resources": "The resources to calculate the value of."},
     )
     async def tools_calculate_value(self, ctx: RiftContext, *, resources: Resources):
+        if not resources:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You didn't specify any resources!",
+                    color=discord.Color.red(),
+                )
+            )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,

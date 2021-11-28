@@ -272,3 +272,6 @@ class Resources:
 
     def __getitem__(self, item: str) -> float:
         return self.__getattribute__(item)
+
+    def __len__(self) -> int:
+        return len([i for i in self.to_dict().values() if i != 0])
