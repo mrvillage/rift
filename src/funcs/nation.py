@@ -26,7 +26,7 @@ async def search_nation(ctx: RiftContext, search: str, advanced: bool = True) ->
             user = None
     if user is not None:
         try:
-            return await Nation.fetch((await get_link_user(user.id))["nation_id"])
+            return await Nation.fetch((await get_link_user(user.id)).nation_id)
         except IndexError:
             pass
     if search.isdigit():

@@ -19,13 +19,11 @@ from ...data.classes import (
     GuildSettings,
     GuildWelcomeSettings,
     Nation,
+    User,
 )
 from ...errors import AllianceNotFoundError
 from ...ref import Rift, RiftContext
 from ...views import AlliancePurposeConfirm
-
-if TYPE_CHECKING:
-    from _typings import UserData
 
 
 class Settings(commands.Cog):
@@ -1375,7 +1373,7 @@ class Settings(commands.Cog):
             link = cache.get_user(member.id)
             if link is None:
                 continue
-            nation = cache.get_nation(link["nation_id"])
+            nation = cache.get_nation(link.nation_id)
             if nation is None:
                 continue
             alliance_id = nation.alliance.id if nation.alliance else None
@@ -1412,7 +1410,7 @@ class Settings(commands.Cog):
             return
         try:
             nat = await get.get_link_user(member.id)
-            nation: Optional[Nation] = await Nation.fetch(nat["nation_id"])
+            nation: Optional[Nation] = await Nation.fetch(nat.nation_id)
             await nation.make_attrs("alliance")
         except IndexError:
             nation = None
@@ -1518,24 +1516,24 @@ class Settings(commands.Cog):
         if before.nick != after.nick and settings.enforce_verified_nickname:
             link = cache.get_user(after.id)
             if link is not None:
-                nation = cache.get_nation(link["nation_id"])
+                nation = cache.get_nation(link.nation_id)
                 if nation is not None:
                     await settings.set_verified_nickname(after, nation)
 
     @commands.Cog.listener()
-    async def on_link_create(self, link: UserData):
+    async def on_link_create(self, link: User):
         # sourcery skip: merge-nested-ifs
-        nation = cache.get_nation(link["nation_id"])
+        nation = cache.get_nation(link.nation_id)
         if nation is None:
             return
         for guild in self.bot.guilds:
-            if link["user_id"] not in {i.id for i in guild.members}:
+            if link.user_id not in {i.id for i in guild.members}:
                 continue
             guild_settings = await GuildSettings.fetch(guild.id)
             settings = guild_settings.welcome_settings
             roles: list[discord.Role] = []
             highest_role: discord.Role = member.guild.get_member(self.bot.user.id).top_role  # type: ignore
-            member = guild.get_member(link["user_id"])
+            member = guild.get_member(link.user_id)
             if member is None:
                 continue
             if settings.verified_nickname and settings.enforce_verified_nickname:

@@ -67,6 +67,7 @@ if TYPE_CHECKING:
         TradePrices,
         Treasure,
         Treaty,
+        User,
         UserSettings,
     )
 
@@ -133,7 +134,6 @@ class Cache:
         self._government_departments: Dict[int, GovernmentDepartment] = {}
         self._guild_settings: Dict[int, GuildSettings] = {}
         self._guild_welcome_settings: Dict[int, GuildWelcomeSettings] = {}
-        self._users: List[UserData] = list()
         self._menu_interfaces: Set[MenuInterface] = set()
         self._menu_items: Dict[int, MenuItem] = {}
         self._menus: Dict[int, Menu] = {}
@@ -148,6 +148,7 @@ class Cache:
         self._trades = {}  # NO CLASS YET
         self._treasures: List[Treasure] = []
         self._treaties: Set[Treaty] = set()
+        self._users: Set[User] = set()
         self._user_settings: Dict[int, UserSettings] = {}
         self._war_attacks = {}  # NO CLASS YET
         self._wars = {}  # NO CLASS YET
@@ -182,6 +183,7 @@ class Cache:
             TradePrices,
             Treasure,
             Treaty,
+            User,
         )
 
         queries = [
@@ -370,7 +372,8 @@ class Cache:
             if i.stopped is None:
                 self._treaties.add(i)
         for i in users:
-            self._users.append(dict(i))  # type: ignore
+            i = User(i)
+            self._users.add(i)
         self.init = True
 
     @property
@@ -474,7 +477,7 @@ class Cache:
         return self._treaties
 
     @property
-    def users(self) -> List[UserData]:
+    def users(self) -> Set[User]:
         return self._users
 
     @property
@@ -661,11 +664,9 @@ class Cache:
         except StopIteration:
             return
 
-    def get_user(self, id: int, /) -> Optional[UserData]:
+    def get_user(self, id: int, /) -> Optional[User]:
         try:
-            return next(
-                i for i in self._users if i["user_id"] == id or i["nation_id"] == id
-            )
+            return next(i for i in self._users if i.user_id == id or i.nation_id == id)
         except StopIteration:
             return
 
@@ -720,6 +721,9 @@ class Cache:
     def add_target_reminder(self, reminder: TargetReminder, /) -> None:
         self._target_reminders[reminder.id] = reminder
 
+    def add_user(self, user: User, /) -> None:
+        self._users.add(user)
+
     def remove_alliance_auto_role(self, role: AllianceAutoRole, /) -> None:
         self._alliance_auto_roles.remove(role)
 
@@ -744,5 +748,7 @@ class Cache:
     def remove_target_reminder(self, reminder: TargetReminder, /) -> None:
         self._target_reminders.pop(reminder.id)
 
+    def remove_user(self, user: User, /) -> None:
+        self._users.remove(user)
 
 cache = Cache()
