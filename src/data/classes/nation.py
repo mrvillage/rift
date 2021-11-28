@@ -156,7 +156,7 @@ class Nation(Makeable):
         link = cache.get_user(self.id)
         if link is None:
             return
-        return bot.get_user(link["user_id"])
+        return bot.get_user(link.user_id)
 
     @property
     def partial_cities(self) -> List[City]:

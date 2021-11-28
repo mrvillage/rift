@@ -164,7 +164,7 @@ class MenuButton(discord.ui.Button):
             embassies: List[Embassy] = []
             try:
                 nation = await get_link_user(interaction.user.id)
-                nation = await Nation.fetch(nation["nation_id"])
+                nation = await Nation.fetch(nation.nation_id)
                 alliance = await Alliance.fetch(nation.alliance_id)
                 if nation.alliance_position not in {"Officer", "Heir", "Leader"}:
                     raise KeyError

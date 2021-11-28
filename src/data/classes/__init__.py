@@ -18,4 +18,5 @@ from .trade import *
 from .transaction import *
 from .treasure import *
 from .treaty import *
+from .user import *
 from .war import *

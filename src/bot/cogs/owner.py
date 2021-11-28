@@ -31,9 +31,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     async def unlink(self, ctx: RiftContext, nation: Nation):
         link = await get.get_link_nation(nation.id)
         await get.remove_link_nation(nation.id)
-        user = self.bot.get_user(link["user_id"])
+        user = self.bot.get_user(link.user_id)
         if not user:
-            user = await self.bot.fetch_user(link["user_id"])
+            user = await self.bot.fetch_user(link.user_id)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 user,

@@ -31,7 +31,7 @@ async def search_alliance(
         try:
             return await Alliance.fetch(
                 (
-                    await Nation.fetch((await get_link_user(user.id))["nation_id"])
+                    await Nation.fetch((await get_link_user(user.id)).nation_id)
                 ).alliance_id
             )
         except IndexError:
