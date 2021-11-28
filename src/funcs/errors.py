@@ -140,7 +140,7 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 await ctx.reply(
                     embed=get_embed_author_member(
                         ctx.author,
-                        "You're not linked so I can't infer your alliance!",
+                        "You're not linked so I can't infer your nation!",
                         color=discord.Color.red(),
                     ),
                     ephemeral=True,
