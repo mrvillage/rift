@@ -210,6 +210,14 @@ class Roles(commands.Cog):
         name="create",
         brief="Create an alliance role.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "name": "The name of the role.",
+            "rank": "The rank of the role.",
+            "starting_members": "A space separated list of members to initially give the role.",
+            "description": "The description of the role.",
+            "alliance": "The alliance to create the role in.",
+            "privacy_level": "The privacy level of the role.",
+        },
     )
     async def roles_create(
         self,
@@ -299,6 +307,9 @@ class Roles(commands.Cog):
         name="delete",
         brief="Delete an alliance role.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "role": "The role to delete.",
+        },
     )
     async def roles_delete(self, ctx: RiftContext, role: Role):
         if role.alliance is None:
@@ -329,6 +340,9 @@ class Roles(commands.Cog):
         name="list",
         brief="List alliance roles.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "alliance": "The alliance to list roles for.",
+        },
     )
     async def roles_list(self, ctx: RiftContext, alliance: Optional[Alliance] = None):
         nation, alliance, can = await manage_roles_command_check(ctx, alliance, True)
@@ -380,6 +394,9 @@ class Roles(commands.Cog):
         name="info",
         brief="Get information about an alliance role.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "role": "The role to get information about.",
+        },
     )
     async def roles_info(self, ctx: RiftContext, role: Role):
         if role.alliance is None:
@@ -435,6 +452,13 @@ class Roles(commands.Cog):
         name="edit",
         brief="Edit an alliance role.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "role": "The role to edit.",
+            "name": "The new name of the role.",
+            "rank": "The new rank of the role.",
+            "description": "The new description of the role.",
+            "privacy_level": "The new privacy level of the role.",
+        },
     )
     async def roles_edit(
         self,
@@ -539,6 +563,10 @@ class Roles(commands.Cog):
         name="add-member",
         brief="Add a new member to an alliance role.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "role": "The role to add.",
+            "member": "The member to add to the role.",
+        },
     )
     async def roles_add_member(
         self, ctx: RiftContext, role: Role, member: Union[discord.Member, discord.User]
@@ -615,6 +643,10 @@ class Roles(commands.Cog):
         name="remove-member",
         brief="Removes a member from an alliance role.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "role": "The role to remove.",
+            "member": "The member to remove from the role.",
+        },
     )
     async def roles_remove_member(
         self, ctx: RiftContext, role: Role, member: Union[discord.Member, discord.User]
@@ -691,6 +723,10 @@ class Roles(commands.Cog):
         name="summary",
         brief="Shows a summary of a users roles in an alliance.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "member": "The member to show the roles of.",
+            "alliance": "The alliance to show the member's roles in.",
+        },
     )
     async def roles_summary(
         self,
