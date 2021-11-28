@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, List, Union
 import discord
 
 from ...cache import cache
+from ...data.classes import MenuInterface
 from ..db import execute_query, execute_read_query
 
 __all__ = (
@@ -48,7 +49,13 @@ async def insert_interface(menu_id: int, message: discord.Message) -> None:
         message.channel.id,
     )
     cache.add_menu_interface(
-        {"menu_id": menu_id, "message_id": message.id, "channel_id": message.channel.id}
+        MenuInterface(
+            {
+                "menu_id": menu_id,
+                "message_id": message.id,
+                "channel_id": message.channel.id,
+            }
+        )
     )
 
 

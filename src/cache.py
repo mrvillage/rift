@@ -55,6 +55,7 @@ if TYPE_CHECKING:
         GuildSettings,
         GuildWelcomeSettings,
         Menu,
+        MenuInterface,
         MenuItem,
         Nation,
         Role,
@@ -133,7 +134,7 @@ class Cache:
         self._guild_settings: Dict[int, GuildSettings] = {}
         self._guild_welcome_settings: Dict[int, GuildWelcomeSettings] = {}
         self._users: List[UserData] = list()
-        self._menu_interfaces: List[MenuInterfaceData] = list()
+        self._menu_interfaces: Set[MenuInterface] = set()
         self._menu_items: Dict[int, MenuItem] = {}
         self._menus: Dict[int, Menu] = {}
         self._nations: Dict[int, Nation] = {}
@@ -169,6 +170,7 @@ class Cache:
             GuildSettings,
             GuildWelcomeSettings,
             Menu,
+            MenuInterface,
             MenuItem,
             Nation,
             Role,
@@ -312,7 +314,8 @@ class Cache:
             i = GuildWelcomeSettings(i)
             self._guild_welcome_settings[i.guild_id] = i
         for i in menu_interfaces:
-            self._menu_interfaces.append(dict(i))  # type: ignore
+            i = MenuInterface(i)
+            self._menu_interfaces.add(i)
         for i in menu_items:
             i = MenuItem(i)
             self._menu_items[i.id] = i
@@ -419,7 +422,7 @@ class Cache:
         return set(self._guild_welcome_settings.values())
 
     @property
-    def menu_interfaces(self) -> List[MenuInterfaceData]:
+    def menu_interfaces(self) -> Set[MenuInterface]:
         return self._menu_interfaces
 
     @property
@@ -598,12 +601,12 @@ class Cache:
 
     def get_menu_interface(
         self, menu_id: int, message_id: int, /
-    ) -> Optional[MenuInterfaceData]:
+    ) -> Optional[MenuInterface]:
         try:
             return next(
                 i
                 for i in self._menu_interfaces
-                if i["menu_id"] == menu_id and i["message_id"] == message_id
+                if i.menu_id == menu_id and i.message_id == message_id
             )
         except StopIteration:
             return
@@ -693,8 +696,8 @@ class Cache:
     def add_menu(self, menu: Menu, /) -> None:
         self._menus[menu.id] = menu
 
-    def add_menu_interface(self, interface: MenuInterfaceData, /) -> None:
-        self._menu_interfaces.append(interface)
+    def add_menu_interface(self, interface: MenuInterface, /) -> None:
+        self._menu_interfaces.add(interface)
 
     def add_menu_item(self, item: MenuItem, /) -> None:
         self._menu_items[item.id] = item
@@ -727,9 +730,9 @@ class Cache:
         self._embassies.pop(embassy.id)
 
     def remove_menu_interface(self, message_id: int, /) -> None:
-        for index, i in enumerate(self.menu_interfaces):
-            if i["message_id"] == message_id:
-                self._menu_interfaces.pop(index)
+        for i in self.menu_interfaces:
+            if i.message_id == message_id:
+                self._menu_interfaces.remove(i)
                 break
 
     def remove_role(self, role: Role, /) -> None:

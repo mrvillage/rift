@@ -24,8 +24,7 @@ class MenuView(discord.ui.View):
             [
                 i
                 for i in cache.menu_interfaces
-                if i["menu_id"] == self.menu_id
-                and i["message_id"] == interaction.message.id
+                if i.menu_id == self.menu_id and i.message_id == interaction.message.id
             ]
         )
 

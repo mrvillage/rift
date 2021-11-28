@@ -18,10 +18,10 @@ from ..db import execute_query, execute_read_query
 from ..query import insert_interface
 from .base import Makeable
 
-__all__ = ("Menu", "MenuItem")
+__all__ = ("Menu", "MenuItem", "MenuInterface")
 
 if TYPE_CHECKING:
-    from _typings import MenuData, MenuFormattedFlags, MenuItemData
+    from _typings import MenuData, MenuFormattedFlags, MenuInterfaceData, MenuItemData
 
     from ...views.menu import MenuButton, MenuSelect, MenuView
 
@@ -388,3 +388,10 @@ class MenuItem:
         if self.type == "select":
             return f"ID: {self.id} - Type: {self.type} - Placeholder: {self.data.get('placeholder', None)} - Min Values: {self.data.get('min_values', 1)} - Max Values: {self.data.get('max_values', 1)} - Options: {', '.join(str(option) for option in self.data.get('options', [None]))}"
         return f"ID: {self.id} - Type: {self.type}"
+
+
+class MenuInterface:
+    def __init__(self, data: MenuInterfaceData) -> None:
+        self.menu_id: int = data.get("menu_id", None)
+        self.message_id: int = data.get("message_id", None)
+        self.channel_id: int = data.get("channel_id", None)
