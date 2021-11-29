@@ -682,6 +682,9 @@ class Cache:
     def add_condition(self, condition: Condition, /) -> None:
         self._conditions[condition.id] = condition
 
+    def add_credentials(self, credentials: Credentials, /) -> None:
+        self._credentials[credentials.nation_id] = credentials
+
     def add_embassy(self, embassy: Embassy, /) -> None:
         self._embassies[embassy.id] = embassy
 
@@ -730,6 +733,9 @@ class Cache:
     def remove_condition(self, condition: Condition, /) -> None:
         self._conditions.pop(condition.id)
 
+    def remove_credentials(self, credentials: Credentials, /) -> None:
+        self._credentials.pop(credentials.nation_id)
+
     def remove_embassy(self, embassy: Embassy, /) -> None:
         self._embassies.pop(embassy.id)
 
@@ -750,5 +756,6 @@ class Cache:
 
     def remove_user(self, user: User, /) -> None:
         self._users.remove(user)
+
 
 cache = Cache()
