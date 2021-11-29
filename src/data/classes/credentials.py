@@ -43,3 +43,9 @@ class Credentials:
 
     def has_permission(self, permission: str) -> bool:
         return getattr(self.permissions, permission, False)
+
+    def update(self, data: CredentialsData) -> None:
+        self.permissions.flags = data["permissions"]
+        self._username: str = data["username"]
+        self._password: str = data["password"]
+        self._api_key: str = data["api_key"]
