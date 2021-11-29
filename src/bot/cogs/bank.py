@@ -8,7 +8,7 @@ from src.errors.credentials import NoCredentialsError
 
 from ... import funcs
 from ...cache import cache
-from ...data.classes import Alliance, Nation, Resources
+from ...data.classes import Alliance, Resources
 from ...errors import NoRolesError
 from ...ref import Rift, RiftContext
 from ...views import Confirm
@@ -34,16 +34,17 @@ class Bank(commands.Cog):
         descriptions={
             "recipient": "The nation or alliance to send to.",
             "resources": "The resources to send.",
-            "alliance": "The alliance to send money from.",
+            "alliance": "The alliance to send money from, defaults to your alliance.",
         },
     )
     async def bank_transfer(
         self,
         ctx: RiftContext,
-        recipient: Nation,
+        recipient: str,
         resources: Resources,
         alliance: Alliance = MISSING,
     ):
+        recipient_ = await funcs.convert_nation_or_alliance(ctx, recipient)
         alliance_ = alliance or await Alliance.convert(ctx, None)
         if alliance_ is None:
             return await ctx.reply(
@@ -77,7 +78,7 @@ class Bank(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Are you sure you want to transfer {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**? To confirm please type the id of the **{type(recipient).__name__}**.",
+                f"Are you sure you want to transfer {resources} to the **{type(recipient_).__name__.lower()}** of **{repr(recipient_)}** from the alliance of **{repr(alliance)}**",
                 color=discord.Color.orange(),
             ),
             view=view,
@@ -97,7 +98,7 @@ class Bank(commands.Cog):
             return await ctx.interaction.edit_original_message(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    f"You have cancelled the transfer of {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                    f"You have cancelled the transfer of {resources} from **{repr(alliance)}** to the **{type(recipient_).__name__.lower()}** of **{repr(recipient_)}**.",
                     color=discord.Color.red(),
                 ),
                 view=None,
@@ -105,7 +106,7 @@ class Bank(commands.Cog):
         await ctx.interaction.edit_original_message(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Sending {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**...",
+                f"Sending {resources} from **{repr(alliance)}** to the **{type(recipient_).__name__.lower()}** of **{repr(recipient_)}**...",
                 color=discord.Color.orange(),
             ),
             view=None,
@@ -119,21 +120,21 @@ class Bank(commands.Cog):
             raise NoCredentialsError()
         complete = await funcs.withdraw(
             resources,
-            recipient,
+            recipient_,
             credentials,
         )
         if not complete:
-            return await ctx.reply(
+            return await ctx.interaction.edit_original_message(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     "Something went wrong with the transaction. Please try again.",
                     color=discord.Color.red(),
                 )
             )
-        await ctx.reply(
+        await ctx.interaction.edit_original_message(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"You successfully transferred {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                f"You successfully transferred {resources} from **{repr(alliance)}** to the **{type(recipient_).__name__.lower()}** of **{repr(recipient_)}**.",
                 color=discord.Color.green(),
             )
         )
