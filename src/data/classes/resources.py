@@ -146,7 +146,7 @@ class Resources:
         return cls(**resources_dict)
 
     @classmethod
-    async def from_dict(cls, resources: Dict[str, Union[float, int]]) -> Resources:
+    def from_dict(cls, resources: Dict[str, Union[float, int]]) -> Resources:
         return cls(
             money=resources["money"],
             food=resources["food"],
