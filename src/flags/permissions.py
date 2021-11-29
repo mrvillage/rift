@@ -139,3 +139,11 @@ class RolePermissions(Flags):
     @flag
     def delete_alliance_announcements(self):
         return 1 << 18
+
+    @flag
+    def create_bank_account(self):
+        return 1 << 19
+
+    @flag
+    def manage_bank_accounts(self):
+        return 1 << 20
