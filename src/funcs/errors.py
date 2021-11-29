@@ -150,7 +150,7 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
             await ctx.reply(
                 embed=get_embed_author_member(
                     ctx.author,
-                    f"You don't have any roles to allow you to perform that action on alliance {repr(error.args[0])}!",
+                    f"You don't have any roles to allow you to perform that action on alliance {repr(error.args[0])}!\nRequired Permissions: {', '.join(f'`{i}`' for i in error.args[1:]) if error.args[1:] else 'None'}",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
