@@ -8,7 +8,7 @@ import discord
 import pnwkit
 
 from ...cache import cache
-from ...errors import AllianceNotFoundError
+from ...errors import AllianceNotFoundError, NoCredentialsError
 from ...find import search_alliance
 from ...ref import RiftContext, bot
 from .base import Makeable
@@ -213,7 +213,7 @@ class Alliance(Makeable):
         ) as response:
             content = await response.text()
         await bot.parse_token(content)
-        return await Resources.from_dict(await parse_alliance_bank(content))
+        return Resources.from_dict(await parse_alliance_bank(content))
 
     def get_info_embed(self, ctx: RiftContext, short: bool = False) -> discord.Embed:
         # sourcery no-metrics
@@ -449,3 +449,32 @@ class Alliance(Makeable):
                 (i["upkeep_total"] for i in revenues[1:]), revenues[0]["upkeep_total"]
             ),
         }
+
+    async def fetch_bank(self) -> Resources:
+        from ...funcs import credentials
+
+        credentials = credentials.find_highest_alliance_credentials(
+            self, "view_alliance_bank"
+        )
+        if credentials is None:
+            raise NoCredentialsError(self)
+
+        data = await pnwkit.async_alliance_query(
+            {"id": self.id, "first": 1},
+            "money",
+            "coal",
+            "oil",
+            "uranium",
+            "iron",
+            "bauxite",
+            "lead",
+            "gasoline",
+            "munitions",
+            "steel",
+            "aluminum",
+            "food",
+        )
+        bank = data[0]
+        if bank.money is None:
+            raise NoCredentialsError(self)
+        return Resources.from_dict(bank.to_dict())
