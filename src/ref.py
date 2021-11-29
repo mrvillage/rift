@@ -58,7 +58,7 @@ class Rift(commands.Bot):
         await self.pnw_session.close()
         await super().close()
 
-    async def parse_token(self, content: str):
+    def parse_token(self, content: str):
         data = BeautifulSoup(content, "html.parser")
         self.auth_token = data.find("input", {"name": "token"}).attrs["value"]  # type: ignore
 
