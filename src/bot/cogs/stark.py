@@ -10,7 +10,7 @@ from discord.utils import MISSING
 
 from ... import funcs
 from ...cache import cache
-from ...data.classes import Alliance, Nation, Transaction
+from ...data.classes import Alliance, Nation
 from ...errors import AllianceNotFoundError
 from ...funcs import withdraw
 from ...ref import Rift, RiftContext
@@ -49,21 +49,22 @@ class Confirm(discord.ui.View):
         await interaction.response.defer()
         main = await Alliance.fetch(3683)
         offshore = await Alliance.fetch(OFFSHORE_ID)
-        resources = await main.get_resources()
-        transaction = Transaction(resources=resources)
+        resources = await main.fetch_bank()
         if TYPE_CHECKING:
             assert isinstance(interaction.user, discord.Member)
+        credentials = cache.get_credentials(251584)
+        if credentials is None:
+            return await interaction.followup.send(
+                embed=funcs.get_embed_author_member(
+                    interaction.user, "No credentials found"
+                )
+            )
         complete = await withdraw(
-            transaction=transaction,
+            credentials=credentials,
+            resources=resources,
             receiver=offshore,
             note=f"Automatic offshore deposit approved by {interaction.user.name}#{interaction.user.discriminator}",
         )
-        if not complete:
-            complete = await withdraw(
-                transaction=transaction,
-                receiver=offshore,
-                note=f"Automatic offshore deposit approved by {interaction.user.name}#{interaction.user.discriminator}",
-            )
         if TYPE_CHECKING:
             assert isinstance(interaction.user, discord.Member)
         if not complete:
