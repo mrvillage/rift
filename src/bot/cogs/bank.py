@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Optional
+
 import discord
 from discord.ext import commands
 from discord.utils import MISSING
@@ -43,6 +45,7 @@ class Bank(commands.Cog):
         recipient: str,
         resources: Resources,
         alliance: Alliance = MISSING,
+        note: Optional[str] = None,
     ):
         recipient_ = await funcs.convert_nation_or_alliance(ctx, recipient)
         alliance_ = alliance or await Alliance.convert(ctx, None)
@@ -122,6 +125,7 @@ class Bank(commands.Cog):
             resources,
             recipient_,
             credentials,
+            note=f"Transfer by {ctx.author.name}#{ctx.author.discriminator} with note: {note}",
         )
         if not complete:
             return await ctx.interaction.edit_original_message(
