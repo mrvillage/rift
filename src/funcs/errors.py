@@ -16,6 +16,8 @@ from ..errors import (
     MenuNotFoundError,
     NationNotFoundError,
     NationOrAllianceNotFoundError,
+    NoCredentialsError,
+    NoRolesError,
     RoleNotFoundError,
     SubscriptionNotFoundError,
     TargetNotFoundError,
@@ -131,6 +133,24 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 embed=get_embed_author_member(
                     ctx.author,
                     "You can't use that command in a server! Try it in DMs instead.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif isinstance(error, NoCredentialsError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    "I don't have any valid credentials to perform that action!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif isinstance(error, NoRolesError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"You don't have any roles to allow you to perform that action on alliance {repr(error.args[0])}!",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
