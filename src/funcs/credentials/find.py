@@ -6,7 +6,7 @@ from ...cache import cache
 from ...data.classes import Alliance, Credentials
 from ..utils import get_alliance_position_id
 
-__all__ = ("find_alliance_credentials",)
+__all__ = ("find_alliance_credentials", "find_highest_alliance_credentials")
 
 
 def find_alliance_credentials(
