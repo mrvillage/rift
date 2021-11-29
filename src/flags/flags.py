@@ -11,7 +11,7 @@ class Flags:
     __slots__ = ("flags",)
 
     def __init__(self, flags: int = 0) -> None:
-        self.flags = flags
+        self.flags: int = flags
 
     @classmethod
     def from_kwargs(cls, **kwargs: bool) -> Flags:
@@ -23,8 +23,8 @@ class Flags:
 
 class flag:
     def __init__(self, func: Callable[[Any], int]):
-        self.flag = func(None)
-        self.__doc__ = func.__doc__
+        self.flag: int = func(None)
+        self.__doc__: Optional[str] = func.__doc__
 
     @overload
     def __get__(self, instance: None, owner: Type[T]) -> T:
