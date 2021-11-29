@@ -15,7 +15,6 @@ from .subscription import *
 from .target import *
 from .ticket import *
 from .trade import *
-from .transaction import *
 from .treasure import *
 from .treaty import *
 from .user import *
