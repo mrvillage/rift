@@ -10,7 +10,7 @@ import pnwkit
 from ...cache import cache
 from ...errors import AllianceNotFoundError, NoCredentialsError
 from ...find import search_alliance
-from ...ref import RiftContext, bot
+from ...ref import RiftContext
 from .base import Makeable
 from .city import City
 from .resources import Resources
@@ -204,16 +204,6 @@ class Alliance(Makeable):
     def partial_cities(self) -> Set[City]:
         ids = {i.id for i in self.members}
         return {i for i in cache.cities if i.nation_id in ids}
-
-    async def get_resources(self) -> Resources:
-        from ...funcs import parse_alliance_bank
-
-        async with bot.pnw_session.request(
-            "GET", f"https://politicsandwar.com/alliance/id={self.id}&display=bank"
-        ) as response:
-            content = await response.text()
-        bot.parse_token(content)
-        return Resources.from_dict(await parse_alliance_bank(content))
 
     def get_info_embed(self, ctx: RiftContext, short: bool = False) -> discord.Embed:
         # sourcery no-metrics
