@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Any, Optional
 
 import aiohttp
 import discord
-from bs4 import BeautifulSoup
 from discord.ext import commands
 
 from .env import (
@@ -57,10 +56,6 @@ class Rift(commands.Bot):
         await notify_connection.close()  # type: ignore
         await self.pnw_session.close()
         await super().close()
-
-    def parse_token(self, content: str):
-        data = BeautifulSoup(content, "html.parser")
-        self.auth_token = data.find("input", {"name": "token"}).attrs["value"]  # type: ignore
 
     async def get_global_application_commands(self):
         if TYPE_CHECKING:
