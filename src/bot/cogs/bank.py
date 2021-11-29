@@ -72,7 +72,7 @@ class Bank(commands.Cog):
             and (i.permissions.send_alliance_bank or i.permissions.leadership)
         ]
         if not roles:
-            raise NoRolesError(alliance, "View Alliance Bank")
+            raise NoRolesError(alliance, "Send Alliance Bank")
         view = Confirm(defer=True)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
