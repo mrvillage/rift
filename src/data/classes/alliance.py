@@ -212,7 +212,7 @@ class Alliance(Makeable):
             "GET", f"https://politicsandwar.com/alliance/id={self.id}&display=bank"
         ) as response:
             content = await response.text()
-        await bot.parse_token(content)
+        bot.parse_token(content)
         return Resources.from_dict(await parse_alliance_bank(content))
 
     def get_info_embed(self, ctx: RiftContext, short: bool = False) -> discord.Embed:
@@ -477,4 +477,4 @@ class Alliance(Makeable):
         bank = data[0]
         if bank.money is None:
             raise NoCredentialsError(self)
-        return Resources.from_dict(bank.to_dict())
+        return Resources.from_dict(bank)  # type: ignore
