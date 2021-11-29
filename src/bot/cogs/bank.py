@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Union
-
 import discord
 from discord.ext import commands
 from discord.utils import MISSING
 
-from ... import funcs, perms
-from ...data.classes import Alliance, Nation, Transaction
-from ...errors import NationNotFoundError
+from src.errors.credentials import NoCredentialsError
+
+from ... import funcs
+from ...cache import cache
+from ...data.classes import Alliance, Nation, Resources
+from ...errors import NoRolesError
 from ...ref import Rift, RiftContext
 from ...views import Confirm
 
@@ -28,75 +29,34 @@ class Bank(commands.Cog):
 
     @bank.command(  # type: ignore
         name="transfer",
-        aliases=["send"],
-        brief="Send money from your alliance bank.",
+        brief="Send money from an alliance bank.",
         type=commands.CommandType.chat_input,
         descriptions={
             "recipient": "The nation or alliance to send to.",
-            "transaction": "The resources to send.",
+            "resources": "The resources to send.",
+            "alliance": "The alliance to send money from.",
         },
     )
     async def bank_transfer(
         self,
         ctx: RiftContext,
-        recipient: Union[Alliance, Nation],
-        *,
-        resources: Transaction,
-    ):  # sourcery no-metrics
-        if isinstance(recipient, Alliance):
-            author = ctx.guild
-        else:
-            await recipient.make_attrs("user")
-            author = recipient.user
-        if TYPE_CHECKING:
-            assert author is not None
-        try:
-            sender = await funcs.search_nation(ctx, str(ctx.author.id))
-        except NationNotFoundError:
-            await ctx.reply(
+        recipient: Nation,
+        resources: Resources,
+        alliance: Alliance = MISSING,
+    ):
+        alliance_ = alliance or await Alliance.convert(ctx, None)
+        if alliance_ is None:
+            return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    "You're not linked so I couldn't verify your bank permissions!",
+                    "You're not in an alliance and didn't specify one to send from! Please try again with an alliance.",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
             )
-            return
-        try:
-            if not await perms.check_bank_perms(
-                nation=sender, author=ctx.author, action="send"
-            ):
-                await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        "You don't have permission to send money from your alliance bank!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
-                )
-                return
-        except IndexError:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "Your alliance hasn't configured this command!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
-            )
-            return
-        except AttributeError:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You're not in an alliance so you can't send money!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
-            )
-            return
-        if len(resources) == 0:
-            await ctx.reply(
+        alliance = alliance_
+        if not len(resources):
+            return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     "You didn't give any valid resources!",
@@ -104,46 +64,28 @@ class Bank(commands.Cog):
                 ),
                 ephemeral=True,
             )
-            return
-        if ctx.guild is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "This command isn't publicly available yet! If you want it bug Village for it!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
-            )
-        if ctx.guild.id not in {239076753065115648, 654109011473596417}:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "This command isn't publicly available yet! If you want it bug Village for it!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
-            )
-        embed = (
-            funcs.get_embed_author_guild(
-                author,
-                f"Are you sure you want to transfer {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**? To confirm please type the id of the **{type(recipient).__name__}**.",
-                color=discord.Color.orange(),
-            )
-            if isinstance(author, discord.Guild)
-            else funcs.get_embed_author_member(
-                author,
-                f"Are you sure you want to transfer {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**? To confirm please type the id of the **{type(recipient).__name__}**.",
-                color=discord.Color.orange(),
-            )
-        )
+        roles = [
+            i
+            for i in cache.roles
+            if i.alliance_id == alliance.id
+            and ctx.author.id in i.member_ids
+            and (i.permissions.send_alliance_bank or i.permissions.leadership)
+        ]
+        if not roles:
+            raise NoRolesError(alliance, "View Alliance Bank")
         view = Confirm(defer=True)
-        message = await ctx.reply(
-            embed=embed, view=view, ephemeral=True, return_message=True
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Are you sure you want to transfer {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**? To confirm please type the id of the **{type(recipient).__name__}**.",
+                color=discord.Color.orange(),
+            ),
+            view=view,
+            ephemeral=True,
         )
-
         r = await view.wait()
         if r:
-            return await message.edit(
+            return await ctx.interaction.edit_original_message(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
                     "You didn't confirm the transaction in time!",
@@ -152,85 +94,49 @@ class Bank(commands.Cog):
                 view=None,
             )
         if not view.value:
-            return await message.edit(
-                embed=funcs.get_embed_author_guild(
-                    author,
-                    f"You have cancelled the transfer of {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
-                    color=discord.Color.red(),
-                )
-                if isinstance(author, discord.Guild)
-                else funcs.get_embed_author_member(
-                    author,
+            return await ctx.interaction.edit_original_message(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
                     f"You have cancelled the transfer of {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
                     color=discord.Color.red(),
                 ),
                 view=None,
             )
-
-        message = await message.edit(
-            embed=funcs.get_embed_author_guild(
-                author,
-                f"Sending {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**...",
-                color=discord.Color.orange(),
-            )
-            if isinstance(author, discord.Guild)
-            else funcs.get_embed_author_member(
-                author,
+        await ctx.interaction.edit_original_message(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
                 f"Sending {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**...",
                 color=discord.Color.orange(),
             ),
             view=None,
         )
-
-        complete = await resources.complete(receiver=recipient, action="send")
+        credentials = funcs.credentials.find_highest_alliance_credentials(
+            alliance, "send_alliance_bank"
+        )
+        if credentials is None or (
+            credentials.username is None and credentials.password is None
+        ):
+            raise NoCredentialsError()
+        complete = await funcs.withdraw(
+            resources,
+            recipient,
+            credentials,
+        )
         if not complete:
-            complete = await resources.complete(receiver=recipient, action="send")
-            if not complete:
-                embed = (
-                    funcs.get_embed_author_guild(
-                        author,
-                        "Something went wrong with the transaction. Please try again.",
-                        color=discord.Color.red(),
-                    )
-                    if isinstance(author, discord.Guild)
-                    else funcs.get_embed_author_member(
-                        author,
-                        "Something went wrong with the transaction. Please try again.",
-                        color=discord.Color.red(),
-                    )
-                )
-
-            else:
-                embed = (
-                    funcs.get_embed_author_guild(
-                        author,
-                        f"You successfully transferred {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
-                        color=discord.Color.green(),
-                    )
-                    if isinstance(author, discord.Guild)
-                    else funcs.get_embed_author_member(
-                        author,
-                        f"You successfully transferred {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
-                        color=discord.Color.green(),
-                    )
-                )
-
-        else:
-            embed = (
-                funcs.get_embed_author_guild(
-                    author,
-                    f"You successfully transferred {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
-                    color=discord.Color.green(),
-                )
-                if isinstance(author, discord.Guild)
-                else funcs.get_embed_author_member(
-                    author,
-                    f"You successfully transferred {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
-                    color=discord.Color.green(),
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "Something went wrong with the transaction. Please try again.",
+                    color=discord.Color.red(),
                 )
             )
-
-        await message.edit(embed=embed)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"You successfully transferred {resources} to the **{type(recipient).__name__}** of **{repr(recipient)}**.",
+                color=discord.Color.green(),
+            )
+        )
 
     @bank.command(  # type: ignore
         name="balance",
@@ -243,78 +149,20 @@ class Bank(commands.Cog):
     )
     async def bank_balance(self, ctx: RiftContext, *, alliance: Alliance = MISSING):
         alliance = alliance or await Alliance.convert(ctx, alliance)
-        try:
-            viewer = await funcs.search_nation(ctx, str(ctx.author.id))
-        except NationNotFoundError:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You're not linked so I couldn't verify your bank permissions!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
-            )
-        try:
-            if not await perms.check_bank_perms(
-                nation=viewer, author=ctx.author, action="view"
-            ):
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        "You don't have permission to view your alliance bank!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
-                )
-        except IndexError:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "Your alliance hasn't configured this command!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
-            )
-        except AttributeError:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You're not in an alliance so you can't view a bank balance!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
-            )
-        if ctx.guild is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "This command isn't publicly available yet! If you want it bug Village for it!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
-            )
-        if ctx.guild.id not in {239076753065115648, 654109011473596417}:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "This command isn't publicly available yet! If you want it bug Village for it!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
-            )
-        message = await ctx.reply(
+        roles = [
+            i
+            for i in cache.roles
+            if i.alliance_id == alliance.id
+            and ctx.author.id in i.member_ids
+            and (i.permissions.view_alliance_bank or i.permissions.leadership)
+        ]
+        if not roles:
+            raise NoRolesError(alliance, "View Alliance Bank")
+        resources = await alliance.fetch_bank()
+        await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Fetching the current bank holdings of {repr(alliance)}...",
-                color=discord.Color.orange(),
-            ),
-            return_message=True,
-        )
-        resources = await alliance.get_resources()
-        await message.edit(
-            embed=funcs.get_embed_author_member(
-                ctx.author,
-                f"The current bank holdings of {repr(alliance)} is:\n{resources.newline()}",
+                f"The **{repr(alliance)}** alliance bank has {resources}.",
                 color=discord.Color.green(),
             )
         )
