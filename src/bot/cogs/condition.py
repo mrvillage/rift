@@ -8,7 +8,7 @@ from src.errors.invalid import InvalidConditionError
 
 from ... import funcs
 from ...cache import cache
-from ...data.classes import Condition, funcs
+from ...data.classes import Condition
 from ...ref import Rift, RiftContext
 from ...views import Confirm
 
