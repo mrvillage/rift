@@ -391,6 +391,8 @@ class MenuItem:
 
 
 class MenuInterface:
+    __slots__ = ("menu_id", "message_id", "channel_id")
+
     def __init__(self, data: MenuInterfaceData) -> None:
         self.menu_id: int = data.get("menu_id", None)
         self.message_id: int = data.get("message_id", None)
