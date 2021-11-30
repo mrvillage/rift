@@ -9,6 +9,8 @@ if TYPE_CHECKING:
 
 
 class User:
+    __slots__ = ("user_id", "nation_id")
+
     def __init__(self, data: UserData) -> None:
         self.user_id: int = data["user_id"]
         self.nation_id: int = data["nation_id"]
