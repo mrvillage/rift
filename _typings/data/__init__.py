@@ -6,7 +6,6 @@ from .condition import *
 from .credentials import *
 from .embassy import *
 from .forum import *
-from .government import *
 from .menu import *
 from .nation import *
 from .prices import *
