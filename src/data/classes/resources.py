@@ -122,6 +122,8 @@ class Resources:
 
     @classmethod
     def convert_resources(cls, argument: str) -> Resources:
+        if not argument:
+            return cls()
         args = [i.strip(" ,.") for i in argument.split(" ")]
         args = [i if i.lower() != "credits" else "credit" for i in args]
         resources_dict = {}
