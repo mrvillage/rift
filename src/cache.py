@@ -20,7 +20,6 @@ if TYPE_CHECKING:
         EmbassyConfigData,
         EmbassyData,
         ForumData,
-        GovernmentDepartmentData,
         GuildSettingsData,
         GuildWelcomeSettingsData,
         MenuData,
@@ -51,7 +50,6 @@ if TYPE_CHECKING:
         Embassy,
         EmbassyConfig,
         Forum,
-        GovernmentDepartment,
         GuildSettings,
         GuildWelcomeSettings,
         Menu,
@@ -95,7 +93,6 @@ class Cache:
         "_embassies",
         "_embassy_configs",
         "_forums",
-        "_government_departments",
         "_guild_settings",
         "_guild_welcome_settings",
         "_users",
@@ -131,7 +128,6 @@ class Cache:
         self._embassies: Dict[int, Embassy] = {}
         self._embassy_configs: Dict[int, EmbassyConfig] = {}
         self._forums: Dict[int, Forum] = {}
-        self._government_departments: Dict[int, GovernmentDepartment] = {}
         self._guild_settings: Dict[int, GuildSettings] = {}
         self._guild_welcome_settings: Dict[int, GuildWelcomeSettings] = {}
         self._menu_interfaces: Set[MenuInterface] = set()
@@ -167,7 +163,6 @@ class Cache:
             Embassy,
             EmbassyConfig,
             Forum,
-            GovernmentDepartment,
             GuildSettings,
             GuildWelcomeSettings,
             Menu,
@@ -197,7 +192,6 @@ class Cache:
             "SELECT * FROM embassies;",
             "SELECT * FROM embassy_configs;",
             "SELECT * FROM forums;",
-            "SELECT * FROM government_departments;",
             "SELECT * FROM guild_settings;",
             "SELECT * FROM guild_welcome_settings;",
             "SELECT * FROM menu_interfaces;",
@@ -226,7 +220,6 @@ class Cache:
             List[EmbassyData],
             List[EmbassyConfigData],
             List[ForumData],
-            List[GovernmentDepartmentData],
             List[GuildSettingsData],
             List[GuildWelcomeSettingsData],
             List[MenuInterfaceData],
@@ -257,7 +250,6 @@ class Cache:
             embassies,
             embassy_configs,
             forums,
-            government_departments,
             guild_settings,
             guild_welcome_settings,
             menu_interfaces,
@@ -305,10 +297,6 @@ class Cache:
         for i in forums:
             i = Forum(i)
             self._forums[i.id] = i
-        for i in government_departments:
-            i = GovernmentDepartment(i)
-            self._government_departments[i.id] = i
-            self._government_departments[i.id] = i
         for i in guild_settings:
             i = GuildSettings(i)
             self._guild_settings[i.guild_id] = i
@@ -411,10 +399,6 @@ class Cache:
     @property
     def forums(self) -> Set[Forum]:
         return set(self._forums.values())
-
-    @property
-    def government_departments(self) -> Set[GovernmentDepartment]:
-        return set(self._government_departments.values())
 
     @property
     def guild_settings(self) -> Set[GuildSettings]:
@@ -592,9 +576,6 @@ class Cache:
 
     def get_forum(self, id: int, /) -> Optional[Forum]:
         return self._forums.get(id)
-
-    def get_government_department(self, id: int, /) -> Optional[GovernmentDepartment]:
-        return self._government_departments.get(id)
 
     def get_guild_settings(self, id: int, /) -> Optional[GuildSettings]:
         return self._guild_settings.get(id)
