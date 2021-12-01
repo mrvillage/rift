@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+import secrets
 import string
 from typing import TYPE_CHECKING, Dict, Mapping, Union
 
@@ -26,6 +27,7 @@ __all__ = (
     "parse_time",
     "convert_seconds_to_text",
     "escape_quoted_string",
+    "generate_custom_id",
 )
 
 color_map = (
@@ -246,3 +248,7 @@ def escape_quoted_string(arg: str) -> str:
     if arg[0] in QUOTES and arg[-1] in QUOTES:
         return arg[1 : len(arg) - 1]
     return arg
+
+
+def generate_custom_id(length: int = 100) -> str:
+    return secrets.token_hex(length // 2)
