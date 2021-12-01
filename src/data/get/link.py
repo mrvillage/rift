@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import Set
+from typing import TYPE_CHECKING, Set
 
 from ...cache import cache
-from ...data.classes import User
 from ...ref import bot
 from ..query import link
 
@@ -16,12 +15,17 @@ __all__ = (
     "get_link_nation",
 )
 
+if TYPE_CHECKING:
+    from ..classes import User
+
 
 async def get_links() -> Set[User]:
     return cache.users
 
 
 async def add_link(user_id: int, nation_id: int, /) -> None:
+    from ..classes import User
+
     user = User({"user_id": user_id, "nation_id": nation_id})
     cache.add_user(user)
     await link.add_link(user_id, nation_id)
