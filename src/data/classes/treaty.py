@@ -17,11 +17,21 @@ class Treaty:
     to_: Alliance
     treaty_type: str
 
-    __slots__ = ("started", "stopped", "from_", "to_", "treaty_type")
+    __slots__ = (
+        "started",
+        "stopped",
+        "from_id",
+        "to_id",
+        "from_",
+        "to_",
+        "treaty_type",
+    )
 
     def __init__(self, data: TreatyData, alliances: Mapping[int, Alliance]) -> None:
         self.started = data["started"]
         self.stopped = data["stopped"]
+        self.from_id = data["from_"]
+        self.to_id = data["to_"]
         self.from_ = alliances[data["from_"]]
         self.to_ = alliances[data["to_"]]
         self.treaty_type = data["treaty_type"]
@@ -34,6 +44,8 @@ class Treaty:
     def update(self, data: TreatyData, alliances: Mapping[int, Alliance]) -> None:
         self.started = data["started"]
         self.stopped = data["stopped"]
+        self.from_id = data["from_"]
+        self.to_id = data["to_"]
         self.from_ = alliances[data["from_"]]
         self.to_ = alliances[data["to_"]]
         self.treaty_type = data["treaty_type"]

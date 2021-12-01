@@ -10,6 +10,7 @@ __all__ = ("cache",)
 
 if TYPE_CHECKING:
     from _typings import (
+        AccountData,
         AllianceAutoRoleData,
         AllianceData,
         AllianceSettingsData,
@@ -35,11 +36,13 @@ if TYPE_CHECKING:
         TicketConfigData,
         TicketData,
         TradePriceData,
+        TransactionData,
         TreatyData,
         UserData,
     )
 
     from .data.classes import (
+        Account,
         Alliance,
         AllianceAutoRole,
         AllianceSettings,
@@ -63,6 +66,7 @@ if TYPE_CHECKING:
         Ticket,
         TicketConfig,
         TradePrices,
+        Transaction,
         Treasure,
         Treaty,
         User,
@@ -83,6 +87,7 @@ class Validate:
 
 class Cache:
     __slots__ = (
+        "_accounts",
         "_alliances",
         "_alliance_auto_roles",
         "_alliance_settings",
@@ -108,6 +113,7 @@ class Cache:
         "_ticket_configs",
         "_tickets",
         "_trades",
+        "_transactions",
         "_treasures",
         "_treaties",
         "_user_settings",
@@ -118,6 +124,7 @@ class Cache:
     )
 
     def __init__(self):
+        self._accounts: Dict[int, Account] = {}
         self._alliances: Dict[int, Alliance] = {}
         self._alliance_auto_roles: Set[AllianceAutoRole] = set()
         self._alliance_settings: Dict[int, AllianceSettings] = {}
@@ -142,6 +149,7 @@ class Cache:
         self._ticket_configs: Dict[int, TicketConfig] = {}
         self._tickets: Dict[int, Ticket] = {}
         self._trades = {}  # NO CLASS YET
+        self._transactions: Dict[int, Transaction] = {}
         self._treasures: List[Treasure] = []
         self._treaties: Set[Treaty] = set()
         self._users: Set[User] = set()
@@ -153,6 +161,7 @@ class Cache:
 
     async def initialize(self):  # sourcery no-metrics
         from .data.classes import (
+            Account,
             Alliance,
             AllianceAutoRole,
             AllianceSettings,
@@ -176,12 +185,14 @@ class Cache:
             Ticket,
             TicketConfig,
             TradePrices,
+            Transaction,
             Treasure,
             Treaty,
             User,
         )
 
         queries = [
+            "SELECT * FROM accounts",
             "SELECT * FROM alliances;",
             "SELECT * FROM alliance_auto_roles;",
             "SELECT * FROM alliance_settings;",
@@ -205,11 +216,13 @@ class Cache:
             "SELECT * FROM target_reminders;",
             "SELECT * FROM ticket_configs;",
             "SELECT * FROM tickets;",
+            "SELECT * FROM transactions;"
             "SELECT * FROM treasures ORDER BY datetime DESC LIMIT 1;",
             "SELECT * FROM treaties;",
             "SELECT * FROM users;",
         ]
         data: Tuple[  # type: ignore
+            List[AccountData],
             List[AllianceData],
             List[AllianceAutoRoleData],
             List[AllianceSettingsData],
@@ -233,6 +246,7 @@ class Cache:
             List[TargetReminderData],
             List[TicketConfigData],
             List[TicketData],
+            List[TransactionData],
             List[RawTreasureData],
             List[TreatyData],
             List[UserData],
@@ -240,6 +254,7 @@ class Cache:
             await asyncio.gather(*(execute_read_query(query) for query in queries))  # type: ignore
         )
         (
+            accounts,
             alliances,
             alliance_auto_roles,
             alliance_settings,
@@ -263,10 +278,14 @@ class Cache:
             target_reminders,
             ticket_configs,
             tickets,
+            transactions,
             treasures,
             treaties,
             users,
         ) = data
+        for i in accounts:
+            i = Account(i)
+            self._accounts[i.id] = i
         for i in alliances:
             i = Alliance(i)
             self._alliances[i.id] = i
@@ -342,6 +361,9 @@ class Cache:
         for i in tickets:
             i = Ticket(i)
             self._tickets[i.id] = i
+        for i in transactions:
+            i = Transaction(i)
+            self._transactions[i.id] = i
         for i in (  # type
             json.loads(treasures[0]["treasures"])
             if isinstance(treasures[0]["treasures"], str)
@@ -363,6 +385,10 @@ class Cache:
             i = User(i)
             self._users.add(i)
         self.init = True
+
+    @property
+    def accounts(self) -> Set[Account]:
+        return set(self._accounts.values())
 
     @property
     def alliances(self) -> Set[Alliance]:
@@ -451,6 +477,10 @@ class Cache:
     @property
     def tickets(self) -> Set[Ticket]:
         return set(self._tickets.values())
+
+    @property
+    def transactions(self) -> Set[Transaction]:
+        return set(self._transactions.values())
 
     @property
     def treasures(self) -> List[Treasure]:
@@ -550,6 +580,9 @@ class Cache:
             treaty.update(data, alliances)
         self._treaties.add(Treaty(data, alliances))
 
+    def get_account(self, id: int, /) -> Optional[Account]:
+        return self._accounts.get(id)
+
     def get_alliance(self, id: int, /) -> Optional[Alliance]:
         return self._alliances.get(id)
 
@@ -636,10 +669,8 @@ class Cache:
             return next(
                 i
                 for i in self._treaties
-                if i.from_ is not None
-                and i.to_ is not None
-                and i.from_.id == from_
-                and i.to_.id == to_
+                if i.from_id == from_
+                and i.to_id == to_
                 and i.treaty_type == treaty_type
             )
         except StopIteration:
@@ -653,6 +684,9 @@ class Cache:
 
     def get_user_settings(self, id: int, /) -> Optional[UserSettings]:
         return self._user_settings.get(id)
+
+    def add_account(self, account: Account) -> None:
+        self._accounts[account.id] = account
 
     def add_alliance_auto_role(self, role: AllianceAutoRole, /) -> None:
         self._alliance_auto_roles.add(role)
@@ -705,8 +739,14 @@ class Cache:
     def add_target_reminder(self, reminder: TargetReminder, /) -> None:
         self._target_reminders[reminder.id] = reminder
 
+    def add_transaction(self, transaction: Transaction, /) -> None:
+        self._transactions[transaction.id] = transaction
+
     def add_user(self, user: User, /) -> None:
         self._users.add(user)
+
+    def remove_account(self, account: Account, /) -> None:
+        self._accounts.pop(account.id)
 
     def remove_alliance_auto_role(self, role: AllianceAutoRole, /) -> None:
         self._alliance_auto_roles.remove(role)
@@ -734,6 +774,9 @@ class Cache:
 
     def remove_target_reminder(self, reminder: TargetReminder, /) -> None:
         self._target_reminders.pop(reminder.id)
+
+    def remove_transaction(self, transaction: Transaction, /) -> None:
+        self._transactions.pop(transaction.id)
 
     def remove_user(self, user: User, /) -> None:
         self._users.remove(user)
