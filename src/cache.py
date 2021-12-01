@@ -216,7 +216,7 @@ class Cache:
             "SELECT * FROM target_reminders;",
             "SELECT * FROM ticket_configs;",
             "SELECT * FROM tickets;",
-            "SELECT * FROM transactions;"
+            "SELECT * FROM transactions;",
             "SELECT * FROM treasures ORDER BY datetime DESC LIMIT 1;",
             "SELECT * FROM treaties;",
             "SELECT * FROM users;",
@@ -657,6 +657,9 @@ class Cache:
 
     def get_ticket(self, id: int, /) -> Optional[Ticket]:
         return self._tickets.get(id)
+
+    def get_transaction(self, id: int, /) -> Optional[Transaction]:
+        return self._transactions.get(id)
 
     def get_treasure(self, name: str, /) -> Optional[Treasure]:
         try:
