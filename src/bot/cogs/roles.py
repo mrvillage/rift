@@ -481,6 +481,20 @@ class Roles(commands.Cog):
         description: str = MISSING,
         privacy_level: Literal["PUBLIC", "PRIVATE", "PROTECTED"] = MISSING,
     ):  # sourcery no-metrics
+        if (
+            name is MISSING
+            and rank is MISSING
+            and description is MISSING
+            and privacy_level is MISSING
+        ):
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You must specify at least one field to edit!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
         if role.alliance is None:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
