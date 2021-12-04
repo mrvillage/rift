@@ -259,7 +259,7 @@ class Roles(commands.Cog):
             for i in cache.roles
             if i.alliance_id == alliance.id and ctx.author.id in i.member_ids
         ]
-        max_rank = max(i.rank for i in roles)
+        max_rank = max(i.rank for i in roles) if roles else 0
         leadership = any(i.permissions.leadership for i in roles) or (
             nation.alliance_id == alliance.id
             and nation.alliance_position in {"Heir", "Leader"}
@@ -620,7 +620,7 @@ class Roles(commands.Cog):
                 for i in cache.roles
                 if i.alliance_id == alliance.id
                 and (i.permissions.manage_roles or i.permissions.leadership)
-                and ctx.author.id in role.member_ids
+                and ctx.author.id in i.member_ids
             ]
             if not roles:
                 return await ctx.reply(
