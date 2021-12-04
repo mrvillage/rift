@@ -700,7 +700,7 @@ class Roles(commands.Cog):
                 for i in cache.roles
                 if i.alliance_id == alliance.id
                 and (i.permissions.manage_roles or i.permissions.leadership)
-                and ctx.author.id in role.member_ids
+                and ctx.author.id in i.member_ids
             ]
             if not roles:
                 return await ctx.reply(
