@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import random
 import secrets
 import string
 from typing import TYPE_CHECKING, Dict, Mapping, Union
@@ -147,7 +146,7 @@ get_command_help = get_command_signature
 
 
 def generate_code(length: int = 16) -> str:
-    return "".join(random.choices(string.ascii_letters + string.digits, k=length))
+    return secrets.token_hex(length // 2)
 
 
 def convert_link(search: str) -> str:
