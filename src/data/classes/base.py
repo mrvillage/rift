@@ -4,6 +4,8 @@ __all__ = ("Makeable",)
 
 
 class Makeable:
+    __slots__ = ()
+
     async def make_attrs(self, *attrs: str) -> None:
         for attr in attrs:
             try:

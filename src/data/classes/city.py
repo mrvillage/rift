@@ -99,7 +99,7 @@ class FullCity(Makeable):
         "oil_refineries",
         "steel_mills",
         "aluminum_refineries",
-        "missiles_factories",
+        "munitions_factories",
         "police_stations",
         "hospitals",
         "recycling_centers",
@@ -112,6 +112,7 @@ class FullCity(Makeable):
         "factories",
         "hangars",
         "drydocks",
+        "projects",
     )
 
     def __init__(self, data: Dict[str, Any], nation: PnWKitNation) -> None:
