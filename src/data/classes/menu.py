@@ -142,11 +142,11 @@ class Menu(Makeable):
         from ...ref import bot
         from ...views import MenuView
 
-        self.view = MenuView(bot=bot, menu_id=self.id, timeout=None)
+        view = MenuView(bot=bot, menu_id=self.id, timeout=None)
         for index, item_set in enumerate(self.items):
             for item in item_set:
-                self.view.add_item(item.get_item(self.id, index))  # type: ignore
-        return self.view
+                view.add_item(item.get_item(self.id, index))  # type: ignore
+        return view
 
     def get_description_embed(self, ctx: RiftContext) -> discord.Embed:
         from ...funcs import get_embed_author_guild
@@ -154,8 +154,7 @@ class Menu(Makeable):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         desc = str(self.description).replace("\\n", "\n")
-        self.embed = get_embed_author_guild(ctx.guild, desc)
-        return self.embed
+        return get_embed_author_guild(ctx.guild, desc)
 
     async def new_interface(self, message: discord.Message) -> None:
         await insert_interface(menu_id=self.id, message=message)

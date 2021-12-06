@@ -93,6 +93,9 @@ class GuildWelcomeSettings(Makeable):
         "diplomat_roles",
         "verified_nickname",
         "defaulted",
+        "enforce_verified_nickname",
+        "alliance_auto_roles_enabled",
+        "alliance_auto_role_creation_enabled",
     )
 
     def __init__(self, data: GuildWelcomeSettingsData) -> None:
@@ -236,6 +239,7 @@ class GuildSettings(Makeable):
         "defaulted",
         "purpose",
         "purpose_argument",
+        "manager_role_ids",
     )
 
     def __init__(self, data: GuildSettingsData) -> None:
