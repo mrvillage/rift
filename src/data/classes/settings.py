@@ -248,6 +248,7 @@ class GuildSettings(Makeable):
         self.purpose_argument: Optional[str] = data["purpose_argument"]
         self.manager_role_ids: Optional[List[int]] = data["manager_role_ids"]
 
+    @property
     def welcome_settings(self) -> GuildWelcomeSettings:
         return cache.get_guild_welcome_settings(
             self.guild_id
