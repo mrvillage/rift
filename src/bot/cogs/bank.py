@@ -1,19 +1,22 @@
 from __future__ import annotations
 
-from typing import Optional
+import datetime
+from typing import Optional, Union
 
 import discord
+import pnwkit
 from discord.ext import commands
 from discord.utils import MISSING
 
-from src.errors.credentials import NoCredentialsError
+from src.data.classes.settings import AllianceSettings
 
 from ... import funcs
 from ...cache import cache
-from ...data.classes import Alliance, Resources
-from ...errors import NoRolesError
+from ...data.classes import Account, Alliance, Nation, Resources, Transaction
+from ...enums import AccountType, TransactionStatus, TransactionType
+from ...errors import NoCredentialsError, NoRolesError
 from ...ref import Rift, RiftContext
-from ...views import Confirm
+from ...views import Confirm, DepositConfirm
 
 
 class Bank(commands.Cog):
@@ -22,7 +25,7 @@ class Bank(commands.Cog):
 
     @commands.group(
         name="bank",
-        brief="A group of commands related to your alliance bank.",
+        brief="A group of commands related to alliance banks.",
         invoke_without_command=True,
         type=commands.CommandType.chat_input,
     )
@@ -167,9 +170,774 @@ class Bank(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"The **{repr(alliance)}** alliance bank has {resources}.",
-                color=discord.Color.green(),
+                color=discord.Color.blue(),
             )
         )
+
+    @bank.group(  # type: ignore
+        name="account",
+        brief="Manage your bank accounts.",
+        type=commands.CommandType.chat_input,
+    )
+    async def bank_account(self, ctx: RiftContext):
+        ...
+
+    @bank_account.command(  # type: ignore
+        name="create",
+        brief="Create a bank account.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "name": "The name of the account",
+            "war_chest": "Whether or not the account's balance counts towards your war chest requirements",
+            "alliance": "The alliance to register the account in, defaults to your alliance.",
+            "primary": "Whether or not the account is your primary account.",
+        },
+    )
+    async def bank_account_create(
+        self,
+        ctx: RiftContext,
+        name: str,
+        war_chest: bool = True,
+        alliance: Alliance = MISSING,
+        primary: bool = False,
+    ):
+        accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
+        if not accounts:
+            primary = True
+        elif primary:
+            for i in accounts:
+                if i.primary:
+                    i.primary = False
+                    await i.save()
+                    break
+        alliance = alliance or await Alliance.convert(ctx, alliance)
+        account = await Account.create(ctx.author, alliance, name, war_chest, primary)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"You have successfully created a {'primary ' if primary else ' '}bank account for **{repr(alliance)}** with ID **{account.id}**.",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @bank_account.command(  # type: ignore
+        name="delete",
+        brief="Delete a bank account.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "account": "The bank account to delete.",
+        },
+    )
+    async def bank_account_delete(self, ctx: RiftContext, account: Account = MISSING):
+        if account.owner_id != ctx.author.id:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You can only delete your own accounts!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
+        primary_account = next(i for i in accounts if i.primary)
+        account = account or primary_account
+        if account.primary and account.resources:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You cannot delete your primary account while it has resources!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        primary_account.resources += account.resources
+        await primary_account.save()
+        await account.delete()
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"You have successfully deleted the bank account with ID **{account.id}**. {account.resources or 'No'} resources have been transferred to your primary account.",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @bank_account.command(  # type: ignore
+        name="transfer",
+        brief="Transfer resources from one bank account to another.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "from": "The bank account to transfer from, defaults to your primary account.",
+            "to": "The bank account to transfer to.",
+            "amount": "The amount of resources to transfer.",
+            "note": "A note to attach to the transaction.",
+        },
+    )
+    async def bank_account_transfer(
+        self,
+        ctx: RiftContext,
+        to: Account,
+        amount: Resources,
+        from_: Account = MISSING,
+        note: Optional[str] = None,
+    ):
+        accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
+        if not accounts:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You do not have any bank accounts!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if not amount:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You cannot transfer no resources!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        from_ = from_ or next(i for i in accounts if i.primary)
+        if from_.id == to.id:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You cannot transfer resources to the same account!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if from_.owner_id != ctx.author.id:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You can only transfer from your own accounts!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if any(
+            value < getattr(amount, key)
+            for key, value in from_.resources.to_dict().items()
+        ):
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You cannot transfer more resources than you have!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if to.owner_id == from_.owner_id:
+            status = TransactionStatus.ACCEPTED
+        else:
+            status = TransactionStatus.PENDING
+        transaction = await Transaction.create(
+            datetime.datetime.utcnow(),
+            status,
+            TransactionType.TRANSFER,
+            ctx.author,
+            to,
+            from_ or next(i for i in accounts if i.primary),
+            amount,
+            note=note,
+        )
+        await transaction.send_for_approval()
+        if transaction.status is TransactionStatus.ACCEPTED:
+            from_.resources -= amount
+            to.resources += amount
+            await from_.save()
+            await to.save()
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"You have successfully transferred **{amount}** resources from **{from_.name}** to **{to.name}**.\n"
+                    f"The transaction ID is **{transaction.id}**.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"You have successfully created a transfer request with ID **{transaction.id}**.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @bank_account.command(  # type: ignore
+        name="info",
+        brief="Get information about a bank account.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "account": "The bank account to get information about.",
+        },
+    )
+    async def bank_account_info(self, ctx: RiftContext, account: Account = MISSING):
+        accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
+        if not accounts:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You do not have any bank accounts!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        account = account or next(i for i in accounts if i.primary)
+        if account.owner_id != ctx.author.id:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You can only get information about your own accounts!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"**{account.name}**\n"
+                f"ID: {account.id}\n"
+                f"Alliance: {repr(account.alliance)}\n"
+                f"Resources: {account.resources or None}\n"
+                f"Single Use Deposit Code:\n"
+                f"{account.deposit_code}\n"
+                f"Primary: {account.primary}\n"
+                f"War Chest: {account.war_chest}",
+                color=discord.Color.blue(),
+            )
+        )
+
+    @bank_account.command(  # type: ignore
+        name="list",
+        brief="List all of your bank accounts.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "user": "The user to list the accounts of, defaults to you.",
+            "alliance": "The alliance to list the accounts of, defaults to your alliance.",
+        },
+    )
+    async def bank_account_list(
+        self,
+        ctx: RiftContext,
+        user: Union[discord.Member, discord.User] = MISSING,
+        alliance: Alliance = MISSING,
+    ):
+        if user is MISSING:
+            user = ctx.author
+            accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
+        else:
+            roles = [
+                i
+                for i in cache.roles
+                if ctx.author.id in i.member_ids
+                and (i.permissions.leadership or i.permissions.manage_bank_accounts)
+            ]
+            accounts = [
+                i
+                for i in cache.accounts
+                if i.owner_id == user.id
+                and (
+                    i.owner_id == ctx.author.id
+                    or [r for r in roles if i.alliance_id == r.alliance_id]
+                )
+            ]
+        if alliance is not MISSING:
+            accounts = [i for i in accounts if i.alliance_id == alliance.id]
+        if not accounts:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "No bank accounts found!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"**{user.mention}'s Bank Accounts**\n"
+                + "\n".join(
+                    f"**{i.id} - {i.name} - {i.alliance_id}**: {i.resources or None}"
+                    for i in accounts
+                ),
+                color=discord.Color.blue(),
+            ),
+            ephemeral=True,
+        )
+
+    @bank_account.command(  # type: ignore
+        name="edit",
+        brief="Edit a bank account.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "account": "The bank account to edit.",
+            "name": "The new name of the account.",
+            "war_chest": "Whether or not the account's balance counts towards your war chest requirements.",
+            "primary": "Whether or not the account is your primary account.",
+            "resources": "The new amount of resources in the account.",
+        },
+    )
+    async def bank_account_edit(
+        self,
+        ctx: RiftContext,
+        account: Account,
+        name: str = MISSING,
+        war_chest: bool = MISSING,
+        primary: bool = MISSING,
+        resources: Resources = MISSING,
+    ):
+        if (
+            name is MISSING
+            and war_chest is MISSING
+            and primary is MISSING
+            and resources is MISSING
+        ):
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You must specify at least one field to edit!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if ctx.author.id != account.owner_id:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You can only edit your own accounts!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if name is not MISSING:
+            account.name = name
+        if war_chest is not MISSING:
+            account.war_chest = war_chest
+        if primary is not MISSING:
+            account.primary = primary
+        if resources is not MISSING:
+            roles = [
+                i
+                for i in cache.roles
+                if i.alliance_id == account.alliance_id
+                and ctx.author.id in i.member_ids
+                and (i.permissions.leadership or i.permissions.manage_bank_accounts)
+            ]
+            if not roles:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "You do not have permission to edit resources on this account!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            account.resources = resources
+        await account.save()
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"You have successfully edited **{account.id} - {account.name}**.",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @bank_account.command(  # type: ignore
+        name="deposit",
+        brief="Deposit resources into a bank account.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "account": "The bank account to deposit into, defaults to your primary account.",
+            "resources": "The amount of resources to deposit.",
+            "note": "A note to attach to the transaction.",
+        },
+    )
+    async def bank_account_deposit(
+        self,
+        ctx: RiftContext,
+        resources: Resources,
+        account: Account = MISSING,
+        note: str = MISSING,
+    ):
+        accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
+        if not accounts:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You do not have any bank accounts!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        account = account or next(i for i in accounts if i.primary)
+        if account.owner_id != ctx.author.id:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You can only deposit into your own accounts!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if not resources or any(i < 0 for i in resources):
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You must specify an amount of resources to deposit!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        nation = await Nation.convert(ctx, None)
+        credentials = cache.get_credentials(nation.id)
+        view = DepositConfirm(account, resources, credentials, note)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Are you sure you want to deposit {resources} into account #{account.id:,}?",
+                color=discord.Color.orange(),
+            ),
+            view=view,
+            ephemeral=True,
+        )
+        if await view.wait():
+            await ctx.interaction.edit_original_message(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"Deposit of {resources} into account #{account.id:,} timed out! Please try again.",
+                    color=discord.Color.red(),
+                ),
+                view=None,
+            )
+
+    @bank_account.command(  # type: ignore
+        name="deposit-check",
+        brief="Check for any new deposits in-game.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "account": "The bank account to check for new deposits to, defaults to your primary account.",
+        },
+    )
+    async def bank_account_deposit_check(
+        self,
+        ctx: RiftContext,
+        account: Account = MISSING,
+    ):
+        accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
+        if not accounts:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You do not have any bank accounts!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        account = account or next(i for i in accounts if i.primary)
+        if account.owner_id != ctx.author.id:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You can only check deposits for your own accounts!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        await ctx.interaction.response.defer(ephemeral=True)
+        nation = await Nation.convert(ctx, None)
+        data = await pnwkit.async_nation_query(
+            {"id": nation.id},
+            {
+                "sent_bankrecs": [
+                    "id",
+                    "sid",
+                    "stype",
+                    "rid",
+                    "rtype",
+                    "note",
+                    "money",
+                    "coal",
+                    "oil",
+                    "uranium",
+                    "iron",
+                    "bauxite",
+                    "lead",
+                    "gasoline",
+                    "munitions",
+                    "steel",
+                    "aluminum",
+                    "food",
+                ]
+            },
+        )
+        if not data:
+            return await ctx.interaction.edit_original_message(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "Could not retrieve bank information!",
+                    color=discord.Color.red(),
+                ),
+            )
+        data = data[0]
+        if not data["sent_bankrecs"]:
+            return await ctx.interaction.edit_original_message(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "No new deposits found!",
+                    color=discord.Color.green(),
+                ),
+            )
+        try:
+            deposit = next(
+                i
+                for i in data["sent_bankrecs"]
+                if int(i["rid"]) == account.alliance_id
+                and i["note"].strip() == account.deposit_code
+            )
+        except StopIteration:
+            return await ctx.interaction.edit_original_message(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "No new deposits found!",
+                    color=discord.Color.green(),
+                ),
+            )
+        resources = Resources.from_dict(deposit)
+        transaction = await Transaction.create(
+            datetime.datetime.utcnow(),
+            TransactionStatus.ACCEPTED,
+            TransactionType.DEPOSIT,
+            ctx.author,
+            account,
+            nation,
+            resources,
+            None,
+            from_type=AccountType.NATION,
+        )
+        account.resources += resources
+        account.regenerate_deposit_code()
+        await account.save()
+        await ctx.interaction.edit_original_message(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Deposit of {resources} into account #{account.id:,} recorded successfully!. The transaction ID is {transaction.id:,}.",
+                color=discord.Color.green(),
+            ),
+        )
+
+    @bank_account.command(  # type: ignore
+        name="withdraw",
+        brief="Withdraw resources from a bank account.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "account": "The bank account to withdraw from, defaults to your primary account.",
+            "resources": "The amount of resources to withdraw.",
+            "nation": "The nation to withdraw the resources to.",
+            "note": "A note to attach to the transaction.",
+        },
+    )
+    async def bank_account_withdraw(
+        self,
+        ctx: RiftContext,
+        resources: Resources,
+        account: Account = MISSING,
+        nation: Nation = MISSING,
+        note: str = MISSING,
+    ):
+        accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
+        if not accounts:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You do not have any bank accounts!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        account = account or next(i for i in accounts if i.primary)
+        if account.owner_id != ctx.author.id:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You can only deposit into your own accounts!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if not resources or any(i < 0 for i in resources):
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You must specify an amount of resources to deposit!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if any(
+            value > getattr(account.resources, key)
+            for key, value in resources.to_dict().items()
+        ):
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You do not have enough resources in your account!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if account.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "The alliance associated with that account no longer exists!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        nation = nation or await Nation.convert(ctx, None)
+        settings = await AllianceSettings.fetch(nation.alliance_id)
+        if settings.require_withdraw_approval:
+            transaction = await Transaction.create(
+                datetime.datetime.utcnow(),
+                TransactionStatus.PENDING,
+                TransactionType.WITHDRAW,
+                ctx.author,
+                nation,
+                account,
+                resources,
+                note or None,
+                to_type=AccountType.NATION,
+            )
+            await transaction.send_for_approval()
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"Withdrawal of {resources} from account #{account.id:,} requested successfully!. The transaction ID is {transaction.id:,}.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            credentials = funcs.credentials.find_highest_alliance_credentials(
+                account.alliance, "send_alliance_bank"
+            )
+            if credentials is None:
+                raise NoCredentialsError(nation.alliance)
+            await ctx.interaction.response.defer(ephemeral=True)
+            transaction = await Transaction.create(
+                datetime.datetime.utcnow(),
+                TransactionStatus.ACCEPTED,
+                TransactionType.WITHDRAW,
+                ctx.author,
+                nation,
+                account,
+                resources,
+                note or None,
+                to_type=AccountType.NATION,
+            )
+            await funcs.withdraw(
+                resources,
+                nation,
+                credentials,
+                note=f"Rift Withdrawal from Account #{account.id} and note: {note}",
+            )
+            account.resources -= resources
+            await account.save()
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"Withdrawal of {resources} from account #{account.id:,} recorded successfully!. The transaction ID is {transaction.id:,}.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @bank_account.command(  # type: ignore
+        name="history",
+        brief="Check the transaction history of a bank account.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "account": "The bank account to check the history of, defaults to your primary account.",
+        },
+    )
+    async def bank_account_history(self, ctx: RiftContext, account: Account = MISSING):
+        ...
+
+    @bank_account.command(  # type: ignore
+        name="pending",
+        brief="Check the pending transactions of a bank account.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "account": "The bank account to check the pending transactions of, defaults to your primary account.",
+        },
+    )
+    async def bank_account_pending(self, ctx: RiftContext, account: Account = MISSING):
+        if account is MISSING:
+            accounts = [
+                i for i in cache.accounts if i.owner_id == ctx.author and i.primary
+            ]
+            if not accounts:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "You do not have a primary bank account!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            account = accounts[0]
+        roles = [
+            i
+            for i in cache.roles
+            if i.alliance_id == account.alliance_id
+            and (i.permissions.leadership or i.permissions.manage_bank_accounts)
+        ]
+        if not (ctx.author.id == account.owner_id or roles):
+            raise NoRolesError(account.alliance, "Manage Bank Accounts")
+        transactions = [
+            i
+            for i in cache.transactions
+            if i.to_id == account.id or i.from_id == account.id
+        ]
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"**{account.id} - {account.name}**\n"
+                "\n".join(
+                    f"*{'SEND' if i.from_id == account.id else 'RECEIVE'} - {i.id}**: {i.resources or None}"
+                    for i in transactions
+                ),
+                color=discord.Color.blue(),
+            )
+        )
+
+    @bank.group(  # type: ignore
+        name="transaction",
+        brief="Manage transactions.",
+        type=commands.CommandType.chat_input,
+    )
+    async def bank_transaction(self, ctx: RiftContext):
+        ...
+
+    @bank_transaction.command(  # type: ignore
+        name="review",
+        brief="Review a pending transaction.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "transaction": "The pending transaction to review.",
+        },
+    )
+    async def bank_account_review(self, ctx: RiftContext, transaction: Transaction):
+        ...
 
 
 def setup(bot: Rift):

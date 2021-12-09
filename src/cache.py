@@ -37,6 +37,7 @@ if TYPE_CHECKING:
         TicketData,
         TradePriceData,
         TransactionData,
+        TransactionRequestData,
         TreatyData,
         UserData,
     )
@@ -67,6 +68,7 @@ if TYPE_CHECKING:
         TicketConfig,
         TradePrices,
         Transaction,
+        TransactionRequest,
         Treasure,
         Treaty,
         User,
@@ -114,6 +116,7 @@ class Cache:
         "_tickets",
         "_trades",
         "_transactions",
+        "_transaction_requests",
         "_treasures",
         "_treaties",
         "_user_settings",
@@ -150,6 +153,7 @@ class Cache:
         self._tickets: Dict[int, Ticket] = {}
         self._trades = {}  # NO CLASS YET
         self._transactions: Dict[int, Transaction] = {}
+        self._transaction_requests: Dict[int, TransactionRequest] = {}
         self._treasures: List[Treasure] = []
         self._treaties: Set[Treaty] = set()
         self._users: Set[User] = set()
@@ -186,6 +190,7 @@ class Cache:
             TicketConfig,
             TradePrices,
             Transaction,
+            TransactionRequest,
             Treasure,
             Treaty,
             User,
@@ -217,6 +222,7 @@ class Cache:
             "SELECT * FROM ticket_configs;",
             "SELECT * FROM tickets;",
             "SELECT * FROM transactions;",
+            "SELECT * FROM transaction_requests;",
             "SELECT * FROM treasures ORDER BY datetime DESC LIMIT 1;",
             "SELECT * FROM treaties;",
             "SELECT * FROM users;",
@@ -247,6 +253,7 @@ class Cache:
             List[TicketConfigData],
             List[TicketData],
             List[TransactionData],
+            List[TransactionRequestData],
             List[RawTreasureData],
             List[TreatyData],
             List[UserData],
@@ -279,6 +286,7 @@ class Cache:
             ticket_configs,
             tickets,
             transactions,
+            transaction_requests,
             treasures,
             treaties,
             users,
@@ -364,6 +372,9 @@ class Cache:
         for i in transactions:
             i = Transaction(i)
             self._transactions[i.id] = i
+        for i in transaction_requests:
+            i = TransactionRequest(i)
+            self._transaction_requests[i.id] = i
         for i in (  # type
             json.loads(treasures[0]["treasures"])
             if isinstance(treasures[0]["treasures"], str)
@@ -481,6 +492,10 @@ class Cache:
     @property
     def transactions(self) -> Set[Transaction]:
         return set(self._transactions.values())
+
+    @property
+    def transaction_requests(self) -> Set[TransactionRequest]:
+        return set(self._transaction_requests.values())
 
     @property
     def treasures(self) -> List[Treasure]:
@@ -661,6 +676,9 @@ class Cache:
     def get_transaction(self, id: int, /) -> Optional[Transaction]:
         return self._transactions.get(id)
 
+    def get_transaction_request(self, id: int, /) -> Optional[TransactionRequest]:
+        return self._transaction_requests.get(id)
+
     def get_treasure(self, name: str, /) -> Optional[Treasure]:
         try:
             return next(i for i in self._treasures if i.name == name)
@@ -745,6 +763,9 @@ class Cache:
     def add_transaction(self, transaction: Transaction, /) -> None:
         self._transactions[transaction.id] = transaction
 
+    def add_transaction_request(self, request: TransactionRequest, /) -> None:
+        self._transaction_requests[request.id] = request
+
     def add_user(self, user: User, /) -> None:
         self._users.add(user)
 
@@ -780,6 +801,9 @@ class Cache:
 
     def remove_transaction(self, transaction: Transaction, /) -> None:
         self._transactions.pop(transaction.id)
+
+    def remove_transaction_request(self, request: TransactionRequest, /) -> None:
+        self._transaction_requests.pop(request.id)
 
     def remove_user(self, user: User, /) -> None:
         self._users.remove(user)

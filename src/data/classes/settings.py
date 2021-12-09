@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, List, Optional, Set
 import discord
 
 from ...cache import cache
+from ...ref import bot
 from ..db.sql import execute_query
 from .alliance import Alliance
 from .base import Makeable
@@ -308,6 +309,8 @@ class AllianceSettings:
         "default_attack_raid_condition",
         "default_attack_nuke_condition",
         "default_attack_military_condition",
+        "withdraw_channels",
+        "require_withdraw_approval",
     )
 
     def __init__(self, data: AllianceSettingsData) -> None:
@@ -327,6 +330,8 @@ class AllianceSettings:
         self.default_attack_military_condition: Optional[str] = data[
             "default_attack_military_condition"
         ]
+        self.withdraw_channels: Optional[List[int]] = data["withdraw_channels"]
+        self.require_withdraw_approval: bool = data["require_withdraw_approval"]
 
     @classmethod
     def default(cls, alliance_id: int, /) -> AllianceSettings:
@@ -339,6 +344,8 @@ class AllianceSettings:
                 "default_attack_raid_condition": None,
                 "default_attack_nuke_condition": None,
                 "default_attack_military_condition": None,
+                "withdraw_channels": None,
+                "require_withdraw_approval": True,
             }
         )
         settings.defaulted = True
@@ -373,3 +380,14 @@ class AllianceSettings:
                 *args,
             )
         return self
+
+    @property
+    def withdraw_channels_(self) -> List[discord.TextChannel]:
+        if self.withdraw_channels is None:
+            return []
+        return [
+            c
+            for i in self.withdraw_channels
+            if (c := bot.get_channel(i)) is not None
+            and isinstance(c, discord.TextChannel)
+        ]
