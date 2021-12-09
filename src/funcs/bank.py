@@ -10,7 +10,13 @@ if TYPE_CHECKING:
 
     from ..data.classes import Alliance, Credentials, Nation, Resources
 
-__all__ = ("parse_bank_token", "withdraw", "withdraw_request")
+__all__ = (
+    "parse_bank_token",
+    "withdraw",
+    "withdraw_request",
+    "deposit",
+    "deposit_request",
+)
 
 
 def parse_bank_token(content: str) -> str:
@@ -61,6 +67,61 @@ async def withdraw_request(
 
 
 async def actual_withdraw_request(
+    session: aiohttp.ClientSession,
+    alliance_id: int,
+    data: Dict[str, Any],
+) -> str:
+    async with session.request(
+        "POST",
+        f"https://politicsandwar.com/alliance/id={alliance_id}&display=bank",
+        data=data,
+    ) as response:
+        return await response.text()
+
+
+async def deposit(
+    resources: Resources,
+    receiver: Alliance,
+    credentials: Credentials,
+    *,
+    note: Optional[str] = None,
+) -> bool:
+    async with aiohttp.ClientSession() as session:
+        success = await credentials.login(session)
+        if not success:
+            return False
+        data: Dict[str, Any] = {
+            f"dep{key}": value for key, value in resources.to_dict().items()
+        }
+        if note is not None:
+            data["depnote"] = note
+        data["deprecipient"] = receiver.name
+        data["depsubmit"] = "Deposit"
+        success, token = await deposit_request(credentials, data, session)
+        if not success:
+            data["token"] = token
+            success, token = await deposit_request(credentials, data, session)
+        return success
+
+
+async def deposit_request(
+    credentials: Credentials,
+    data: Dict[str, Any],
+    session: aiohttp.ClientSession,
+) -> Tuple[bool, str]:
+    if TYPE_CHECKING:
+        assert credentials.nation is not None
+    content = await actual_deposit_request(
+        session, credentials.nation.alliance_id, data
+    )
+    token = parse_bank_token(content)
+    return (
+        "Something went wrong" not in content
+        and "successfully made a deposit" in content
+    ), token
+
+
+async def actual_deposit_request(
     session: aiohttp.ClientSession,
     alliance_id: int,
     data: Dict[str, Any],

@@ -18,6 +18,8 @@ class AllianceSettingsData(TypedDict):
     default_attack_raid_condition: Optional[str]
     default_attack_nuke_condition: Optional[str]
     default_attack_military_condition: Optional[str]
+    withdraw_channels: Optional[List[int]]
+    require_withdraw_approval: bool
 
 
 class GuildSettingsData(TypedDict):

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Union
+from typing import Dict, Iterator, Union
 
 from ...funcs.utils import check_resource, convert_number
 from ...ref import RiftContext
@@ -277,3 +277,6 @@ class Resources:
 
     def __len__(self) -> int:
         return len([i for i in self.to_dict().values() if i != 0])
+
+    def __iter__(self) -> Iterator[float]:
+        return iter([i for i in self.to_dict().values() if i != 0])

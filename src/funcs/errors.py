@@ -8,6 +8,7 @@ from discord.ext import commands
 
 from ..data.classes import Alliance, Nation
 from ..errors import (
+    AccountNotFoundError,
     AllianceNotFoundError,
     EmbassyConfigNotFoundError,
     EmbassyNotFoundError,
@@ -23,6 +24,7 @@ from ..errors import (
     TargetNotFoundError,
     TicketConfigNotFoundError,
     TicketNotFoundError,
+    TransactionNotFoundError,
 )
 from ..ref import RiftContext
 from .embeds import get_embed_author_member
@@ -270,6 +272,24 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 embed=get_embed_author_member(
                     ctx.author,
                     f"No role found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif isinstance(error, AccountNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No account found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif isinstance(error, TransactionNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No transaction found with argument `{error.args[0]}`.",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
