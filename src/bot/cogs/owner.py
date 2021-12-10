@@ -217,6 +217,19 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             )
         )
 
+    @commands.command(name="owners")
+    async def owners(self, ctx: RiftContext):
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                "\n".join(
+                    f"{i.name} - {i.member_count} - {i.owner and i.owner.mention}"
+                    for i in self.bot.guilds
+                ),
+                title=f"{len(self.bot.guilds):,} guilds",
+            )
+        )
+
 
 def setup(bot: Rift):
     bot.add_cog(Owner(bot))

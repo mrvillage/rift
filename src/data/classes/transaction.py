@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import time
 from typing import TYPE_CHECKING
 
 import discord
@@ -19,7 +20,7 @@ __all__ = ("Transaction", "TransactionRequest")
 if TYPE_CHECKING:
     from typing import Optional, Union
 
-    from _typings import TransactionData, TransactionRequestData
+    from _typings import Field, TransactionData, TransactionRequestData
 
     from ...views import TransactionRequestView
     from .account import Account
@@ -165,6 +166,19 @@ class Transaction:
     @property
     def from_alliance(self) -> Optional[Alliance]:
         return cache.get_alliance(self.from_id)
+
+    @property
+    def field(self) -> Field:
+        return {
+            "name": f"ID: {self.id}",
+            "value": f"Time: <t:{int(time.mktime(self.time.timetuple()))}:f>\n"
+            f"Status: {self.status.name}\n"
+            f"Type: {self.type.name}\n"
+            f"To: {repr(self.to_alliance) if self.to_type is AccountType.ALLIANCE else repr(self.to_nation) if self.to_type is AccountType.NATION else f'#{self.to.id:,}' if self.to is not None else 'None'}  ({self.to_type.name})\n"
+            f"From: {repr(self.from_alliance) if self.from_type is AccountType.ALLIANCE else repr(self.from_nation) if self.from_type is AccountType.NATION else f'#{self.from_.id:,}' if self.from_ is not None else 'None'} ({self.from_type.name})\n"
+            f"Resources: {self.resources}\n"
+            f"Note: {self.note}",
+        }
 
     async def send_for_approval(self) -> None:
         from ...funcs import get_embed_author_member

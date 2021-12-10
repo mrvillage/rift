@@ -11,10 +11,12 @@ from ..data.classes import Transaction
 from ..enums import AccountType, TransactionStatus, TransactionType
 from ..errors import NoCredentialsError
 
-__all__ = ("TransactionRequestView", "DepositConfirm")
+__all__ = ("TransactionRequestView", "DepositConfirm", "TransactionHistoryView")
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import List, Optional, Union
+
+    from _typings import Field
 
     from ..data.classes import (
         Account,
@@ -335,3 +337,83 @@ class DepositConfirmCancelButton(discord.ui.Button[DepositConfirm]):
             view=None,
         )
         self.view.stop()
+
+
+class TransactionHistoryView(discord.ui.View):
+    def __init__(
+        self,
+        user: Union[discord.Member, discord.User],
+        transactions: List[Transaction],
+        description: str,
+        page: int,
+    ) -> None:
+        super().__init__(timeout=5)
+        self.user: Union[discord.Member, discord.User] = user
+        self.transactions: List[Transaction] = transactions
+        self.page: int = page
+        self.pages: int = (len(transactions) // 2) + (len(transactions) % 2 > 0)
+        self.description: str = description
+        if self.pages == 1:
+            self.back_button.disabled = True  # type: ignore
+            self.forward_button.disabled = True  # type: ignore
+        if self.page == 1:
+            self.back_button.disabled = True  # type: ignore
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        return interaction.user is not None and interaction.user.id == self.user.id
+
+    def get_embed(self, user: Union[discord.Member, discord.User]) -> discord.Embed:
+        fields: List[Field] = [
+            i.field for i in self.transactions[(self.page - 1) * 2 : (self.page) * 2]
+        ]
+        return funcs.get_embed_author_member(
+            user,
+            self.description.format(page=self.page, pages=self.pages),
+            fields=fields,
+            color=discord.Color.blue(),
+        )
+
+    async def callback(
+        self,
+        button: discord.ui.Button[TransactionHistoryView],
+        interaction: discord.Interaction,
+        page: int,
+    ):
+        if TYPE_CHECKING:
+            assert interaction.user is not None
+        self.page = page
+        if self.page == 1:
+            self.back_button.disabled = True  # type: ignore
+            self.forward_button.disabled = self.pages <= 1  # type: ignore
+        elif self.page == self.pages:
+            self.back_button.disabled = False  # type: ignore
+            self.forward_button.disabled = True  # type: ignore
+        else:
+            self.back_button.disabled = False  # type: ignore
+            self.forward_button.disabled = False  # type: ignore
+        await interaction.response.edit_message(
+            embed=self.get_embed(interaction.user), view=self
+        )
+
+    @discord.ui.button(  # type: ignore
+        label="Back",
+        style=discord.ButtonStyle.gray,
+        disabled=True,
+    )
+    async def back_button(
+        self,
+        button: discord.ui.Button[TransactionHistoryView],
+        interaction: discord.Interaction,
+    ):
+        await self.callback(button, interaction, self.page - 1)
+
+    @discord.ui.button(  # type: ignore
+        label="Forward",
+        style=discord.ButtonStyle.gray,
+    )
+    async def forward_button(
+        self,
+        button: discord.ui.Button[TransactionHistoryView],
+        interaction: discord.Interaction,
+    ):
+        await self.callback(button, interaction, self.page + 1)
