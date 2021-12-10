@@ -1,4 +1,4 @@
-__version__ = "Beta 0.10.0"
+__version__ = "Beta 0.10.1"
 
 import os
 
