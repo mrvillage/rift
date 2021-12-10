@@ -223,11 +223,18 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 "\n".join(
-                    f"{i.name} - {i.member_count} - {i.owner and i.owner.mention}"
+                    f"{i.name} - {i.member_count} - <@{i.owner_id}>"
                     for i in self.bot.guilds
                 ),
                 title=f"{len(self.bot.guilds):,} guilds",
-            )
+            ),
+        )
+
+    @commands.command(name="owner-mentions")
+    async def owner_mentions(self, ctx: RiftContext):
+        await ctx.reply(
+            "".join(f"<@{i.owner_id}>" for i in self.bot.guilds if i.owner is not None),
+            allowed_mentions=discord.AllowedMentions(users=False),
         )
 
 
