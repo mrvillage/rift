@@ -65,6 +65,7 @@ class MenuButton(discord.ui.Button):
                     embed=get_embed_author_member(
                         interaction.user,
                         f"Added the following roles: {', '.join(role.mention for role in roles)}",
+                        color=discord.Color.green(),
                     ),
                 )
             else:
@@ -73,6 +74,7 @@ class MenuButton(discord.ui.Button):
                     embed=get_embed_author_member(
                         interaction.user,
                         "No roles were added since you have them all already.",
+                        color=discord.Color.green(),
                     ),
                 )
         elif self.action in {"REMOVE_ROLE", "REMOVE_ROLES"}:
@@ -90,6 +92,7 @@ class MenuButton(discord.ui.Button):
                     embed=get_embed_author_member(
                         interaction.user,
                         f"Removed the following roles from you: {', '.join(role.mention for role in roles)}",
+                        color=discord.Color.green(),
                     ),
                 )
             else:
@@ -98,6 +101,7 @@ class MenuButton(discord.ui.Button):
                     embed=get_embed_author_member(
                         interaction.user,
                         "No roles were removed since you you don't have any of them.",
+                        color=discord.Color.green(),
                     ),
                 )
         elif self.action in {"TOGGLE_ROLE", "TOGGLE_ROLES"}:
@@ -121,6 +125,7 @@ class MenuButton(discord.ui.Button):
                     embed=get_embed_author_member(
                         interaction.user,
                         f"Toggled the following roles: {', '.join(role.mention for role in add_roles + remove_roles)}",
+                        color=discord.Color.green(),
                     ),
                 )
             else:
@@ -129,6 +134,7 @@ class MenuButton(discord.ui.Button):
                     embed=get_embed_author_member(
                         interaction.user,
                         "No roles were toggled since you have them all already.",
+                        color=discord.Color.green(),
                     ),
                 )
         elif self.action in {"CREATE_TICKET", "CREATE_TICKETS"}:
@@ -146,14 +152,18 @@ class MenuButton(discord.ui.Button):
                 await interaction.followup.send(
                     ephemeral=True,
                     embed=get_embed_author_member(
-                        interaction.user, f"Tickets Created!\n{tickets_str}"
+                        interaction.user,
+                        f"Tickets Created!\n{tickets_str}",
+                        color=discord.Color.green(),
                     ),
                 )
             else:
                 await interaction.followup.send(
                     ephemeral=True,
                     embed=get_embed_author_member(
-                        interaction.user, f"Ticket Created!\n<#{tickets[0].id}>"
+                        interaction.user,
+                        f"Ticket Created!\n<#{tickets[0].id}>",
+                        color=discord.Color.green(),
                     ),
                 )
         elif self.action in {"CLOSE_TICKET", "CREATE_TICKETS"}:
@@ -198,22 +208,27 @@ class MenuButton(discord.ui.Button):
                 await interaction.followup.send(
                     ephemeral=True,
                     embed=get_embed_author_member(
-                        interaction.user, f"Embassies:\n{embassies_str}"
+                        interaction.user,
+                        f"Embassies:\n{embassies_str}",
+                        color=discord.Color.green(),
                     ),
                 )
             elif len(embassies) == 0:
                 await interaction.followup.send(
                     ephemeral=True,
                     embed=get_embed_author_member(
-                        interaction.user, "No embassies were created."
+                        interaction.user,
+                        "No embassies were created.",
+                        color=discord.Color.green(),
                     ),
                 )
-
             else:
                 await interaction.followup.send(
                     ephemeral=True,
                     embed=get_embed_author_member(
-                        interaction.user, f"Embassy:\n<#{embassies[0].id}>"
+                        interaction.user,
+                        f"Embassy:\n<#{embassies[0].id}>",
+                        color=discord.Color.green(),
                     ),
                 )
         elif self.action in {"CLOSE_EMBASSY", "CLOSE_EMBASSIES"}:
