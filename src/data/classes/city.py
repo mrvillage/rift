@@ -9,7 +9,6 @@ from src.errors.notfound import CityNotFoundError
 
 from ...cache import cache
 from ...errors import CityNotFoundError
-from .base import Makeable
 from .resources import Resources
 
 __all__ = ("City", "FullCity")
@@ -75,7 +74,7 @@ class City:
         return cache.get_nation(self.nation_id)  # type: ignore
 
 
-class FullCity(Makeable):
+class FullCity:
     __slots__ = (
         "data",
         "id",
@@ -112,6 +111,7 @@ class FullCity(Makeable):
         "factories",
         "hangars",
         "drydocks",
+        "nation",
         "projects",
     )
 
