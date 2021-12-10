@@ -522,7 +522,21 @@ class Bank(commands.Cog):
         if war_chest is not MISSING:
             account.war_chest = war_chest
         if primary is not MISSING:
+            if not primary:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "You can't unset your primary account!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
             account.primary = primary
+            accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
+            for i in accounts:
+                if i.primary:
+                    i.primary = False
+                    await i.save()
         if resources is not MISSING:
             roles = [
                 i
