@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Optional, Union
+from typing import Literal, Optional, Union
 
 import discord
 import pnwkit
@@ -16,7 +16,7 @@ from ...data.classes import Account, Alliance, Nation, Resources, Transaction
 from ...enums import AccountType, TransactionStatus, TransactionType
 from ...errors import NoCredentialsError, NoRolesError
 from ...ref import Rift, RiftContext
-from ...views import Confirm, DepositConfirm
+from ...views import Confirm, DepositConfirm, TransactionHistoryView
 
 
 class Bank(commands.Cog):
@@ -881,58 +881,74 @@ class Bank(commands.Cog):
         type=commands.CommandType.chat_input,
         descriptions={
             "account": "The bank account to check the history of, defaults to your primary account.",
+            "page": "The page of the history to view.",
+            "status": "The status of transactions to view, defaults to all.",
         },
     )
-    async def bank_account_history(self, ctx: RiftContext, account: Account = MISSING):
-        ...
-
-    @bank_account.command(  # type: ignore
-        name="pending",
-        brief="Check the pending transactions of a bank account.",
-        type=commands.CommandType.chat_input,
-        descriptions={
-            "account": "The bank account to check the pending transactions of, defaults to your primary account.",
-        },
-    )
-    async def bank_account_pending(self, ctx: RiftContext, account: Account = MISSING):
-        if account is MISSING:
-            accounts = [
-                i for i in cache.accounts if i.owner_id == ctx.author and i.primary
-            ]
-            if not accounts:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        "You do not have a primary bank account!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
-                )
-            account = accounts[0]
+    async def bank_account_history(
+        self,
+        ctx: RiftContext,
+        account: Account = MISSING,
+        page: int = 1,
+        status: Literal["PENDING", "ACCEPTED", "REJECTED", "CANCELLED"] = MISSING,
+    ):
+        accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
+        if not accounts:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You do not have any bank accounts!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        account = account or next(i for i in accounts if i.primary)
         roles = [
             i
             for i in cache.roles
             if i.alliance_id == account.alliance_id
+            and ctx.author.id in i.member_ids
             and (i.permissions.leadership or i.permissions.manage_bank_accounts)
         ]
-        if not (ctx.author.id == account.owner_id or roles):
-            raise NoRolesError(account.alliance, "Manage Bank Accounts")
+        if account.owner_id != ctx.author.id and not roles:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You don't have permission to view the transaction history of that account!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
         transactions = [
             i
             for i in cache.transactions
-            if i.to_id == account.id or i.from_id == account.id
+            if (i.to_id == account.id and i.to_type is AccountType.ACCOUNT)
+            or (i.from_id == account.id and i.from_type is AccountType.ACCOUNT)
         ]
-        await ctx.reply(
-            embed=funcs.get_embed_author_member(
-                ctx.author,
-                f"**{account.id} - {account.name}**\n"
-                "\n".join(
-                    f"*{'SEND' if i.from_id == account.id else 'RECEIVE'} - {i.id}**: {i.resources or None}"
-                    for i in transactions
+        if status is not MISSING:
+            status = getattr(TransactionStatus, status)
+            transactions = [i for i in transactions if i.status is status]
+        if not transactions:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "There are no transactions for that account!",
+                    color=discord.Color.red(),
                 ),
-                color=discord.Color.blue(),
+                ephemeral=True,
             )
+        transactions.sort(key=lambda x: x.id, reverse=True)
+        view = TransactionHistoryView(
+            ctx.author,
+            transactions,
+            f"Showing transactions for account #{account.id:,} owned by <@{account.owner_id}>.\n"
+            f"{len(transactions)} transactions found.\n"
+            "Page **{page}** of **{pages}**.",
+            page,
         )
+        await ctx.reply(embed=view.get_embed(ctx.author), view=view)
+        if await view.wait():
+            await ctx.interaction.edit_original_message(view=None)
 
     @bank.group(  # type: ignore
         name="transaction",
