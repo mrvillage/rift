@@ -1,3 +1,4 @@
+from .account import *
 from .alliance import *
 from .city import *
 from .color import *
@@ -5,7 +6,6 @@ from .condition import *
 from .credentials import *
 from .embassy import *
 from .forum import *
-from .government import *
 from .menu import *
 from .nation import *
 from .resources import *
@@ -18,4 +18,5 @@ from .trade import *
 from .transaction import *
 from .treasure import *
 from .treaty import *
+from .user import *
 from .war import *

@@ -113,7 +113,7 @@ class PnWInfo(commands.Cog):
         brief="Get a list of the members of an alliance.",
         type=commands.CommandType.chat_input,
         descriptions={
-            "nation": "The nation to get information about, defaults to your nationf.",
+            "nation": "The nation to get information about, defaults to your nation.",
         },
     )
     async def members(self, ctx: RiftContext, *, alliance: Alliance = MISSING):
@@ -207,27 +207,12 @@ class PnWInfo(commands.Cog):
         alliance: bool = False,
         fetch_spies: bool = False,
     ):  # sourcery no-metrics
-        if search is MISSING and alliance:
-            search_ = await Alliance.convert(ctx, search, False)
-        elif search is MISSING:
-            search_ = await Nation.convert(ctx, search, False)
-        elif alliance:
+        if search is MISSING and alliance or search is not MISSING and alliance:
             search_ = await Alliance.convert(ctx, search)
+        elif search is MISSING:
+            search_ = await Nation.convert(ctx, search)
         else:
-            try:
-                search_ = await Nation.convert(ctx, search, False)
-            except NationNotFoundError:
-                try:
-                    search_ = await Alliance.convert(ctx, search, False)
-                except AllianceNotFoundError:
-                    try:
-                        search_ = await Nation.convert(ctx, search, True)
-                    except NationNotFoundError:
-                        try:
-                            search_ = await Alliance.convert(ctx, search, True)
-                        except AllianceNotFoundError:
-                            raise NationOrAllianceNotFoundError(search)
-        search_ = search_ or await Nation.convert(ctx, search_)
+            search_ = await funcs.convert_nation_or_alliance(ctx, search)
         if fetch_spies and ctx.author.id != 258298021266063360:
             fetch_spies = False
         await ctx.interaction.response.defer()

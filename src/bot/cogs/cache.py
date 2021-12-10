@@ -8,7 +8,7 @@ import discord
 from discord.ext import commands, tasks
 
 from ...cache import cache
-from ...data.classes import Alliance, City, Color, Nation, TradePrices, War
+from ...data.classes import Alliance, City, Color, Credentials, Nation, TradePrices, War
 from ...data.db import execute_read_query
 from ...ref import Rift
 
@@ -27,6 +27,7 @@ if TYPE_CHECKING:
         BulkWarListData,
         CityData,
         ColorUpdateData,
+        CredentialsData,
         NationData,
         RawColorData,
         TradePriceData,
@@ -223,6 +224,24 @@ class Cache(commands.Cog):
         while wait < now:
             wait += datetime.timedelta(hours=1)
         await discord.utils.sleep_until(wait)
+
+    @commands.Cog.listener()
+    async def on_credentials_create(self, data: CredentialsData):
+        cache.add_credentials(Credentials(data))
+
+    @commands.Cog.listener()
+    async def on_credentials_update(self, data: CredentialsData):
+        credentials = cache.get_credentials(data["nation"])
+        if credentials is None:
+            cache.add_credentials(Credentials(data))
+        else:
+            credentials.update(data)
+
+    @commands.Cog.listener()
+    async def on_credentials_delete(self, data: CredentialsData):
+        credentials = cache.get_credentials(data["nation"])
+        if credentials is not None:
+            cache.remove_credentials(credentials)
 
 
 def setup(bot: Rift):

@@ -10,6 +10,7 @@ __all__ = ("cache",)
 
 if TYPE_CHECKING:
     from _typings import (
+        AccountData,
         AllianceAutoRoleData,
         AllianceData,
         AllianceSettingsData,
@@ -20,7 +21,6 @@ if TYPE_CHECKING:
         EmbassyConfigData,
         EmbassyData,
         ForumData,
-        GovernmentDepartmentData,
         GuildSettingsData,
         GuildWelcomeSettingsData,
         MenuData,
@@ -36,11 +36,14 @@ if TYPE_CHECKING:
         TicketConfigData,
         TicketData,
         TradePriceData,
+        TransactionData,
+        TransactionRequestData,
         TreatyData,
         UserData,
     )
 
     from .data.classes import (
+        Account,
         Alliance,
         AllianceAutoRole,
         AllianceSettings,
@@ -51,10 +54,10 @@ if TYPE_CHECKING:
         Embassy,
         EmbassyConfig,
         Forum,
-        GovernmentDepartment,
         GuildSettings,
         GuildWelcomeSettings,
         Menu,
+        MenuInterface,
         MenuItem,
         Nation,
         Role,
@@ -64,8 +67,11 @@ if TYPE_CHECKING:
         Ticket,
         TicketConfig,
         TradePrices,
+        Transaction,
+        TransactionRequest,
         Treasure,
         Treaty,
+        User,
         UserSettings,
     )
 
@@ -83,6 +89,7 @@ class Validate:
 
 class Cache:
     __slots__ = (
+        "_accounts",
         "_alliances",
         "_alliance_auto_roles",
         "_alliance_settings",
@@ -93,7 +100,6 @@ class Cache:
         "_embassies",
         "_embassy_configs",
         "_forums",
-        "_government_departments",
         "_guild_settings",
         "_guild_welcome_settings",
         "_users",
@@ -109,6 +115,8 @@ class Cache:
         "_ticket_configs",
         "_tickets",
         "_trades",
+        "_transactions",
+        "_transaction_requests",
         "_treasures",
         "_treaties",
         "_user_settings",
@@ -119,6 +127,7 @@ class Cache:
     )
 
     def __init__(self):
+        self._accounts: Dict[int, Account] = {}
         self._alliances: Dict[int, Alliance] = {}
         self._alliance_auto_roles: Set[AllianceAutoRole] = set()
         self._alliance_settings: Dict[int, AllianceSettings] = {}
@@ -129,11 +138,9 @@ class Cache:
         self._embassies: Dict[int, Embassy] = {}
         self._embassy_configs: Dict[int, EmbassyConfig] = {}
         self._forums: Dict[int, Forum] = {}
-        self._government_departments: Dict[int, GovernmentDepartment] = {}
         self._guild_settings: Dict[int, GuildSettings] = {}
         self._guild_welcome_settings: Dict[int, GuildWelcomeSettings] = {}
-        self._users: List[UserData] = list()
-        self._menu_interfaces: List[MenuInterfaceData] = list()
+        self._menu_interfaces: Set[MenuInterface] = set()
         self._menu_items: Dict[int, MenuItem] = {}
         self._menus: Dict[int, Menu] = {}
         self._nations: Dict[int, Nation] = {}
@@ -145,8 +152,11 @@ class Cache:
         self._ticket_configs: Dict[int, TicketConfig] = {}
         self._tickets: Dict[int, Ticket] = {}
         self._trades = {}  # NO CLASS YET
+        self._transactions: Dict[int, Transaction] = {}
+        self._transaction_requests: Dict[int, TransactionRequest] = {}
         self._treasures: List[Treasure] = []
         self._treaties: Set[Treaty] = set()
+        self._users: Set[User] = set()
         self._user_settings: Dict[int, UserSettings] = {}
         self._war_attacks = {}  # NO CLASS YET
         self._wars = {}  # NO CLASS YET
@@ -155,6 +165,7 @@ class Cache:
 
     async def initialize(self):  # sourcery no-metrics
         from .data.classes import (
+            Account,
             Alliance,
             AllianceAutoRole,
             AllianceSettings,
@@ -165,10 +176,10 @@ class Cache:
             Embassy,
             EmbassyConfig,
             Forum,
-            GovernmentDepartment,
             GuildSettings,
             GuildWelcomeSettings,
             Menu,
+            MenuInterface,
             MenuItem,
             Nation,
             Role,
@@ -178,11 +189,15 @@ class Cache:
             Ticket,
             TicketConfig,
             TradePrices,
+            Transaction,
+            TransactionRequest,
             Treasure,
             Treaty,
+            User,
         )
 
         queries = [
+            "SELECT * FROM accounts",
             "SELECT * FROM alliances;",
             "SELECT * FROM alliance_auto_roles;",
             "SELECT * FROM alliance_settings;",
@@ -193,7 +208,6 @@ class Cache:
             "SELECT * FROM embassies;",
             "SELECT * FROM embassy_configs;",
             "SELECT * FROM forums;",
-            "SELECT * FROM government_departments;",
             "SELECT * FROM guild_settings;",
             "SELECT * FROM guild_welcome_settings;",
             "SELECT * FROM menu_interfaces;",
@@ -207,11 +221,14 @@ class Cache:
             "SELECT * FROM target_reminders;",
             "SELECT * FROM ticket_configs;",
             "SELECT * FROM tickets;",
+            "SELECT * FROM transactions;",
+            "SELECT * FROM transaction_requests;",
             "SELECT * FROM treasures ORDER BY datetime DESC LIMIT 1;",
             "SELECT * FROM treaties;",
             "SELECT * FROM users;",
         ]
         data: Tuple[  # type: ignore
+            List[AccountData],
             List[AllianceData],
             List[AllianceAutoRoleData],
             List[AllianceSettingsData],
@@ -222,7 +239,6 @@ class Cache:
             List[EmbassyData],
             List[EmbassyConfigData],
             List[ForumData],
-            List[GovernmentDepartmentData],
             List[GuildSettingsData],
             List[GuildWelcomeSettingsData],
             List[MenuInterfaceData],
@@ -236,6 +252,8 @@ class Cache:
             List[TargetReminderData],
             List[TicketConfigData],
             List[TicketData],
+            List[TransactionData],
+            List[TransactionRequestData],
             List[RawTreasureData],
             List[TreatyData],
             List[UserData],
@@ -243,6 +261,7 @@ class Cache:
             await asyncio.gather(*(execute_read_query(query) for query in queries))  # type: ignore
         )
         (
+            accounts,
             alliances,
             alliance_auto_roles,
             alliance_settings,
@@ -253,7 +272,6 @@ class Cache:
             embassies,
             embassy_configs,
             forums,
-            government_departments,
             guild_settings,
             guild_welcome_settings,
             menu_interfaces,
@@ -267,10 +285,15 @@ class Cache:
             target_reminders,
             ticket_configs,
             tickets,
+            transactions,
+            transaction_requests,
             treasures,
             treaties,
             users,
         ) = data
+        for i in accounts:
+            i = Account(i)
+            self._accounts[i.id] = i
         for i in alliances:
             i = Alliance(i)
             self._alliances[i.id] = i
@@ -301,10 +324,6 @@ class Cache:
         for i in forums:
             i = Forum(i)
             self._forums[i.id] = i
-        for i in government_departments:
-            i = GovernmentDepartment(i)
-            self._government_departments[i.id] = i
-            self._government_departments[i.id] = i
         for i in guild_settings:
             i = GuildSettings(i)
             self._guild_settings[i.guild_id] = i
@@ -312,7 +331,8 @@ class Cache:
             i = GuildWelcomeSettings(i)
             self._guild_welcome_settings[i.guild_id] = i
         for i in menu_interfaces:
-            self._menu_interfaces.append(dict(i))  # type: ignore
+            i = MenuInterface(i)
+            self._menu_interfaces.add(i)
         for i in menu_items:
             i = MenuItem(i)
             self._menu_items[i.id] = i
@@ -333,6 +353,7 @@ class Cache:
         )
         for i in roles:
             i = Role(i)
+            self._roles[i.id] = i
         for i in subscriptions:
             i = Subscription(i)
             self._subscriptions[i.id] = i
@@ -348,6 +369,12 @@ class Cache:
         for i in tickets:
             i = Ticket(i)
             self._tickets[i.id] = i
+        for i in transactions:
+            i = Transaction(i)
+            self._transactions[i.id] = i
+        for i in transaction_requests:
+            i = TransactionRequest(i)
+            self._transaction_requests[i.id] = i
         for i in (  # type
             json.loads(treasures[0]["treasures"])
             if isinstance(treasures[0]["treasures"], str)
@@ -366,8 +393,13 @@ class Cache:
             if i.stopped is None:
                 self._treaties.add(i)
         for i in users:
-            self._users.append(dict(i))  # type: ignore
+            i = User(i)
+            self._users.add(i)
         self.init = True
+
+    @property
+    def accounts(self) -> Set[Account]:
+        return set(self._accounts.values())
 
     @property
     def alliances(self) -> Set[Alliance]:
@@ -406,10 +438,6 @@ class Cache:
         return set(self._forums.values())
 
     @property
-    def government_departments(self) -> Set[GovernmentDepartment]:
-        return set(self._government_departments.values())
-
-    @property
     def guild_settings(self) -> Set[GuildSettings]:
         return set(self._guild_settings.values())
 
@@ -418,7 +446,7 @@ class Cache:
         return set(self._guild_welcome_settings.values())
 
     @property
-    def menu_interfaces(self) -> List[MenuInterfaceData]:
+    def menu_interfaces(self) -> Set[MenuInterface]:
         return self._menu_interfaces
 
     @property
@@ -462,6 +490,14 @@ class Cache:
         return set(self._tickets.values())
 
     @property
+    def transactions(self) -> Set[Transaction]:
+        return set(self._transactions.values())
+
+    @property
+    def transaction_requests(self) -> Set[TransactionRequest]:
+        return set(self._transaction_requests.values())
+
+    @property
     def treasures(self) -> List[Treasure]:
         return self._treasures
 
@@ -470,7 +506,7 @@ class Cache:
         return self._treaties
 
     @property
-    def users(self) -> List[UserData]:
+    def users(self) -> Set[User]:
         return self._users
 
     @property
@@ -559,6 +595,9 @@ class Cache:
             treaty.update(data, alliances)
         self._treaties.add(Treaty(data, alliances))
 
+    def get_account(self, id: int, /) -> Optional[Account]:
+        return self._accounts.get(id)
+
     def get_alliance(self, id: int, /) -> Optional[Alliance]:
         return self._alliances.get(id)
 
@@ -586,9 +625,6 @@ class Cache:
     def get_forum(self, id: int, /) -> Optional[Forum]:
         return self._forums.get(id)
 
-    def get_government_department(self, id: int, /) -> Optional[GovernmentDepartment]:
-        return self._government_departments.get(id)
-
     def get_guild_settings(self, id: int, /) -> Optional[GuildSettings]:
         return self._guild_settings.get(id)
 
@@ -597,12 +633,12 @@ class Cache:
 
     def get_menu_interface(
         self, menu_id: int, message_id: int, /
-    ) -> Optional[MenuInterfaceData]:
+    ) -> Optional[MenuInterface]:
         try:
             return next(
                 i
                 for i in self._menu_interfaces
-                if i["menu_id"] == menu_id and i["message_id"] == message_id
+                if i.menu_id == menu_id and i.message_id == message_id
             )
         except StopIteration:
             return
@@ -637,6 +673,12 @@ class Cache:
     def get_ticket(self, id: int, /) -> Optional[Ticket]:
         return self._tickets.get(id)
 
+    def get_transaction(self, id: int, /) -> Optional[Transaction]:
+        return self._transactions.get(id)
+
+    def get_transaction_request(self, id: int, /) -> Optional[TransactionRequest]:
+        return self._transaction_requests.get(id)
+
     def get_treasure(self, name: str, /) -> Optional[Treasure]:
         try:
             return next(i for i in self._treasures if i.name == name)
@@ -648,23 +690,24 @@ class Cache:
             return next(
                 i
                 for i in self._treaties
-                if i.from_.id == from_
-                and i.to_.id == to_
+                if i.from_id == from_
+                and i.to_id == to_
                 and i.treaty_type == treaty_type
             )
         except StopIteration:
             return
 
-    def get_user(self, id: int, /) -> Optional[UserData]:
+    def get_user(self, id: int, /) -> Optional[User]:
         try:
-            return next(
-                i for i in self._users if i["user_id"] == id or i["nation_id"] == id
-            )
+            return next(i for i in self._users if i.user_id == id or i.nation_id == id)
         except StopIteration:
             return
 
     def get_user_settings(self, id: int, /) -> Optional[UserSettings]:
         return self._user_settings.get(id)
+
+    def add_account(self, account: Account) -> None:
+        self._accounts[account.id] = account
 
     def add_alliance_auto_role(self, role: AllianceAutoRole, /) -> None:
         self._alliance_auto_roles.add(role)
@@ -674,6 +717,9 @@ class Cache:
 
     def add_condition(self, condition: Condition, /) -> None:
         self._conditions[condition.id] = condition
+
+    def add_credentials(self, credentials: Credentials, /) -> None:
+        self._credentials[credentials.nation_id] = credentials
 
     def add_embassy(self, embassy: Embassy, /) -> None:
         self._embassies[embassy.id] = embassy
@@ -690,11 +736,14 @@ class Cache:
     def add_menu(self, menu: Menu, /) -> None:
         self._menus[menu.id] = menu
 
-    def add_menu_interface(self, interface: MenuInterfaceData, /) -> None:
-        self._menu_interfaces.append(interface)
+    def add_menu_interface(self, interface: MenuInterface, /) -> None:
+        self._menu_interfaces.add(interface)
 
     def add_menu_item(self, item: MenuItem, /) -> None:
         self._menu_items[item.id] = item
+
+    def add_role(self, role: Role, /) -> None:
+        self._roles[role.id] = role
 
     def add_subscription(self, subscription: Subscription, /) -> None:
         self._subscriptions[subscription.id] = subscription
@@ -711,26 +760,53 @@ class Cache:
     def add_target_reminder(self, reminder: TargetReminder, /) -> None:
         self._target_reminders[reminder.id] = reminder
 
+    def add_transaction(self, transaction: Transaction, /) -> None:
+        self._transactions[transaction.id] = transaction
+
+    def add_transaction_request(self, request: TransactionRequest, /) -> None:
+        self._transaction_requests[request.id] = request
+
+    def add_user(self, user: User, /) -> None:
+        self._users.add(user)
+
+    def remove_account(self, account: Account, /) -> None:
+        self._accounts.pop(account.id)
+
     def remove_alliance_auto_role(self, role: AllianceAutoRole, /) -> None:
         self._alliance_auto_roles.remove(role)
 
     def remove_condition(self, condition: Condition, /) -> None:
         self._conditions.pop(condition.id)
 
+    def remove_credentials(self, credentials: Credentials, /) -> None:
+        self._credentials.pop(credentials.nation_id)
+
     def remove_embassy(self, embassy: Embassy, /) -> None:
         self._embassies.pop(embassy.id)
 
     def remove_menu_interface(self, message_id: int, /) -> None:
-        for index, i in enumerate(self.menu_interfaces):
-            if i["message_id"] == message_id:
-                self._menu_interfaces.pop(index)
+        for i in self.menu_interfaces:
+            if i.message_id == message_id:
+                self._menu_interfaces.remove(i)
                 break
+
+    def remove_role(self, role: Role, /) -> None:
+        self._roles.pop(role.id)
 
     def remove_subscription(self, subscription: Subscription, /) -> None:
         self._subscriptions.pop(subscription.id)
 
     def remove_target_reminder(self, reminder: TargetReminder, /) -> None:
         self._target_reminders.pop(reminder.id)
+
+    def remove_transaction(self, transaction: Transaction, /) -> None:
+        self._transactions.pop(transaction.id)
+
+    def remove_transaction_request(self, request: TransactionRequest, /) -> None:
+        self._transaction_requests.pop(request.id)
+
+    def remove_user(self, user: User, /) -> None:
+        self._users.remove(user)
 
 
 cache = Cache()

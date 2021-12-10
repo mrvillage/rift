@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Union
+from typing import Dict, Iterator, Union
 
 from ...funcs.utils import check_resource, convert_number
 from ...ref import RiftContext
@@ -122,6 +122,8 @@ class Resources:
 
     @classmethod
     def convert_resources(cls, argument: str) -> Resources:
+        if not argument:
+            return cls()
         args = [i.strip(" ,.") for i in argument.split(" ")]
         args = [i if i.lower() != "credits" else "credit" for i in args]
         resources_dict = {}
@@ -146,7 +148,7 @@ class Resources:
         return cls(**resources_dict)
 
     @classmethod
-    async def from_dict(cls, resources: Dict[str, Union[float, int]]) -> Resources:
+    def from_dict(cls, resources: Dict[str, Union[float, int]]) -> Resources:
         return cls(
             money=resources["money"],
             food=resources["food"],
@@ -272,3 +274,9 @@ class Resources:
 
     def __getitem__(self, item: str) -> float:
         return self.__getattribute__(item)
+
+    def __len__(self) -> int:
+        return len([i for i in self.to_dict().values() if i != 0])
+
+    def __iter__(self) -> Iterator[float]:
+        return iter([i for i in self.to_dict().values() if i != 0])

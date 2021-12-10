@@ -8,6 +8,7 @@ from discord.ext import commands
 
 from ..data.classes import Alliance, Nation
 from ..errors import (
+    AccountNotFoundError,
     AllianceNotFoundError,
     EmbassyConfigNotFoundError,
     EmbassyNotFoundError,
@@ -16,10 +17,14 @@ from ..errors import (
     MenuNotFoundError,
     NationNotFoundError,
     NationOrAllianceNotFoundError,
+    NoCredentialsError,
+    NoRolesError,
+    RoleNotFoundError,
     SubscriptionNotFoundError,
     TargetNotFoundError,
     TicketConfigNotFoundError,
     TicketNotFoundError,
+    TransactionNotFoundError,
 )
 from ..ref import RiftContext
 from .embeds import get_embed_author_member
@@ -61,7 +66,7 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 await ctx.reply(
                     embed=get_embed_author_member(
                         ctx.author,
-                        f"You need to have the `Manage Server` or `Administrator` permission or have a manager role to run this command.",
+                        "You need to have the `Manage Server` or `Administrator` permission or have a manager role to run this command.",
                         color=discord.Color.red(),
                     ),
                     ephemeral=True,
@@ -70,7 +75,7 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 await ctx.reply(
                     embed=get_embed_author_member(
                         ctx.author,
-                        f"You need to have the `Manage Server` or `Administrator` to run this command.",
+                        "You need to have the `Manage Server` or `Administrator` to run this command.",
                         color=discord.Color.red(),
                     ),
                     ephemeral=True,
@@ -79,11 +84,21 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 await ctx.reply(
                     embed=get_embed_author_member(
                         ctx.author,
-                        f"You need to have permission to manage your alliance's settings to run this command.",
+                        "You need to have permission to manage your alliance's settings to run this command.",
                         color=discord.Color.red(),
                     ),
                     ephemeral=True,
                 )
+            elif error.missing_permissions[0] == "alliance_manage_roles":
+                await ctx.reply(
+                    embed=get_embed_author_member(
+                        ctx.author,
+                        "You don't have permission to manage that alliance's roles!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+
         elif isinstance(error, discord.Forbidden):
             await ctx.reply(
                 'I don\'t have permission to do that! Please make sure I have the "Embed Links" permission.'
@@ -124,12 +139,30 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 ),
                 ephemeral=True,
             )
+        elif isinstance(error, NoCredentialsError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    "I don't have any valid credentials to perform that action!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif isinstance(error, NoRolesError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"You don't have any roles to allow you to perform that action on alliance {repr(error.args[0])}!\nRequired Permissions: {', '.join(f'`{i}`' for i in error.args[1:]) if error.args[1:] else 'None'}",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
         elif isinstance(error, NationNotFoundError):
             if str(error.args[0]) == str(ctx.author.id):
                 await ctx.reply(
                     embed=get_embed_author_member(
                         ctx.author,
-                        "You're not linked so I can't infer your alliance!",
+                        "You're not linked so I can't infer your nation!",
                         color=discord.Color.red(),
                     ),
                     ephemeral=True,
@@ -230,6 +263,33 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 embed=get_embed_author_member(
                     ctx.author,
                     f"No embassy config found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif isinstance(error, RoleNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No role found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif isinstance(error, AccountNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No account found with argument `{error.args[0]}`.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif isinstance(error, TransactionNotFoundError):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"No transaction found with argument `{error.args[0]}`.",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,

@@ -19,13 +19,11 @@ from ...data.classes import (
     GuildSettings,
     GuildWelcomeSettings,
     Nation,
+    User,
 )
 from ...errors import AllianceNotFoundError
 from ...ref import Rift, RiftContext
 from ...views import AlliancePurposeConfirm
-
-if TYPE_CHECKING:
-    from _typings import UserData
 
 
 class Settings(commands.Cog):
@@ -433,6 +431,119 @@ class Settings(commands.Cog):
                 ),
                 ephemeral=True,
             )
+
+    @alliance_settings.command(  # type: ignore
+        name="withdraw-channels",
+        brief="Modify the alliance's withdraw request channels.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "channels": "The new withdraw channels, given by space separated channel mentions.",
+            "clear": "Set to True to clear the withdraw channels.",
+        },
+    )
+    @has_alliance_manage_permissions()
+    @commands.guild_only()
+    async def alliance_settings_withdraw_channels(
+        self,
+        ctx: RiftContext,
+        *,
+        channels: List[discord.TextChannel] = MISSING,
+        clear: bool = False,
+    ):
+        nation = await Nation.convert(ctx, None)
+        if nation.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "You need to be in an alliance to run this command."
+                )
+            )
+        settings = await AllianceSettings.fetch(nation.alliance_id)
+        if channels is MISSING and not clear:
+            if settings.withdraw_channels:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description=f"The withdraw request channels are:\n\n{''.join(f'<#{i}>' for i in settings.withdraw_channels)}",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        description="This server has no withdraw request channels.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        channels_set = None if clear else [i.id for i in channels]
+        await settings.set_(withdraw_channels=channels_set)
+        if channels_set:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"The withdraw request channels are now:\n\n{''.join(f'<#{i}>' for i in channels_set)}",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The withdraw request channels have been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+
+    @alliance_settings.command(  # type: ignore
+        name="require-withdraw-approval",
+        brief="View or modify the alliance's withdraw approval requirement.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_alliance_manage_permissions()
+    async def alliance_settings_require_withdraw_approval(
+        self,
+        ctx: RiftContext,
+        require: bool = MISSING,
+    ):
+        nation = await Nation.convert(ctx, None)
+        if nation.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "You need to be in an alliance to run this command."
+                )
+            )
+        settings = await AllianceSettings.fetch(nation.alliance_id)
+        if require is MISSING:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"{repr(nation.alliance)} {'requires' if settings.require_withdraw_approval else 'does not require'} withdrawal approval.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        if require is settings.require_withdraw_approval:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="That's already the current withdrawal approval requirement.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        await settings.set_(require_withdraw_approval=require)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                description=f"{repr(nation.alliance)} {'now requires' if require else 'no longer requires'} withdrawal approval.",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
 
     @commands.group(
         name="server-settings",
@@ -1375,7 +1486,7 @@ class Settings(commands.Cog):
             link = cache.get_user(member.id)
             if link is None:
                 continue
-            nation = cache.get_nation(link["nation_id"])
+            nation = cache.get_nation(link.nation_id)
             if nation is None:
                 continue
             alliance_id = nation.alliance.id if nation.alliance else None
@@ -1412,7 +1523,7 @@ class Settings(commands.Cog):
             return
         try:
             nat = await get.get_link_user(member.id)
-            nation: Optional[Nation] = await Nation.fetch(nat["nation_id"])
+            nation: Optional[Nation] = await Nation.fetch(nat.nation_id)
             await nation.make_attrs("alliance")
         except IndexError:
             nation = None
@@ -1518,24 +1629,24 @@ class Settings(commands.Cog):
         if before.nick != after.nick and settings.enforce_verified_nickname:
             link = cache.get_user(after.id)
             if link is not None:
-                nation = cache.get_nation(link["nation_id"])
+                nation = cache.get_nation(link.nation_id)
                 if nation is not None:
                     await settings.set_verified_nickname(after, nation)
 
     @commands.Cog.listener()
-    async def on_link_create(self, link: UserData):
+    async def on_link_create(self, link: User):
         # sourcery skip: merge-nested-ifs
-        nation = cache.get_nation(link["nation_id"])
+        nation = cache.get_nation(link.nation_id)
         if nation is None:
             return
         for guild in self.bot.guilds:
-            if link["user_id"] not in {i.id for i in guild.members}:
+            if link.user_id not in {i.id for i in guild.members}:
                 continue
             guild_settings = await GuildSettings.fetch(guild.id)
             settings = guild_settings.welcome_settings
             roles: list[discord.Role] = []
             highest_role: discord.Role = member.guild.get_member(self.bot.user.id).top_role  # type: ignore
-            member = guild.get_member(link["user_id"])
+            member = guild.get_member(link.user_id)
             if member is None:
                 continue
             if settings.verified_nickname and settings.enforce_verified_nickname:
@@ -1606,6 +1717,7 @@ class Settings(commands.Cog):
     @commands.Cog.listener()
     async def on_nation_update(self, before: Nation, after: Nation):
         # sourcery skip: merge-nested-ifs
+        # sourcery no-metrics
         link = after.user
         if link is None:
             return

@@ -52,13 +52,17 @@ class Tickets(commands.Cog):
         except IndexError:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, "This channel is not a ticket."
+                    ctx.author,
+                    "This channel is not a ticket.",
+                    color=discord.Color.red(),
                 )
             )
         if not ticket.open:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
-                    ctx.author, "This ticket is already archived!"
+                    ctx.author,
+                    "This ticket is already archived!",
+                    color=discord.Color.red(),
                 ),
                 ephemeral=True,
             )
@@ -75,7 +79,9 @@ class Tickets(commands.Cog):
         await ctx.channel.edit(name=name, category=category, sync_permissions=True)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
-                ctx.author, f"Ticket `{ctx.channel.id}` has been archived."
+                ctx.author,
+                f"Ticket `{ctx.channel.id}` has been archived.",
+                color=discord.Color.green(),
             ),
             ephemeral=True,
         )

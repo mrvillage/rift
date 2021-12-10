@@ -1,6 +1,7 @@
 from .base import BaseError
 
 __all__ = (
+    "AccountNotFoundError",
     "AllianceNotFoundError",
     "AttackNotFoundError",
     "CategoryNotFoundError",
@@ -16,17 +17,23 @@ __all__ = (
     "NationNotFoundError",
     "NationOrAllianceNotFoundError",
     "RecipientNotFoundError",
+    "RoleNotFoundError",
     "ServerNotFoundError",
     "SubscriptionNotFoundError",
     "TargetNotFoundError",
     "TicketConfigNotFoundError",
     "TicketNotFoundError",
+    "TransactionNotFoundError",
     "TreasureNotFoundError",
     "WarNotFoundError",
 )
 
 
 class NotFoundError(BaseError):
+    ...
+
+
+class AccountNotFoundError(NotFoundError):
     ...
 
 
@@ -90,6 +97,10 @@ class RecipientNotFoundError(NotFoundError):
     ...
 
 
+class RoleNotFoundError(NotFoundError):
+    ...
+
+
 class ServerNotFoundError(NotFoundError):
     ...
 
@@ -107,6 +118,10 @@ class TicketConfigNotFoundError(NotFoundError):
 
 
 class TicketNotFoundError(NotFoundError):
+    ...
+
+
+class TransactionNotFoundError(NotFoundError):
     ...
 
 

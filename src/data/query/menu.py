@@ -41,6 +41,8 @@ async def query_menu_item(item_id: int, guild_id: int) -> MenuItemData:
 
 
 async def insert_interface(menu_id: int, message: discord.Message) -> None:
+    from ...data.classes import MenuInterface
+
     await execute_query(
         "INSERT INTO menu_interfaces (menu_id, message_id, channel_id) VALUES ($1, $2, $3);",
         menu_id,
@@ -48,7 +50,13 @@ async def insert_interface(menu_id: int, message: discord.Message) -> None:
         message.channel.id,
     )
     cache.add_menu_interface(
-        {"menu_id": menu_id, "message_id": message.id, "channel_id": message.channel.id}
+        MenuInterface(
+            {
+                "menu_id": menu_id,
+                "message_id": message.id,
+                "channel_id": message.channel.id,
+            }
+        )
     )
 
 

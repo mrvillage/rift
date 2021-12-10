@@ -4,6 +4,8 @@ from .confirm import *
 from .events import *
 from .margins import *
 from .menu import *
+from .permissions import *
 from .prices import *
 from .settings import *
+from .transaction import *
 from .treasures import *

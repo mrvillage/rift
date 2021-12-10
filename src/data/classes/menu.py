@@ -18,10 +18,10 @@ from ..db import execute_query, execute_read_query
 from ..query import insert_interface
 from .base import Makeable
 
-__all__ = ("Menu", "MenuItem")
+__all__ = ("Menu", "MenuItem", "MenuInterface")
 
 if TYPE_CHECKING:
-    from _typings import MenuData, MenuFormattedFlags, MenuItemData
+    from _typings import MenuData, MenuFormattedFlags, MenuInterfaceData, MenuItemData
 
     from ...views.menu import MenuButton, MenuSelect, MenuView
 
@@ -142,11 +142,11 @@ class Menu(Makeable):
         from ...ref import bot
         from ...views import MenuView
 
-        self.view = MenuView(bot=bot, menu_id=self.id, timeout=None)
+        view = MenuView(bot=bot, menu_id=self.id, timeout=None)
         for index, item_set in enumerate(self.items):
             for item in item_set:
-                self.view.add_item(item.get_item(self.id, index))  # type: ignore
-        return self.view
+                view.add_item(item.get_item(self.id, index))  # type: ignore
+        return view
 
     def get_description_embed(self, ctx: RiftContext) -> discord.Embed:
         from ...funcs import get_embed_author_guild
@@ -154,8 +154,7 @@ class Menu(Makeable):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         desc = str(self.description).replace("\\n", "\n")
-        self.embed = get_embed_author_guild(ctx.guild, desc)
-        return self.embed
+        return get_embed_author_guild(ctx.guild, desc)
 
     async def new_interface(self, message: discord.Message) -> None:
         await insert_interface(menu_id=self.id, message=message)
@@ -388,3 +387,12 @@ class MenuItem:
         if self.type == "select":
             return f"ID: {self.id} - Type: {self.type} - Placeholder: {self.data.get('placeholder', None)} - Min Values: {self.data.get('min_values', 1)} - Max Values: {self.data.get('max_values', 1)} - Options: {', '.join(str(option) for option in self.data.get('options', [None]))}"
         return f"ID: {self.id} - Type: {self.type}"
+
+
+class MenuInterface:
+    __slots__ = ("menu_id", "message_id", "channel_id")
+
+    def __init__(self, data: MenuInterfaceData) -> None:
+        self.menu_id: int = data.get("menu_id", None)
+        self.message_id: int = data.get("message_id", None)
+        self.channel_id: int = data.get("channel_id", None)
