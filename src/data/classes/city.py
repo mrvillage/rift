@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import math
 from datetime import datetime
-from functools import cached_property
 from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
 
-from src.errors.notfound import CityNotFoundError
+import cachetools
 
 from ...cache import cache
 from ...errors import CityNotFoundError
@@ -69,7 +68,8 @@ class City:
     def __float__(self) -> Tuple[float, float]:
         return self.infrastructure, self.land
 
-    @cached_property
+    @property
+    @cachetools.cached(cache=cachetools.TTLCache(1024, 30))  # type: ignore
     def nation(self) -> Nation:
         return cache.get_nation(self.nation_id)  # type: ignore
 
@@ -153,7 +153,8 @@ class FullCity:
         self.nation: Nation = cache.get_nation(self.nation_id)  # type: ignore
         self.projects: PnWKitNation = nation
 
-    @cached_property
+    @property
+    @cachetools.cached(cache=cachetools.TTLCache(1024, 30))  # type: ignore
     def population(self) -> float:
         return (
             (
@@ -163,7 +164,8 @@ class FullCity:
             - max((self.crime / 10) * (100 * self.infrastructure) - 25, 0)
         ) * (1 + (math.log(self.age) if self.age else 0) / 15)
 
-    @cached_property
+    @property
+    @cachetools.cached(cache=cachetools.TTLCache(1024, 30))  # type: ignore
     def disease(self) -> float:
         disease = (
             (((((self.infrastructure * 100 / self.land) ** 2) * 0.01) - 25) / 100)
@@ -178,7 +180,8 @@ class FullCity:
             return 100
         return disease
 
-    @cached_property
+    @property
+    @cachetools.cached(cache=cachetools.TTLCache(1024, 30))  # type: ignore
     def crime(self) -> float:
         crime = (
             ((103 - self.commerce) ** 2 + (self.infrastructure * 100)) / (111111)
@@ -191,7 +194,8 @@ class FullCity:
             return 100
         return crime
 
-    @cached_property
+    @property
+    @cachetools.cached(cache=cachetools.TTLCache(1024, 30))  # type: ignore
     def pollution(self) -> float:
         return (
             self.coal_power * 8
@@ -216,7 +220,8 @@ class FullCity:
             + self.stadiums * 5
         )
 
-    @cached_property
+    @property
+    @cachetools.cached(cache=cachetools.TTLCache(1024, 30))  # type: ignore
     def commerce(self) -> float:
         commerce = (
             self.supermarkets * 3
