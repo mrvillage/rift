@@ -1645,8 +1645,8 @@ class Settings(commands.Cog):
             guild_settings = await GuildSettings.fetch(guild.id)
             settings = guild_settings.welcome_settings
             roles: list[discord.Role] = []
-            highest_role: discord.Role = member.guild.get_member(self.bot.user.id).top_role  # type: ignore
             member = guild.get_member(link.user_id)
+            highest_role: discord.Role = member.guild.get_member(self.bot.user.id).top_role  # type: ignore
             if member is None:
                 continue
             if settings.verified_nickname and settings.enforce_verified_nickname:
