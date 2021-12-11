@@ -202,6 +202,24 @@ class Bank(commands.Cog):
         primary: bool = False,
     ):
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
+        roles = [
+            i
+            for i in cache.roles
+            if i.alliance_id == alliance.id
+            and (
+                i.permissions.leadership
+                or i.permissions.create_bank_account
+                or i.permissions.manage_bank_accounts
+            )
+        ]
+        if not roles:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"You don't have permission to create bank accounts in alliance {repr(alliance)}.",
+                    color=discord.Color.red(),
+                )
+            )
         if not accounts:
             primary = True
         elif primary:
@@ -391,11 +409,22 @@ class Bank(commands.Cog):
                 ephemeral=True,
             )
         account = account or next(i for i in accounts if i.primary)
-        if account.owner_id != ctx.author.id:
+        roles = [
+            i
+            for i in cache.roles
+            if i.alliance_id == account.alliance_id
+            and ctx.author.id in i.member_ids
+            and (
+                i.permissions.leadership
+                or i.permissions.view_bank_accounts
+                or i.permissions.manage_bank_accounts
+            )
+        ]
+        if account.owner_id != ctx.author.id and not roles:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    "You can only get information about your own accounts!",
+                    "You don't have permission to get information about that bank account!",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
@@ -405,6 +434,7 @@ class Bank(commands.Cog):
                 ctx.author,
                 f"**{account.name}**\n"
                 f"ID: {account.id}\n"
+                f"Owner: <@{account.owner_id}>\n"
                 f"Alliance: {repr(account.alliance)}\n"
                 f"Resources: {account.resources or None}\n"
                 f"Single Use Deposit Code:\n"
@@ -438,7 +468,11 @@ class Bank(commands.Cog):
                 i
                 for i in cache.roles
                 if ctx.author.id in i.member_ids
-                and (i.permissions.leadership or i.permissions.manage_bank_accounts)
+                and (
+                    i.permissions.leadership
+                    or i.permissions.view_bank_accounts
+                    or i.permissions.manage_bank_accounts
+                )
             ]
             accounts = [
                 i
@@ -508,11 +542,18 @@ class Bank(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        if ctx.author.id != account.owner_id:
+        roles = [
+            i
+            for i in cache.roles
+            if account.alliance_id == i.alliance_id
+            and ctx.author.id in i.member_ids
+            and (i.permissions.leadership or i.permissions.manage_bank_accounts)
+        ]
+        if ctx.author.id != account.owner_id and not roles:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    "You can only edit your own accounts!",
+                    "You don't have permission to edit that account!",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
@@ -538,13 +579,6 @@ class Bank(commands.Cog):
                     i.primary = False
                     await i.save()
         if resources is not MISSING:
-            roles = [
-                i
-                for i in cache.roles
-                if i.alliance_id == account.alliance_id
-                and ctx.author.id in i.member_ids
-                and (i.permissions.leadership or i.permissions.manage_bank_accounts)
-            ]
             if not roles:
                 return await ctx.reply(
                     embed=funcs.get_embed_author_member(
