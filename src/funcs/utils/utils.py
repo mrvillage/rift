@@ -158,7 +158,7 @@ def convert_link(search: str) -> str:
 
 
 def convert_number(num: str) -> Union[int, float]:
-    num = "".join(i for i in num if i in string.digits or i == ".")
+    num = "".join(i for i in num if i in string.digits or i in ".-")
     if num.count(".") > 1:
         last = num.rfind(".")
         beginning = num[:last]
