@@ -32,8 +32,9 @@ class TransactionRequestView(discord.ui.View):
         self,
         request: TransactionRequest,
         user_id: int,
+        timeout: Optional[float] = None,
     ) -> None:
-        super().__init__(timeout=None)
+        super().__init__(timeout=timeout)
         self.request: TransactionRequest = request
         transaction = self.request.transaction
         if transaction is None:
@@ -121,7 +122,6 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                 )
             transaction.to.resources += transaction.resources
             transaction.from_.resources -= transaction.resources
-            await transaction.save()
             await interaction.response.send_message(
                 embed=funcs.get_embed_author_member(
                     interaction.user,
@@ -148,10 +148,21 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                 value < getattr(transaction.resources, key)
                 for key, value in resources.to_dict().items()
             ):
-                return await interaction.response.send_message(
+                return await interaction.followup.send(
                     embed=funcs.get_embed_author_member(
                         interaction.user,
                         "The sending alliance does not have enough resources to complete this transaction! Please try sending a new transaction again.",
+                    ),
+                    ephemeral=True,
+                )
+            if any(
+                value < getattr(transaction.resources, key)
+                for key, value in transaction.from_.resources.to_dict().items()
+            ):
+                return await interaction.followup.send(
+                    embed=funcs.get_embed_author_member(
+                        interaction.user,
+                        "The sending account does not have enough resources to complete this transaction! Please try sending a new transaction again.",
                     ),
                     ephemeral=True,
                 )
@@ -176,6 +187,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                 ),
                 view=None,
             )
+        await transaction.save()
 
 
 class TransactionRequestRejectButton(discord.ui.Button[TransactionRequestView]):
@@ -343,11 +355,11 @@ class TransactionHistoryView(discord.ui.View):
         description: str,
         page: int,
     ) -> None:
-        super().__init__(timeout=5)
+        super().__init__(timeout=300)
         self.user: Union[discord.Member, discord.User] = user
         self.transactions: List[Transaction] = transactions
         self.page: int = page
-        self.pages: int = (len(transactions) // 2) + (len(transactions) % 2 > 0)
+        self.pages: int = (len(transactions) // 9) + (len(transactions) % 12 > 0)
         self.description: str = description
         if self.pages == 1:
             self.back_button.disabled = True  # type: ignore
@@ -360,7 +372,7 @@ class TransactionHistoryView(discord.ui.View):
 
     def get_embed(self, user: Union[discord.Member, discord.User]) -> discord.Embed:
         fields: List[Field] = [
-            i.field for i in self.transactions[(self.page - 1) * 2 : (self.page) * 2]
+            i.field for i in self.transactions[(self.page - 1) * 9 : (self.page) * 9]
         ]
         return funcs.get_embed_author_member(
             user,
