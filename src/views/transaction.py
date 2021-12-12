@@ -64,11 +64,7 @@ class TransactionRequestView(discord.ui.View):
                 for i in cache.roles
                 if alliance_id == i.alliance_id
                 and user_id in i.member_ids
-                and (
-                    i.permissions.send_nation_safekeeping
-                    or i.permissions.leadership
-                    or i.permissions.manage_bank_accounts
-                )
+                and (i.permissions.leadership or i.permissions.manage_bank_accounts)
             ]
             return bool(roles)
         if interaction.user.id == self.user_id:
