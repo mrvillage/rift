@@ -61,11 +61,6 @@ async def on_ready():
     type=(commands.CommandType.default, commands.CommandType.chat_input),
 )
 async def about(ctx: RiftContext):
-    import json
-    import traceback
-
-    with open("banana.txt", "w") as f:
-        f.write(json.dumps(traceback.format_stack()))
     await ctx.reply(
         embed=funcs.get_embed_author_member(
             ctx.author,
