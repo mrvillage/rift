@@ -15,7 +15,7 @@ from ...errors import AllianceNotFoundError
 from ...funcs import withdraw
 from ...ref import Rift, RiftContext
 
-OFFSHORE_ID = 9066
+OFFSHORE_ID = 9302
 
 
 class Confirm(discord.ui.View):
