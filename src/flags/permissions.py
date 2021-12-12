@@ -101,49 +101,49 @@ class RolePermissions(Flags):
         return 1 << 8
 
     @flag
-    def view_nation_safekeeping(self):
+    def create_bank_account(self):
         return 1 << 9
 
     @flag
-    def send_nation_safekeeping(self):
+    def view_bank_accounts(self):
         return 1 << 10
 
     @flag
-    def manage_nation_safekeeping(self):
+    def manage_bank_accounts(self):
         return 1 << 11
 
     @flag
-    def approve_grants(self):
+    def view_grants(self):
         return 1 << 12
 
     @flag
-    def manage_grants(self):
+    def request_grants(self):
         return 1 << 13
 
     @flag
-    def manage_alliance_taxes(self):
+    def approve_grants(self):
         return 1 << 14
 
     @flag
-    def manage_alliance_positions(self):
+    def manage_grants(self):
         return 1 << 15
 
     @flag
-    def manage_treaties(self):
+    def manage_alliance_taxes(self):
         return 1 << 16
 
     @flag
-    def create_alliance_announcements(self):
+    def manage_alliance_positions(self):
         return 1 << 17
 
     @flag
-    def delete_alliance_announcements(self):
+    def manage_treaties(self):
         return 1 << 18
 
     @flag
-    def create_bank_account(self):
+    def create_alliance_announcements(self):
         return 1 << 19
 
     @flag
-    def manage_bank_accounts(self):
+    def delete_alliance_announcements(self):
         return 1 << 20
