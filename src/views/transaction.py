@@ -87,6 +87,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
         self.transaction: Transaction = transaction
 
     async def callback(self, interaction: discord.Interaction) -> None:
+        # sourcery no-metrics
         if TYPE_CHECKING:
             assert interaction.user is not None
         transaction = self.transaction
@@ -96,6 +97,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                 embed=funcs.get_embed_author_member(
                     interaction.user,
                     f"Transaction {transaction.id} is no longer pending!",
+                    color=discord.Color.red(),
                 ),
                 ephemeral=True,
             )
@@ -106,6 +108,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                     embed=funcs.get_embed_author_member(
                         interaction.user,
                         "One account involved in this transaction no longer exists! Please try sending a new transaction again.",
+                        color=discord.Color.red(),
                     ),
                     ephemeral=True,
                 )
@@ -117,6 +120,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                     embed=funcs.get_embed_author_member(
                         interaction.user,
                         "The sending account does not have enough resources to complete this transaction! Please try sending a new transaction again.",
+                        color=discord.Color.red(),
                     ),
                     ephemeral=True,
                 )
@@ -126,6 +130,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                 embed=funcs.get_embed_author_member(
                     interaction.user,
                     f"Transaction accepted! {transaction.resources} has been added to account #{transaction.to_id:,}.",
+                    color=discord.Color.green(),
                 ),
                 ephemeral=True,
             )
@@ -139,6 +144,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                     embed=funcs.get_embed_author_member(
                         interaction.user,
                         "One party involved in this transaction no longer exists! Please try sending a new transaction again.",
+                        color=discord.Color.red(),
                     ),
                     ephemeral=True,
                 )
@@ -152,6 +158,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                     embed=funcs.get_embed_author_member(
                         interaction.user,
                         "The sending alliance does not have enough resources to complete this transaction! Please try sending a new transaction again.",
+                        color=discord.Color.red(),
                     ),
                     ephemeral=True,
                 )
@@ -163,6 +170,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                     embed=funcs.get_embed_author_member(
                         interaction.user,
                         "The sending account does not have enough resources to complete this transaction! Please try sending a new transaction again.",
+                        color=discord.Color.red(),
                     ),
                     ephemeral=True,
                 )
@@ -225,7 +233,9 @@ class TransactionRequestCancelButton(discord.ui.Button[TransactionRequestView]):
         await self.transaction.save()
         await interaction.response.send_message(
             embed=funcs.get_embed_author_member(
-                interaction.user, "Transaction cancelled!"
+                interaction.user,
+                "Transaction cancelled!",
+                color=discord.Color.red(),
             ),
             ephemeral=True,
         )

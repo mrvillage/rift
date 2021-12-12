@@ -8,15 +8,26 @@ import pnwkit
 from discord.ext import commands
 from discord.utils import MISSING
 
-from src.data.classes.settings import AllianceSettings
-
 from ... import funcs
 from ...cache import cache
-from ...data.classes import Account, Alliance, Nation, Resources, Transaction
+from ...data.classes import (
+    Account,
+    Alliance,
+    AllianceSettings,
+    Nation,
+    Resources,
+    Transaction,
+    TransactionRequest,
+)
 from ...enums import AccountType, TransactionStatus, TransactionType
 from ...errors import NoCredentialsError, NoRolesError
 from ...ref import Rift, RiftContext
-from ...views import Confirm, DepositConfirm, TransactionHistoryView
+from ...views import (
+    Confirm,
+    DepositConfirm,
+    TransactionHistoryView,
+    TransactionRequestView,
+)
 
 
 class Bank(commands.Cog):
@@ -1000,8 +1011,124 @@ class Bank(commands.Cog):
             "transaction": "The pending transaction to review.",
         },
     )
-    async def bank_account_review(self, ctx: RiftContext, transaction: Transaction):
-        ...
+    async def bank_account_review(
+        self, ctx: RiftContext, transaction: Transaction
+    ):  # sourcery no-metrics
+        if transaction.status is not TransactionStatus.PENDING:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "That transaction is not pending!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if transaction.type is TransactionType.WITHDRAW:
+            if transaction.from_ is None:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "One account involved in that transaction does not exist!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            roles = [
+                i
+                for i in cache.roles
+                if i.alliance_id == transaction.from_.alliance_id
+                and ctx.author.id in i.member_ids
+                and (i.permissions.leadership or i.permissions.manage_bank_accounts)
+            ]
+            if not roles:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "You don't have permission to review that transaction!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        elif transaction.type is TransactionType.TRANSFER:
+            if transaction.to is None:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "One account involved that transaction does not exist!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            if transaction.to.owner_id != ctx.author.id:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "You don't have permission to review that transaction!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        elif transaction.type is TransactionType.DEPOSIT:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You can't review a deposit!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        elif transaction.type is TransactionType.GRANT:
+            if transaction.from_ is None:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "One account involved in that transaction does not exist!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            roles = [
+                i
+                for i in cache.roles
+                if i.alliance_id == transaction.from_.alliance_id
+                and ctx.author.id in i.member_ids
+                and (
+                    i.permissions.leadership
+                    or i.permissions.manage_grants
+                    or i.permissions.approve_grants
+                )
+            ]
+            if not roles:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        "You don't have permission to review that transaction!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+        request = await TransactionRequest.create(transaction, ctx.author)
+        view = TransactionRequestView(request, ctx.author.id, 60)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Reviewing transaction #{transaction.id:,}\n\n"
+                + transaction.field["value"]
+                + "\n\nYou have 60 seconds to review before this review times out.",
+                color=discord.Color.orange(),
+            ),
+            view=view,
+            ephemeral=True,
+        )
+        if await view.wait():
+            await ctx.interaction.edit_original_message(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"Review of transaction #{transaction.id:,} timed out.",
+                    color=discord.Color.red(),
+                ),
+                view=None,
+            )
 
 
 def setup(bot: Rift):
