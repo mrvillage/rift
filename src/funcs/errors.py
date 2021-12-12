@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import io
 import sys
 import traceback
+from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands
@@ -43,6 +45,29 @@ async def print_handler(ctx: RiftContext, error: Exception) -> None:
     )
     traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
     sys.stderr.flush()
+    f = io.StringIO()
+    traceback.print_exception(type(error), error, error.__traceback__, file=f)
+    channel = ctx.bot.get_channel(919428590167277609)
+    if channel is not None:
+        if TYPE_CHECKING:
+            assert isinstance(channel, discord.TextChannel)
+        try:
+            await channel.send(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"Error encountered by {ctx.author.mention} in guild {ctx.guild and ctx.guild.name} ({ctx.guild and ctx.guild.id})\n\n"
+                    f"Command: {ctx.command and ctx.command.qualified_name}\n"
+                    f"ID: {ctx.message.id if ctx.message else ctx.interaction.id}\n\n"
+                    f"```py\n{f.getvalue()}\n```",
+                    color=discord.Color.red(),
+                )
+            )
+        except discord.HTTPException:
+            print(
+                "Failed to send error message to errors channel.",
+                file=sys.stderr,
+                flush=True,
+            )
 
 
 async def handler(ctx: RiftContext, error: Exception) -> None:
