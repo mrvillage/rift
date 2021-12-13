@@ -212,6 +212,7 @@ class Bank(commands.Cog):
         alliance: Alliance = MISSING,
         primary: bool = False,
     ):
+        alliance = alliance or await Alliance.convert(ctx, alliance)
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         roles = [
             i
@@ -239,7 +240,6 @@ class Bank(commands.Cog):
                     i.primary = False
                     await i.save()
                     break
-        alliance = alliance or await Alliance.convert(ctx, alliance)
         account = await Account.create(ctx.author, alliance, name, war_chest, primary)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
