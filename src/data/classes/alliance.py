@@ -181,6 +181,8 @@ class Alliance(Makeable):
     @property
     def militarization(self) -> Dict[str, float]:
         cities = self.cities
+        if not cities:
+            return {"soldiers": 0, "tanks": 0, "aircraft": 0, "ships": 0, "total": 0}
         militarization = {
             "soldiers": self.soldiers / (cities * 15000),
             "tanks": self.tanks / (cities * 1250),

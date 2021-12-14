@@ -160,9 +160,17 @@ def parse_condition_string(condition: str) -> Any:  # sourcery no-metrics
                 name = ""
             try:
                 if (
-                    (arguments[-1][0] in CHARACTERS or arguments[-1][0] in QUOTES)
+                    (
+                        arguments[-1][0] in CHARACTERS
+                        or arguments[-1][0] in QUOTES
+                        or isinstance(arguments[-1], tuple)
+                    )
                     and arguments[-2] in OPERATORS
-                    and (arguments[-3][0] in CHARACTERS or arguments[-3][0] in QUOTES)
+                    and (
+                        arguments[-3][0] in CHARACTERS
+                        or arguments[-3][0] in QUOTES
+                        or isinstance(arguments[-1], tuple)
+                    )
                 ) or isinstance(arguments[-1], list):
                     arguments.append(boolean_operator)
                     operator = ""

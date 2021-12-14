@@ -94,7 +94,7 @@ async def find_targets(
         )
     fields: List[Field] = []
     for target in ratings[offset:]:
-        if len(fields) >= 15:
+        if len(fields) >= 12:
             break
         rating = target[0]
         target = target[1]
@@ -139,7 +139,7 @@ async def find_targets(
     await ctx.reply(
         embed=funcs.get_embed_author_member(
             ctx.author,
-            f"{len(ratings):,} targets found for [{nation}](https://politicsandwar.com/nation/id=251584). Showing #{offset+1:,}-#{offset+15:,}\n{counting_str}{defaults_str}",
+            f"{len(ratings):,} targets found for [{nation}](https://politicsandwar.com/nation/id={nation.id}). Showing #{offset+1:,}-#{offset+12:,}\n{counting_str}{defaults_str}",
             fields=fields,
             color=discord.Color.green(),
         ),
@@ -226,7 +226,7 @@ async def find_attackers(
         )
     fields: List[Field] = []
     for target in ratings[offset:]:
-        if len(fields) >= 15:
+        if len(fields) >= 12:
             break
         rating = target[0]
         target = target[1]
@@ -267,7 +267,7 @@ async def find_attackers(
     await ctx.reply(
         embed=funcs.get_embed_author_member(
             ctx.author,
-            f"{len(ratings):,} attackers found for [{nation}](https://politicsandwar.com/nation/id=251584). Showing #{offset+1:,}-#{offset+15:,}\n{counting_str}{defaults_str}",
+            f"{len(ratings):,} attackers found for [{nation}](https://politicsandwar.com/nation/id={nation.id}). Showing #{offset+1:,}-#{offset+12:,}\n{counting_str}{defaults_str}",
             fields=fields,
             color=discord.Color.green(),
         ),
