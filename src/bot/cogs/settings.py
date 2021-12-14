@@ -31,15 +31,6 @@ class Settings(commands.Cog):
         self.bot = bot
 
     @commands.group(
-        name="user-settings",
-        aliases=["us", "usersettings", "my-settings", "mysettings"],
-        invoke_without_command=True,
-        enabled=False,
-    )
-    async def user_settings(self, ctx: RiftContext):
-        ...
-
-    @commands.group(
         name="alliance-settings",
         brief="View or modify alliance settings.",
         type=commands.CommandType.chat_input,
