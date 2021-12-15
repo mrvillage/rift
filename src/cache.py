@@ -21,6 +21,7 @@ if TYPE_CHECKING:
         EmbassyConfigData,
         EmbassyData,
         ForumData,
+        GrantData,
         GuildSettingsData,
         GuildWelcomeSettingsData,
         MenuData,
@@ -54,6 +55,7 @@ if TYPE_CHECKING:
         Embassy,
         EmbassyConfig,
         Forum,
+        Grant,
         GuildSettings,
         GuildWelcomeSettings,
         Menu,
@@ -100,6 +102,7 @@ class Cache:
         "_embassies",
         "_embassy_configs",
         "_forums",
+        "_grants",
         "_guild_settings",
         "_guild_welcome_settings",
         "_users",
@@ -138,6 +141,7 @@ class Cache:
         self._embassies: Dict[int, Embassy] = {}
         self._embassy_configs: Dict[int, EmbassyConfig] = {}
         self._forums: Dict[int, Forum] = {}
+        self._grants: Dict[int, Grant] = {}
         self._guild_settings: Dict[int, GuildSettings] = {}
         self._guild_welcome_settings: Dict[int, GuildWelcomeSettings] = {}
         self._menu_interfaces: Set[MenuInterface] = set()
@@ -176,6 +180,7 @@ class Cache:
             Embassy,
             EmbassyConfig,
             Forum,
+            Grant,
             GuildSettings,
             GuildWelcomeSettings,
             Menu,
@@ -208,6 +213,7 @@ class Cache:
             "SELECT * FROM embassies;",
             "SELECT * FROM embassy_configs;",
             "SELECT * FROM forums;",
+            "SELECT * FROM grants;",
             "SELECT * FROM guild_settings;",
             "SELECT * FROM guild_welcome_settings;",
             "SELECT * FROM menu_interfaces;",
@@ -239,6 +245,7 @@ class Cache:
             List[EmbassyData],
             List[EmbassyConfigData],
             List[ForumData],
+            List[GrantData],
             List[GuildSettingsData],
             List[GuildWelcomeSettingsData],
             List[MenuInterfaceData],
@@ -272,6 +279,7 @@ class Cache:
             embassies,
             embassy_configs,
             forums,
+            grants,
             guild_settings,
             guild_welcome_settings,
             menu_interfaces,
@@ -324,6 +332,9 @@ class Cache:
         for i in forums:
             i = Forum(i)
             self._forums[i.id] = i
+        for i in grants:
+            i = Grant(i)
+            self._grants[i.id] = i
         for i in guild_settings:
             i = GuildSettings(i)
             self._guild_settings[i.guild_id] = i
@@ -625,6 +636,9 @@ class Cache:
     def get_forum(self, id: int, /) -> Optional[Forum]:
         return self._forums.get(id)
 
+    def get_grant(self, id: int, /) -> Optional[Grant]:
+        return self._grants.get(id)
+
     def get_guild_settings(self, id: int, /) -> Optional[GuildSettings]:
         return self._guild_settings.get(id)
 
@@ -726,6 +740,9 @@ class Cache:
 
     def add_embassy_config(self, config: EmbassyConfig, /) -> None:
         self._embassy_configs[config.id] = config
+
+    def add_grant(self, grant: Grant, /) -> None:
+        self._grants[grant.id] = grant
 
     def add_guild_settings(self, settings: GuildSettings, /) -> None:
         self._guild_settings[settings.guild_id] = settings
