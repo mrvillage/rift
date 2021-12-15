@@ -173,7 +173,7 @@ class Condition:
 
         try:
             return cls.validate_and_create(parse_condition_string(condition), user_id)
-        except Exception as e:
+        except Exception:
             raise InvalidConditionError(condition)
 
     @staticmethod

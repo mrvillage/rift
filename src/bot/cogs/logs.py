@@ -24,7 +24,7 @@ class Logs(commands.Cog):
                 "",
                 ctx.command and ctx.command.qualified_name,  # type: ignore
                 json.dumps([str(i) for i in ctx.args]),
-                json.dumps({i: str(ctx.kwargs[i]) for i in ctx.kwargs}),
+                json.dumps(ctx.options),
             )
         await logs.insert_log(
             str(ctx.message.edited_at or ctx.message.created_at),
