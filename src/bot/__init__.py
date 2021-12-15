@@ -115,6 +115,7 @@ async def main() -> None:
                 bot.unload_extension("src.bot.cogs.event_messages")
                 bot.unload_extension("src.bot.cogs.database_cache")
             bot.unload_extension("src.bot.cogs.odds")
+            bot.unload_extension("src.bot.cogs.grants")
             print("Loaded cogs!", flush=True)
 
             await bot.register_application_commands()
