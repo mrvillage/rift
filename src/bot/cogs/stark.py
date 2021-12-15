@@ -79,7 +79,6 @@ class Confirm(discord.ui.View):
                 interaction.user, f"Alliance bank transfer complete. Sent {resources}"
             )
         )
-        self.stop()
 
     @discord.ui.button(
         custom_id="r2eTyOp98ZMQ7MHdGkskhxK7QEVZKPfOmmZoYD5Ncj3IcKdOfVOzHA58O9zSWn9mL0SuXjxcZ6V5dQVW",
@@ -94,7 +93,6 @@ class Confirm(discord.ui.View):
         self.interaction = interaction
         self.value = False
         await interaction.edit_original_message(view=None)
-        self.stop()
 
 
 class HouseStark(commands.Cog):
