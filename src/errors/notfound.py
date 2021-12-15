@@ -11,6 +11,7 @@ __all__ = (
     "EmbassyConfigNotFoundError",
     "EmbassyNotFoundError",
     "ForumNotFoundError",
+    "GrantNotFoundError",
     "GuildNotFoundError",
     "MenuItemNotFoundError",
     "MenuNotFoundError",
@@ -70,6 +71,10 @@ class EmbassyNotFoundError(NotFoundError):
 
 
 class ForumNotFoundError(NotFoundError):
+    ...
+
+
+class GrantNotFoundError(NotFoundError):
     ...
 
 
