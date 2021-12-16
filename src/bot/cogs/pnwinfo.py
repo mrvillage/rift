@@ -506,6 +506,9 @@ class PnWInfo(commands.Cog):
         name="alliance",
         brief="Get top nation revenue information of an alliance.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "alliance": "The alliance to get revenue about, defaults to your alliance.",
+        },
     )
     async def top_revenue_alliance(
         self, ctx: RiftContext, alliance: Alliance = MISSING
