@@ -380,6 +380,9 @@ class PnWInfo(commands.Cog):
         name="projects",
         brief="Get a nations projects.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "nation": "The nation to get information about, defaults to your nation.",
+        },
     )
     async def projects(self, ctx: RiftContext, nation: Nation = MISSING):
         nation = nation or await Nation.convert(ctx, nation)
