@@ -113,7 +113,7 @@ class PnWInfo(commands.Cog):
         brief="Get a list of the members of an alliance.",
         type=commands.CommandType.chat_input,
         descriptions={
-            "nation": "The nation to get information about, defaults to your nation.",
+            "alliance": "The alliance to get members of, defaults to your alliance.",
         },
     )
     async def members(self, ctx: RiftContext, *, alliance: Alliance = MISSING):
