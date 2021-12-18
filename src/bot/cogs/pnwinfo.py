@@ -113,7 +113,7 @@ class PnWInfo(commands.Cog):
         brief="Get a list of the members of an alliance.",
         type=commands.CommandType.chat_input,
         descriptions={
-            "nation": "The nation to get information about, defaults to your nation.",
+            "alliance": "The alliance to get members of, defaults to your alliance.",
         },
     )
     async def members(self, ctx: RiftContext, *, alliance: Alliance = MISSING):
@@ -380,6 +380,9 @@ class PnWInfo(commands.Cog):
         name="projects",
         brief="Get a nations projects.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "nation": "The nation to get information about, defaults to your nation.",
+        },
     )
     async def projects(self, ctx: RiftContext, nation: Nation = MISSING):
         nation = nation or await Nation.convert(ctx, nation)
@@ -503,6 +506,9 @@ class PnWInfo(commands.Cog):
         name="alliance",
         brief="Get top nation revenue information of an alliance.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "alliance": "The alliance to get revenue about, defaults to your alliance.",
+        },
     )
     async def top_revenue_alliance(
         self, ctx: RiftContext, alliance: Alliance = MISSING

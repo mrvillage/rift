@@ -553,7 +553,9 @@ class Settings(commands.Cog):
         aliases=["p"],
         brief="View or modify the server's purpose.",
         type=commands.CommandType.chat_input,
-        descriptions={"purpose": "The new purpose of the server."},
+        descriptions={
+            "purpose": "The new purpose of the server.",
+        },
     )
     @has_manage_permissions()
     @commands.guild_only()
@@ -755,7 +757,7 @@ class Settings(commands.Cog):
     @has_manage_permissions()
     @commands.guild_only()
     async def server_settings_welcome_message(
-        self, ctx: RiftContext, *, message: str = MISSING  # type: ignore
+        self, ctx: RiftContext, *, message: str = MISSING
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
@@ -1131,7 +1133,9 @@ class Settings(commands.Cog):
         name="enforce-verified-nickname",
         brief="Whether or not to enforce verified nicknames.",
         type=commands.CommandType.chat_input,
-        descriptions={"enforce": "Whether or not to enforce verified nicknames."},
+        descriptions={
+            "enforce": "Whether or not to enforce verified nicknames.",
+        },
     )
     @has_manage_permissions()
     @commands.guild_only()
@@ -1271,6 +1275,9 @@ class Settings(commands.Cog):
         name="toggle",
         brief="Toggle alliance auto roles on and off.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "enable": "Whether or not alliance auto roles are enabled.",
+        },
     )
     @has_manage_permissions()
     @commands.guild_only()
@@ -1303,6 +1310,9 @@ class Settings(commands.Cog):
         name="toggle-create",
         brief="Toggle automatically creating alliance auto roles on and off.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "enable": "Whether or not alliance auto role creation is enabled.",
+        },
     )
     @has_manage_permissions()
     @commands.guild_only()

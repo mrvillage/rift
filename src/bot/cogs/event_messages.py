@@ -228,7 +228,7 @@ class EventMessages(commands.Cog):
         for sub in subscriptions:
             if sub.condition is None:
                 pass
-            elif sum(await sub.condition.evaluate(war)) == 0:
+            elif sum(await sub.condition.evaluate(war.attacker, war.defender)) == 0:
                 continue
             await sub.send(
                 funcs.get_embed_author_member(

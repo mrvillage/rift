@@ -210,7 +210,9 @@ class Tools(commands.Cog):
         name="calculate-value",
         brief="Calculates the value of a set of resources.",
         type=commands.CommandType.chat_input,
-        descriptions={"resources": "The resources to calculate the value of."},
+        descriptions={
+            "resources": "The resources to calculate the value of.",
+        },
     )
     async def tools_calculate_value(self, ctx: RiftContext, *, resources: Resources):
         if not resources:
@@ -374,7 +376,6 @@ class Tools(commands.Cog):
         brief="Calculate city cost for a nation.",
         type=commands.CommandType.chat_input,
         descriptions={
-            "after": "The final city.",
             "nation": "The nation to calculate for, defaults to your nation.",
             "page": "The page of projects to show (projects ordered alphabetically, can be 1 or 2).",
         },
