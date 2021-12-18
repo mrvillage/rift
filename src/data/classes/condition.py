@@ -76,12 +76,15 @@ class Condition:
 
         if value.startswith(("f-", "c-")):
             value = value[2:]
-        num = funcs.utils.convert_int(value)
-        condition = cache.get_condition(num)
-        if condition is not None and (
-            condition.owner_id == user_id or condition.owner_id is None
-        ):
-            return condition
+        try:
+            num = funcs.utils.convert_int(value)
+            condition = cache.get_condition(num)
+            if condition is not None and (
+                condition.owner_id == user_id or condition.owner_id is None
+            ):
+                return condition
+        except ValueError:
+            pass
         try:
             return next(
                 i
