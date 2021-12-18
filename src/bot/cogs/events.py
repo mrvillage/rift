@@ -133,7 +133,6 @@ class Events(commands.Cog):
         type=commands.CommandType.chat_input,
         descriptions={
             "changes": "A space separated list of changes. ALLIANCE_POSITION, ALLIANCE_POSITION_ALL, ALLIANCE, VACATION_MODE",
-            "alliances": "A space separated list of alliances to get updates of, defaults to all alliances if not provided.",
             "condition": "The condition to evaluate to determine whether to send the event or not.",
         },
     )
@@ -290,7 +289,7 @@ class Events(commands.Cog):
             ephemeral=True,
         )
 
-    @subscribe.group(name="forum_post", type=commands.CommandType.chat_input)  # type: ignore
+    @subscribe.group(name="forum-post", type=commands.CommandType.chat_input)  # type: ignore
     @has_manage_permissions()
     @commands.guild_only()
     async def subscribe_forum_post(self, ctx: RiftContext):

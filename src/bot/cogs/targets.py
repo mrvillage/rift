@@ -89,7 +89,9 @@ class Targets(commands.Cog):
         name="remove",
         brief="Remove a target reminder.",
         type=commands.CommandType.chat_input,
-        descriptions={"reminder": "The target reminder to remove."},
+        descriptions={
+            "reminder": "The target reminder to remove.",
+        },
     )
     async def target_reminder_remove(
         self, ctx: RiftContext, *, reminder: TargetReminder
@@ -139,6 +141,9 @@ class Targets(commands.Cog):
         name="info",
         brief="Get information about a target.",
         type=commands.CommandType.chat_input,
+        descriptions={
+            "reminder": "The target reminder to remove.",
+        },
     )
     async def target_reminder_info(self, ctx: RiftContext, reminder: TargetReminder):
         channel_mentions = " ".join(f"<#{i}>" for i in reminder.channel_ids)

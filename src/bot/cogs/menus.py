@@ -69,7 +69,9 @@ class Menus(commands.Cog):
         aliases=["new"],
         brief="Create a new menu configuration.",
         type=commands.CommandType.chat_input,
-        descriptions={"description": "The description to send with the menu."},
+        descriptions={
+            "description": "The description to send with the menu.",
+        },
     )
     @commands.guild_only()
     @has_manage_permissions()
@@ -269,7 +271,9 @@ class Menus(commands.Cog):
         name="edit",
         brief="Create a new menu configuration.",
         type=commands.CommandType.chat_input,
-        descriptions={"description": "The new description to send with the menu."},
+        descriptions={
+            "description": "The new description to send with the menu.",
+            },
     )
     @commands.guild_only()
     @has_manage_permissions()
