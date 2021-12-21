@@ -103,6 +103,132 @@ class DatabaseCache(commands.Cog):
                 after.display_avatar.url,
             )
 
+    @commands.Cog.listener()
+    async def on_guild_channel_create(self, channel: discord.abc.GuildChannel):
+        await execute_query(
+            "INSERT INTO cache_channels (id, category, guild, name, overwrites, permissions_synced, position, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (id) DO UPDATE SET category = $2, guild = $3, name = $4, overwrites = $5, permissions_synced = $6, position = $7, type = $8 WHERE cache_channels.id = $1;",
+            channel.id,
+            channel.category_id,
+            channel.guild.id,
+            channel.name,
+            {
+                key.id: value._values  # type: ignore
+                for key, value in channel.overwrites.items()
+                if not value.is_empty()
+            },
+            channel.permissions_synced,
+            channel.position,
+            channel.type.value,
+        )
+
+    @commands.Cog.listener()
+    async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
+        await execute_query("DELETE FROM cache_channels WHERE id = $1;", channel.id)
+
+    @commands.Cog.listener()
+    async def on_guild_channel_update(
+        self, before: discord.abc.GuildChannel, after: discord.abc.GuildChannel
+    ):
+        before_overwrites = {
+            key.id: value._values  # type: ignore
+            for key, value in before.overwrites.items()
+            if not value.is_empty()
+        }
+        after_overwrites = {
+            key.id: value._values  # type: ignore
+            for key, value in after.overwrites.items()
+            if not value.is_empty()
+        }
+        if (
+            before.category_id != after.category_id
+            or before.name != after.name
+            or before_overwrites != after_overwrites
+            or before.permissions_synced != after.permissions_synced
+            or before.position != after.position
+            or before.type != after.type
+        ):
+            await execute_query(
+                "INSERT INTO cache_channels (id, category, guild, name, overwrites, permissions_synced, position, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (id) DO UPDATE SET category = $2, guild = $3, name = $4, overwrites = $5, permissions_synced = $6, position = $7, type = $8 WHERE cache_channels.id = $1;",
+                after.id,
+                after.category_id,
+                after.guild.id,
+                after.name,
+                after_overwrites,
+                after.permissions_synced,
+                after.position,
+                after.type.value,
+            )
+
+    @commands.Cog.listener()
+    async def on_guild_role_create(self, role: discord.Role):
+        await execute_query(
+            "INSERT INTO cache_roles (id, name, guild, color, members, permissions, position, tags) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (id) DO UPDATE SET name = $2, guild = $3, color = $4, members = $5, permissions = $6, position = $7, tags = $8 WHERE cache_roles.id = $1;",
+            role.id,
+            role.name,
+            role.guild.id,
+            role.color.value,
+            [i.id for i in role.members],
+            role.permissions.value,
+            role.position,
+            {
+                "is_bot_managed": role.tags.is_bot_managed() if role.tags else False,
+                "is_premium_subscriber": role.tags.is_premium_subscriber()
+                if role.tags
+                else False,
+                "is_integration": role.tags.is_integration() if role.tags else False,
+            },
+        )
+
+    @commands.Cog.listener()
+    async def on_guild_role_delete(self, role: discord.Role):
+        await execute_query("DELETE FROM cache_roles WHERE id = $1;", role.id)
+
+    @commands.Cog.listener()
+    async def on_guild_role_update(self, before: discord.Role, after: discord.Role):
+        before_tags = {
+            "is_bot_managed": before.tags.is_bot_managed() if before.tags else False,
+            "is_premium_subscriber": before.tags.is_premium_subscriber()
+            if before.tags
+            else False,
+            "is_integration": before.tags.is_integration() if before.tags else False,
+        }
+        after_tags = {
+            "is_bot_managed": after.tags.is_bot_managed() if after.tags else False,
+            "is_premium_subscriber": after.tags.is_premium_subscriber()
+            if after.tags
+            else False,
+            "is_integration": after.tags.is_integration() if after.tags else False,
+        }
+        if (
+            before.name != after.name
+            or before.color.value != after.color.value
+            or {i.id for i in before.members} != {i.id for i in after.members}
+            or before.permissions.value != after.permissions.value
+            or before.position != after.position
+            or before_tags != after_tags
+        ):
+            await execute_query(
+                "INSERT INTO cache_roles (id, name, guild, color, members, permissions, position, tags) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (id) DO UPDATE SET name = $2, guild = $3, color = $4, members = $5, permissions = $6, position = $7, tags = $8 WHERE cache_roles.id = $1;",
+                after.id,
+                after.name,
+                after.guild.id,
+                after.color.value,
+                [i.id for i in after.members],
+                after.permissions.value,
+                after.position,
+                {
+                    "is_bot_managed": after.tags.is_bot_managed()
+                    if after.tags
+                    else False,
+                    "is_premium_subscriber": after.tags.is_premium_subscriber()
+                    if after.tags
+                    else False,
+                    "is_integration": after.tags.is_integration()
+                    if after.tags
+                    else False,
+                },
+            )
+
 
 def setup(bot: Rift):
     bot.add_cog(DatabaseCache(bot))
