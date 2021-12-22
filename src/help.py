@@ -58,6 +58,64 @@ class EmbedHelpCommand(commands.HelpCommand):
     def get_destination(self):  # type: ignore
         return self.context  # type: ignore
 
+    async def filter_commands(self, commands, *, sort=False, key=None):
+        """|coro|
+
+        Returns a filtered list of commands and optionally sorts them.
+
+        This takes into account the :attr:`verify_checks` and :attr:`show_hidden`
+        attributes.
+
+        Parameters
+        ------------
+        commands: Iterable[:class:`Command`]
+            An iterable of commands that are getting filtered.
+        sort: :class:`bool`
+            Whether to sort the result.
+        key: Optional[Callable[:class:`Command`, Any]]
+            An optional key function to pass to :func:`py:sorted` that
+            takes a :class:`Command` as its sole parameter. If ``sort`` is
+            passed as ``True`` then this will default as the command name.
+
+        Returns
+        ---------
+        List[:class:`Command`]
+            A list of commands that passed the filter.
+        """
+
+        if sort and key is None:
+            key = lambda c: c.name
+
+        iterator = (
+            commands if self.show_hidden else filter(lambda c: not c.hidden, commands)
+        )
+
+        if self.verify_checks is False:
+            # if we do not need to verify the checks then we can just
+            # run it straight through normally without using await.
+            return sorted(iterator, key=key) if sort else list(iterator)
+
+        if self.verify_checks is None and not self.context.guild:
+            # if verify_checks is None and we're in a DM, don't verify
+            return sorted(iterator, key=key) if sort else list(iterator)
+
+        # if we're here then we need to check every command if it can run
+        async def predicate(cmd):
+            try:
+                return await cmd.can_run(self.context)
+            except Exception:
+                return False
+
+        ret = []
+        for cmd in iterator:
+            valid = await predicate(cmd)
+            if valid:
+                ret.append(cmd)
+
+        if sort:
+            ret.sort(key=key)
+        return ret
+
     async def send_bot_help(self, mapping):  # type: ignore
         embed = get_embed_author_member(
             self.context.author, "Rift uses slash commands, meaning the prefix is `/`. Try them out by typing `/`!", title="Bot Commands", color=discord.Color.blue()  # type: ignore

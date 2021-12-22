@@ -183,7 +183,7 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 ephemeral=True,
             )
         elif isinstance(error, NationNotFoundError):
-            if str(error.args[0]) == str(ctx.author.id):
+            if str(error.args[0]) == str(ctx.author.id) or error.args[0] is None:
                 await ctx.reply(
                     embed=get_embed_author_member(
                         ctx.author,
@@ -202,7 +202,7 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                     ephemeral=True,
                 )
         elif isinstance(error, AllianceNotFoundError):
-            if str(error.args[0]) == str(ctx.author.id):
+            if str(error.args[0]) == str(ctx.author.id) or error.args[0] is None:
                 await ctx.reply(
                     embed=get_embed_author_member(
                         ctx.author,
