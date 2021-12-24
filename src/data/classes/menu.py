@@ -15,7 +15,6 @@ from ...errors import (
 from ...funcs.utils import convert_int
 from ...ref import RiftContext
 from ..db import execute_query, execute_read_query
-from ..query import insert_interface
 from .base import Makeable
 
 __all__ = ("Menu", "MenuItem", "MenuInterface")
@@ -39,16 +38,14 @@ class Menu(Makeable):
         "name",
         "description",
         "item_ids",
-        "permissions",
     )
 
     def __init__(self, data: MenuData) -> None:
-        self.id = data.get("id")
-        self.guild_id = data["guild_id"]
+        self.id = data.get("id", 0)
+        self.guild_id = data["guild"]
         self.name = data["name"]
         self.description = data["description"]
         self.item_ids = data["items"] or [[], [], [], [], []]
-        self.permissions = data["permissions"] or {}
 
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str) -> Menu:
@@ -68,32 +65,19 @@ class Menu(Makeable):
     @classmethod
     def default(cls, guild_id: int) -> Menu:
         return cls(
-            data={  # type: ignore
-                "guild_id": guild_id,
+            data={
+                "id": 0,
+                "guild": guild_id,
                 "name": None,
                 "description": None,
                 "items": [[], [], [], [], []],
-                "permissions": {},
             }
         )
 
-    async def set_(self, **kwargs: Mapping[str, Any]) -> Menu:
-        sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
-        sets = ", ".join(sets)
-        args = tuple(kwargs.values())
-        await execute_query(
-            f"""
-        UPDATE menus SET {sets} WHERE id = $1;
-        """,
-            self.id,
-            *args,
-        )
-        return self
-
     async def save(self) -> None:
-        if self.id is None:
+        if self.id:
             id = await execute_read_query(
-                "INSERT INTO menus (guild_id, name, description, items, permissions) VALUES ($1, $2, $3, $4, $5) RETURNING id;",
+                "INSERT INTO menus (guild, name, description, items) VALUES ($1, $2, $3, $4) RETURNING id;",
                 self.guild_id,
                 self.name,
                 self.description,
@@ -106,7 +90,6 @@ class Menu(Makeable):
                     [],
                     [],
                 ],
-                self.permissions or None,
             )
             self.id = id[0]["id"]
             cache.add_menu(self)
@@ -126,7 +109,6 @@ class Menu(Makeable):
                     [],
                     [],
                 ],
-                self.permissions or None,
             )
 
     def add_item(self, item: MenuItem, row: int) -> None:
@@ -157,7 +139,7 @@ class Menu(Makeable):
         return get_embed_author_guild(ctx.guild, desc, color=discord.Color.purple())
 
     async def new_interface(self, message: discord.Message) -> None:
-        await insert_interface(menu_id=self.id, message=message)
+        await MenuInterface.create(self, message)
 
     def __str__(self) -> str:
         if self.name is None:
@@ -181,7 +163,7 @@ class MenuItem:
 
     def __init__(self, data: MenuItemData) -> None:
         self.id: int = data.get("id")
-        self.guild_id: int = data["guild_id"]
+        self.guild_id: int = data["guild"]
         self.type: str = data["type_"]
         self.data: Dict[str, Any] = data["data_"] or {}
 
@@ -246,7 +228,7 @@ class MenuItem:
     async def save(self) -> None:
         id = await execute_read_query(
             """
-        INSERT INTO menu_items (guild_id, type_, data_) VALUES ($1, $2, $3) RETURNING id;
+        INSERT INTO menu_items (guild, type_, data_) VALUES ($1, $2, $3) RETURNING id;
         """,
             self.guild_id,
             self.type,
@@ -393,6 +375,31 @@ class MenuInterface:
     __slots__ = ("menu_id", "message_id", "channel_id")
 
     def __init__(self, data: MenuInterfaceData) -> None:
-        self.menu_id: int = data.get("menu_id", None)
-        self.message_id: int = data.get("message_id", None)
-        self.channel_id: int = data.get("channel_id", None)
+        self.menu_id: int = data["menu"]
+        self.message_id: int = data["message"]
+        self.channel_id: int = data["channel"]
+
+    @classmethod
+    async def create(cls, menu: Menu, message: discord.Message) -> MenuInterface:
+        interface = cls(
+            {"menu": menu.id, "message": message.id, "channel": message.channel.id}
+        )
+        await interface.save()
+        cache.add_menu_interface(interface)
+        return interface
+
+    async def save(self) -> None:
+        await execute_query(
+            "INSERT INTO menu_interface (menu, message, channel) VALUES ($1, $2, $3);",
+            self.menu_id,
+            self.message_id,
+            self.channel_id,
+        )
+
+    async def delete(self) -> None:
+        await execute_query(
+            "DELETE FROM menu_interface WHERE menu = $1 AND message = $2 AND channel = $3",
+            self.menu_id,
+            self.message_id,
+            self.channel_id,
+        )

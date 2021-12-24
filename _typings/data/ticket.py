@@ -8,17 +8,17 @@ __all__ = ("TicketData", "TicketConfigData")
 class TicketData(TypedDict):
     id: int
     ticket_number: int
-    config_id: int
-    guild_id: int
-    user_id: int
+    config: int
+    guild: int
+    user_: int
     open: bool
 
 
 class TicketConfigData(TypedDict):
     id: int
-    category_id: Optional[int]
-    guild_id: int
+    category: Optional[int]
+    guild: int
     start_message: str
-    archive_category_id: Optional[int]
+    archive_category: Optional[int]
     role_mentions: List[int]
     user_mentions: List[int]

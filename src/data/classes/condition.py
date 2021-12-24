@@ -20,29 +20,29 @@ class Condition:
     __slots__ = ("id", "name", "owner_id", "condition")
 
     def __init__(self, data: ConditionData) -> None:
-        self.id: int = data.get("id")
+        self.id: int = data["id"]
         self.name: Optional[str] = data["name"]
-        self.owner_id: Optional[int] = data["owner_id"]
+        self.owner_id: Optional[int] = data["owner"]
         self.condition: List[Any] = data["condition"]
 
     async def save(self) -> None:
-        if self.id is None:
+        if self.id:
+            await execute_query(
+                "UPDATE conditions SET name = $2, owner = $3, condition = $4 WHERE id = $1;",
+                self.id,
+                self.name,
+                self.owner_id,
+                self.condition,
+            )
+        else:
             id = await execute_read_query(
-                "INSERT INTO conditions (name, owner_id, condition) VALUES ($1, $2, $3) RETURNING id;",
+                "INSERT INTO conditions (name, owner, condition) VALUES ($1, $2, $3) RETURNING id;",
                 self.name,
                 self.owner_id,
                 self.condition,
             )
             self.id = id[0]["id"]
             cache.add_condition(self)
-        else:
-            await execute_query(
-                "UPDATE conditions SET name = $2, owner_id = $3, condition = $4 WHERE id = $1;",
-                self.id,
-                self.name,
-                self.owner_id,
-                self.condition,
-            )
 
     async def remove(self) -> None:
         await execute_query("DELETE FROM conditions WHERE id = $1;", self.id)
@@ -163,9 +163,9 @@ class Condition:
     ) -> Condition:
         return cls(
             {
-                "id": None,  # type: ignore
+                "id": 0,
                 "name": None,
-                "owner_id": user_id,
+                "owner": user_id,
                 "condition": cls.validate_condition(condition, user_id),
             }
         )

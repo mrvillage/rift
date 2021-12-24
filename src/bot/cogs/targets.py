@@ -68,7 +68,7 @@ class Targets(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        reminder = await TargetReminder.add(
+        reminder = await TargetReminder.create(
             nation,
             ctx.author,
             channels,
@@ -96,7 +96,7 @@ class Targets(commands.Cog):
     async def target_reminder_remove(
         self, ctx: RiftContext, *, reminder: TargetReminder
     ):
-        await reminder.remove()
+        await reminder.delete()
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,

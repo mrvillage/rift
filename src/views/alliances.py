@@ -5,7 +5,7 @@ from typing import List
 import discord
 
 from .. import funcs
-from ..data.get import get_alliances_offset, get_max_alliances_page
+from ..cache import cache
 
 __all__ = ("AlliancesPaginator",)
 
@@ -21,7 +21,7 @@ class AlliancesPaginator(discord.ui.View):
         elif page == 1:
             self.left.disabled = True  # type: ignore
 
-    @discord.ui.button(
+    @discord.ui.button( # type: ignore
         custom_id="XMP7cqDL99UKz5UHNoPv3zuds64epgX2mD07hV6cfd3ZF9P2JWiPsFhIHYUG1yWW1AQsh1venmDXoF6k",
         label="Previous",
         style=discord.ButtonStyle.gray,
@@ -33,14 +33,18 @@ class AlliancesPaginator(discord.ui.View):
     ):
         desc: str = interaction.message.embeds[0].description[7:]  # type: ignore
         page = int(desc[: desc.index("**")].strip("*")) - 1
-        max_page = await get_max_alliances_page()
+        max_page = (
+            (len(cache.alliances) // 50) + 1
+            if len(cache.alliances) % 50
+            else (len(cache.alliances) // 50)
+        )
         if page == 1:
             button.disabled = True
         for i in self.children:
             if i is not button:
                 i.disabled = False  # type: ignore
         offset = (page - 1) * 50
-        alliances = await get_alliances_offset(offset=offset)
+        alliances = sorted(i for i in cache.alliances, key=lambda x: x.rank)[offset: offset + 50]
         embed = funcs.get_embed_author_member(
             interaction.user,  # type: ignore
             f"Page **{page}** of **{max_page}**\n"
@@ -53,7 +57,7 @@ class AlliancesPaginator(discord.ui.View):
         )
         await interaction.response.edit_message(embed=embed, view=self)
 
-    @discord.ui.button(
+    @discord.ui.button( # type: ignore
         custom_id="Sti8atDJZR3yCa53mOwN87AaTiV9SrRI0CDV4fd6xtvud6Etx6uYKgUhgqZZ1DZ94fexUhQQYcGdu7pJ",
         label="Refresh",
         style=discord.ButtonStyle.gray,
@@ -65,14 +69,18 @@ class AlliancesPaginator(discord.ui.View):
     ):
         desc: str = interaction.message.embeds[0].description[7:]  # type: ignore
         page = int(desc[: desc.index("**")].strip("*"))
-        max_page = await get_max_alliances_page()
+        max_page = (
+            (len(cache.alliances) // 50) + 1
+            if len(cache.alliances) % 50
+            else (len(cache.alliances) // 50)
+        )
         if page == max_page:
             self.right.disabled = False  # type: ignore
         elif page > max_page:
             page = max_page
             self.right.disabled = False  # type: ignore
         offset = (page - 1) * 50
-        alliances = await get_alliances_offset(offset=offset)
+        alliances = sorted(i for i in cache.alliances, key=lambda x: x.rank)[offset: offset + 50]
         embed = funcs.get_embed_author_member(
             interaction.user,  # type: ignore
             f"Page **{page}** of **{max_page}**\n"
@@ -85,7 +93,7 @@ class AlliancesPaginator(discord.ui.View):
         )
         await interaction.response.edit_message(embed=embed, view=self)
 
-    @discord.ui.button(
+    @discord.ui.button( # type: ignore
         custom_id="NixTSNYXBclJfdBbY8mDzTTGziFovBC3f1pTSl7CDoVAxDUlJ7io6Wc4IISyoyXQ6BqQrTsW3XlupLpV",
         label="Next",
         style=discord.ButtonStyle.gray,
@@ -97,7 +105,11 @@ class AlliancesPaginator(discord.ui.View):
     ):
         desc: str = interaction.message.embeds[0].description[7:]  # type: ignore
         page = int(desc[: desc.index("**")].strip("*")) + 1
-        max_page = await get_max_alliances_page()
+        max_page = (
+            (len(cache.alliances) // 50) + 1
+            if len(cache.alliances) % 50
+            else (len(cache.alliances) // 50)
+        )
         if page == max_page:
             button.disabled = True
         elif page > max_page:
@@ -115,7 +127,7 @@ class AlliancesPaginator(discord.ui.View):
             if i is not button:
                 i.disabled = False  # type: ignore
         offset = (page - 1) * 50
-        alliances = await get_alliances_offset(offset=offset)
+        alliances = sorted(i for i in cache.alliances, key=lambda x: x.rank)[offset: offset + 50]
         embed = funcs.get_embed_author_member(
             interaction.user,  # type: ignore
             f"Page **{page}** of **{max_page}**\n"

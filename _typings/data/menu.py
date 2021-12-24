@@ -7,21 +7,20 @@ __all__ = ("MenuData", "MenuInterfaceData", "MenuItemData")
 
 class MenuData(TypedDict):
     id: int
-    guild_id: int
+    guild: int
     name: Optional[str]
     description: Optional[str]
     items: List[List[int]]
-    permissions: None  # unknown typing since unimplemented
 
 
 class MenuInterfaceData(TypedDict):
-    menu_id: int
-    message_id: int
-    channel_id: int
+    menu: int
+    message: int
+    channel: int
 
 
 class MenuItemData(TypedDict):
     id: int
-    guild_id: int
+    guild: int
     type_: str
     data_: Dict[str, Any]  # fully type this

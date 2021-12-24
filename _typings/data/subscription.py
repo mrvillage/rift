@@ -13,8 +13,8 @@ EventTypeLiteral = Literal["CREATE", "DELETE", "UPDATE"]  # ACCEPT, VICTORY
 class SubscriptionData(TypedDict):
     id: int
     token: str
-    guild_id: int
-    channel_id: int
+    guild: int
+    channel: int
     category: EventCategoryLiteral
     type: EventTypeLiteral
     sub_types: List[str]

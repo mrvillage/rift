@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional, Set
+from typing import TYPE_CHECKING, List, Optional, Set
 
 import discord
 
@@ -12,7 +12,6 @@ from .base import Makeable
 from .nation import Nation
 
 __all__ = (
-    "UserSettings",
     "AllianceAutoRole",
     "GuildWelcomeSettings",
     "GuildSettings",
@@ -28,42 +27,28 @@ if TYPE_CHECKING:
     )
 
 
-class UserSettings(Makeable):
-    __slots__ = ()
-
-    def __init__(self) -> None:
-        ...
-
-    @classmethod
-    async def default(cls) -> UserSettings:
-        ...
-
-    @classmethod
-    async def fetch(cls) -> UserSettings:
-        ...
-
-
 class AllianceAutoRole:
     __slots__ = ("role_id", "guild_id", "alliance_id")
 
     def __init__(self, data: AllianceAutoRoleData) -> None:
-        self.role_id: int = data["role_id"]
-        self.guild_id: int = data["guild_id"]
-        self.alliance_id: int = data["alliance_id"]
+        self.role_id: int = data["role"]
+        self.guild_id: int = data["guild"]
+        self.alliance_id: int = data["alliance"]
 
     @classmethod
     async def create(cls, role: discord.Role, alliance: Alliance) -> AllianceAutoRole:
-        await execute_query(
-            "INSERT INTO alliance_auto_roles (role_id, guild_id, alliance_id) VALUES ($1, $2, $3);",
-            role.id,
-            role.guild.id,
-            alliance.id,
-        )
-        auto = cls(
-            {"role_id": role.id, "guild_id": role.guild.id, "alliance_id": alliance.id}
-        )
+        auto = cls({"role": role.id, "guild": role.guild.id, "alliance": alliance.id})
+        await auto.save()
         cache.add_alliance_auto_role(auto)
         return auto
+
+    async def save(self) -> None:
+        await execute_query(
+            "INSERT INTO alliance_auto_roles (role, guild, alliance) VALUES ($1, $2, $3);",
+            self.role_id,
+            self.guild_id,
+            self.alliance_id,
+        )
 
     async def delete(self) -> None:
         cache.remove_alliance_auto_role(self)
@@ -99,8 +84,7 @@ class GuildWelcomeSettings(Makeable):
     )
 
     def __init__(self, data: GuildWelcomeSettingsData) -> None:
-        self.defaulted: bool = False
-        self.guild_id: int = int(data["guild_id"])
+        self.guild_id: int = int(data["guild"])
         self.welcome_message: Optional[str] = data["welcome_message"]
         self.welcome_channels: Optional[List[int]] = data["welcome_channels"]
         self.join_roles: Optional[List[int]] = data["join_roles"]
@@ -126,9 +110,9 @@ class GuildWelcomeSettings(Makeable):
 
     @classmethod
     def default(cls, guild_id: int) -> GuildWelcomeSettings:
-        settings = cls(
+        return cls(
             {
-                "guild_id": guild_id,
+                "guild": guild_id,
                 "welcome_message": None,
                 "welcome_channels": None,
                 "join_roles": None,
@@ -141,8 +125,6 @@ class GuildWelcomeSettings(Makeable):
                 "alliance_auto_role_creation_enabled": None,
             }
         )
-        settings.defaulted = True
-        return settings
 
     @classmethod
     async def fetch(cls, guild_id: int) -> GuildWelcomeSettings:
@@ -206,31 +188,21 @@ class GuildWelcomeSettings(Makeable):
             return
         await member.edit(nick=nickname)
 
-    async def set_(self, **kwargs: Any) -> GuildWelcomeSettings:
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-        sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
-        sets = ", ".join(sets)
-        args = tuple(kwargs.values())
-        if self.defaulted:
-            await execute_query(
-                f"""
-            INSERT INTO guild_welcome_settings (guild_id, {', '.join(kwargs.keys())}) VALUES ({', '.join(f'${i}' for i in range(1, len(kwargs)+2))});
-            """,
-                self.guild_id,
-                *tuple(kwargs.values()),
-            )
-            cache.add_guild_welcome_settings(self)
-            self.defaulted = False
-        else:
-            await execute_query(
-                f"""
-            UPDATE guild_welcome_settings SET {sets} WHERE guild_id = $1;
-            """,
-                self.guild_id,
-                *args,
-            )
-        return self
+    async def save(self) -> None:
+        await execute_query(
+            "INSERT INTO guild_welcome_settings (guild, welcome_message, welcome_channels, join_roles, verified_roles, member_roles, diplomat_roles, verified_nickname, enforce_verified_nicknames, alliance_auto_roles_enabled, alliance_auto_role_creation_enabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT (guild) DO UPDATE SET welcome_message = $2, welcome_channels = $3, join_roles = $4, verified_roles = $5, member_roles = $6, diplomat_roles = $7, verified_nickname = $8, enforce_verified_nicknames = $9, alliance_auto_roles_enabled = $10, alliance_auto_role_creation_enabled = $11 WHERE guild_welcome_settings.guild = $1;",
+            self.guild_id,
+            self.welcome_message,
+            self.welcome_channels,
+            self.join_roles,
+            self.verified_roles,
+            self.member_roles,
+            self.diplomat_roles,
+            self.verified_nickname,
+            self.enforce_verified_nickname,
+            self.alliance_auto_roles_enabled,
+            self.alliance_auto_role_creation_enabled,
+        )
 
 
 class GuildSettings(Makeable):
@@ -244,7 +216,7 @@ class GuildSettings(Makeable):
 
     def __init__(self, data: GuildSettingsData) -> None:
         self.defaulted: bool = False
-        self.guild_id: int = data["guild_id"]
+        self.guild_id: int = data["guild"]
         self.purpose: Optional[str] = data["purpose"]
         self.purpose_argument: Optional[str] = data["purpose_argument"]
         self.manager_role_ids: Optional[List[int]] = data["manager_role_ids"]
@@ -259,7 +231,7 @@ class GuildSettings(Makeable):
     def default(cls, guild_id: int) -> GuildSettings:
         settings = cls(
             {
-                "guild_id": guild_id,
+                "guild": guild_id,
                 "purpose": None,
                 "purpose_argument": None,
                 "manager_role_ids": None,
@@ -272,37 +244,19 @@ class GuildSettings(Makeable):
     async def fetch(cls, guild_id: int, *attrs: str) -> GuildSettings:
         return cache.get_guild_settings(guild_id) or cls.default(guild_id)
 
-    async def set_(self, **kwargs: Any) -> GuildSettings:
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-        sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
-        sets = ", ".join(sets)
-        args = tuple(kwargs.values())
-        if self.defaulted:
-            await execute_query(
-                f"""
-            INSERT INTO guild_settings (guild_id, {', '.join(kwargs.keys())}) VALUES ({', '.join(f'${i}' for i in range(1, len(kwargs)+2))});
-            """,
-                self.guild_id,
-                *tuple(kwargs.values()),
-            )
-            cache.add_guild_settings(self)
-            self.defaulted = False
-        else:
-            await execute_query(
-                f"""
-            UPDATE guild_settings SET {sets} WHERE guild_id = $1;
-            """,
-                self.guild_id,
-                *args,
-            )
-        return self
+    async def save(self) -> None:
+        await execute_query(
+            "INSERT INTO guild_settings (guild, purpose, purpose_argument, manager_role_ids) VALUES ($1, $2, $3, $4) ON CONFLICT (guild) DO UPDATE SET purpose = $2, purpose_argument = $3, manager_role_ids = $4 WHERE guild_settings.guild = $1;",
+            self.guild_id,
+            self.purpose,
+            self.purpose_argument,
+            self.manager_role_ids,
+        )
 
 
 class AllianceSettings:
     __slots__ = (
         "alliance_id",
-        "defaulted",
         "default_raid_condition",
         "default_nuke_condition",
         "default_military_condition",
@@ -314,8 +268,7 @@ class AllianceSettings:
     )
 
     def __init__(self, data: AllianceSettingsData) -> None:
-        self.defaulted: bool = False
-        self.alliance_id: int = data["alliance_id"]
+        self.alliance_id: int = data["alliance"]
         self.default_raid_condition: Optional[str] = data["default_raid_condition"]
         self.default_nuke_condition: Optional[str] = data["default_nuke_condition"]
         self.default_military_condition: Optional[str] = data[
@@ -335,9 +288,9 @@ class AllianceSettings:
 
     @classmethod
     def default(cls, alliance_id: int, /) -> AllianceSettings:
-        settings = cls(
+        return cls(
             {
-                "alliance_id": alliance_id,
+                "alliance": alliance_id,
                 "default_raid_condition": None,
                 "default_nuke_condition": None,
                 "default_military_condition": None,
@@ -348,38 +301,24 @@ class AllianceSettings:
                 "require_withdraw_approval": True,
             }
         )
-        settings.defaulted = True
-        return settings
 
     @classmethod
     async def fetch(cls, alliance_id: int) -> AllianceSettings:
         return cache.get_alliance_settings(alliance_id) or cls.default(alliance_id)
 
-    async def set_(self, **kwargs: Any) -> AllianceSettings:
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-        sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
-        sets = ", ".join(sets)
-        args = tuple(kwargs.values())
-        if self.defaulted:
-            await execute_query(
-                f"""
-            INSERT INTO alliance_settings (alliance_id, {', '.join(kwargs.keys())}) VALUES ({', '.join(f'${i}' for i in range(1, len(kwargs)+2))});
-            """,
-                self.alliance_id,
-                *tuple(kwargs.values()),
-            )
-            cache.add_alliance_settings(self)
-            self.defaulted = False
-        else:
-            await execute_query(
-                f"""
-            UPDATE alliance_settings SET {sets} WHERE alliance_id = $1;
-            """,
-                self.alliance_id,
-                *args,
-            )
-        return self
+    async def save(self) -> None:
+        await execute_query(
+            "INSERT INTO alliance_settings (alliance, default_raid_condition, default_nuke_condition, default_military_condition, default_attack_raid_condition, default_attack_nuke_condition, default_attack_military_condition, withdraw_channels, require_withdraw_approval) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (alliance) DO UPDATE SET default_raid_condition = $2, default_nuke_condition = $3, default_military_condition = $4, default_attack_raid_condition = $5, default_attack_nuke_condition = $6, default_attack_military_condition = $7, withdraw_channels = $8, require_withdraw_approval = $9 WHERE alliance_settings.alliance = $1;",
+            self.alliance_id,
+            self.default_raid_condition,
+            self.default_nuke_condition,
+            self.default_military_condition,
+            self.default_attack_raid_condition,
+            self.default_attack_nuke_condition,
+            self.default_attack_military_condition,
+            self.withdraw_channels,
+            self.require_withdraw_approval,
+        )
 
     @property
     def withdraw_channels_(self) -> List[discord.TextChannel]:
