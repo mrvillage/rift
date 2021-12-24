@@ -39,7 +39,7 @@ class Ticket:
         self.ticket_number = data["ticket_number"]
         self.config_id = data["config"]
         self.guild_id = data["guild"]
-        self.user_id = data["user"]
+        self.user_id = data["user_"]
         self.open = data["open"]
 
     @classmethod
@@ -52,7 +52,7 @@ class Ticket:
     async def save(self) -> None:
         cache.add_ticket(self)
         await execute_query(
-            "INSERT INTO tickets (id, ticket_number, config, guild, user, open) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (id) DO UPDATE SET ticket_number = $2, config = $3, guild = $4, user = $5, open = $6 WHERE tickets.id = $1;",
+            "INSERT INTO tickets (id, ticket_number, config, guild, user_, open) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (id) DO UPDATE SET ticket_number = $2, config = $3, guild = $4, user_ = $5, open = $6 WHERE tickets.id = $1;",
             self.id,
             self.ticket_number,
             self.config_id,
