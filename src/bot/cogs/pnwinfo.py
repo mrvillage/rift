@@ -13,12 +13,6 @@ from _typings import Field
 from ... import funcs
 from ...cache import cache
 from ...data.classes import Alliance, Nation
-from ...data.get import (
-    get_alliances_offset,
-    get_colors,
-    get_max_alliances_page,
-    get_nation_color_counts,
-)
 from ...errors import (
     AllianceNotFoundError,
     NationNotFoundError,
@@ -293,7 +287,11 @@ class PnWInfo(commands.Cog):
         },
     )
     async def alliances(self, ctx: RiftContext, page: int = 1):
-        max_page = await get_max_alliances_page()
+        max_page = (
+            (len(cache.alliances) // 50) + 1
+            if len(cache.alliances) % 50
+            else (len(cache.alliances) // 50)
+        )
         if page > max_page or page < 0:
             return await ctx.interaction.response.send_message(
                 embed=funcs.get_embed_author_member(
@@ -304,7 +302,7 @@ class PnWInfo(commands.Cog):
                 ephemeral=True,
             )
         offset = (page - 1) * 50
-        alliances = await get_alliances_offset(offset=offset)
+        alliances = sorted(i for i in cache.alliances, key=lambda x: x.rank)[offset: offset + 50]
         embed = funcs.get_embed_author_member(
             ctx.author,
             f"Page **{page}** of **{max_page}**\n"
@@ -323,8 +321,9 @@ class PnWInfo(commands.Cog):
         type=commands.CommandType.chat_input,
     )
     async def colors(self, ctx: RiftContext):
-        colors = await get_colors()
-        nations = await get_nation_color_counts()
+        colors = {i.color: i for i in cache.colors}
+        nations = [i.color for i in cache.nations]
+        nations = {i.color: nations.count(i.color.capitalize()) for i in cache.colors}
         average_bonus = (
             sum(i.bonus for i in colors.values() if i.color not in {"beige", "gray"})
             / len(colors)

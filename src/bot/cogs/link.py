@@ -5,8 +5,8 @@ from discord.ext import commands
 from discord.utils import MISSING
 
 from ... import funcs
-from ...data import get
-from ...data.classes import Nation
+from ...cache import cache
+from ...data.classes import Nation, User
 from ...ref import Rift, RiftContext
 
 
@@ -27,8 +27,8 @@ class Link(commands.Cog):
         self, ctx: RiftContext, nation: Nation, user: discord.User = MISSING
     ):
         member = user or ctx.author
-        try:
-            await get.get_link_user(member.id)
+        link = cache.get_user(member.id)
+        if link is not None:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -37,10 +37,8 @@ class Link(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        except IndexError:
-            pass
-        try:
-            await get.get_link_nation(nation.id)
+        link = cache.get_user(nation.id)
+        if link is not None:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -49,14 +47,12 @@ class Link(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        except IndexError:
-            pass
         await ctx.interaction.response.defer(ephemeral=True)
         try:
             name = await nation.get_discord_page_username()
             if name != f"{member.name}#{member.discriminator}":
                 raise IndexError
-            await get.add_link(member.id, nation.id)
+            await User.create(user, nation)
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     member,

@@ -11,7 +11,6 @@ from ... import funcs
 from ...cache import cache
 from ...checks import has_manage_permissions
 from ...data.classes import Menu, MenuItem
-from ...data.query import delete_interface
 from ...errors import MenuItemNotFoundError
 from ...ref import Rift, RiftContext
 from ...text_flags import ButtonFlags, SelectFlags, SelectOptionFlags
@@ -273,7 +272,7 @@ class Menus(commands.Cog):
         type=commands.CommandType.chat_input,
         descriptions={
             "description": "The new description to send with the menu.",
-            },
+        },
     )
     @commands.guild_only()
     @has_manage_permissions()
@@ -297,8 +296,7 @@ class Menus(commands.Cog):
         )
         items: List[List[MenuItem]] = [[], [], [], [], []]
         try:
-            running = True
-            while running:
+            while True:
                 message = await self.bot.wait_for(
                     "message",
                     check=lambda message: message.author.id == ctx.author.id
@@ -309,8 +307,7 @@ class Menus(commands.Cog):
                 if lower.startswith(
                     ("finish", "cancel", "complete", "done", "save", "stop")
                 ):
-                    running = False
-                    continue
+                    break
                 if lower.startswith("button "):
                     flags = ButtonFlags.parse_flags(message.content[7:])
                     row = await funcs.utils.get_row(
@@ -364,46 +361,45 @@ class Menus(commands.Cog):
                             break
                         if lower.startswith("option "):
                             flags = SelectOptionFlags.parse_flags(message.content[7:])
-            else:
-                if not any(items):
-                    return await ctx.reply(
-                        embed=funcs.get_embed_author_member(
-                            ctx.author,
-                            "You didn't add any items!",
-                            color=discord.Color.red(),
-                        )
-                    )
-                menu.item_ids = new_menu.item_ids
-                menu.description = new_menu.description
-                menu.name = new_menu.name
-                for index, row in enumerate(items):
-                    for item in row:
-                        if item.id is None:
-                            await item.save()
-                        menu.add_item(item, index)
-                await menu.save()
-                interfaces = [i for i in cache.menu_interfaces if i.menu_id == menu.id]
-                view = menu.get_view()
-                embed = menu.get_description_embed(ctx)
-                for interface in interfaces:
-                    channel = self.bot.get_channel(interface.channel_id)
-                    if channel is None:
-                        continue
-                    if TYPE_CHECKING:
-                        assert isinstance(channel, discord.TextChannel)
-                    partial_message = channel.get_partial_message(interface.message_id)
-                    try:
-                        await partial_message.edit(embed=embed, view=view)
-                    except discord.NotFound:
-                        await delete_interface(menu.id, partial_message)
-                await main_message.reply(  # type: ignore
+            if not any(items):
+                return await ctx.reply(
                     embed=funcs.get_embed_author_member(
                         ctx.author,
-                        f"Menu {menu.id} has been edited and all interfaces updated!\n\n"
-                        + "\n\n".join(str(j) for i in menu.items for j in i),
-                        color=discord.Color.green(),
+                        "You didn't add any items!",
+                        color=discord.Color.red(),
                     )
                 )
+            menu.item_ids = new_menu.item_ids
+            menu.description = new_menu.description
+            menu.name = new_menu.name
+            for index, row in enumerate(items):
+                for item in row:
+                    if item.id is None:
+                        await item.save()
+                    menu.add_item(item, index)
+            await menu.save()
+            interfaces = [i for i in cache.menu_interfaces if i.menu_id == menu.id]
+            view = menu.get_view()
+            embed = menu.get_description_embed(ctx)
+            for interface in interfaces:
+                channel = self.bot.get_channel(interface.channel_id)
+                if channel is None:
+                    continue
+                if TYPE_CHECKING:
+                    assert isinstance(channel, discord.TextChannel)
+                partial_message = channel.get_partial_message(interface.message_id)
+                try:
+                    await partial_message.edit(embed=embed, view=view)
+                except discord.NotFound:
+                    await interface.delete()
+            await main_message.reply(  # type: ignore
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"Menu {menu.id} has been edited and all interfaces updated!\n\n"
+                    + "\n\n".join(str(j) for i in menu.items for j in i),
+                    color=discord.Color.green(),
+                )
+            )
         except TimeoutError:
             await main_message.reply(  # type: ignore
                 embed=funcs.get_embed_author_member(

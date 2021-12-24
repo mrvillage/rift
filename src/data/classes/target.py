@@ -7,11 +7,10 @@ from typing import TYPE_CHECKING, List, Optional, Union
 import discord
 
 from ...cache import cache
-from ...data.db import execute_query
+from ...data.db import execute_query, execute_read_query
 from ...errors import TargetNotFoundError
 from ...funcs.utils import convert_int
 from ...ref import RiftContext
-from ..query import add_target_reminder, remove_target_reminder
 
 __all__ = (
     "Target",
@@ -116,7 +115,7 @@ class Target:
             last_turn = None
             resources = None
             updated = False
-        data["resources"] = resources and str(resources)
+        data["resources"] = resources if resources is None else str(resources)
         data["last_turn_fetched"] = last_turn and str(last_turn)
         if target is None:
             target = cls(data)
@@ -277,11 +276,11 @@ class TargetReminder:
 
     def __init__(self, data: TargetReminderData) -> None:
         self.id: int = data["id"]
-        self.target_id: int = data["target_id"]
-        self.owner_id: int = data["owner_id"]
-        self.channel_ids: List[int] = data["channel_ids"]
-        self.role_ids: List[int] = data["role_ids"]
-        self.user_ids: List[int] = data["user_ids"]
+        self.target_id: int = data["target"]
+        self.owner_id: int = data["owner"]
+        self.channel_ids: List[int] = data["channels"]
+        self.role_ids: List[int] = data["roles"]
+        self.user_ids: List[int] = data["users"]
         self.direct_message: bool = data["direct_message"]
 
     @classmethod
@@ -300,14 +299,6 @@ class TargetReminder:
             raise TargetNotFoundError(reminder_id)
         return reminder
 
-    def _update(self, data: TargetReminderData) -> None:
-        self.id: int = data["id"]
-        self.target_id: int = data["target_id"]
-        self.owner_id: int = data["owner_id"]
-        self.channel_ids: List[int] = data["channel_ids"]
-        self.role_ids: List[int] = data["role_ids"]
-        self.user_ids: List[int] = data["user_ids"]
-
     def __int__(self) -> int:
         return self.id
 
@@ -324,7 +315,7 @@ class TargetReminder:
         return cache.get_nation(self.target_id)
 
     @classmethod
-    async def add(
+    async def create(
         cls,
         nation: Nation,
         owner: Union[discord.User, discord.Member],
@@ -334,18 +325,45 @@ class TargetReminder:
         direct_message: bool = False,
         /,
     ) -> TargetReminder:
-        data = await add_target_reminder(
-            nation.id,
-            owner.id,
-            [i.id for i in channels],
-            [i.id for i in roles],
-            [i.id for i in users],
-            direct_message,
+        reminder = cls(
+            {
+                "id": 0,
+                "target": nation.id,
+                "owner": owner.id,
+                "channels": [i.id for i in channels],
+                "roles": [i.id for i in roles],
+                "users": [i.id for i in users],
+                "direct_message": direct_message,
+            }
         )
-        added = cls(data)
-        cache.add_target_reminder(added)
-        return added
+        await reminder.save()
+        return reminder
 
-    async def remove(self) -> None:
-        await remove_target_reminder(self.id)
+    async def save(self) -> None:
+        if self.id:
+            await execute_query(
+                "UPDATE target_reminders SET target = $2, owner = $3, channels = $4, roles = $5, users = $6, direct_message = $7 WHERE id = $1;",
+                self.id,
+                self.target_id,
+                self.owner_id,
+                self.channel_ids,
+                self.role_ids,
+                self.user_ids,
+                self.direct_message,
+            )
+        else:
+            id = await execute_read_query(
+                "INSERT INTO target_reminders (target, owner, channels, roles, users, direct_message) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;",
+                self.target_id,
+                self.owner_id,
+                self.channel_ids,
+                self.role_ids,
+                self.user_ids,
+                self.direct_message,
+            )
+            self.id = id[0]["id"]
+            cache.add_target_reminder(self)
+
+    async def delete(self) -> None:
         cache.remove_target_reminder(self)
+        await execute_query("DELETE FROM target_reminders WHERE id = $1;", self.id)

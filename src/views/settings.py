@@ -45,9 +45,9 @@ class AlliancePurposeConfirm(Confirm):
 
     async def hook(self, interaction: discord.Interaction) -> None:
         if self.value:
-            await self.settings.set_(
-                purpose=self.purpose, purpose_argument=str(self.alliance.id)
-            )
+            self.settings.purpose = self.purpose
+            self.settings.purpose_argument = str(self.alliance.id)
+            await self.settings.save()
             await self.message.edit(
                 embed=funcs.get_embed_author_member(
                     self.user,

@@ -26,7 +26,7 @@ class Forums(commands.Cog):
         ) as r:
             m: int = (
                 await execute_read_query(
-                    "SELECT MAX(id) FROM forum_posts WHERE forum_id = 42;"
+                    "SELECT MAX(id) FROM forum_posts WHERE forum = 42;"
                 )
             )[0]["max"]
             feed: FeedParserDict = feedparser.parse(await r.text())  # type: ignore
@@ -45,7 +45,7 @@ class Forums(commands.Cog):
                         {
                             "id": int(entry["guid"]),  # type: ignore
                             "link": entry["link"],  # type: ignore
-                            "forum_id": 42,
+                            "forum": 42,
                         }
                     )
                     await post.save()
@@ -63,7 +63,7 @@ class Forums(commands.Cog):
         ) as r:
             m: int = (
                 await execute_read_query(
-                    "SELECT MAX(id) FROM forum_posts WHERE forum_id = 40;"
+                    "SELECT MAX(id) FROM forum_posts WHERE forum = 40;"
                 )
             )[0]["max"]
             feed: FeedParserDict = feedparser.parse(await r.text())  # type: ignore
@@ -82,7 +82,7 @@ class Forums(commands.Cog):
                         {
                             "id": int(entry["guid"]),  # type: ignore
                             "link": entry["link"],  # type: ignore
-                            "forum_id": 40,
+                            "forum": 40,
                         }
                     )
                     await post.save()

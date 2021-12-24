@@ -34,8 +34,8 @@ class Subscription:
     def __init__(self, data: SubscriptionData) -> None:
         self.id: int = data["id"]
         self.token: str = data["token"]
-        self.guild_id: int = data["guild_id"]
-        self.channel_id: int = data["channel_id"]
+        self.guild_id: int = data["guild"]
+        self.channel_id: int = data["channel"]
         self.category: EventCategoryLiteral = data["category"]
         self.type: EventTypeLiteral = data["type"]
         self.sub_types: List[str] = data["sub_types"]
@@ -101,8 +101,8 @@ class Subscription:
         data: SubscriptionData = {
             "id": webhook.id,
             "token": webhook.token,  # type: ignore
-            "guild_id": channel.guild.id,
-            "channel_id": channel.id,
+            "guild": channel.guild.id,
+            "channel": channel.id,
             "category": category,
             "type": type,
             "sub_types": sub_types,
@@ -127,7 +127,7 @@ class Subscription:
 
     async def save(self) -> None:
         await execute_query(
-            "INSERT INTO subscriptions (id, token, guild_id, channel_id, category, type, sub_types, condition) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
+            "INSERT INTO subscriptions (id, token, guild, channel, category, type, sub_types, condition) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
             self.id,
             self.token,
             self.guild_id,

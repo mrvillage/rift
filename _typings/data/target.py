@@ -17,9 +17,9 @@ class TargetData(TypedDict):
 
 class TargetReminderData(TypedDict):
     id: int
-    target_id: int
-    owner_id: int
-    channel_ids: List[int]
-    role_ids: List[int]
-    user_ids: List[int]
+    target: int
+    owner: int
+    channels: List[int]
+    roles: List[int]
+    users: List[int]
     direct_message: bool

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional
 
 import discord
 
@@ -37,9 +37,9 @@ class Ticket:
     def __init__(self, data: TicketData) -> None:
         self.id = data["id"]
         self.ticket_number = data["ticket_number"]
-        self.config_id = data["config_id"]
-        self.guild_id = data["guild_id"]
-        self.user_id = data["user_id"]
+        self.config_id = data["config"]
+        self.guild_id = data["guild"]
+        self.user_id = data["user"]
         self.open = data["open"]
 
     @classmethod
@@ -51,8 +51,8 @@ class Ticket:
 
     async def save(self) -> None:
         cache.add_ticket(self)
-        await execute_read_query(
-            """INSERT INTO tickets (id, ticket_number, config_id, guild_id, user_id, open) VALUES ($1, $2, $3, $4, $5, $6);""",
+        await execute_query(
+            "INSERT INTO tickets (id, ticket_number, config, guild, user, open) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (id) DO UPDATE SET ticket_number = $2, config = $3, guild = $4, user = $5, open = $6 WHERE tickets.id = $1;",
             self.id,
             self.ticket_number,
             self.config_id,
@@ -60,19 +60,6 @@ class Ticket:
             self.user_id,
             self.open,
         )
-
-    async def set_(self, **kwargs: Union[int, bool]) -> Ticket:
-        sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
-        sets = ", ".join(sets)
-        args = tuple(kwargs.values())
-        await execute_query(
-            f"""
-        UPDATE tickets SET {sets} WHERE id = $1;
-        """,
-            self.id,
-            *args,
-        )
-        return self
 
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str) -> Ticket:
@@ -133,10 +120,10 @@ class TicketConfig:
 
     def __init__(self, data: TicketConfigData) -> None:
         self.id = data.get("id")
-        self.category_id = data["category_id"]
-        self.guild_id = data["guild_id"]
+        self.category_id = data["category"]
+        self.guild_id = data["guild"]
         self.start_message = data["start_message"]
-        self.archive_category_id = data["archive_category_id"]
+        self.archive_category_id = data["archive_category"]
         self.role_mentions = data["role_mentions"]
         self.user_mentions = data["user_mentions"]
 
@@ -161,7 +148,7 @@ class TicketConfig:
 
     async def save(self) -> None:
         id = await execute_read_query(
-            """INSERT INTO ticket_configs (category_id, guild_id, start_message, archive_category_id, role_mentions, user_mentions) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;""",
+            """INSERT INTO ticket_configs (category, guild, start_message, archive_category, role_mentions, user_mentions) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;""",
             self.category_id,
             self.guild_id,
             self.start_message,
@@ -171,19 +158,6 @@ class TicketConfig:
         )
         self.id = id[0]["id"]
         cache.add_ticket_config(self)
-
-    async def set_(self, **kwargs: Union[int, bool]) -> TicketConfig:
-        sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
-        sets = ", ".join(sets)
-        args = tuple(kwargs.values())
-        await execute_query(
-            f"""
-        UPDATE ticket_configs SET {sets} WHERE id = $1;
-        """,
-            self.id,
-            *args,
-        )
-        return self
 
     async def create(self, user: discord.Member) -> Ticket:
         from ...errors import GuildNotFoundError
@@ -203,7 +177,7 @@ class TicketConfig:
             + 1
         )
         if category is not None:
-            overwrites = {key: value for key, value in category.overwrites.items()}
+            overwrites = dict(category.overwrites.items())
             overwrites[user] = discord.PermissionOverwrite(
                 read_messages=True, send_messages=True
             )
