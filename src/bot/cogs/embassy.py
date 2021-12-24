@@ -182,7 +182,7 @@ class Embassies(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        embassy, start = await config.create(ctx.author, nation.alliance)
+        embassy, start = await config.create_embassy(ctx.author, nation.alliance)
         if start:
             await embassy.start(ctx.author, config)
             await ctx.reply(

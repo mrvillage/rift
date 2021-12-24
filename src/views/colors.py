@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, List
 
 import discord
 
-from ..data.get import get_colors, get_nation_color_counts
+from ..cache import cache
 from ..funcs import get_embed_author_member
 from ..ref import ID
 
@@ -18,7 +18,7 @@ class Colors(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(
+    @discord.ui.button(  # type: ignore
         label="Refresh", style=discord.ButtonStyle.gray, custom_id="COLORS_REFRESH_1"
     )
     async def refresh(
@@ -35,8 +35,9 @@ class Colors(discord.ui.View):
             or message.author.id != ID
         ):
             return
-        colors = await get_colors()
-        nations = await get_nation_color_counts()
+        colors = {i.color: i for i in cache.colors}
+        nations = [i.color for i in cache.nations]
+        nations = {i.color: nations.count(i.color.capitalize()) for i in cache.colors}
         average_bonus = (
             sum(i.bonus for i in colors.values() if i.color not in {"beige", "gray"})
             / len(colors)

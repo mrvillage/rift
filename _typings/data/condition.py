@@ -8,5 +8,5 @@ __all__ = ("ConditionData",)
 class ConditionData(TypedDict):
     id: int
     name: Optional[str]
-    owner_id: Optional[int]
+    owner: Optional[int]
     condition: List[Any]

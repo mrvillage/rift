@@ -10,7 +10,6 @@ from discord.utils import MISSING
 from ... import funcs
 from ...cache import cache
 from ...checks import has_alliance_manage_permissions, has_manage_permissions
-from ...data import get
 from ...data.classes import (
     Alliance,
     AllianceAutoRole,
@@ -78,11 +77,10 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        await settings.set_(
-            default_raid_condition=Condition.convert_to_string(condition.condition)
-            if condition
-            else None
+        settings.default_raid_condition = (
+            Condition.convert_to_string(condition.condition) if condition else None
         )
+        await settings.save()
         if condition:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -141,11 +139,10 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        await settings.set_(
-            default_nuke_condition=Condition.convert_to_string(condition.condition)
-            if condition
-            else None
+        settings.default_nuke_condition = (
+            Condition.convert_to_string(condition.condition) if condition else None
         )
+        await settings.save()
         if condition:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -204,11 +201,10 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        await settings.set_(
-            default_military_condition=Condition.convert_to_string(condition.condition)
-            if condition
-            else None
+        settings.default_military_condition = (
+            Condition.convert_to_string(condition.condition) if condition else None
         )
+        await settings.save()
         if condition:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -267,13 +263,10 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        await settings.set_(
-            default_attack_raid_condition=Condition.convert_to_string(
-                condition.condition
-            )
-            if condition
-            else None
+        settings.default_attack_raid_condition = (
+            Condition.convert_to_string(condition.condition) if condition else None
         )
+        await settings.save()
         if condition:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -332,13 +325,10 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        await settings.set_(
-            default_attack_nuke_condition=Condition.convert_to_string(
-                condition.condition
-            )
-            if condition
-            else None
+        settings.default_attack_nuke_condition = (
+            Condition.convert_to_string(condition.condition) if condition else None
         )
+        await settings.save()
         if condition:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -397,13 +387,10 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        await settings.set_(
-            default_attack_military_condition=Condition.convert_to_string(
-                condition.condition
-            )
-            if condition
-            else None
+        settings.default_attack_military_condition = (
+            Condition.convert_to_string(condition.condition) if condition else None
         )
+        await settings.save()
         if condition:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -469,7 +456,8 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         channels_set = None if clear else [i.id for i in channels]
-        await settings.set_(withdraw_channels=channels_set)
+        settings.withdraw_channels = channels_set
+        await settings.save()
         if channels_set:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -526,7 +514,8 @@ class Settings(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        await settings.set_(require_withdraw_approval=require)
+        settings.require_withdraw_approval = require
+        await settings.save()
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
@@ -590,7 +579,9 @@ class Settings(commands.Cog):
         if purpose.lower() == "none":
             purpose = None  # type: ignore
         if not purpose:
-            await settings.set_(purpose=purpose, purpose_argument=None)
+            settings.purpose = purpose
+            settings.purpose_argument = None
+            await settings.save()
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -609,7 +600,9 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-            await settings.set_(purpose=purpose, purpose_argument=None)
+            settings.purpose = purpose
+            settings.purpose_argument = None
+            await settings.save()
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -736,7 +729,9 @@ class Settings(commands.Cog):
                         color=discord.Color.red(),
                     )
                 )
-            await settings.set_(purpose=purpose, purpose_argument=m.content)
+            settings.purpose = purpose
+            settings.purpose_argument = m.content
+            await settings.save()
             await message.edit(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -774,7 +769,10 @@ class Settings(commands.Cog):
             message = message.strip("\n ")
         if message.lower() == "none":
             message = None  # type: ignore
-        await settings.welcome_settings.set_(welcome_message=message)
+        settings.welcome_settings.welcome_message = message
+        await settings.save()
+        settings.welcome_settings.welcome_message = message
+        await settings.welcome_settings.save()
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
@@ -814,7 +812,8 @@ class Settings(commands.Cog):
             nickname = nickname.strip("\n ")
         if nickname.lower() == "none":
             nickname = None  # type: ignore
-        await settings.welcome_settings.set_(verified_nickname=nickname)
+        settings.welcome_settings.verified_nickname = nickname
+        await settings.save()
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
@@ -865,7 +864,8 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         channels_set = None if clear else [i.id for i in channels]  # type: ignore
-        await settings.welcome_settings.set_(welcome_channels=channels_set)
+        settings.welcome_settings.welcome_channels = channels_set
+        await settings.welcome_settings.save()
         if channels_set:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -926,7 +926,8 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         roles_set = None if clear else [i.id for i in roles]  # type: ignore
-        await settings.welcome_settings.set_(join_roles=roles_set)
+        settings.welcome_settings.join_roles = roles_set
+        await settings.welcome_settings.save()
         if roles_set:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -987,7 +988,8 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         roles_set = None if clear else [i.id for i in roles]  # type: ignore
-        await settings.welcome_settings.set_(verified_roles=roles_set)
+        settings.welcome_settings.verified_roles = roles_set
+        await settings.welcome_settings.save()
         if roles_set:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -1048,7 +1050,8 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         roles_set = None if clear else [i.id for i in roles]  # type: ignore
-        await settings.welcome_settings.set_(member_roles=roles_set)
+        settings.welcome_settings.member_roles = roles_set
+        await settings.welcome_settings.save()
         if roles_set:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -1109,7 +1112,8 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         roles_set = None if clear else [i.id for i in roles]  # type: ignore
-        await settings.welcome_settings.set_(diplomat_roles=roles_set)
+        settings.welcome_settings.diplomat_roles = roles_set
+        await settings.welcome_settings.save()
         if roles_set:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -1164,7 +1168,8 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        await settings.set_(enforce_verified_nickname=enforce)
+        settings.welcome_settings.enforce_verified_nickname = enforce
+        await settings.welcome_settings.save()
         if enforce:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -1221,7 +1226,8 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         roles_set = None if clear else [i.id for i in roles]
-        await settings.set_(manager_role_ids=roles_set)
+        settings.manager_role_ids = roles_set
+        await settings.save()
         if roles_set:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -1296,7 +1302,8 @@ class Settings(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        await settings.welcome_settings.set_(alliance_auto_roles_enabled=enable)
+        settings.welcome_settings.alliance_auto_roles_enabled = enable
+        await settings.welcome_settings.save()
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
@@ -1331,7 +1338,8 @@ class Settings(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        await settings.welcome_settings.set_(alliance_auto_role_creation_enabled=enable)
+        settings.welcome_settings.alliance_auto_role_creation_enabled = enable
+        await settings.welcome_settings.save()
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
@@ -1522,12 +1530,8 @@ class Settings(commands.Cog):
         # sourcery no-metrics skip: merge-nested-ifs
         if member.pending:
             return
-        try:
-            nat = await get.get_link_user(member.id)
-            nation: Optional[Nation] = await Nation.fetch(nat.nation_id)
-            await nation.make_attrs("alliance")
-        except IndexError:
-            nation = None
+        link = cache.get_user(member.id)
+        nation = cache.get_nation(link.nation_id) if link is not None else None
         guild_settings = await GuildSettings.fetch(member.guild.id, "welcome_settings")
         settings = guild_settings.welcome_settings
         if settings.welcome_channels:
@@ -1637,6 +1641,7 @@ class Settings(commands.Cog):
     @commands.Cog.listener()
     async def on_link_create(self, link: User):
         # sourcery skip: merge-nested-ifs
+        # sourcery no-metrics
         nation = cache.get_nation(link.nation_id)
         if nation is None:
             return

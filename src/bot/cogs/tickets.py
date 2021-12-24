@@ -68,7 +68,7 @@ class Tickets(commands.Cog):
             )
         config = await TicketConfig.fetch(ticket.config_id)
         ticket.open = False
-        await ticket.set_(open=False)
+        await ticket.save()
         category = self.bot.get_channel(config.archive_category_id) or ctx.channel.category  # type: ignore
         if TYPE_CHECKING:
             assert isinstance(category, discord.CategoryChannel) or category is None

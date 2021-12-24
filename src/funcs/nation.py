@@ -4,7 +4,6 @@ from discord.ext import commands
 
 from ..cache import cache
 from ..data.classes import Nation
-from ..data.get import get_link_user
 from ..errors import LinkError, NationNotFoundError
 from ..funcs.utils import convert_link
 from ..ref import RiftContext
@@ -25,10 +24,11 @@ async def search_nation(ctx: RiftContext, search: str, advanced: bool = True) ->
         except commands.UserNotFound:
             user = None
     if user is not None:
-        try:
-            return await Nation.fetch((await get_link_user(user.id)).nation_id)
-        except IndexError:
-            pass
+        link = cache.get_user(user.id)
+        if link is not None:
+            nation = cache.get_nation(link.nation_id)
+            if nation is not None:
+                return nation
     if search.isdigit():
         try:
             return await Nation.fetch(int(search))

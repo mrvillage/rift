@@ -37,8 +37,7 @@ class MenuButton(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction) -> None:
         # sourcery no-metrics
-        from ..data.classes import Alliance, EmbassyConfig, Nation, TicketConfig
-        from ..data.get import get_link_user
+        from ..data.classes import EmbassyConfig, TicketConfig
         from ..funcs import get_embed_author_member
 
         if TYPE_CHECKING:
@@ -172,34 +171,49 @@ class MenuButton(discord.ui.Button):
             await interaction.response.defer()
             configs = [await EmbassyConfig.fetch(opt) for opt in self.options]
             embassies: List[Embassy] = []
-            try:
-                nation = await get_link_user(interaction.user.id)
-                nation = await Nation.fetch(nation.nation_id)
-                alliance = await Alliance.fetch(nation.alliance_id)
-                if nation.alliance_position not in {"Officer", "Heir", "Leader"}:
-                    raise KeyError
-            except IndexError:
+            link = cache.get_user(interaction.user.id)
+            if link is None:
                 return await interaction.followup.send(
-                    ephemeral=True,
                     embed=get_embed_author_member(
                         interaction.user,
                         "You must be linked to create an embassy.",
                         color=discord.Color.red(),
                     ),
-                )
-            except KeyError:
-                return await interaction.followup.send(
                     ephemeral=True,
+                )
+            nation = cache.get_nation(link.nation_id)
+            if nation is None:
+                return await interaction.followup.send(
+                    embed=get_embed_author_member(
+                        interaction.user,
+                        "You must be linked to create an embassy.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            alliance = nation.alliance
+            if alliance is None:
+                return await interaction.followup.send(
+                    embed=get_embed_author_member(
+                        interaction.user,
+                        "You must be in an alliance to create an embassy.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            if nation.alliance_position not in {"Officer", "Heir", "Leader"}:
+                return await interaction.followup.send(
                     embed=get_embed_author_member(
                         interaction.user,
                         "You must be an Officer or higher to create an embassy.",
                         color=discord.Color.red(),
                     ),
+                    ephemeral=True,
                 )
             for config in configs:
                 if config.guild_id != interaction.guild.id:
                     continue
-                embassy, start = await config.create(interaction.user, alliance)
+                embassy, start = await config.create_embassy(interaction.user, alliance)
                 if start:
                     await embassy.start(interaction.user, config)
                 embassies.append(embassy)

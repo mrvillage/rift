@@ -6,7 +6,7 @@ from ...cache import cache
 from ...errors import AttackNotFoundError, WarNotFoundError
 from ...funcs.utils import convert_int
 from ...ref import RiftContext
-from .. import query
+from ..db import execute_read_query
 
 __all__ = ("War", "Attack")
 
@@ -132,7 +132,9 @@ class War:
     @classmethod
     async def fetch(cls, id: int, /) -> War:
         try:
-            return cls(await query.query_war(id))
+            return cls(
+                (await execute_read_query("SELECT * FROM wars WHERE id = $1;", id))[0]
+            )
         except IndexError:
             raise WarNotFoundError(id)
 
@@ -199,7 +201,12 @@ class War:
         return cache.get_nation(self.defender_id)
 
     async def fetch_attacks(self) -> List[Attack]:
-        return [Attack(i) for i in await query.query_attacks(self.id)]
+        return [
+            Attack(i)
+            for i in await execute_read_query(
+                "SELECT * FROM attacks WHERE war_id = $1;", self.id
+            )
+        ]
 
 
 class Attack:
@@ -264,7 +271,9 @@ class Attack:
     @classmethod
     async def fetch(cls, id: int, /) -> Attack:
         try:
-            return cls(await query.query_attack(id))
+            return cls(
+                (await execute_read_query("SELECT * FROM attacks WHERE id = $1;"))[0]
+            )
         except IndexError:
             raise AttackNotFoundError(id)
 

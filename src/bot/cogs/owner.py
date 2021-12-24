@@ -8,8 +8,7 @@ from discord.utils import MISSING
 
 from ... import funcs
 from ...cache import cache
-from ...data import get
-from ...data.classes import Nation
+from ...data.classes import Nation, User
 from ...env import __version__
 from ...ref import Rift, RiftContext
 
@@ -29,8 +28,17 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command(name="unlink", aliases=["unverify", "remove-link", "removelink"])
     async def unlink(self, ctx: RiftContext, nation: Nation):
-        link = await get.get_link_nation(nation.id)
-        await get.remove_link_nation(nation.id)
+        link = cache.get_user(nation.id)
+        if link is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"{repr(nation)} is not linked!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        await link.delete()
         user = self.bot.get_user(link.user_id)
         if not user:
             user = await self.bot.fetch_user(link.user_id)
@@ -49,8 +57,8 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         self, ctx: RiftContext, nation: Nation, user: discord.User = MISSING
     ):
         member = user or ctx.author
-        try:
-            await get.get_link_user(member.id)
+        link = cache.get_user(member.id)
+        if link is not None:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -58,10 +66,8 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                     color=discord.Color.red(),
                 )
             )
-        except IndexError:
-            pass
-        try:
-            await get.get_link_nation(nation.id)
+        link = cache.get_user(nation.id)
+        if link is not None:
             return await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
@@ -69,9 +75,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                     color=discord.Color.red(),
                 )
             )
-        except IndexError:
-            pass
-        await get.add_link(member.id, nation.id)
+        await User.create(user, nation)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 member,

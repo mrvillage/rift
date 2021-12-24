@@ -49,7 +49,7 @@ class ForumPost:
     def __init__(self, data: ForumPostData):
         self.id: int = data["id"]
         self.link: str = data["link"]
-        self.forum_id: int = data["forum_id"]
+        self.forum_id: int = data["forum"]
 
     @property
     def forum(self) -> Forum:
@@ -57,7 +57,7 @@ class ForumPost:
 
     async def save(self) -> None:
         await execute_query(
-            "INSERT INTO forum_posts (id, link, forum_id) VALUES ($1, $2, $3);",
+            "INSERT INTO forum_posts (id, link, forum) VALUES ($1, $2, $3);",
             self.id,
             self.link,
             self.forum_id,

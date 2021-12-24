@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Optional, Tuple
 
 import discord
 
@@ -29,9 +29,9 @@ class Embassy:
 
     def __init__(self, data: EmbassyData) -> None:
         self.id: int = data["id"]
-        self.alliance_id: int = data["alliance_id"]
-        self.config_id: int = data["config_id"]
-        self.guild_id: int = data["guild_id"]
+        self.alliance_id: int = data["alliance"]
+        self.config_id: int = data["config"]
+        self.guild_id: int = data["guild"]
         self.open: bool = data["open"]
 
     @classmethod
@@ -57,7 +57,7 @@ class Embassy:
     async def save(self) -> None:
         cache.add_embassy(self)
         await execute_query(
-            """INSERT INTO embassies (id, alliance_id, config_id, guild_id, open) VALUES ($1, $2, $3, $4, $5);""",
+            "INSERT INTO embassies (id, alliance, config, guild, open) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET alliance = $2, config = $3, guild = $4, open = $5 WHERE embassies.id = $1;",
             self.id,
             self.alliance_id,
             self.config_id,
@@ -67,7 +67,7 @@ class Embassy:
 
     async def delete(self) -> None:
         cache.remove_embassy(self)
-        await execute_read_query("""DELETE FROM embassies WHERE id = $1;""", self.id)
+        await execute_read_query("DELETE FROM embassies WHERE id = $1;", self.id)
 
     async def start(
         self,
@@ -106,8 +106,8 @@ class EmbassyConfig:
 
     def __init__(self, data: EmbassyConfigData) -> None:
         self.id: int = data.get("id")
-        self.category_id: Optional[int] = data["category_id"]
-        self.guild_id: int = data["guild_id"]
+        self.category_id: Optional[int] = data["category"]
+        self.guild_id: int = data["guild"]
         self.start_message: str = data["start_message"]
 
     @classmethod
@@ -133,29 +133,24 @@ class EmbassyConfig:
         return self.id
 
     async def save(self) -> None:
-        id = await execute_read_query(
-            """INSERT INTO embassy_configs (category_id, guild_id, start_message) VALUES ($1, $2, $3) RETURNING id;""",
-            self.category_id,
-            self.guild_id,
-            self.start_message,
-        )
-        self.id = id[0]["id"]
-        cache.add_embassy_config(self)
+        if self.id:
+            await execute_query(
+                "UPDATE embassy_configs SET category_id = $2, start_message = $3 WHERE id = $1;",
+                self.id,
+                self.category_id,
+                self.start_message,
+            )
+        else:
+            id = await execute_read_query(
+                "INSERT INTO embassy_configs (category, guild, start_message) VALUES ($1, $2, $3) RETURNING id;",
+                self.category_id,
+                self.guild_id,
+                self.start_message,
+            )
+            self.id = id[0]["id"]
+            cache.add_embassy_config(self)
 
-    async def set_(self, **kwargs: Union[int, bool]) -> EmbassyConfig:
-        sets = [f"{key} = ${e+2}" for e, key in enumerate(kwargs)]
-        sets = ", ".join(sets)
-        args = tuple(kwargs.values())
-        await execute_query(
-            f"""
-        UPDATE embassy_configs SET {sets} WHERE id = $1;
-        """,
-            self.id,
-            *args,
-        )
-        return self
-
-    async def create(
+    async def create_embassy(
         self, user: discord.Member, alliance: Alliance
     ) -> Tuple[Embassy, bool]:
         from ...errors import GuildNotFoundError
@@ -186,7 +181,7 @@ class EmbassyConfig:
         if TYPE_CHECKING and category is not None:
             assert isinstance(category, discord.CategoryChannel)
         if category is not None:
-            overwrites = {key: value for key, value in category.overwrites.items()}
+            overwrites = dict(category.overwrites.items())
             overwrites[user] = discord.PermissionOverwrite(
                 read_messages=True, send_messages=True
             )

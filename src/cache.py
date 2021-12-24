@@ -74,7 +74,6 @@ if TYPE_CHECKING:
         Treasure,
         Treaty,
         User,
-        UserSettings,
     )
 
 
@@ -122,7 +121,6 @@ class Cache:
         "_transaction_requests",
         "_treasures",
         "_treaties",
-        "_user_settings",
         "_war_attacks",
         "_wars",
         "init",
@@ -161,7 +159,6 @@ class Cache:
         self._treasures: List[Treasure] = []
         self._treaties: Set[Treaty] = set()
         self._users: Set[User] = set()
-        self._user_settings: Dict[int, UserSettings] = {}
         self._war_attacks = {}  # NO CLASS YET
         self._wars = {}  # NO CLASS YET
         self.init: bool = False
@@ -520,10 +517,6 @@ class Cache:
     def users(self) -> Set[User]:
         return self._users
 
-    @property
-    def user_settings(self) -> Set[UserSettings]:
-        return set(self._user_settings.values())
-
     def hook_alliance(
         self, action: Literal["update", "create", "delete"], data: AllianceData
     ) -> None:
@@ -716,9 +709,6 @@ class Cache:
             return next(i for i in self._users if i.user_id == id or i.nation_id == id)
         except StopIteration:
             return
-
-    def get_user_settings(self, id: int, /) -> Optional[UserSettings]:
-        return self._user_settings.get(id)
 
     def add_account(self, account: Account) -> None:
         self._accounts[account.id] = account

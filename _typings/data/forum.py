@@ -17,4 +17,4 @@ class ForumData(TypedDict):
 class ForumPostData(TypedDict):
     id: int
     link: str
-    forum_id: int
+    forum: int

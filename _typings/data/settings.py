@@ -11,7 +11,7 @@ __all__ = (
 
 
 class AllianceSettingsData(TypedDict):
-    alliance_id: int
+    alliance: int
     default_raid_condition: Optional[str]
     default_nuke_condition: Optional[str]
     default_military_condition: Optional[str]
@@ -23,14 +23,14 @@ class AllianceSettingsData(TypedDict):
 
 
 class GuildSettingsData(TypedDict):
-    guild_id: int
+    guild: int
     purpose: Optional[str]
     purpose_argument: Optional[str]
     manager_role_ids: Optional[List[int]]
 
 
 class GuildWelcomeSettingsData(TypedDict):
-    guild_id: int
+    guild: int
     welcome_message: Optional[str]
     welcome_channels: Optional[List[int]]
     join_roles: Optional[List[int]]
@@ -44,6 +44,6 @@ class GuildWelcomeSettingsData(TypedDict):
 
 
 class AllianceAutoRoleData(TypedDict):
-    role_id: int
-    guild_id: int
-    alliance_id: int
+    role: int
+    guild: int
+    alliance: int
