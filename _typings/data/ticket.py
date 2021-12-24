@@ -10,7 +10,7 @@ class TicketData(TypedDict):
     ticket_number: int
     config: int
     guild: int
-    user: int
+    user_: int
     open: bool
 
 

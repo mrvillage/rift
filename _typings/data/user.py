@@ -4,5 +4,5 @@ from typing import TypedDict
 
 
 class UserData(TypedDict):
-    user: int
+    user_: int
     nation: int
