@@ -302,7 +302,9 @@ class PnWInfo(commands.Cog):
                 ephemeral=True,
             )
         offset = (page - 1) * 50
-        alliances = sorted(iter(cache.alliances), key=lambda x: x.rank)[offset:offset + 50]
+        alliances = sorted(iter(cache.alliances), key=lambda x: x.rank)[
+            offset : offset + 50
+        ]
         embed = funcs.get_embed_author_member(
             ctx.author,
             f"Page **{page}** of **{max_page}**\n"
@@ -331,7 +333,7 @@ class PnWInfo(commands.Cog):
         fields: List[Field] = [
             {
                 "name": i.color.capitalize(),
-                "value": f"Name: {i.name}\nTurn Bonus: ${i.bonus:,.0f}\nNations on Color: {nations[i.color.capitalize()]:,}",
+                "value": f"Name: {i.name}\nTurn Bonus: ${i.bonus:,.0f}\nNations on Color: {nations[i.color]:,}",
             }
             for i in colors.values()
         ]
