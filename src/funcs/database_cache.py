@@ -107,6 +107,10 @@ async def fill_database_cache() -> None:  # sourcery no-metrics
     for channel in current_channels:
         if channel["id"] not in channel_ids:
             await execute_query(
+                "UPDATE cache_channels SET category = NULL WHERE category = $1;",
+                channel["id"],
+            )
+            await execute_query(
                 "DELETE FROM cache_channels WHERE id = $1;",
                 channel["id"],
             )
