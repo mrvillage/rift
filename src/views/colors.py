@@ -45,7 +45,7 @@ class Colors(discord.ui.View):
         fields: List[Field] = [
             {
                 "name": i.color.capitalize(),
-                "value": f"Name: {i.name}\nTurn Bonus: ${i.bonus:,.0f}\nNations on Color: {nations[i.color.capitalize()]:,}",
+                "value": f"Name: {i.name}\nTurn Bonus: ${i.bonus:,.0f}\nNations on Color: {nations[i.color]:,}",
             }
             for i in colors.values()
         ]
