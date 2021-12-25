@@ -22,6 +22,7 @@ CHARACTERS = string.ascii_letters + string.digits + "._-"
 QUOTES = ("'", '"')
 ALLIANCE_TYPES: Dict[str, Any] = {
     "id": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
+    "name": lambda x: utils.escape_quoted_string(x),  # type: ignore
     "member_count": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
     "rank": lambda x: utils.convert_int(x) if isinstance(x, str) else x,  # type: ignore
     "score": lambda x: utils.convert_number(x) if isinstance(x, str) else x,  # type: ignore
