@@ -200,17 +200,16 @@ class TicketConfig:
             overwrites=overwrites,
             category=category,
         )
-        data = {
-            "id": channel.id,
-            "ticket_number": number,
-            "config_id": self.id,
-            "guild_id": self.guild_id,
-            "user_id": user.id,
-            "open": True,
-        }
-        if TYPE_CHECKING:
-            assert isinstance(data, TicketData)
-        ticket = Ticket(data)
+        ticket = Ticket(
+            {
+                "id": channel.id,
+                "ticket_number": number,
+                "config": self.id,
+                "guild": self.guild_id,
+                "user_": user.id,
+                "open": True,
+            }
+        )
         await ticket.save()
         return ticket
 
