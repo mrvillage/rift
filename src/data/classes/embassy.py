@@ -204,15 +204,14 @@ class EmbassyConfig:
             overwrites=overwrites,
             category=category,
         )
-        data = {
-            "id": channel.id,
-            "alliance_id": alliance.id,
-            "config_id": self.id,
-            "guild_id": self.guild_id,
-            "open": True,
-        }
-        if TYPE_CHECKING:
-            assert isinstance(data, EmbassyData)
-        embassy = Embassy(data)
+        embassy = Embassy(
+            {
+                "id": channel.id,
+                "alliance": alliance.id,
+                "config": self.id,
+                "guild": self.guild_id,
+                "open": True,
+            }
+        )
         await embassy.save()
         return embassy, True
