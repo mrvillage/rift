@@ -204,6 +204,8 @@ class Condition:
         for a in attributes[1:]:
             if a in {"id", "rank", "member_count", "score"} and attr is None:
                 attr = 0
+            elif a in {"name"} and attr is None:
+                attr = "None"
             else:
                 attr = getattr(attr, a)
         attr = cls.convert_attribute_value(attributes, attr)
