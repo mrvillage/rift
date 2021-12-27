@@ -52,7 +52,7 @@ class Link(commands.Cog):
             name = await nation.get_discord_page_username()
             if name != f"{member.name}#{member.discriminator}":
                 raise IndexError
-            await User.create(user, nation)
+            await User.create(member, nation)
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
                     member,
