@@ -33,6 +33,8 @@ class DatabaseCache(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
+        await execute_query("DELETE FROM cache_roles WHERE guild = $1;", guild.id)
+        await execute_query("DELETE FROM cache_channels WHERE guild = $1;", guild.id)
         await execute_query("DELETE FROM cache_members WHERE guild = $1;", guild.id)
         await execute_query("DELETE FROM cache_guilds WHERE id = $1;", guild.id)
 
