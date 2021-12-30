@@ -90,6 +90,14 @@ async def fill_database_cache() -> None:  # sourcery no-metrics
                 "DELETE FROM cache_members WHERE guild = $1;",
                 guild["id"],
             )
+            await execute_query(
+                "DELETE FROM cache_roles WHERE guild = $1;",
+                guild["id"],
+            )
+            await execute_query(
+                "DELETE FROM cache_channels WHERE guild = $1;",
+                guild["id"],
+            )
             await execute_query("DELETE FROM cache_guilds WHERE id = $1;", guild["id"])
     for member in current_members:
         if (member["id"], member["guild"]) not in member_ids:
