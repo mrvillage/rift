@@ -46,7 +46,7 @@ class TreasuresView(discord.ui.View):
         fields: List[Field] = [
             {
                 "name": i.name,
-                "value": f"Color: {i.color.capitalize()}\nBonus: %{i.bonus}\nSpawn Date: <t:{int(time.mktime(datetime.fromisoformat(i.spawn_date).timetuple()))}:D>",
+                "value": f"Color: {i.color.capitalize()}\nBonus: %{i.bonus}\nSpawn Date: <t:{int(time.mktime(datetime.fromisoformat(i.spawn_date).timetuple()))}:D>\nNation: [{i.nation}](https://politicsandwar.com/nation/id={i.nation_id})",
             }
             for i in list(cache.treasures)[(page - 1) * 15 : page * 15]
         ]
@@ -58,7 +58,7 @@ class TreasuresView(discord.ui.View):
         )
         await interaction.response.edit_message(embed=embed, view=self)
 
-    @discord.ui.button(
+    @discord.ui.button(  # type: ignore
         custom_id="MYUVf8qSrCsSq78nyHcRSWuhWWlsUerBSVYFxqgQcvF2gVoTEd9OqtP3Kaa51B4rMgbVfTlvkGOAPgn3",
         label="Page 1",
         style=discord.ButtonStyle.gray,
@@ -70,7 +70,7 @@ class TreasuresView(discord.ui.View):
     ):
         await self.callback(button, interaction, 1)
 
-    @discord.ui.button(
+    @discord.ui.button(  # type: ignore
         custom_id="HipBhbpcigjQwysxH6yqHUUl2BOFJvsm3CmJHQs3ZsLY1aA5qJdHBI67u7jgY5Aq21fzbzlABU1lO3GH",
         label="Refresh",
         style=discord.ButtonStyle.gray,
@@ -82,7 +82,7 @@ class TreasuresView(discord.ui.View):
     ):
         await self.callback(button, interaction, 0)
 
-    @discord.ui.button(
+    @discord.ui.button(  # type: ignore
         custom_id="xMV8GXEACJcmvhFtTVKIa3M41IT38RCewSq14n62e7OVASX5U6pfMnBAyFmrkmVGPhPsvXK60ggVdngp",
         label="Page 2",
         style=discord.ButtonStyle.gray,

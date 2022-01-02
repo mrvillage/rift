@@ -363,7 +363,7 @@ class PnWInfo(commands.Cog):
         fields: List[Field] = [
             {
                 "name": i.name,
-                "value": f"Color: {i.color.capitalize()}\nBonus: %{i.bonus}\nSpawn Date: <t:{int(time.mktime(datetime.fromisoformat(i.spawn_date).timetuple()))}:D>",
+                "value": f"Color: {i.color.capitalize()}\nBonus: %{i.bonus}\nSpawn Date: <t:{int(time.mktime(datetime.fromisoformat(i.spawn_date).timetuple()))}:D>\nNation: [{i.nation}](https://politicsandwar.com/nation/id={i.nation_id})",
             }
             for i in list(cache.treasures)[(page - 1) * 15 : (page) * 15]
         ]
