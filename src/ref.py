@@ -15,6 +15,9 @@ from .env import (
 )
 from .help import EmbedHelpCommand
 
+if TYPE_CHECKING:
+    from .cache import Cache
+
 
 class Rift(commands.Bot):
     bytes_avatar: bytes
@@ -63,6 +66,12 @@ class Rift(commands.Bot):
         self.global_application_commands = await bot.http.get_global_commands(
             self.application_id
         )
+
+    @property
+    def cache(self) -> Cache:
+        from .cache import cache
+
+        return cache
 
 
 intents = discord.Intents(
