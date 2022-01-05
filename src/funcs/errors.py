@@ -164,6 +164,15 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 ),
                 ephemeral=True,
             )
+        elif isinstance(error, commands.TooManyArguments):
+            await ctx.reply(
+                embed=get_embed_author_member(
+                    ctx.author,
+                    f"You gave too many arguments!\n\n`{get_command_signature(ctx)}`",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
         elif isinstance(error, NoCredentialsError):
             await ctx.reply(
                 embed=get_embed_author_member(
