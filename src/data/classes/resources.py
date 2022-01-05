@@ -128,10 +128,13 @@ class Resources:
         args = [i if i.lower() != "credits" else "credit" for i in args]
         resources_dict = {}
         if len(args) == 1:
-            arg = args[0]
-            num = convert_number(arg)
-            if arg.startswith("$"):
-                resources_dict["money"] = num
+            try:
+                arg = args[0]
+                num = convert_number(arg)
+                if arg.startswith("$"):
+                    resources_dict["money"] = num
+            except ValueError:
+                pass
         for i, arg in enumerate(args[:-1]):
             try:
                 num = convert_number(arg)
@@ -143,8 +146,11 @@ class Resources:
                     resources_dict[args[i + 1].lower()] = num
             except ValueError:
                 pass
-        if args[-1].startswith("$"):
-            resources_dict["money"] = convert_number(args[-1])
+        try:
+            if args[-1].startswith("$"):
+                resources_dict["money"] = convert_number(args[-1])
+        except ValueError:
+            pass
         return cls(**resources_dict)
 
     @classmethod
