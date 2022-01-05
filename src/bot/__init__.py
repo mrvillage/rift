@@ -102,6 +102,7 @@ async def main() -> None:
             async with aiohttp.request("GET", bot.user.display_avatar.url) as req:  # type: ignore
                 bot.bytes_avatar = await req.read()
 
+            bot.load_extension("jishaku")
             cogPath = Path.cwd() / "src" / "bot" / "cogs"
             cogs = [
                 i.name.replace(".py", "")
