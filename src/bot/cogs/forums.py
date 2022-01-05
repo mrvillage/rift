@@ -33,8 +33,8 @@ class Forums(commands.Cog):
             for entry in feed["entries"]:  # type: ignore
                 entry: FeedParserDict
                 try:
-                    g = int(entry.guid)  # type: ignore
-                except (ValueError, AttributeError):
+                    g = int(entry["guid"])  # type: ignore
+                except (ValueError, IndexError):
                     continue
                 if g > m:
                     if TYPE_CHECKING:
@@ -70,8 +70,8 @@ class Forums(commands.Cog):
             for entry in feed["entries"]:  # type: ignore
                 entry: FeedParserDict
                 try:
-                    g = int(entry.guid)  # type: ignore
-                except (ValueError, AttributeError):
+                    g = int(entry["guid"])  # type: ignore
+                except (ValueError, IndexError):
                     continue
                 if g > m:
                     if TYPE_CHECKING:
