@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import asyncio
+import sys
 from typing import TYPE_CHECKING
 
 import aiohttp
+import discord
 import feedparser
 from discord.ext import commands, tasks
 from feedparser.util import FeedParserDict
 
+from ... import funcs
 from ...data.classes import ForumPost
 from ...data.db import execute_read_query
 from ...ref import Rift
@@ -20,6 +24,12 @@ class Forums(commands.Cog):
 
     @tasks.loop(minutes=1)
     async def check_alliance_affairs(self):
+        try:
+            await asyncio.wait_for(self._check_alliance_affairs(), timeout=60)
+        except asyncio.TimeoutError:
+            await self.send_loop_error("check_alliance_affairs")
+
+    async def _check_alliance_affairs(self):
         async with aiohttp.request(
             "GET",
             "https://forum.politicsandwar.com/index.php?/forum/42-alliance-affairs.xml",
@@ -57,6 +67,12 @@ class Forums(commands.Cog):
 
     @tasks.loop(minutes=1)
     async def check_orbis_central(self):
+        try:
+            await asyncio.wait_for(self._check_orbis_central(), timeout=60)
+        except asyncio.TimeoutError:
+            await self.send_loop_error("check_orbis_central")
+
+    async def _check_orbis_central(self):
         async with aiohttp.request(
             "GET",
             "https://forum.politicsandwar.com/index.php?/forum/40-orbis-central.xml",
@@ -91,6 +107,32 @@ class Forums(commands.Cog):
     @check_orbis_central.before_loop
     async def before_check_orbis_central(self):
         await self.bot.wait_until_ready()
+
+    async def send_loop_error(self, name: str):
+        print(
+            f"Loop {name} timed out",
+            file=sys.stderr,
+            flush=True,
+        )
+        sys.stderr.flush()
+        channel = self.bot.get_channel(919428590167277609)
+        if channel is not None:
+            if TYPE_CHECKING:
+                assert isinstance(channel, discord.TextChannel)
+            try:
+                await channel.send(
+                    embed=funcs.get_embed_author_member(
+                        self.bot.get_user(self.bot.user.id),  # type: ignore
+                        f"Loop {name} timed out!",
+                        color=discord.Color.red(),
+                    )
+                )
+            except discord.HTTPException:
+                print(
+                    "Failed to send error message to errors channel.",
+                    file=sys.stderr,
+                    flush=True,
+                )
 
 
 def setup(bot: Rift):
