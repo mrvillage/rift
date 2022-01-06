@@ -755,11 +755,16 @@ class Bank(commands.Cog):
                     color=discord.Color.green(),
                 ),
             )
+        alliance_settings = await AllianceSettings.fetch(account.alliance_id)
+        if alliance_settings.offshore_id is not None:
+            offshore_id = alliance_settings.offshore_id
+        else:
+            offshore_id = -1
         try:
             deposit = next(
                 i
                 for i in data["sent_bankrecs"]
-                if int(i["rid"]) == account.alliance_id
+                if int(i["rid"]) in {account.alliance_id, offshore_id}
                 and i["note"].strip() == account.deposit_code
             )
         except StopIteration:
@@ -811,7 +816,7 @@ class Bank(commands.Cog):
         account: Account = MISSING,
         nation: Nation = MISSING,
         note: str = MISSING,
-    ):
+    ):  # sourcery no-metrics
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         if not accounts:
             return await ctx.reply(
@@ -864,61 +869,79 @@ class Bank(commands.Cog):
             )
         nation = nation or await Nation.convert(ctx, None)
         settings = await AllianceSettings.fetch(nation.alliance_id)
-        if settings.require_withdraw_approval:
-            transaction = await Transaction.create(
-                datetime.datetime.utcnow(),
-                TransactionStatus.PENDING,
-                TransactionType.WITHDRAW,
-                ctx.author,
-                nation,
-                account,
-                resources,
-                note or None,
-                to_type=AccountType.NATION,
-            )
-            await transaction.send_for_approval()
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"Withdrawal of {resources} from account #{account.id:,} requested successfully!. The transaction ID is {transaction.id:,}.",
-                    color=discord.Color.green(),
-                ),
-                ephemeral=True,
-            )
-        else:
-            credentials = funcs.credentials.find_highest_alliance_credentials(
-                account.alliance, "send_alliance_bank"
-            )
-            if credentials is None:
-                raise NoCredentialsError(nation.alliance)
+        if not settings.require_withdraw_approval:
             await ctx.interaction.response.defer(ephemeral=True)
-            transaction = await Transaction.create(
-                datetime.datetime.utcnow(),
-                TransactionStatus.ACCEPTED,
-                TransactionType.WITHDRAW,
-                ctx.author,
-                nation,
-                account,
-                resources,
-                note or None,
-                to_type=AccountType.NATION,
-            )
-            await funcs.withdraw(
-                resources,
-                nation,
-                credentials,
-                note=f"Rift Withdrawal from Account #{account.id} and note: {note}",
-            )
-            account.resources -= resources
-            await account.save()
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
+            alliance_settings = await AllianceSettings.fetch(account.alliance_id)
+            offshore = alliance_settings.offshore
+            if offshore is not None and alliance_settings.withdraw_from_offshore:
+                credentials = funcs.credentials.find_highest_alliance_credentials(
+                    offshore, "send_alliance_bank"
+                )
+                if credentials is not None:
+                    success = await funcs.withdraw(
+                        resources,
+                        nation,
+                        credentials,
+                        note=f"Rift Withdrawal from Account #{account.id} and note: {note}",
+                    )
+                else:
+                    success = False
+            else:
+                success = False
+            if not success:
+                credentials = funcs.credentials.find_highest_alliance_credentials(
+                    account.alliance, "send_alliance_bank"
+                )
+                if credentials is None:
+                    raise NoCredentialsError(account.alliance)
+                success = await funcs.withdraw(
+                    resources,
+                    nation,
+                    credentials,
+                    note=f"Rift Withdrawal from Account #{account.id} and note: {note}",
+                )
+            if success:
+                transaction = await Transaction.create(
+                    datetime.datetime.utcnow(),
+                    TransactionStatus.ACCEPTED,
+                    TransactionType.WITHDRAW,
                     ctx.author,
-                    f"Withdrawal of {resources} from account #{account.id:,} recorded successfully!. The transaction ID is {transaction.id:,}.",
-                    color=discord.Color.green(),
-                ),
-                ephemeral=True,
-            )
+                    nation,
+                    account,
+                    resources,
+                    note or None,
+                    to_type=AccountType.NATION,
+                )
+                account.resources -= resources
+                await account.save()
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        f"Withdrawal of {resources} from account #{account.id:,} recorded successfully!. The transaction ID is {transaction.id:,}.",
+                        color=discord.Color.green(),
+                    ),
+                    ephemeral=True,
+                )
+        transaction = await Transaction.create(
+            datetime.datetime.utcnow(),
+            TransactionStatus.PENDING,
+            TransactionType.WITHDRAW,
+            ctx.author,
+            nation,
+            account,
+            resources,
+            note or None,
+            to_type=AccountType.NATION,
+        )
+        await transaction.send_for_approval()
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Withdrawal of {resources} from account #{account.id:,} requested successfully!. The transaction ID is {transaction.id:,}.",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
 
     @bank_account.command(  # type: ignore
         name="history",
