@@ -20,6 +20,8 @@ class AllianceSettingsData(TypedDict):
     default_attack_military_condition: Optional[str]
     withdraw_channels: Optional[List[int]]
     require_withdraw_approval: bool
+    offshore: Optional[int]
+    withdraw_from_offshore: bool
 
 
 class GuildSettingsData(TypedDict):
