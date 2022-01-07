@@ -7,4 +7,4 @@ python-dotenv
 feedparser
 cachetools
 cryptography
-git+git://github.com/mrvillage/jishaku.git
+jishaku
