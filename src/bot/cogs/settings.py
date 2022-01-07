@@ -22,7 +22,7 @@ from ...data.classes import (
 )
 from ...errors import AllianceNotFoundError
 from ...ref import Rift, RiftContext
-from ...views import AlliancePurposeConfirm
+from ...views import AlliancePurposeConfirm, Confirm
 
 
 class Settings(commands.Cog):
@@ -520,6 +520,192 @@ class Settings(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 description=f"{repr(nation.alliance)} {'now requires' if require else 'no longer requires'} withdrawal approval.",
+                color=discord.Color.green(),
+            ),
+            ephemeral=True,
+        )
+
+    @alliance_settings.command(  # type: ignore
+        name="offshore",
+        brief="View or modify the alliance's offshore.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "alliance": "The new offshore.",
+            "clear": "Set to True to clear the offshore.",
+        },
+    )
+    async def alliance_settings_offshore(
+        self,
+        ctx: RiftContext,
+        alliance: Alliance = MISSING,
+        clear: bool = False,
+    ):  # sourcery no-metrics
+        nation = await Nation.convert(ctx, None)
+        nation_alliance = nation.alliance
+        if nation_alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You need to be in an alliance to run this command.",
+                    color=discord.Color.red(),
+                )
+            )
+        roles = [
+            i
+            for i in cache.roles
+            if i.alliance_id == nation_alliance.id
+            and (i.permissions.leadership or i.permissions.manage_offshores)
+        ]
+        if not roles:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="You do not have permission to manage the offshore.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        settings = await AllianceSettings.fetch(nation.alliance_id)
+        if clear:
+            settings.offshore_id = None
+            await settings.save()
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="The offshore has been cleared.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        view = Confirm()
+        leaders = [u for i in alliance.leaders if (u := i.user) is not None]
+        if not leaders:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "That alliance has no leaders.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+
+        await ctx.interaction.response.defer(ephemeral=True)
+        messages = [
+            await leader.send(
+                embed=funcs.get_embed_author_member(
+                    leader,
+                    f"{ctx.author.mention} is requesting to set {repr(alliance)} as the offshore for {repr(nation_alliance)}.\n\nDo you accept this request?",
+                    color=discord.Color.orange(),
+                ),
+                view=view,
+            )
+            for leader in leaders
+        ]
+        await ctx.interaction.edit_original_message(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Sent a DM to {repr(alliance)}'s leader{'s' if len(leaders) > 1 else ''} to confirm .",
+                color=discord.Color.orange(),
+            )
+        )
+        if await view.wait():
+            await ctx.interaction.edit_original_message(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "Timed out waiting for confirmation.",
+                    color=discord.Color.red(),
+                )
+            )
+            for message, leader in zip(messages, leaders):
+                await message.edit(
+                    embed=funcs.get_embed_author_member(
+                        leader,
+                        f"Timed out waiting for confirmation for request by {ctx.author.mention} to set {repr(alliance)} as the offshore for {repr(nation_alliance)}.",
+                        color=discord.Color.red(),
+                    ),
+                    view=None,
+                )
+            return
+        if view.value:
+            settings.offshore_id = alliance.id
+            await settings.save()
+            await ctx.interaction.edit_original_message(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"Confirmed! {repr(alliance)} is now the offshore for {repr(nation_alliance)}.",
+                    color=discord.Color.green(),
+                )
+            )
+            for message, leader in zip(messages, leaders):
+                await message.edit(
+                    embed=funcs.get_embed_author_member(
+                        leader,
+                        f"Confirmed! {repr(alliance)} is now the offshore for {repr(nation_alliance)}.",
+                        color=discord.Color.green(),
+                    ),
+                    view=None,
+                )
+        else:
+            await ctx.interaction.edit_original_message(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "Declined.",
+                    color=discord.Color.red(),
+                )
+            )
+            for message, leader in zip(messages, leaders):
+                await message.edit(
+                    embed=funcs.get_embed_author_member(
+                        leader,
+                        f"Declined {ctx.author.mention}'s request to set {repr(alliance)} as the offshore for {repr(nation_alliance)}.",
+                        color=discord.Color.red(),
+                    ),
+                    view=None,
+                )
+
+    @alliance_settings.command(  # type: ignore
+        name="withdraw-from-offshore",
+        brief="Whether to withdraw from the alliance's offshore.",
+        type=commands.CommandType.chat_input,
+    )
+    @has_alliance_manage_permissions()
+    async def alliance_settings_withdraw_from_offshore(
+        self,
+        ctx: RiftContext,
+        require: bool = MISSING,
+    ):
+        nation = await Nation.convert(ctx, None)
+        if nation.alliance is None:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "You need to be in an alliance to run this command."
+                )
+            )
+        settings = await AllianceSettings.fetch(nation.alliance_id)
+        if require is MISSING:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description=f"{repr(nation.alliance)} {'withdraws' if settings.withdraw_from_offshore else 'does not withdraw'} from the offshore.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
+            )
+        if require is settings.withdraw_from_offshore:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="That's already the offshore withdrawal setting.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        settings.withdraw_from_offshore = require
+        await settings.save()
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                description=f"{repr(nation.alliance)} {'now withdraw' if require else 'no longer withdraws'} from the offshore.",
                 color=discord.Color.green(),
             ),
             ephemeral=True,

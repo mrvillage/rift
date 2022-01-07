@@ -7,7 +7,7 @@ import discord
 
 from .. import funcs
 from ..cache import cache
-from ..data.classes import Transaction
+from ..data.classes import AllianceSettings, Transaction
 from ..enums import AccountType, TransactionStatus, TransactionType
 from ..errors import NoCredentialsError
 
@@ -149,19 +149,6 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                     ephemeral=True,
                 )
             await interaction.response.defer(ephemeral=True)
-            resources = await transaction.from_.alliance.fetch_bank()
-            if any(
-                value < getattr(transaction.resources, key)
-                for key, value in resources.to_dict().items()
-            ):
-                return await interaction.followup.send(
-                    embed=funcs.get_embed_author_member(
-                        interaction.user,
-                        "The sending alliance does not have enough resources to complete this transaction! Please try sending a new transaction again.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
-                )
             if any(
                 value < getattr(transaction.resources, key)
                 for key, value in transaction.from_.resources.to_dict().items()
@@ -174,18 +161,47 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                     ),
                     ephemeral=True,
                 )
-            credentials = funcs.credentials.find_highest_alliance_credentials(
-                transaction.from_.alliance, "send_alliance_bank"
+            alliance_settings = await AllianceSettings.fetch(
+                transaction.from_.alliance_id
             )
-            if credentials is None:
-                raise NoCredentialsError(transaction.from_.alliance)
-            await funcs.withdraw(
-                transaction.resources,
-                transaction.to_nation,
-                credentials,
-                note=f"Rift Withdrawal from Account #{transaction.from_.id} and note: {transaction.note}",
-            )
-            transaction.from_.resources -= resources
+            offshore = alliance_settings.offshore
+            if offshore is not None and alliance_settings.withdraw_from_offshore:
+                credentials = funcs.credentials.find_highest_alliance_credentials(
+                    offshore, "send_alliance_bank"
+                )
+                if credentials is not None:
+                    success = await funcs.withdraw(
+                        transaction.resources,
+                        transaction.to_nation,
+                        credentials,
+                        note=f"Rift Withdrawal from Account #{transaction.from_.id} and note: {transaction.note}",
+                    )
+                else:
+                    success = False
+            else:
+                success = False
+            if not success:
+                credentials = funcs.credentials.find_highest_alliance_credentials(
+                    transaction.from_.alliance, "send_alliance_bank"
+                )
+                if credentials is None:
+                    raise NoCredentialsError(transaction.from_.alliance)
+                success = await funcs.withdraw(
+                    transaction.resources,
+                    transaction.to_nation,
+                    credentials,
+                    note=f"Rift Withdrawal from Account #{transaction.from_.id} and note: {transaction.note}",
+                )
+            if not success:
+                return await interaction.followup.send(
+                    embed=funcs.get_embed_author_member(
+                        interaction.user,
+                        "Automatic transfer failed!",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            transaction.from_.resources -= transaction.resources
             await transaction.from_.save()
             await interaction.edit_original_message(
                 embed=funcs.get_embed_author_member(
@@ -216,6 +232,7 @@ class TransactionRequestRejectButton(discord.ui.Button[TransactionRequestView]):
                 f"Transaction #{self.transaction.id:,} rejected by {interaction.user.mention}!",
                 color=discord.Color.red(),
             ),
+            view=None,
         )
 
 

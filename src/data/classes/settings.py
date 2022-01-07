@@ -265,6 +265,8 @@ class AllianceSettings:
         "default_attack_military_condition",
         "withdraw_channels",
         "require_withdraw_approval",
+        "offshore_id",
+        "withdraw_from_offshore",
     )
 
     def __init__(self, data: AllianceSettingsData) -> None:
@@ -285,6 +287,8 @@ class AllianceSettings:
         ]
         self.withdraw_channels: Optional[List[int]] = data["withdraw_channels"]
         self.require_withdraw_approval: bool = data["require_withdraw_approval"]
+        self.offshore_id: Optional[int] = data["offshore"]
+        self.withdraw_from_offshore: bool = data["withdraw_from_offshore"]
 
     @classmethod
     def default(cls, alliance_id: int, /) -> AllianceSettings:
@@ -299,6 +303,8 @@ class AllianceSettings:
                 "default_attack_military_condition": None,
                 "withdraw_channels": None,
                 "require_withdraw_approval": True,
+                "offshore": None,
+                "withdraw_from_offshore": False,
             }
         )
 
@@ -308,7 +314,7 @@ class AllianceSettings:
 
     async def save(self) -> None:
         await execute_query(
-            "INSERT INTO alliance_settings (alliance, default_raid_condition, default_nuke_condition, default_military_condition, default_attack_raid_condition, default_attack_nuke_condition, default_attack_military_condition, withdraw_channels, require_withdraw_approval) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (alliance) DO UPDATE SET default_raid_condition = $2, default_nuke_condition = $3, default_military_condition = $4, default_attack_raid_condition = $5, default_attack_nuke_condition = $6, default_attack_military_condition = $7, withdraw_channels = $8, require_withdraw_approval = $9 WHERE alliance_settings.alliance = $1;",
+            "INSERT INTO alliance_settings (alliance, default_raid_condition, default_nuke_condition, default_military_condition, default_attack_raid_condition, default_attack_nuke_condition, default_attack_military_condition, withdraw_channels, require_withdraw_approval) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (alliance) DO UPDATE SET default_raid_condition = $2, default_nuke_condition = $3, default_military_condition = $4, default_attack_raid_condition = $5, default_attack_nuke_condition = $6, default_attack_military_condition = $7, withdraw_channels = $8, require_withdraw_approval = $9, offshore = $10, withdraw_from_offshore = $11 WHERE alliance_settings.alliance = $1;",
             self.alliance_id,
             self.default_raid_condition,
             self.default_nuke_condition,
@@ -318,6 +324,8 @@ class AllianceSettings:
             self.default_attack_military_condition,
             self.withdraw_channels,
             self.require_withdraw_approval,
+            self.offshore_id,
+            self.withdraw_from_offshore,
         )
 
     @property
@@ -330,3 +338,7 @@ class AllianceSettings:
             if (c := bot.get_channel(i)) is not None
             and isinstance(c, discord.TextChannel)
         ]
+
+    @property
+    def offshore(self) -> Optional[Alliance]:
+        return cache.get_alliance(self.offshore_id or -1)
