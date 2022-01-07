@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import urllib.parse
 from typing import TYPE_CHECKING
 
 import discord
@@ -41,6 +42,8 @@ class TransactionRequestView(discord.ui.View):
             return
         self.user_id: int = user_id
         self.add_item(TransactionRequestAcceptButton(transaction, custom_id=request.accept_custom_id))  # type: ignore
+        if transaction.type is TransactionType.WITHDRAW:
+            self.add_item(TransactionRequestManualAcceptButton(transaction, request.accept_custom_id[:99]))  # type: ignore
         self.add_item(TransactionRequestRejectButton(transaction, custom_id=request.reject_custom_id))  # type: ignore
         if transaction.to is not None and user_id == transaction.to.owner_id:
             self.add_item(  # type: ignore
@@ -82,7 +85,11 @@ class TransactionRequestView(discord.ui.View):
 class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
     def __init__(self, transaction: Transaction, custom_id: str):
         super().__init__(
-            custom_id=custom_id, style=discord.ButtonStyle.green, label="Accept"
+            custom_id=custom_id,
+            style=discord.ButtonStyle.green,
+            label="Accept"
+            if transaction.type is not TransactionType.WITHDRAW
+            else "Automatic Transfer",
         )
         self.transaction: Transaction = transaction
 
@@ -211,6 +218,100 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                 ),
                 view=None,
             )
+        await transaction.save()
+
+
+class TransactionRequestManualAcceptButton(discord.ui.Button[TransactionRequestView]):
+    def __init__(self, transaction: Transaction, custom_id: str):
+        super().__init__(
+            custom_id=custom_id,
+            style=discord.ButtonStyle.green,
+            label="Manually Transfer",
+        )
+        self.transaction: Transaction = transaction
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        # sourcery no-metrics
+        if TYPE_CHECKING:
+            assert interaction.user is not None
+        transaction = self.transaction
+        if transaction.status is not TransactionStatus.PENDING:
+            await interaction.edit_original_message(view=None)
+            return await interaction.followup.send(
+                embed=funcs.get_embed_author_member(
+                    interaction.user,
+                    f"Transaction {transaction.id} is no longer pending!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        transaction.status = TransactionStatus.ACCEPTED
+        if (
+            transaction.from_ is None
+            or transaction.to_nation is None
+            or transaction.from_.alliance is None
+        ):
+            return await interaction.response.send_message(
+                embed=funcs.get_embed_author_member(
+                    interaction.user,
+                    "One party involved in this transaction no longer exists! Please try sending a new transaction again.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        if any(
+            value < getattr(transaction.resources, key)
+            for key, value in transaction.from_.resources.to_dict().items()
+        ):
+            return await interaction.response.send_message(
+                embed=funcs.get_embed_author_member(
+                    interaction.user,
+                    "The sending account does not have enough resources to complete this transaction! Please try sending a new transaction again.",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
+        alliance_settings = await AllianceSettings.fetch(transaction.from_.alliance_id)
+        offshore = alliance_settings.offshore
+        transaction.from_.resources -= transaction.resources
+        await transaction.from_.save()
+        view = discord.ui.View()
+        note = urllib.parse.quote(
+            f"Rift Withdrawal from Account #{transaction.from_.id} and note: {transaction.note}"
+        )
+        recipient = urllib.parse.quote_plus(
+            transaction.to_nation.name if transaction.to_nation is not None else ""
+        )
+        view.add_item(  # type: ignore
+            discord.ui.Button(
+                label="Main Alliance",
+                url=f"https://politicsandwar.com/alliance/id={transaction.from_.alliance_id}&display=bank&{'&'.join(f'w_{key}={value}' for key, value in transaction.resources.to_dict().items() if value > 0)}&w_recipient={recipient}&w_note={note}",
+            )
+        )
+        if offshore is not None and alliance_settings.withdraw_from_offshore:
+            view.add_item(  # type: ignore
+                discord.ui.Button(
+                    label="Offshore",
+                    url=f"https://politicsandwar.com/alliance/id={alliance_settings.offshore_id}&display=bank&{'&'.join(f'w_{key}={value}' for key, value in transaction.resources.to_dict().items() if value > 0)}&w_recipient={recipient}&w_note={note}",
+                )
+            )
+        await interaction.response.edit_message(
+            embed=funcs.get_embed_author_member(
+                interaction.user,
+                f"Withdrawal of {transaction.resources} from account #{transaction.from_.id:,} approved by {interaction.user.mention}!",
+                color=discord.Color.green(),
+            ),
+            view=None,
+        )
+        await interaction.followup.send(
+            embed=funcs.get_embed_author_member(
+                interaction.user,
+                f"Please use one of the links below to send the resources for transaction #{transaction.id}.",
+                color=discord.Color.green(),
+            ),
+            view=view,
+            ephemeral=True,
+        )
         await transaction.save()
 
 
