@@ -121,11 +121,7 @@ async def main() -> None:
 
             bot.load_extension("jishaku")
             cogPath = Path.cwd() / "src" / "bot" / "cogs"
-            cogs = [
-                i.name.replace(".py", "")
-                for i in cogPath.glob("*.py")
-                if i.name not in {"server.py", "documents.py"}
-            ]
+            cogs = [i.name.replace(".py", "") for i in cogPath.glob("*.py")]
             for cog in cogs:
                 bot.load_extension(f"src.bot.cogs.{cog}")
             if bot.debug:  # type: ignore
