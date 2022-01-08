@@ -10,6 +10,7 @@ from ... import funcs
 from ...cache import cache
 from ...data.classes import Nation, User
 from ...env import __version__
+from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 
@@ -30,13 +31,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     async def unlink(self, ctx: RiftContext, nation: Nation):
         link = cache.get_user(nation.id)
         if link is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"{repr(nation)} is not linked!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"{repr(nation)} is not linked!",
             )
         await link.delete()
         user = self.bot.get_user(link.user_id)
@@ -59,21 +56,15 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         member = user or ctx.author
         link = cache.get_user(member.id)
         if link is not None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"{member.mention} is already linked!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"{member.mention} is already linked!",
             )
         link = cache.get_user(nation.id)
         if link is not None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"{repr(nation)} is already linked!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"{repr(nation)} is already linked!",
             )
         await User.create(user, nation)
         await ctx.reply(
@@ -86,12 +77,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.group(name="extension", invoke_without_command=True)
     async def extension(self, ctx: RiftContext):
-        await ctx.reply(
-            embed=funcs.get_embed_author_member(
-                ctx.author,
-                "You forgot to give a subcommand!",
-                color=discord.Color.red(),
-            )
+        raise EmbedErrorMessage(
+            ctx.author,
+            "You forgot to give a subcommand!",
         )
 
     @extension.command(name="reload")  # type: ignore
@@ -106,20 +94,14 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                 )
             )
         except commands.ExtensionNotLoaded:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"Extension `{extension}` is not loaded.",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"Extension `{extension}` is not loaded.",
             )
         except commands.ExtensionNotFound:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"Extension `{extension}` does not exist.",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"Extension `{extension}` does not exist.",
             )
 
     @extension.command(name="load")  # type: ignore
@@ -134,20 +116,14 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                 )
             )
         except commands.ExtensionAlreadyLoaded:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"Extension `{extension}` is already loaded.",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"Extension `{extension}` is already loaded.",
             )
         except commands.ExtensionNotFound:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"Extension `{extension}` does not exist.",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"Extension `{extension}` does not exist.",
             )
 
     @extension.command(name="unload")  # type: ignore
@@ -162,20 +138,14 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
                 )
             )
         except commands.ExtensionNotLoaded:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"Extension `{extension}` is not loaded.",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"Extension `{extension}` is not loaded.",
             )
         except commands.ExtensionNotFound:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"Extension `{extension}` does not exist.",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"Extension `{extension}` does not exist.",
             )
 
     @commands.command(name="enable-debug", aliases=["debug", "enabledebug"])

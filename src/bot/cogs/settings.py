@@ -20,7 +20,7 @@ from ...data.classes import (
     Nation,
     User,
 )
-from ...errors import AllianceNotFoundError
+from ...errors import AllianceNotFoundError, EmbedErrorMessage
 from ...ref import Rift, RiftContext
 from ...views import AlliancePurposeConfirm, Confirm
 
@@ -60,13 +60,9 @@ class Settings(commands.Cog):
         settings = await AllianceSettings.fetch(nation.alliance.id)
         if condition is MISSING and not clear:
             if settings.default_raid_condition is None:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description=f"{repr(nation.alliance)} has no default raid condition.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description=f"{repr(nation.alliance)} has no default raid condition.",
                 )
             else:
                 return await ctx.reply(
@@ -122,13 +118,9 @@ class Settings(commands.Cog):
         settings = await AllianceSettings.fetch(nation.alliance.id)
         if condition is MISSING and not clear:
             if settings.default_nuke_condition is None:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description=f"{repr(nation.alliance)} has no default nuke condition.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description=f"{repr(nation.alliance)} has no default nuke condition.",
                 )
             else:
                 return await ctx.reply(
@@ -184,13 +176,9 @@ class Settings(commands.Cog):
         settings = await AllianceSettings.fetch(nation.alliance.id)
         if condition is MISSING and not clear:
             if settings.default_military_condition is None:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description=f"{repr(nation.alliance)} has no default military condition.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description=f"{repr(nation.alliance)} has no default military condition.",
                 )
             else:
                 return await ctx.reply(
@@ -246,13 +234,9 @@ class Settings(commands.Cog):
         settings = await AllianceSettings.fetch(nation.alliance.id)
         if condition is MISSING and not clear:
             if settings.default_attack_raid_condition is None:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description=f"{repr(nation.alliance)} has no default attacking raid condition.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description=f"{repr(nation.alliance)} has no default attacking raid condition.",
                 )
             else:
                 return await ctx.reply(
@@ -308,13 +292,9 @@ class Settings(commands.Cog):
         settings = await AllianceSettings.fetch(nation.alliance.id)
         if condition is MISSING and not clear:
             if settings.default_attack_nuke_condition is None:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description=f"{repr(nation.alliance)} has no default attacking nuke condition.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description=f"{repr(nation.alliance)} has no default attacking nuke condition.",
                 )
             else:
                 return await ctx.reply(
@@ -370,13 +350,9 @@ class Settings(commands.Cog):
         settings = await AllianceSettings.fetch(nation.alliance.id)
         if condition is MISSING and not clear:
             if settings.default_attack_military_condition is None:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description=f"{repr(nation.alliance)} has no default attacking military condition.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description=f"{repr(nation.alliance)} has no default attacking military condition.",
                 )
             else:
                 return await ctx.reply(
@@ -447,13 +423,9 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
             else:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description="This server has no withdraw request channels.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description="This server has no withdraw request channels.",
                 )
         channels_set = None if clear else [i.id for i in channels]
         settings.withdraw_channels = channels_set
@@ -506,13 +478,9 @@ class Settings(commands.Cog):
                 ephemeral=True,
             )
         if require is settings.require_withdraw_approval:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    description="That's already the current withdrawal approval requirement.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                description="That's already the current withdrawal approval requirement.",
             )
         settings.require_withdraw_approval = require
         await settings.save()
@@ -543,12 +511,9 @@ class Settings(commands.Cog):
         nation = await Nation.convert(ctx, None)
         nation_alliance = nation.alliance
         if nation_alliance is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You need to be in an alliance to run this command.",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You need to be in an alliance to run this command.",
             )
         roles = [
             i
@@ -557,13 +522,9 @@ class Settings(commands.Cog):
             and (i.permissions.leadership or i.permissions.manage_offshores)
         ]
         if not roles:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    description="You do not have permission to manage the offshore.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                description="You do not have permission to manage the offshore.",
             )
         settings = await AllianceSettings.fetch(nation.alliance_id)
         if clear:
@@ -580,13 +541,9 @@ class Settings(commands.Cog):
         view = Confirm()
         leaders = [u for i in alliance.leaders if (u := i.user) is not None]
         if not leaders:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "That alliance has no leaders.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "That alliance has no leaders.",
             )
 
         await ctx.interaction.response.defer(ephemeral=True)
@@ -692,13 +649,9 @@ class Settings(commands.Cog):
                 ephemeral=True,
             )
         if require is settings.withdraw_from_offshore:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    description="That's already the offshore withdrawal setting.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                description="That's already the offshore withdrawal setting.",
             )
         settings.withdraw_from_offshore = require
         await settings.save()
@@ -778,13 +731,9 @@ class Settings(commands.Cog):
             )
         if purpose == "PERSONAL":
             if settings.purpose == "PERSONAL":
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description="The server purpose is already set to `PERSONAL`!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description="The server purpose is already set to `PERSONAL`!",
                 )
             settings.purpose = purpose
             settings.purpose_argument = None
@@ -1041,13 +990,9 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
             else:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description="This server has no welcome channels.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description="This server has no welcome channels.",
                 )
         channels_set = None if clear else [i.id for i in channels]  # type: ignore
         settings.welcome_settings.welcome_channels = channels_set
@@ -1103,13 +1048,9 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
             else:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description="This server has no join roles.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description="This server has no join roles.",
                 )
         roles_set = None if clear else [i.id for i in roles]  # type: ignore
         settings.welcome_settings.join_roles = roles_set
@@ -1165,13 +1106,9 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
             else:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description="This server has no verified roles.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description="This server has no verified roles.",
                 )
         roles_set = None if clear else [i.id for i in roles]  # type: ignore
         settings.welcome_settings.verified_roles = roles_set
@@ -1227,13 +1164,9 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
             else:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description="This server has no member roles.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description="This server has no member roles.",
                 )
         roles_set = None if clear else [i.id for i in roles]  # type: ignore
         settings.welcome_settings.member_roles = roles_set
@@ -1289,13 +1222,9 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
             else:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description="This server has no diplomat roles.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description="This server has no diplomat roles.",
                 )
         roles_set = None if clear else [i.id for i in roles]  # type: ignore
         settings.welcome_settings.diplomat_roles = roles_set
@@ -1403,13 +1332,9 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
             else:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description="This server has no manager roles.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description="This server has no manager roles.",
                 )
         roles_set = None if clear else [i.id for i in roles]
         settings.manager_role_ids = roles_set
@@ -1557,13 +1482,9 @@ class Settings(commands.Cog):
                         for i in settings.welcome_settings.alliance_auto_roles
                     )
                 if len(roles_str) >= 4000:
-                    await ctx.reply(
-                        embed=funcs.get_embed_author_member(
-                            ctx.author,
-                            description="There are too alliance auto roles to display.",
-                            color=discord.Color.red(),
-                        ),
-                        ephemeral=True,
+                    raise EmbedErrorMessage(
+                        ctx.author,
+                        description="There are too alliance auto roles to display.",
                     )
                 else:
                     await ctx.reply(
@@ -1575,13 +1496,9 @@ class Settings(commands.Cog):
                         ephemeral=True,
                     )
             else:
-                await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        description="This server has no alliance auto roles.",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    description="This server has no alliance auto roles.",
                 )
         else:
             await ctx.reply(
@@ -1644,13 +1561,9 @@ class Settings(commands.Cog):
                 ephemeral=True,
             )
         else:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    description="No alliance auto roles removed.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                description="No alliance auto roles removed.",
             )
 
     @server_settings_alliance_auto_roles.command(  # type: ignore
@@ -1667,13 +1580,9 @@ class Settings(commands.Cog):
         guild = ctx.guild
         settings = await GuildSettings.fetch(guild.id)
         if not settings.welcome_settings.alliance_auto_roles_enabled:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    description="Alliance auto roles are disabled.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                description="Alliance auto roles are disabled.",
             )
         auto_roles = [i for i in cache.alliance_auto_roles if i.guild_id == guild.id]
         highest_role: discord.Role = guild.get_member(self.bot.user.id).top_role  # type: ignore

@@ -10,6 +10,7 @@ from ... import funcs
 from ...cache import cache
 from ...checks import has_manage_permissions
 from ...data.classes import Alliance, Embassy, EmbassyConfig, Nation
+from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 if TYPE_CHECKING:
@@ -92,13 +93,9 @@ class Embassies(commands.Cog):
             assert isinstance(ctx.guild, discord.Guild)
         configs = [i for i in cache.embassy_configs if i.guild_id == ctx.guild.id]
         if not configs:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "No embassy configurations found for this server.",
-                    discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "No embassy configurations found for this server.",
             )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -165,22 +162,14 @@ class Embassies(commands.Cog):
         await ctx.interaction.response.defer()
         nation = await Nation.convert(ctx, None)
         if nation.alliance_position not in {"Officer", "Heir", "Leader"}:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You must be an Officer or higher to create an embassy.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You must be an Officer or higher to create an embassy.",
             )
         if nation.alliance is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You must be in an alliance to create an embassy.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You must be in an alliance to create an embassy.",
             )
         embassy, start = await config.create_embassy(ctx.author, nation.alliance)
         if start:

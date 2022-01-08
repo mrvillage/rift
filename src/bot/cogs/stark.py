@@ -11,7 +11,7 @@ from discord.utils import MISSING
 from ... import funcs
 from ...cache import cache
 from ...data.classes import Alliance, Nation
-from ...errors import AllianceNotFoundError
+from ...errors import AllianceNotFoundError, EmbedErrorMessage
 from ...funcs import withdraw
 from ...ref import Rift, RiftContext
 
@@ -107,21 +107,15 @@ class HouseStark(commands.Cog):
         nation = nation or await Nation.convert(ctx, nation)
         author_nation = await Nation.convert(ctx, None)
         if nation.alliance_id not in {3683, 8139, OFFSHORE_ID}:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "Stockpiles doesn't apply to that nation!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                "Stockpiles doesn't apply to that nation!",
             )
             return
         if author_nation.alliance_id not in {3683, 8139, OFFSHORE_ID}:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You don't have permission to use that command!!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You don't have permission to use that command!!",
             )
             return
         mmr = {
@@ -172,21 +166,15 @@ class HouseStark(commands.Cog):
         nat = nat[0]
         author_nation = await Nation.convert(ctx, None)
         if nation.alliance_id not in {3683, 8139, OFFSHORE_ID}:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "Stockpiles doesn't apply to that nation!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                "Stockpiles doesn't apply to that nation!",
             )
             return
         if author_nation.alliance_id not in {3683, 8139, OFFSHORE_ID}:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You don't have permission to use that command!!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You don't have permission to use that command!!",
             )
             return
         stockpile = {

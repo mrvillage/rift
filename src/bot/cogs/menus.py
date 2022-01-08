@@ -11,7 +11,7 @@ from ... import funcs
 from ...cache import cache
 from ...checks import has_manage_permissions
 from ...data.classes import Menu, MenuItem
-from ...errors import MenuItemNotFoundError
+from ...errors import EmbedErrorMessage, MenuItemNotFoundError
 from ...ref import Rift, RiftContext
 from ...text_flags import ButtonFlags, SelectFlags, SelectOptionFlags
 
@@ -54,13 +54,9 @@ class Menus(commands.Cog):
                 )
             )
         else:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "No menus found for this server!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "No menus found for this server!",
             )
 
     @menu.command(  # type: ignore
@@ -166,12 +162,9 @@ class Menus(commands.Cog):
                             flags = SelectOptionFlags.parse_flags(message.content[7:])
             else:
                 if not any(items):
-                    return await ctx.reply(
-                        embed=funcs.get_embed_author_member(
-                            ctx.author,
-                            "You didn't add any items!",
-                            color=discord.Color.red(),
-                        )
+                    raise EmbedErrorMessage(
+                        ctx.author,
+                        "You didn't add any items!",
                     )
                 for index, row in enumerate(items):
                     for item in row:
@@ -362,12 +355,9 @@ class Menus(commands.Cog):
                         if lower.startswith("option "):
                             flags = SelectOptionFlags.parse_flags(message.content[7:])
             if not any(items):
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        "You didn't add any items!",
-                        color=discord.Color.red(),
-                    )
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    "You didn't add any items!",
                 )
             menu.item_ids = new_menu.item_ids
             menu.description = new_menu.description

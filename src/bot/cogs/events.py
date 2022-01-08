@@ -16,6 +16,7 @@ from ...cache import cache
 from ...checks import has_manage_permissions
 from ...data.classes import Condition, Forum, Subscription
 from ...env import SOCKET_IP, SOCKET_PORT
+from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 
@@ -159,13 +160,9 @@ class Events(commands.Cog):
             }
         ]
         if not changes:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You didn't give any valid changes!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You didn't give any valid changes!",
             )
         subscription = await Subscription.subscribe(
             ctx.channel, "NATION", "UPDATE", changes, condition=condition
@@ -314,13 +311,9 @@ class Events(commands.Cog):
             assert isinstance(ctx.channel, discord.TextChannel)
             assert isinstance(ctx.author, discord.Member)
         if not forums:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You didn't give any valid forums!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You didn't give any valid forums!",
             )
         subscription = await Subscription.subscribe(
             ctx.channel,
@@ -397,13 +390,9 @@ class Events(commands.Cog):
                 i for i in cache.subscriptions if i.guild_id == ctx.guild.id
             ]
         elif channel.guild.id != ctx.guild.id:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You can only list subscriptions for this server.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You can only list subscriptions for this server.",
             )
         else:
             subscriptions = [
@@ -411,21 +400,13 @@ class Events(commands.Cog):
             ]
         if not subscriptions:
             if channel is MISSING:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        "There are no subscriptions for this server!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
-                )
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
+                raise EmbedErrorMessage(
                     ctx.author,
-                    f"There are no subscriptions for {channel.mention}.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+                    "There are no subscriptions for this server!",
+                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"There are no subscriptions for {channel.mention}.",
             )
         if channel is MISSING:
             return await ctx.reply(

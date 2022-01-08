@@ -7,6 +7,7 @@ from discord.utils import MISSING
 from ... import funcs
 from ...cache import cache
 from ...data.classes import Nation, User
+from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 
@@ -29,23 +30,15 @@ class Link(commands.Cog):
         member = user or ctx.author
         link = cache.get_user(member.id)
         if link is not None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"{member.mention} is already linked!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"{member.mention} is already linked!",
             )
         link = cache.get_user(nation.id)
         if link is not None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"{repr(nation)} is already linked!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"{repr(nation)} is already linked!",
             )
         await ctx.interaction.response.defer(ephemeral=True)
         try:
@@ -62,16 +55,12 @@ class Link(commands.Cog):
                 ephemeral=True,
             )
         except IndexError:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    member,
-                    f"""
+            raise EmbedErrorMessage(
+                member,
+                f"""
                 The Discord username on your nation page doesn't match the one on your account!
                 Head down to https://politicsandwar.com/nation/edit/ and scroll to the very bottom where it says "Discord Username:" and put `{member.name}#{member.discriminator}` in the space, hit Save Changes and run the command again!
                 """,
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
             )
 
     @commands.command(
