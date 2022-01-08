@@ -10,6 +10,7 @@ from discord.utils import MISSING
 from ... import funcs
 from ...cache import cache
 from ...data.classes import Condition, Nation, TargetReminder
+from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 
@@ -60,13 +61,9 @@ class Targets(commands.Cog):
         direct_message: bool = False,
     ):
         if not channels and not direct_message:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You need to specify channels to send in or specify to Direct Message you!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You need to specify channels to send in or specify to Direct Message you!",
             )
         reminder = await TargetReminder.create(
             nation,
@@ -117,13 +114,9 @@ class Targets(commands.Cog):
             key=lambda x: x.id,
         )
         if not reminders:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You have no target reminders.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You have no target reminders.",
             )
         await ctx.reply(
             embed=funcs.get_embed_author_member(

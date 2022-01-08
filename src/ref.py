@@ -33,20 +33,14 @@ class Rift(commands.Bot):
         self.enable_debug: bool = False
 
     async def update_pnw_session(self):
-        from .errors import LoginError
-
         login_data = {
             "email": PNW_EMAIL,
             "password": PNW_PASSWORD,
             "loginform": "Login",
         }
-        try:
-            async with self.pnw_session.request(
-                "POST", "https://politicsandwar.com/login/", data=login_data
-            ) as response:  # pylint: disable=line-too-long
-                if "login failure" in (await response.text()).lower():
-                    raise LoginError
-        except LoginError:
+        async with self.pnw_session.request(
+            "POST", "https://politicsandwar.com/login/", data=login_data
+        ):  # pylint: disable=line-too-long
             pass
 
     async def get_staff(self):

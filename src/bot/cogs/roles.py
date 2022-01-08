@@ -21,7 +21,7 @@ from ...cache import cache
 from ...checks import can_manage_alliance_roles
 from ...data.classes import Alliance, Nation, Role
 from ...enums import PrivacyLevel
-from ...errors import RoleNotFoundError
+from ...errors import EmbedErrorMessage, RoleNotFoundError
 from ...flags import Flags
 from ...ref import Rift, RiftContext
 from ...views import PermissionsSelector
@@ -168,29 +168,19 @@ def save_role_permissions(role: Role) -> Callable[[Flags], Coroutine[Any, Any, N
 
 async def manage_roles_command_check_with_message(
     ctx: RiftContext, alliance: Optional[Alliance] = None
-) -> Tuple[Nation, Optional[Alliance], bool]:
+) -> Tuple[Nation, Alliance]:
     nation, alliance, can = await manage_roles_command_check(ctx, alliance)
     if alliance is None:
-        await ctx.reply(
-            embed=funcs.get_embed_author_member(
-                ctx.author,
-                "You're not in an alliance and didn't specify one so I don't know where to manage! Please try again with an alliance.",
-                color=discord.Color.red(),
-            ),
-            ephemeral=True,
+        raise EmbedErrorMessage(
+            ctx.author,
+            "You're not in an alliance and didn't specify one so I don't know where to manage! Please try again with an alliance.",
         )
-        return nation, alliance, False
     if not can:
-        await ctx.reply(
-            embed=funcs.get_embed_author_member(
-                ctx.author,
-                f"You don't have permission to manage roles for {repr(alliance)}!",
-                color=discord.Color.red(),
-            ),
-            ephemeral=True,
+        raise EmbedErrorMessage(
+            ctx.author,
+            f"You don't have permission to manage roles for {repr(alliance)}!",
         )
-        return nation, alliance, False
-    return nation, alliance, True
+    return nation, alliance
 
 
 async def manage_roles_command_check(
@@ -241,11 +231,7 @@ class Roles(commands.Cog):
         alliance: Optional[Alliance] = None,
         privacy_level: Literal["PUBLIC", "PRIVATE", "PROTECTED"] = "PUBLIC",
     ):
-        nation, alliance, can = await manage_roles_command_check_with_message(
-            ctx, alliance
-        )
-        if not can or alliance is None:
-            return
+        nation, alliance = await manage_roles_command_check_with_message(ctx, alliance)
         role = Role.create(
             name,
             description,
@@ -265,13 +251,9 @@ class Roles(commands.Cog):
             and nation.alliance_position in {"Heir", "Leader"}
         )
         if rank >= max_rank and not leadership:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You can't create a role with a rank higher than the highest rank you have!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You can't create a role with a rank higher than the highest rank you have!",
             )
         view = PermissionsSelector(
             ctx.author.id,
@@ -325,19 +307,11 @@ class Roles(commands.Cog):
     )
     async def roles_delete(self, ctx: RiftContext, role: Role):
         if role.alliance is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "This role doesn't belong to an alliance!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "This role doesn't belong to an alliance!",
             )
-        _, alliance, can = await manage_roles_command_check_with_message(
-            ctx, role.alliance
-        )
-        if not can or alliance is None:
-            return
+        _, alliance = await manage_roles_command_check_with_message(ctx, role.alliance)
         await role.delete()
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -359,13 +333,9 @@ class Roles(commands.Cog):
     async def roles_list(self, ctx: RiftContext, alliance: Optional[Alliance] = None):
         nation, alliance, can = await manage_roles_command_check(ctx, alliance, True)
         if alliance is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You're not in an alliance and didn't specify one so I don't know where to look! Please try again with an alliance.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You're not in an alliance and didn't specify one so I don't know where to look! Please try again with an alliance.",
             )
         if can:
             privacy_levels = {
@@ -393,13 +363,9 @@ class Roles(commands.Cog):
                 ephemeral=True,
             )
         else:
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You can't view any roles for that alliance!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You can't view any roles for that alliance!",
             )
 
     @roles.command(  # type: ignore
@@ -424,13 +390,9 @@ class Roles(commands.Cog):
             ctx, role.alliance, True
         )
         if alliance is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You're not in an alliance and didn't specify one so I don't know where to look! Please try again with an alliance.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You're not in an alliance and didn't specify one so I don't know where to look! Please try again with an alliance.",
             )
         if can:
             privacy_levels = {
@@ -487,28 +449,18 @@ class Roles(commands.Cog):
             and description is MISSING
             and privacy_level is MISSING
         ):
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
+            raise EmbedErrorMessage(
                     ctx.author,
                     "You must specify at least one field to edit!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
             )
         if role.alliance is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
+            raise EmbedErrorMessage(
                     ctx.author,
                     "This role doesn't belong to an alliance!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
             )
-        nation, alliance, can = await manage_roles_command_check_with_message(
+        nation, alliance = await manage_roles_command_check_with_message(
             ctx, role.alliance
         )
-        if not can or alliance is None:
-            return
         roles = [
             i
             for i in cache.roles
@@ -520,22 +472,14 @@ class Roles(commands.Cog):
         )
         max_rank = max(i.rank for i in roles)
         if rank >= max_rank and not leadership:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
+            raise EmbedErrorMessage(
                     ctx.author,
                     "You can't edit a role to have a rank higher than the highest rank you have!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
             )
         if role.rank >= max_rank and not leadership:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
+            raise EmbedErrorMessage(
                     ctx.author,
                     "You can't edit a role with a higher rank than the highest rank you have!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
             )
         if name is not MISSING:
             role.name = name
@@ -598,19 +542,13 @@ class Roles(commands.Cog):
         self, ctx: RiftContext, role: Role, member: Union[discord.Member, discord.User]
     ):
         if role.alliance is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
+            raise EmbedErrorMessage(
                     ctx.author,
                     "This role doesn't belong to an alliance!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
             )
-        nation, alliance, can = await manage_roles_command_check_with_message(
+        nation, alliance = await manage_roles_command_check_with_message(
             ctx, role.alliance
         )
-        if not can or alliance is None:
-            return
         if (
             nation.alliance_position in {"Heir", "Leader"}
             and nation.alliance_id != alliance.id
@@ -623,13 +561,9 @@ class Roles(commands.Cog):
                 and ctx.author.id in i.member_ids
             ]
             if not roles:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
+                raise EmbedErrorMessage(
                         ctx.author,
                         "You don't have permission to add members to this role!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
                 )
             max_rank = max(i.rank for i in roles)
             leadership = any(i.permissions.leadership for i in roles) or (
@@ -637,22 +571,14 @@ class Roles(commands.Cog):
                 and nation.alliance_position in {"Heir", "Leader"}
             )
             if role.rank >= max_rank and not leadership:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
+                raise EmbedErrorMessage(
                         ctx.author,
                         "You don't have permission to add members to this role!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
                 )
         if member.id in role.member_ids:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
+            raise EmbedErrorMessage(
                     ctx.author,
                     f"{member.mention} is already a member of this role!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
             )
         role.member_ids.append(member.id)
         await role.save()
@@ -678,19 +604,13 @@ class Roles(commands.Cog):
         self, ctx: RiftContext, role: Role, member: Union[discord.Member, discord.User]
     ):
         if role.alliance is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
+            raise EmbedErrorMessage(
                     ctx.author,
                     "This role doesn't belong to an alliance!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
             )
-        nation, alliance, can = await manage_roles_command_check_with_message(
+        nation, alliance = await manage_roles_command_check_with_message(
             ctx, role.alliance
         )
-        if not can or alliance is None:
-            return
         if (
             nation.alliance_position in {"Heir", "Leader"}
             and nation.alliance_id != alliance.id
@@ -703,13 +623,9 @@ class Roles(commands.Cog):
                 and ctx.author.id in i.member_ids
             ]
             if not roles:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
+                raise EmbedErrorMessage(
                         ctx.author,
                         "You don't have permission to add members to this role!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
                 )
             max_rank = max(i.rank for i in roles)
             leadership = any(i.permissions.leadership for i in roles) or (
@@ -717,22 +633,14 @@ class Roles(commands.Cog):
                 and nation.alliance_position in {"Heir", "Leader"}
             )
             if role.rank >= max_rank and not leadership:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
+                raise EmbedErrorMessage(
                         ctx.author,
                         "You don't have permission to add members to this role!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
                 )
         if member.id not in role.member_ids:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
+            raise EmbedErrorMessage(
                     ctx.author,
                     f"{member.mention} is not a member of this role!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
             )
         role.member_ids.remove(member.id)
         await role.save()
@@ -763,13 +671,9 @@ class Roles(commands.Cog):
         member = member or ctx.author
         nation, alliance, can = await manage_roles_command_check(ctx, alliance, True)
         if alliance is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
+            raise EmbedErrorMessage(
                     ctx.author,
                     "You're not in an alliance and didn't specify one so I don't know where to look! Please try again with an alliance.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
             )
         if can:
             privacy_levels = {
@@ -789,13 +693,9 @@ class Roles(commands.Cog):
             and member.id in i.member_ids
         }
         if not roles:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
+            raise EmbedErrorMessage(
                     ctx.author,
                     f"{member.mention} doesn't have any roles in this alliance!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
             )
         enabled_permissions = ", ".join(
             f"`{i['name']}`"

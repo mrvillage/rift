@@ -6,6 +6,7 @@ from discord.utils import MISSING
 
 from ... import funcs
 from ...data.classes import Nation
+from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 
@@ -34,13 +35,9 @@ class Odds(commands.Cog):
     ):
         await ctx.response.defer()  # type: ignore
         if attacker is MISSING and defender is MISSING:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You must specify at least one nation.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You must specify at least one nation.",
             )
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)

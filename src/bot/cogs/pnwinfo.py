@@ -15,6 +15,7 @@ from ...cache import cache
 from ...data.classes import Alliance, Nation
 from ...errors import (
     AllianceNotFoundError,
+    EmbedErrorMessage,
     NationNotFoundError,
     NationOrAllianceNotFoundError,
 )
@@ -213,12 +214,9 @@ class PnWInfo(commands.Cog):
         try:
             rev = await search_.calculate_revenue(fetch_spies=fetch_spies)
         except IndexError:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"Something went wrong calculating {repr(search_)}'s revenue. It's probably a turn, try again in a few minutes!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"Something went wrong calculating {repr(search_)}'s revenue. It's probably a turn, try again in a few minutes!",
             )
         if TYPE_CHECKING:
             from ...data.classes import Resources
@@ -293,13 +291,9 @@ class PnWInfo(commands.Cog):
             else (len(cache.alliances) // 50)
         )
         if page > max_page or page < 0:
-            return await ctx.interaction.response.send_message(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"Page {page} does not exist.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"Page {page} does not exist.",
             )
         offset = (page - 1) * 50
         alliances = sorted(iter(cache.alliances), key=lambda x: x.rank)[

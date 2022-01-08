@@ -8,7 +8,7 @@ from discord.ext import commands
 from ... import funcs
 from ...cache import cache
 from ...data.classes import Condition
-from ...errors import InvalidConditionError
+from ...errors import EmbedErrorMessage, InvalidConditionError
 from ...ref import Rift, RiftContext
 from ...views import Confirm
 
@@ -93,13 +93,9 @@ class Conditions(commands.Cog):
     async def condition_list(self, ctx: RiftContext):
         conditions = [i for i in cache.conditions if i.owner_id == ctx.author.id]
         if not conditions:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You don't have any conditions!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You don't have any conditions!",
             )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
