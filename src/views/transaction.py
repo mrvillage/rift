@@ -111,6 +111,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
         transaction.status = TransactionStatus.ACCEPTED
         if transaction.type is TransactionType.TRANSFER:
             if transaction.to is None or transaction.from_ is None:
+                transaction.status = TransactionStatus.FAILED
                 return await interaction.response.send_message(
                     embed=funcs.get_embed_author_member(
                         interaction.user,
@@ -123,6 +124,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                 value < transaction.resources[key]
                 for key, value in transaction.resources.to_dict().items()
             ):
+                transaction.status = TransactionStatus.FAILED
                 return await interaction.response.send_message(
                     embed=funcs.get_embed_author_member(
                         interaction.user,
@@ -147,6 +149,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                 or transaction.to_nation is None
                 or transaction.from_.alliance is None
             ):
+                transaction.status = TransactionStatus.FAILED
                 return await interaction.response.send_message(
                     embed=funcs.get_embed_author_member(
                         interaction.user,
@@ -160,6 +163,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                 value < getattr(transaction.resources, key)
                 for key, value in transaction.from_.resources.to_dict().items()
             ):
+                transaction.status = TransactionStatus.FAILED
                 return await interaction.followup.send(
                     embed=funcs.get_embed_author_member(
                         interaction.user,
@@ -200,6 +204,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                     note=f"Rift Withdrawal from Account #{transaction.from_.id} and note: {transaction.note}",
                 )
             if not success:
+                transaction.status = TransactionStatus.PENDING
                 return await interaction.followup.send(
                     embed=funcs.get_embed_author_member(
                         interaction.user,

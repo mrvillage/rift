@@ -17,3 +17,4 @@ class TransactionStatus(Enum):
     ACCEPTED = 1
     REJECTED = 2
     CANCELLED = 3
+    FAILED = 4
