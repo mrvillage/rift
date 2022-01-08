@@ -26,6 +26,8 @@ class Errors(commands.Cog):
             and commands.Cog._get_overridden_method(cog.cog_command_error) is not None  # type: ignore
         ):
             return
+        if getattr(error, "success", False):
+            return
         await funcs.handler(ctx, error)
 
 

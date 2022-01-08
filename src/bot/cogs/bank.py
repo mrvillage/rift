@@ -20,7 +20,7 @@ from ...data.classes import (
     TransactionRequest,
 )
 from ...enums import AccountType, TransactionStatus, TransactionType
-from ...errors import NoCredentialsError, NoRolesError
+from ...errors import EmbedErrorMessage, NoCredentialsError, NoRolesError
 from ...ref import Rift, RiftContext
 from ...views import (
     Confirm,
@@ -64,13 +64,9 @@ class Bank(commands.Cog):
         recipient_ = await funcs.convert_nation_or_alliance(ctx, recipient)
         alliance_ = alliance or await Alliance.convert(ctx, None)
         if alliance_ is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You're not in an alliance and didn't specify one to send from! Please try again with an alliance.",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You're not in an alliance and didn't specify one to send from! Please try again with an alliance.",
             )
         if not len(resources):
             return await ctx.reply(
@@ -225,12 +221,9 @@ class Bank(commands.Cog):
             )
         ]
         if not roles:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"You don't have permission to create bank accounts in alliance {repr(alliance)}.",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"You don't have permission to create bank accounts in alliance {repr(alliance)}.",
             )
         if not accounts:
             primary = True
@@ -260,25 +253,17 @@ class Bank(commands.Cog):
     )
     async def bank_account_delete(self, ctx: RiftContext, account: Account = MISSING):
         if account.owner_id != ctx.author.id:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You can only delete your own accounts!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You can only delete your own accounts!",
             )
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         primary_account = next(i for i in accounts if i.primary)
         account = account or primary_account
         if account.primary and account.resources:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You cannot delete your primary account while it has resources!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You cannot delete your primary account while it has resources!",
             )
         primary_account.resources += account.resources
         await primary_account.save()
@@ -313,53 +298,33 @@ class Bank(commands.Cog):
     ):
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         if not accounts:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You do not have any bank accounts!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You do not have any bank accounts!",
             )
         if not amount:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You cannot transfer no resources!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You cannot transfer no resources!",
             )
         from_ = from_ or next(i for i in accounts if i.primary)
         if from_.id == to.id:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You cannot transfer resources to the same account!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You cannot transfer resources to the same account!",
             )
         if from_.owner_id != ctx.author.id:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You can only transfer from your own accounts!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You can only transfer from your own accounts!",
             )
         if any(
             value < getattr(amount, key)
             for key, value in from_.resources.to_dict().items()
         ):
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You cannot transfer more resources than you have!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You cannot transfer more resources than you have!",
             )
         if to.owner_id == from_.owner_id:
             status = TransactionStatus.ACCEPTED
@@ -411,13 +376,9 @@ class Bank(commands.Cog):
     async def bank_account_info(self, ctx: RiftContext, account: Account = MISSING):
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         if not accounts:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You do not have any bank accounts!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You do not have any bank accounts!",
             )
         account = account or next(i for i in accounts if i.primary)
         roles = [
@@ -432,13 +393,9 @@ class Bank(commands.Cog):
             )
         ]
         if account.owner_id != ctx.author.id and not roles:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You don't have permission to get information about that bank account!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You don't have permission to get information about that bank account!",
             )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -497,13 +454,9 @@ class Bank(commands.Cog):
         if alliance is not MISSING:
             accounts = [i for i in accounts if i.alliance_id == alliance.id]
         if not accounts:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "No bank accounts found!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "No bank accounts found!",
             )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -545,13 +498,9 @@ class Bank(commands.Cog):
             and primary is MISSING
             and resources is MISSING
         ):
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You must specify at least one field to edit!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You must specify at least one field to edit!",
             )
         roles = [
             i
@@ -561,13 +510,9 @@ class Bank(commands.Cog):
             and (i.permissions.leadership or i.permissions.manage_bank_accounts)
         ]
         if ctx.author.id != account.owner_id and not roles:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You don't have permission to edit that account!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You don't have permission to edit that account!",
             )
         if name is not MISSING:
             account.name = name
@@ -575,13 +520,9 @@ class Bank(commands.Cog):
             account.war_chest = war_chest
         if primary is not MISSING:
             if not primary:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        "You can't unset your primary account!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    "You can't unset your primary account!",
                 )
             account.primary = primary
             accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
@@ -591,13 +532,9 @@ class Bank(commands.Cog):
                     await i.save()
         if resources is not MISSING:
             if not roles:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        "You do not have permission to edit resources on this account!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    "You do not have permission to edit resources on this account!",
                 )
             account.resources = resources
         await account.save()
@@ -629,32 +566,20 @@ class Bank(commands.Cog):
     ):
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         if not accounts:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You do not have any bank accounts!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You do not have any bank accounts!",
             )
         account = account or next(i for i in accounts if i.primary)
         if account.owner_id != ctx.author.id:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You can only deposit into your own accounts!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You can only deposit into your own accounts!",
             )
         if not resources or any(i < 0 for i in resources):
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You must specify an amount of resources to deposit!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You must specify an amount of resources to deposit!",
             )
         nation = await Nation.convert(ctx, None)
         credentials = cache.get_credentials(nation.id)
@@ -693,23 +618,15 @@ class Bank(commands.Cog):
     ):
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         if not accounts:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You do not have any bank accounts!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You do not have any bank accounts!",
             )
         account = account or next(i for i in accounts if i.primary)
         if account.owner_id != ctx.author.id:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You can only check deposits for your own accounts!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You can only check deposits for your own accounts!",
             )
         await ctx.interaction.response.defer(ephemeral=True)
         nation = await Nation.convert(ctx, None)
@@ -742,7 +659,7 @@ class Bank(commands.Cog):
             return await ctx.interaction.edit_original_message(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    "Could not retrieve bank information!",
+                    "I could not retrieve bank information!",
                     color=discord.Color.red(),
                 ),
             )
@@ -819,53 +736,33 @@ class Bank(commands.Cog):
     ):  # sourcery no-metrics
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         if not accounts:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You do not have any bank accounts!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You do not have any bank accounts!",
             )
         account = account or next(i for i in accounts if i.primary)
         if account.owner_id != ctx.author.id:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You can only deposit into your own accounts!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You can only deposit into your own accounts!",
             )
         if not resources or any(i < 0 for i in resources):
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You must specify an amount of resources to deposit!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You must specify an amount of resources to deposit!",
             )
         if any(
             value > getattr(account.resources, key)
             for key, value in resources.to_dict().items()
         ):
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You do not have enough resources in your account!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You do not have enough resources in your account!",
             )
         if account.alliance is None:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "The alliance associated with that account no longer exists!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "The alliance associated with that account no longer exists!",
             )
         nation = nation or await Nation.convert(ctx, None)
         settings = await AllianceSettings.fetch(nation.alliance_id)
@@ -962,13 +859,9 @@ class Bank(commands.Cog):
     ):
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         if not accounts:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You do not have any bank accounts!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You do not have any bank accounts!",
             )
         account = account or next(i for i in accounts if i.primary)
         roles = [
@@ -979,13 +872,9 @@ class Bank(commands.Cog):
             and (i.permissions.leadership or i.permissions.manage_bank_accounts)
         ]
         if account.owner_id != ctx.author.id and not roles:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You don't have permission to view the transaction history of that account!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You don't have permission to view the transaction history of that account!",
             )
         transactions = [
             i
@@ -997,13 +886,9 @@ class Bank(commands.Cog):
             status = getattr(TransactionStatus, status)
             transactions = [i for i in transactions if i.status is status]
         if not transactions:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "There are no transactions for that account!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "There are no transactions for that account!",
             )
         transactions.sort(key=lambda x: x.id, reverse=True)
         view = TransactionHistoryView(
@@ -1038,23 +923,15 @@ class Bank(commands.Cog):
         self, ctx: RiftContext, transaction: Transaction
     ):  # sourcery no-metrics
         if transaction.status is not TransactionStatus.PENDING:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "That transaction is not pending!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "That transaction is not pending!",
             )
         if transaction.type is TransactionType.WITHDRAW:
             if transaction.from_ is None:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        "One account involved in that transaction does not exist!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    "One account involved in that transaction does not exist!",
                 )
             roles = [
                 i
@@ -1064,51 +941,31 @@ class Bank(commands.Cog):
                 and (i.permissions.leadership or i.permissions.manage_bank_accounts)
             ]
             if not roles:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        "You don't have permission to review that transaction!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    "You don't have permission to review that transaction!",
                 )
         elif transaction.type is TransactionType.TRANSFER:
             if transaction.to is None:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        "One account involved that transaction does not exist!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    "One account involved that transaction does not exist!",
                 )
             if transaction.to.owner_id != ctx.author.id:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        "You don't have permission to review that transaction!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    "You don't have permission to review that transaction!",
                 )
         elif transaction.type is TransactionType.DEPOSIT:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You can't review a deposit!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You can't review a deposit!",
             )
         elif transaction.type is TransactionType.GRANT:
             if transaction.from_ is None:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        "One account involved in that transaction does not exist!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    "One account involved in that transaction does not exist!",
                 )
             roles = [
                 i
@@ -1122,13 +979,9 @@ class Bank(commands.Cog):
                 )
             ]
             if not roles:
-                return await ctx.reply(
-                    embed=funcs.get_embed_author_member(
-                        ctx.author,
-                        "You don't have permission to review that transaction!",
-                        color=discord.Color.red(),
-                    ),
-                    ephemeral=True,
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    "You don't have permission to review that transaction!",
                 )
         request = await TransactionRequest.create(transaction, ctx.author)
         view = TransactionRequestView(request, ctx.author.id, 60)

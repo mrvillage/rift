@@ -10,6 +10,7 @@ from ... import funcs
 from ...cache import cache
 from ...checks import has_manage_permissions
 from ...data.classes import Ticket, TicketConfig
+from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 if TYPE_CHECKING:
@@ -50,21 +51,14 @@ class Tickets(commands.Cog):
         try:
             ticket = await Ticket.fetch(ctx.channel.id)
         except IndexError:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "This channel is not a ticket.",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                "This channel is not a ticket.",
             )
         if not ticket.open:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "This ticket is already archived!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author,
+                "This ticket is already archived!",
             )
         config = await TicketConfig.fetch(ticket.config_id)
         ticket.open = False

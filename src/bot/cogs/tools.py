@@ -10,6 +10,7 @@ from discord.utils import MISSING
 from ... import Rift, funcs
 from ...cache import cache
 from ...data.classes import Alliance, Nation, Resources
+from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 if TYPE_CHECKING:
@@ -53,12 +54,9 @@ class Tools(commands.Cog):
         advanced_engineering_corps: bool = False,
     ):
         if after - before >= 1000000:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "Sorry, but I can't calculate that much infrastructure!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                "Sorry, but I can't calculate that much infrastructure!",
             )
         raw_cost = cost = funcs.calculate_infrastructure_value(before, after)
         if urbanization_policy:
@@ -97,12 +95,9 @@ class Tools(commands.Cog):
         advanced_engineering_corps: bool = False,
     ):
         if after - before >= 1000000:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "Sorry, but I can't calculate that much land!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                "Sorry, but I can't calculate that much land!",
             )
         raw_cost = cost = funcs.calculate_land_value(before, after)
         if rapid_expansion_policy:
@@ -141,12 +136,9 @@ class Tools(commands.Cog):
         advanced_urban_planning: bool = False,
     ):
         if before < 1:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "Sorry, but I can't calculate that range of cities! I can only calculate numbers above 1.",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                "Sorry, but I can't calculate that range of cities! I can only calculate numbers above 1.",
             )
         raw_cost = cost = funcs.calculate_city_value(before, after)
         if urban_planning:
@@ -179,12 +171,9 @@ class Tools(commands.Cog):
         page: int = 1,
     ):
         if page not in {1, 2}:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"`{page}` is not a valid page!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"`{page}` is not a valid page!",
             )
         prices = cache.prices
         fields: List[Field] = [
@@ -216,12 +205,9 @@ class Tools(commands.Cog):
     )
     async def tools_calculate_value(self, ctx: RiftContext, *, resources: Resources):
         if not resources:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You didn't specify any resources!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You didn't specify any resources!",
             )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -254,12 +240,9 @@ class Tools(commands.Cog):
     ):
         nation = nation or await Nation.convert(ctx, nation)
         if any(after - i.infrastructure >= 1000000 for i in nation.partial_cities):
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "Sorry, but I can't calculate that much infrastructure!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                "Sorry, but I can't calculate that much infrastructure!",
             )
         raw_cost = cost = sum(
             funcs.calculate_infrastructure_value(i.infrastructure, after)
@@ -304,12 +287,9 @@ class Tools(commands.Cog):
     ):
         nation = nation or await Nation.convert(ctx, nation)
         if any(after - i.land >= 1000000 for i in nation.partial_cities):
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "Sorry, but I can't calculate that much land!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                "Sorry, but I can't calculate that much land!",
             )
         raw_cost = cost = sum(
             funcs.calculate_land_value(i.land, after)
@@ -387,12 +367,9 @@ class Tools(commands.Cog):
         page: int = 1,
     ):
         if page not in {1, 2}:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"`{page}` is not a valid page!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"`{page}` is not a valid page!",
             )
         nation = nation or await Nation.convert(ctx, nation)
         prices = cache.prices
@@ -446,12 +423,9 @@ class Tools(commands.Cog):
     ):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         if any(after - i.infrastructure >= 1000000 for i in alliance.partial_cities):
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "Sorry, but I can't calculate that much infrastructure!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                "Sorry, but I can't calculate that much infrastructure!",
             )
         await ctx.interaction.response.defer()
         projects = (
@@ -505,12 +479,9 @@ class Tools(commands.Cog):
     ):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         if any(after - i.infrastructure >= 1000000 for i in alliance.partial_cities):
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "Sorry, but I can't calculate that much land!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                "Sorry, but I can't calculate that much land!",
             )
         await ctx.interaction.response.defer()
         projects = (
@@ -608,12 +579,9 @@ class Tools(commands.Cog):
         page: int = 1,
     ):  # sourcery no-metrics
         if page not in {1, 2}:
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    f"`{page}` is not a valid page!",
-                    color=discord.Color.red(),
-                )
+            raise EmbedErrorMessage(
+                ctx.author,
+                f"`{page}` is not a valid page!",
             )
         alliance = alliance or await Alliance.convert(ctx, alliance)
         await ctx.interaction.response.defer()

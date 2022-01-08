@@ -8,6 +8,7 @@ from discord.utils import MISSING
 
 from .. import funcs
 from ..data.classes import AllianceSettings, Condition, Nation, Target
+from ..errors import EmbedErrorMessage
 from ..ref import RiftContext
 
 __all__ = ("find_targets", "find_attackers")
@@ -84,13 +85,9 @@ async def find_targets(
             await asyncio.sleep(0)
     ratings = sorted(ratings, key=lambda i: i[0], reverse=True)
     if not ratings[offset:]:
-        return await ctx.reply(
-            embed=funcs.get_embed_author_member(
-                ctx.author,
-                "No targets found.",
-                color=discord.Color.red(),
-            ),
-            ephemeral=True,
+        raise EmbedErrorMessage(
+            ctx.author,
+            "No targets found.",
         )
     fields: List[Field] = []
     for target in ratings[offset:]:
@@ -216,13 +213,9 @@ async def find_attackers(
             await asyncio.sleep(0)
     ratings = sorted(ratings, key=lambda i: i[0], reverse=True)
     if not ratings[offset:]:
-        return await ctx.reply(
-            embed=funcs.get_embed_author_member(
-                ctx.author,
-                "No attackers found.",
-                color=discord.Color.red(),
-            ),
-            ephemeral=True,
+        raise EmbedErrorMessage(
+            ctx.author,
+            "No attackers found.",
         )
     fields: List[Field] = []
     for target in ratings[offset:]:
