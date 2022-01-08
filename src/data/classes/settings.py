@@ -190,7 +190,7 @@ class GuildWelcomeSettings(Makeable):
 
     async def save(self) -> None:
         await execute_query(
-            "INSERT INTO guild_welcome_settings (guild, welcome_message, welcome_channels, join_roles, verified_roles, member_roles, diplomat_roles, verified_nickname, enforce_verified_nicknames, alliance_auto_roles_enabled, alliance_auto_role_creation_enabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT (guild) DO UPDATE SET welcome_message = $2, welcome_channels = $3, join_roles = $4, verified_roles = $5, member_roles = $6, diplomat_roles = $7, verified_nickname = $8, enforce_verified_nickname = $9, alliance_auto_roles_enabled = $10, alliance_auto_role_creation_enabled = $11 WHERE guild_welcome_settings.guild = $1;",
+            "INSERT INTO guild_welcome_settings (guild, welcome_message, welcome_channels, join_roles, verified_roles, member_roles, diplomat_roles, verified_nickname, enforce_verified_nickname, alliance_auto_roles_enabled, alliance_auto_role_creation_enabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT (guild) DO UPDATE SET welcome_message = $2, welcome_channels = $3, join_roles = $4, verified_roles = $5, member_roles = $6, diplomat_roles = $7, verified_nickname = $8, enforce_verified_nickname = $9, alliance_auto_roles_enabled = $10, alliance_auto_role_creation_enabled = $11 WHERE guild_welcome_settings.guild = $1;",
             self.guild_id,
             self.welcome_message,
             self.welcome_channels,
