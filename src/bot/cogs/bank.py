@@ -409,10 +409,16 @@ class Bank(commands.Cog):
             user = ctx.author
             accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         else:
+            link = cache.get_user(ctx.author.id)
+            nation = cache.get_nation(link.nation_id) if link is not None else None
+            alliance_position = nation.alliance_position if nation is not None else 0
             roles = [
                 i
                 for i in cache.roles
-                if ctx.author.id in i.member_ids
+                if (
+                    ctx.author.id in i.member_ids
+                    or alliance_position in i.alliance_positions
+                )
                 and (
                     i.permissions.leadership
                     or i.permissions.view_bank_accounts
