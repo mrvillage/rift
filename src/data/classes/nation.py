@@ -69,9 +69,7 @@ class Nation(Makeable):
         self.domestic_policy: str = utils.get_domestic_policy(data["domestic_policy"])
         self.color: str = utils.get_color(data["color"])
         self.alliance_id: int = data["alliance_id"]
-        self.alliance_position: str = utils.get_alliance_position(
-            data["alliance_position"]
-        )
+        self.alliance_position: int = data["alliance_position"]
         self.cities: int = data["cities"]
         self.offensive_wars: int = data["offensive_wars"]
         self.defensive_wars: int = data["defensive_wars"]
@@ -110,9 +108,7 @@ class Nation(Makeable):
         self.domestic_policy: str = utils.get_domestic_policy(data["domestic_policy"])
         self.color: str = utils.get_color(data["color"])
         self.alliance_id: int = data["alliance_id"]
-        self.alliance_position: str = utils.get_alliance_position(
-            data["alliance_position"]
-        )
+        self.alliance_position: int = data["alliance_position"]
         self.cities: int = data["cities"]
         self.offensive_wars: int = data["offensive_wars"]
         self.defensive_wars: int = data["defensive_wars"]
@@ -225,7 +221,10 @@ class Nation(Makeable):
                 if self.alliance is not None
                 else "None",
             },
-            {"name": "Alliance Position", "value": self.alliance_position},
+            {
+                "name": "Alliance Position",
+                "value": utils.get_alliance_position(self.alliance_position),
+            },
             {
                 "name": "Cities",
                 "value": f"[{self.cities}](https://politicsandwar.com/?id=62&n={'+'.join(self.name.split(' '))})",

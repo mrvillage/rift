@@ -161,7 +161,7 @@ class Embassies(commands.Cog):
             assert isinstance(ctx.author, discord.Member)
         await ctx.interaction.response.defer()
         nation = await Nation.convert(ctx, None)
-        if nation.alliance_position not in {"Officer", "Heir", "Leader"}:
+        if nation.alliance_position < 3:
             raise EmbedErrorMessage(
                 ctx.author,
                 "You must be an Officer or higher to create an embassy.",

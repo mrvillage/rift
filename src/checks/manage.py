@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 from discord.ext import commands
 
-from ..cache import cache
 from ..data.classes import GuildSettings, Nation
 from ..ref import RiftContext
 
@@ -27,17 +26,13 @@ async def can_manage_alliance_roles(
 ):
     if alliance is None:
         return False
-    if (
-        nation.alliance_position in {"Heir", "Leader"}
-        and nation.alliance_id == alliance.id
-    ):
+    if nation.alliance_position >= 4 and nation.alliance_id == alliance.id:
         return True
-    roles = [i for i in cache.roles if i.alliance_id == alliance.id]
-    if any(
-        role.permissions.manage_roles or role.permissions.leadership
-        for role in roles
-        if nation.id in role.member_ids
-    ):
+    user = nation.user
+    if user is None:
+        return False
+    permissions = alliance.permissions_for(user)
+    if permissions.leadership or permissions.manage_roles:
         return True
     if suppress:
         return False
@@ -47,7 +42,7 @@ async def can_manage_alliance_roles(
 def has_alliance_manage_permissions():
     async def predicate(ctx: RiftContext):
         nation = await Nation.convert(ctx, None)
-        if nation.alliance_position in {"Officer", "Heir", "Leader"}:
+        if nation.alliance_position >= 3:
             return True
         raise commands.MissingPermissions(["alliance_manage"])
 
