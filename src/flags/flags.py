@@ -20,11 +20,11 @@ class Flags:
             setattr(flags, flag, value)
         return flags
 
-    def __add__(self, other: Flags) -> Flags:
-        return Flags(self.flags | other.flags)
+    def __add__(self, other: T) -> T:
+        return self.__class__(self.flags | other.flags)  # type: ignore
 
-    def __sub__(self, other: Flags) -> Flags:
-        return Flags(self.flags & ~other.flags)
+    def __sub__(self, other: T) -> T:
+        return self.__class__(self.flags & ~other.flags)  # type: ignore
 
 
 class flag:

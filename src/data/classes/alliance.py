@@ -473,12 +473,6 @@ class Alliance(Makeable):
     @staticmethod
     def permissions_for_id(id: int, user: Union[discord.User, discord.Member]) -> RolePermissions:
         link = cache.get_user(user.id)
-        if link is not None:
-            nation = cache.get_nation(link.nation_id)
-        else:
-            nation = None
-        if nation is not None:
-            alliance_position = nation.alliance_position
-        else:
-            alliance_position = 0
-        return sum(i.permissions for i in cache.roles if i.alliance_id == id and (user.id in i.member_ids or alliance_position in i.alliance_positions), RolePermissions())
+        nation = cache.get_nation(link.nation_id) if link is not None else None
+        alliance_position = nation.alliance_position if nation is not None else 0
+        return sum((i.permissions for i in cache.roles if i.alliance_id == id and (user.id in i.member_ids or alliance_position in i.alliance_positions)), RolePermissions())

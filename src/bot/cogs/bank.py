@@ -78,7 +78,7 @@ class Bank(commands.Cog):
                 ephemeral=True,
             )
         permissions = alliance.permissions_for(ctx.author)
-        if permissions.send_alliance_bank or permissions.leadership:
+        if not (permissions.leadership or permissions.send_alliance_bank):
             raise NoRolesError(alliance_, "Send Alliance Bank")
         view = Confirm(defer=True)
         await ctx.reply(
@@ -158,7 +158,7 @@ class Bank(commands.Cog):
     async def bank_balance(self, ctx: RiftContext, *, alliance: Alliance = MISSING):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         permissions = alliance.permissions_for(ctx.author)
-        if permissions.view_alliance_bank or permissions.leadership:
+        if not (permissions.view_alliance_bank or permissions.leadership):
             raise NoRolesError(alliance, "View Alliance Bank")
         resources = await alliance.fetch_bank()
         await ctx.reply(
@@ -199,7 +199,7 @@ class Bank(commands.Cog):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         permissions = alliance.permissions_for(ctx.author)
-        if (
+        if not (
             permissions.create_bank_account
             or permissions.manage_bank_accounts
             or permissions.leadership
