@@ -101,7 +101,7 @@ class RolePermissions(Flags):
         return 1 << 8
 
     @flag
-    def create_bank_account(self):
+    def create_bank_accounts(self):
         return 1 << 9
 
     @flag

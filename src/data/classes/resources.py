@@ -286,3 +286,23 @@ class Resources:
 
     def __iter__(self) -> Iterator[float]:
         return iter([i for i in self.to_dict().values() if i != 0])
+
+    def __lt__(self, other: Union[float, int, Resources]) -> bool:
+        if isinstance(other, Resources):
+            return any(self[key] < other[key] for key in self.to_dict().keys())
+        return any(self[key] < other for key in self.to_dict().keys())
+
+    def __le__(self, other: Union[float, int, Resources]) -> bool:
+        if isinstance(other, Resources):
+            return all(self[key] <= other[key] for key in self.to_dict().keys())
+        return all(self[key] <= other for key in self.to_dict().keys())
+
+    def __gt__(self, other: Union[float, int, Resources]) -> bool:
+        if isinstance(other, Resources):
+            return any(self[key] > other[key] for key in self.to_dict().keys())
+        return any(self[key] > other for key in self.to_dict().keys())
+
+    def __ge__(self, other: Union[float, int, Resources]) -> bool:
+        if isinstance(other, Resources):
+            return all(self[key] >= other[key] for key in self.to_dict().keys())
+        return all(self[key] >= other for key in self.to_dict().keys())

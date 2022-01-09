@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Union
 import cachetools
 import discord
 import pnwkit
+from pnwkit.async_ import AsyncKit
 
 from ...cache import cache
 from ...errors import AllianceNotFoundError, NoCredentialsError
@@ -442,10 +443,11 @@ class Alliance(Makeable):
         credentials = credentials.find_highest_alliance_credentials(
             self, "view_alliance_bank"
         )
-        if credentials is None:
+        if credentials is None or credentials.api_key is None:
             raise NoCredentialsError(self)
 
-        data = await pnwkit.async_alliance_query(
+        kit = AsyncKit(credentials.api_key)
+        data = await kit.alliance_query(
             {"id": self.id, "first": 1},
             "money",
             "coal",
@@ -471,8 +473,20 @@ class Alliance(Makeable):
         return self.permissions_for_id(self.id, user)
 
     @staticmethod
-    def permissions_for_id(id: int, user: Union[discord.User, discord.Member]) -> RolePermissions:
+    def permissions_for_id(
+        id: int, user: Union[discord.User, discord.Member]
+    ) -> RolePermissions:
         link = cache.get_user(user.id)
         nation = cache.get_nation(link.nation_id) if link is not None else None
         alliance_position = nation.alliance_position if nation is not None else 0
-        return sum((i.permissions for i in cache.roles if i.alliance_id == id and (user.id in i.member_ids or alliance_position in i.alliance_positions)), RolePermissions())
+        return sum(
+            (
+                i.permissions
+                for i in cache.roles
+                if i.alliance_id == id
+                and (
+                    user.id in i.member_ids or alliance_position in i.alliance_positions
+                )
+            ),
+            RolePermissions(),
+        )

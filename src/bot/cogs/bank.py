@@ -69,13 +69,13 @@ class Bank(commands.Cog):
                 "You're not in an alliance and didn't specify one to send from! Please try again with an alliance.",
             )
         if not len(resources):
-            return await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author,
-                    "You didn't give any valid resources!",
-                    color=discord.Color.red(),
-                ),
-                ephemeral=True,
+            raise EmbedErrorMessage(
+                ctx.author, "You didn't specify any resources to send!"
+            )
+        if resources < 0:
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You can't send negative resources! Please try again with a positive amount.",
             )
         permissions = alliance.permissions_for(ctx.author)
         if not (permissions.leadership or permissions.send_alliance_bank):
@@ -200,7 +200,7 @@ class Bank(commands.Cog):
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         permissions = alliance.permissions_for(ctx.author)
         if not (
-            permissions.create_bank_account
+            permissions.create_bank_accounts
             or permissions.manage_bank_accounts
             or permissions.leadership
         ):
@@ -409,10 +409,16 @@ class Bank(commands.Cog):
             user = ctx.author
             accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         else:
+            link = cache.get_user(ctx.author.id)
+            nation = cache.get_nation(link.nation_id) if link is not None else None
+            alliance_position = nation.alliance_position if nation is not None else 0
             roles = [
                 i
                 for i in cache.roles
-                if ctx.author.id in i.member_ids
+                if (
+                    ctx.author.id in i.member_ids
+                    or alliance_position in i.alliance_positions
+                )
                 and (
                     i.permissions.leadership
                     or i.permissions.view_bank_accounts
@@ -719,7 +725,7 @@ class Bank(commands.Cog):
                 ctx.author,
                 "You can only deposit into your own accounts!",
             )
-        if not resources or any(i < 0 for i in resources):
+        if not resources or resources < 0:
             raise EmbedErrorMessage(
                 ctx.author,
                 "You must specify an amount of resources to deposit!",
