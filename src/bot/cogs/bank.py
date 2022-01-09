@@ -290,6 +290,11 @@ class Bank(commands.Cog):
                 ctx.author,
                 "You cannot transfer no resources!",
             )
+        if amount < 0:
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You cannot transfer negative resources!",
+            )
         from_ = from_ or next(i for i in accounts if i.primary)
         if from_.id == to.id:
             raise EmbedErrorMessage(
@@ -493,6 +498,11 @@ class Bank(commands.Cog):
                 ctx.author,
                 "You don't have permission to edit that account!",
             )
+        if resources is not MISSING and resources < 0:
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You cannot set a negative amount of resources!",
+            )
         if name is not MISSING:
             account.name = name
         if war_chest is not MISSING:
@@ -555,7 +565,7 @@ class Bank(commands.Cog):
                 ctx.author,
                 "You can only deposit into your own accounts!",
             )
-        if not resources or any(i < 0 for i in resources):
+        if not resources or resources < 0:
             raise EmbedErrorMessage(
                 ctx.author,
                 "You must specify an amount of resources to deposit!",
