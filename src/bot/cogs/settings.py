@@ -515,13 +515,8 @@ class Settings(commands.Cog):
                 ctx.author,
                 "You need to be in an alliance to run this command.",
             )
-        roles = [
-            i
-            for i in cache.roles
-            if i.alliance_id == nation_alliance.id
-            and (i.permissions.leadership or i.permissions.manage_offshores)
-        ]
-        if not roles:
+        permissions = nation_alliance.permissions_for(ctx.author)
+        if not (permissions.leadership or permissions.manage_offshores):
             raise EmbedErrorMessage(
                 ctx.author,
                 description="You do not have permission to manage the offshore.",
@@ -1676,8 +1671,7 @@ class Settings(commands.Cog):
                 if (
                     guild_settings.purpose.startswith("ALLIANCE")
                     and nation.alliance.id == int(guild_settings.purpose_argument)
-                    and nation.alliance_position
-                    in {"Member", "Officer", "Heir", "Leader"}
+                    and nation.alliance_position >= 2
                 ):
                     for role_id in settings.member_roles:
                         role: Optional[discord.Role] = member.guild.get_role(role_id)
@@ -1685,11 +1679,7 @@ class Settings(commands.Cog):
                             continue
                         if highest_role > role:
                             roles.append(role)
-            if settings.diplomat_roles is not None and nation.alliance_position in {
-                "Officer",
-                "Heir",
-                "Leader",
-            }:
+            if settings.diplomat_roles is not None and nation.alliance_position >= 3:
                 for role_id in settings.diplomat_roles:
                     role: Optional[discord.Role] = member.guild.get_role(role_id)
                     if role is None:
@@ -1771,8 +1761,7 @@ class Settings(commands.Cog):
                 if (
                     guild_settings.purpose.startswith("ALLIANCE")
                     and nation.alliance.id == int(guild_settings.purpose_argument)
-                    and nation.alliance_position
-                    in {"Member", "Officer", "Heir", "Leader"}
+                    and nation.alliance_position >= 2
                 ):
                     for role_id in settings.member_roles:
                         role: Optional[discord.Role] = member.guild.get_role(role_id)
@@ -1780,11 +1769,7 @@ class Settings(commands.Cog):
                             continue
                         if highest_role > role and role not in member.roles:
                             roles.append(role)
-            if settings.diplomat_roles is not None and nation.alliance_position in {
-                "Officer",
-                "Heir",
-                "Leader",
-            }:
+            if settings.diplomat_roles is not None and nation.alliance_position >= 3:
                 for role_id in settings.diplomat_roles:
                     role: Optional[discord.Role] = member.guild.get_role(role_id)
                     if role is None:
@@ -1890,8 +1875,7 @@ class Settings(commands.Cog):
                             guild_settings.purpose.startswith("ALLIANCE")
                             and after.alliance.id
                             == int(guild_settings.purpose_argument)
-                            and after.alliance_position
-                            in {"Member", "Officer", "Heir", "Leader"}
+                            and after.alliance_position > 2
                         ):
                             for role_id in settings.member_roles:
                                 role: Optional[discord.Role] = member.guild.get_role(
@@ -1911,8 +1895,7 @@ class Settings(commands.Cog):
                             guild_settings.purpose.startswith("ALLIANCE")
                             and before.alliance.id
                             == int(guild_settings.purpose_argument)
-                            and before.alliance_position
-                            in {"Member", "Officer", "Heir", "Leader"}
+                            and before.alliance_position >= 2
                         ):
                             for role_id in settings.member_roles:
                                 role: Optional[discord.Role] = member.guild.get_role(
@@ -1924,12 +1907,7 @@ class Settings(commands.Cog):
                                     remove_roles.append(role)
                     if (
                         settings.diplomat_roles is not None
-                        and after.alliance_position
-                        in {
-                            "Officer",
-                            "Heir",
-                            "Leader",
-                        }
+                        and after.alliance_position >= 3
                     ):
                         for role_id in settings.diplomat_roles:
                             role: Optional[discord.Role] = member.guild.get_role(
@@ -1941,12 +1919,7 @@ class Settings(commands.Cog):
                                 add_roles.append(role)
                     if (
                         settings.diplomat_roles is not None
-                        and before.alliance_position
-                        in {
-                            "Officer",
-                            "Heir",
-                            "Leader",
-                        }
+                        and before.alliance_position >= 3
                     ):
                         for role_id in settings.diplomat_roles:
                             role: Optional[discord.Role] = member.guild.get_role(

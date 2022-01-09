@@ -7,8 +7,7 @@ from typing import TYPE_CHECKING
 import discord
 
 from .. import funcs
-from ..cache import cache
-from ..data.classes import AllianceSettings, Transaction
+from ..data.classes import Alliance, AllianceSettings, Transaction
 from ..enums import AccountType, TransactionStatus, TransactionType
 from ..errors import NoCredentialsError
 
@@ -62,15 +61,8 @@ class TransactionRequestView(discord.ui.View):
             ):
                 return False
             alliance_id = self.request.transaction.from_.alliance_id
-            user_id = interaction.user.id
-            roles = [
-                i
-                for i in cache.roles
-                if alliance_id == i.alliance_id
-                and user_id in i.member_ids
-                and (i.permissions.leadership or i.permissions.manage_bank_accounts)
-            ]
-            return bool(roles)
+            permissions = Alliance.permissions_for_id(alliance_id, interaction.user)
+            return permissions.leadership or permissions.manage_bank_accounts
         if interaction.user.id == self.user_id:
             return True
         await interaction.response.send_message(

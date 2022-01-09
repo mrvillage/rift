@@ -201,7 +201,7 @@ class MenuButton(discord.ui.Button):
                     ),
                     ephemeral=True,
                 )
-            if nation.alliance_position not in {"Officer", "Heir", "Leader"}:
+            if nation.alliance_position < 3:
                 return await interaction.followup.send(
                     embed=get_embed_author_member(
                         interaction.user,

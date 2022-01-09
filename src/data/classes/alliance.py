@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Union
 
 import cachetools
 import discord
@@ -10,6 +10,7 @@ import pnwkit
 from ...cache import cache
 from ...errors import AllianceNotFoundError, NoCredentialsError
 from ...find import search_alliance
+from ...flags import RolePermissions
 from ...ref import RiftContext
 from .base import Makeable
 from .city import City
@@ -95,9 +96,7 @@ class Alliance(Makeable):
         return [
             i
             for i in cache.nations
-            if i.alliance_id == self.id
-            and i.alliance_position != "Applicant"
-            and not i.v_mode
+            if i.alliance_id == self.id and i.alliance_position != 1 and not i.v_mode
         ]
 
     @property
@@ -105,29 +104,27 @@ class Alliance(Makeable):
         return [
             i
             for i in cache.nations
-            if i.alliance_id == self.id
-            and i.v_mode
-            and i.alliance_position != "Applicant"
+            if i.alliance_id == self.id and i.v_mode and i.alliance_position != 1
         ]
 
     @property
     def leaders(self) -> List[Nation]:
-        return [i for i in self.members if i.alliance_position == "Leader"]
+        return [i for i in self.members if i.alliance_position == 5]
 
     @property
     def heirs(self) -> List[Nation]:
-        return [i for i in self.members if i.alliance_position == "Heir"]
+        return [i for i in self.members if i.alliance_position == 4]
 
     @property
     def officers(self) -> List[Nation]:
-        return [i for i in self.members if i.alliance_position == "Officer"]
+        return [i for i in self.members if i.alliance_position == 3]
 
     @property
     def applicants(self) -> List[Nation]:
         return [
             i
             for i in cache.nations
-            if i.alliance_id == self.id and i.alliance_position == "Applicant"
+            if i.alliance_id == self.id and i.alliance_position == 1
         ]
 
     @property
@@ -467,3 +464,15 @@ class Alliance(Makeable):
         if bank.money is None:
             raise NoCredentialsError(self)
         return Resources.from_dict(bank)  # type: ignore
+
+    def permissions_for(
+        self, user: Union[discord.User, discord.Member]
+    ) -> RolePermissions:
+        return self.permissions_for_id(self.id, user)
+
+    @staticmethod
+    def permissions_for_id(id: int, user: Union[discord.User, discord.Member]) -> RolePermissions:
+        link = cache.get_user(user.id)
+        nation = cache.get_nation(link.nation_id) if link is not None else None
+        alliance_position = nation.alliance_position if nation is not None else 0
+        return sum((i.permissions for i in cache.roles if i.alliance_id == id and (user.id in i.member_ids or alliance_position in i.alliance_positions)), RolePermissions())

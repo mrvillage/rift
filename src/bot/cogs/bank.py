@@ -77,14 +77,8 @@ class Bank(commands.Cog):
                 ),
                 ephemeral=True,
             )
-        roles = [
-            i
-            for i in cache.roles
-            if i.alliance_id == alliance_.id
-            and ctx.author.id in i.member_ids
-            and (i.permissions.send_alliance_bank or i.permissions.leadership)
-        ]
-        if not roles:
+        permissions = alliance.permissions_for(ctx.author)
+        if not (permissions.leadership or permissions.send_alliance_bank):
             raise NoRolesError(alliance_, "Send Alliance Bank")
         view = Confirm(defer=True)
         await ctx.reply(
@@ -163,14 +157,8 @@ class Bank(commands.Cog):
     )
     async def bank_balance(self, ctx: RiftContext, *, alliance: Alliance = MISSING):
         alliance = alliance or await Alliance.convert(ctx, alliance)
-        roles = [
-            i
-            for i in cache.roles
-            if i.alliance_id == alliance.id
-            and ctx.author.id in i.member_ids
-            and (i.permissions.view_alliance_bank or i.permissions.leadership)
-        ]
-        if not roles:
+        permissions = alliance.permissions_for(ctx.author)
+        if not (permissions.view_alliance_bank or permissions.leadership):
             raise NoRolesError(alliance, "View Alliance Bank")
         resources = await alliance.fetch_bank()
         await ctx.reply(
@@ -210,17 +198,12 @@ class Bank(commands.Cog):
     ):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
-        roles = [
-            i
-            for i in cache.roles
-            if i.alliance_id == alliance.id
-            and (
-                i.permissions.leadership
-                or i.permissions.create_bank_account
-                or i.permissions.manage_bank_accounts
-            )
-        ]
-        if not roles:
+        permissions = alliance.permissions_for(ctx.author)
+        if not (
+            permissions.create_bank_account
+            or permissions.manage_bank_accounts
+            or permissions.leadership
+        ):
             raise EmbedErrorMessage(
                 ctx.author,
                 f"You don't have permission to create bank accounts in alliance {repr(alliance)}.",
@@ -381,18 +364,12 @@ class Bank(commands.Cog):
                 "You do not have any bank accounts!",
             )
         account = account or next(i for i in accounts if i.primary)
-        roles = [
-            i
-            for i in cache.roles
-            if i.alliance_id == account.alliance_id
-            and ctx.author.id in i.member_ids
-            and (
-                i.permissions.leadership
-                or i.permissions.view_bank_accounts
-                or i.permissions.manage_bank_accounts
-            )
-        ]
-        if account.owner_id != ctx.author.id and not roles:
+        permissions = Alliance.permissions_for_id(account.alliance_id, ctx.author)
+        if account.owner_id != ctx.author.id and not (
+            permissions.leadership
+            or permissions.view_bank_accounts
+            or permissions.manage_bank_accounts
+        ):
             raise EmbedErrorMessage(
                 ctx.author,
                 "You don't have permission to get information about that bank account!",
@@ -502,14 +479,10 @@ class Bank(commands.Cog):
                 ctx.author,
                 "You must specify at least one field to edit!",
             )
-        roles = [
-            i
-            for i in cache.roles
-            if account.alliance_id == i.alliance_id
-            and ctx.author.id in i.member_ids
-            and (i.permissions.leadership or i.permissions.manage_bank_accounts)
-        ]
-        if ctx.author.id != account.owner_id and not roles:
+        permissions = Alliance.permissions_for_id(account.alliance_id, ctx.author)
+        if ctx.author.id != account.owner_id and not (
+            permissions.leadership or permissions.manage_bank_accounts
+        ):
             raise EmbedErrorMessage(
                 ctx.author,
                 "You don't have permission to edit that account!",
@@ -531,7 +504,7 @@ class Bank(commands.Cog):
                     i.primary = False
                     await i.save()
         if resources is not MISSING:
-            if not roles:
+            if not permissions.manage_bank_accounts:
                 raise EmbedErrorMessage(
                     ctx.author,
                     "You do not have permission to edit resources on this account!",
@@ -864,14 +837,10 @@ class Bank(commands.Cog):
                 "You do not have any bank accounts!",
             )
         account = account or next(i for i in accounts if i.primary)
-        roles = [
-            i
-            for i in cache.roles
-            if i.alliance_id == account.alliance_id
-            and ctx.author.id in i.member_ids
-            and (i.permissions.leadership or i.permissions.manage_bank_accounts)
-        ]
-        if account.owner_id != ctx.author.id and not roles:
+        permissions = Alliance.permissions_for_id(account.alliance_id, ctx.author)
+        if account.owner_id != ctx.author.id and not (
+            permissions.leadership or permissions.manage_bank_accounts
+        ):
             raise EmbedErrorMessage(
                 ctx.author,
                 "You don't have permission to view the transaction history of that account!",
@@ -933,14 +902,10 @@ class Bank(commands.Cog):
                     ctx.author,
                     "One account involved in that transaction does not exist!",
                 )
-            roles = [
-                i
-                for i in cache.roles
-                if i.alliance_id == transaction.from_.alliance_id
-                and ctx.author.id in i.member_ids
-                and (i.permissions.leadership or i.permissions.manage_bank_accounts)
-            ]
-            if not roles:
+            permissions = Alliance.permissions_for_id(
+                transaction.from_.alliance_id, ctx.author
+            )
+            if not (permissions.leadership or permissions.manage_bank_accounts):
                 raise EmbedErrorMessage(
                     ctx.author,
                     "You don't have permission to review that transaction!",
@@ -967,18 +932,14 @@ class Bank(commands.Cog):
                     ctx.author,
                     "One account involved in that transaction does not exist!",
                 )
-            roles = [
-                i
-                for i in cache.roles
-                if i.alliance_id == transaction.from_.alliance_id
-                and ctx.author.id in i.member_ids
-                and (
-                    i.permissions.leadership
-                    or i.permissions.manage_grants
-                    or i.permissions.approve_grants
-                )
-            ]
-            if not roles:
+            permissions = Alliance.permissions_for_id(
+                transaction.from_.alliance_id, ctx.author
+            )
+            if not (
+                permissions.leadership
+                or permissions.manage_grants
+                or permissions.approve_grants
+            ):
                 raise EmbedErrorMessage(
                     ctx.author,
                     "You don't have permission to review that transaction!",

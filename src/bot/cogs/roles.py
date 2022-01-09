@@ -219,6 +219,7 @@ class Roles(commands.Cog):
             "description": "The description of the role.",
             "alliance": "The alliance to create the role in.",
             "privacy_level": "The privacy level of the role.",
+            "alliance_positions": "A space separated list of alliance positions to link to the role.",
         },
     )
     async def roles_create(
@@ -230,8 +231,19 @@ class Roles(commands.Cog):
         description: Optional[str] = None,
         alliance: Optional[Alliance] = None,
         privacy_level: Literal["PUBLIC", "PRIVATE", "PROTECTED"] = "PUBLIC",
-    ):
+        alliance_positions: List[str] = [],
+    ): # sourcery no-metrics
         nation, alliance = await manage_roles_command_check_with_message(ctx, alliance)
+        alliance_positions = [i.capitalize() for i in alliance_positions]
+        try:
+            positions = [
+                funcs.utils.get_alliance_position_id(i) for i in alliance_positions
+            ]
+        except ValueError:
+            raise EmbedErrorMessage(
+                ctx.author,
+                "One or more of the alliance positions you specified is invalid!",
+            )
         role = Role.create(
             name,
             description,
@@ -239,16 +251,20 @@ class Roles(commands.Cog):
             rank,
             starting_members,
             getattr(PrivacyLevel, privacy_level),
+            positions,
         )
         roles = [
             i
             for i in cache.roles
-            if i.alliance_id == alliance.id and ctx.author.id in i.member_ids
+            if i.alliance_id == alliance.id
+            and (
+                ctx.author.id in i.member_ids
+                or nation.alliance_position in i.alliance_positions
+            )
         ]
         max_rank = max(i.rank for i in roles) if roles else 0
         leadership = any(i.permissions.leadership for i in roles) or (
-            nation.alliance_id == alliance.id
-            and nation.alliance_position in {"Heir", "Leader"}
+            nation.alliance_id == alliance.id and nation.alliance_position >= 4
         )
         if rank >= max_rank and not leadership:
             raise EmbedErrorMessage(
@@ -291,7 +307,7 @@ class Roles(commands.Cog):
         await ctx.interaction.edit_original_message(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Role created!\n\nID: {role.id}\nName: {role.name}\nRank: {role.rank:,}\nAlliance: {repr(role.alliance)}\nMembers: {' '.join(i.mention for i in starting_members) or 'None'}\nDescription: {role.description}\nPermissions: {enabled_permissions}\nPrivacy Level: `{role.privacy_level.name}`",
+                f"Role created!\n\nID: {role.id}\nName: {role.name}\nRank: {role.rank:,}\nAlliance: {repr(role.alliance)}\nMembers: {' '.join(i.mention for i in starting_members) or 'None'}\nDescription: {role.description}\nPermissions: {enabled_permissions}\nPrivacy Level: `{role.privacy_level.name}`\nAlliance Positions: {', '.join(funcs.utils.get_alliance_position(i) for i in role.alliance_positions) or 'None'}",
                 color=discord.Color.green(),
             ),
             view=None,
@@ -350,7 +366,12 @@ class Roles(commands.Cog):
         roles = [
             i
             for i in cache.roles
-            if i.alliance_id == alliance.id and i.privacy_level in privacy_levels
+            if i.alliance_id == alliance.id
+            and i.privacy_level in privacy_levels
+            and (
+                ctx.author.id in i.member_ids
+                or nation.alliance_position in i.alliance_positions
+            )
         ]
         if roles:
             await ctx.reply(
@@ -416,7 +437,7 @@ class Roles(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"ID: {role.id}\nName: {role.name}\nRank: {role.rank:,}\nAlliance: {repr(role.alliance)}\nMembers: {' '.join(f'<@{i}>' for i in role.member_ids) or 'None'}\nDescription: {role.description}\nPermissions: {enabled_permissions}\nPrivacy Level: `{role.privacy_level.name}`",
+                f"ID: {role.id}\nName: {role.name}\nRank: {role.rank:,}\nAlliance: {repr(role.alliance)}\nMembers: {' '.join(f'<@{i}>' for i in role.member_ids) or 'None'}\nDescription: {role.description}\nPermissions: {enabled_permissions}\nPrivacy Level: `{role.privacy_level.name}`\nAlliance Positions: {', '.join(funcs.utils.get_alliance_position(i) for i in role.alliance_positions) or 'None'}",
                 color=discord.Color.blue(),
             ),
             ephemeral=True,
@@ -432,6 +453,7 @@ class Roles(commands.Cog):
             "rank": "The new rank of the role.",
             "description": "The new description of the role.",
             "privacy_level": "The new privacy level of the role.",
+            "alliance_positions": "The new alliance positions of the role.",
         },
     )
     async def roles_edit(
@@ -442,21 +464,23 @@ class Roles(commands.Cog):
         rank: int = MISSING,
         description: str = MISSING,
         privacy_level: Literal["PUBLIC", "PRIVATE", "PROTECTED"] = MISSING,
+        alliance_positions: List[str] = MISSING,
     ):  # sourcery no-metrics
         if (
             name is MISSING
             and rank is MISSING
             and description is MISSING
             and privacy_level is MISSING
+            and alliance_positions is MISSING
         ):
             raise EmbedErrorMessage(
-                    ctx.author,
-                    "You must specify at least one field to edit!",
+                ctx.author,
+                "You must specify at least one field to edit!",
             )
         if role.alliance is None:
             raise EmbedErrorMessage(
-                    ctx.author,
-                    "This role doesn't belong to an alliance!",
+                ctx.author,
+                "This role doesn't belong to an alliance!",
             )
         nation, alliance = await manage_roles_command_check_with_message(
             ctx, role.alliance
@@ -464,31 +488,36 @@ class Roles(commands.Cog):
         roles = [
             i
             for i in cache.roles
-            if i.alliance_id == alliance.id and ctx.author.id in i.member_ids
+            if i.alliance_id == alliance.id
+            and (
+                ctx.author.id in i.member_ids
+                or nation.alliance_position in i.alliance_positions
+            )
         ]
         leadership = any(i.permissions.leadership for i in roles) or (
-            nation.alliance_id == alliance.id
-            and nation.alliance_position in {"Heir", "Leader"}
+            nation.alliance_id == alliance.id and nation.alliance_position >= 4
         )
         max_rank = max(i.rank for i in roles)
         if rank >= max_rank and not leadership:
             raise EmbedErrorMessage(
-                    ctx.author,
-                    "You can't edit a role to have a rank higher than the highest rank you have!",
+                ctx.author,
+                "You can't edit a role to have a rank higher than the highest rank you have!",
             )
         if role.rank >= max_rank and not leadership:
             raise EmbedErrorMessage(
-                    ctx.author,
-                    "You can't edit a role with a higher rank than the highest rank you have!",
+                ctx.author,
+                "You can't edit a role with a higher rank than the highest rank you have!",
             )
-        if name is not MISSING:
-            role.name = name
-        if rank is not MISSING:
-            role.rank = rank
-        if description is not MISSING:
-            role.description = description
-        if privacy_level is not MISSING:
-            role.privacy_level = getattr(PrivacyLevel, privacy_level)
+        try:
+            positions = [
+                funcs.utils.get_alliance_position_id(i.capitalize())
+                for i in (alliance_positions or [])
+            ]
+        except ValueError:
+            raise EmbedErrorMessage(
+                ctx.author,
+                "One or more of the alliance positions you specified is invalid!",
+            )
         view = PermissionsSelector(
             ctx.author.id,
             save_role_permissions(role),
@@ -515,6 +544,16 @@ class Roles(commands.Cog):
                 ),
                 view=None,
             )
+        if name is not MISSING:
+            role.name = name
+        if rank is not MISSING:
+            role.rank = rank
+        if description is not MISSING:
+            role.description = description
+        if privacy_level is not MISSING:
+            role.privacy_level = getattr(PrivacyLevel, privacy_level)
+        if alliance_positions is not MISSING:
+            role.alliance_positions = positions
         enabled_permissions = ", ".join(
             f"`{i['name']}`"
             for i in ROLE_PERMISSIONS
@@ -523,7 +562,7 @@ class Roles(commands.Cog):
         await ctx.interaction.edit_original_message(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Role edited!\n\nID: {role.id}\nName: {role.name}\nRank: {role.rank:,}\nAlliance: {repr(role.alliance)}\nMembers: {' '.join(i.mention for i in role.members) or 'None'}\nDescription: {role.description}\nPermissions: {enabled_permissions}\nPrivacy Level: `{role.privacy_level.name}`",
+                f"Role edited!\n\nID: {role.id}\nName: {role.name}\nRank: {role.rank:,}\nAlliance: {repr(role.alliance)}\nMembers: {' '.join(i.mention for i in role.members) or 'None'}\nDescription: {role.description}\nPermissions: {enabled_permissions}\nPrivacy Level: `{role.privacy_level.name}`\nAlliance Positions: {', '.join(funcs.utils.get_alliance_position(i) for i in role.alliance_positions) or 'None'}",
                 color=discord.Color.green(),
             ),
             view=None,
@@ -543,42 +582,43 @@ class Roles(commands.Cog):
     ):
         if role.alliance is None:
             raise EmbedErrorMessage(
-                    ctx.author,
-                    "This role doesn't belong to an alliance!",
+                ctx.author,
+                "This role doesn't belong to an alliance!",
             )
         nation, alliance = await manage_roles_command_check_with_message(
             ctx, role.alliance
         )
         if (
-            nation.alliance_position in {"Heir", "Leader"}
-            and nation.alliance_id != alliance.id
-        ) or nation.alliance_position not in {"Heir", "Leader"}:
+            nation.alliance_position >= 4 and nation.alliance_id != alliance.id
+        ) or nation.alliance_position < 4:
             roles = [
                 i
                 for i in cache.roles
                 if i.alliance_id == alliance.id
                 and (i.permissions.manage_roles or i.permissions.leadership)
-                and ctx.author.id in i.member_ids
+                and (
+                    ctx.author.id in i.member_ids
+                    or nation.alliance_position in i.alliance_positions
+                )
             ]
             if not roles:
                 raise EmbedErrorMessage(
-                        ctx.author,
-                        "You don't have permission to add members to this role!",
+                    ctx.author,
+                    "You don't have permission to add members to this role!",
                 )
             max_rank = max(i.rank for i in roles)
             leadership = any(i.permissions.leadership for i in roles) or (
-                nation.alliance_id == alliance.id
-                and nation.alliance_position in {"Heir", "Leader"}
+                nation.alliance_id == alliance.id and nation.alliance_position >= 4
             )
             if role.rank >= max_rank and not leadership:
                 raise EmbedErrorMessage(
-                        ctx.author,
-                        "You don't have permission to add members to this role!",
+                    ctx.author,
+                    "You don't have permission to add members to this role!",
                 )
         if member.id in role.member_ids:
             raise EmbedErrorMessage(
-                    ctx.author,
-                    f"{member.mention} is already a member of this role!",
+                ctx.author,
+                f"{member.mention} is already a member of this role!",
             )
         role.member_ids.append(member.id)
         await role.save()
@@ -605,42 +645,43 @@ class Roles(commands.Cog):
     ):
         if role.alliance is None:
             raise EmbedErrorMessage(
-                    ctx.author,
-                    "This role doesn't belong to an alliance!",
+                ctx.author,
+                "This role doesn't belong to an alliance!",
             )
         nation, alliance = await manage_roles_command_check_with_message(
             ctx, role.alliance
         )
         if (
-            nation.alliance_position in {"Heir", "Leader"}
-            and nation.alliance_id != alliance.id
-        ) or nation.alliance_position not in {"Heir", "Leader"}:
+            nation.alliance_position >= 4 and nation.alliance_id != alliance.id
+        ) or nation.alliance_position < 4:
             roles = [
                 i
                 for i in cache.roles
                 if i.alliance_id == alliance.id
                 and (i.permissions.manage_roles or i.permissions.leadership)
-                and ctx.author.id in i.member_ids
+                and (
+                    ctx.author.id in i.member_ids
+                    or nation.alliance_position in i.alliance_positions
+                )
             ]
             if not roles:
                 raise EmbedErrorMessage(
-                        ctx.author,
-                        "You don't have permission to add members to this role!",
+                    ctx.author,
+                    "You don't have permission to add members to this role!",
                 )
             max_rank = max(i.rank for i in roles)
             leadership = any(i.permissions.leadership for i in roles) or (
-                nation.alliance_id == alliance.id
-                and nation.alliance_position in {"Heir", "Leader"}
+                nation.alliance_id == alliance.id and nation.alliance_position >= 4
             )
             if role.rank >= max_rank and not leadership:
                 raise EmbedErrorMessage(
-                        ctx.author,
-                        "You don't have permission to add members to this role!",
+                    ctx.author,
+                    "You don't have permission to add members to this role!",
                 )
         if member.id not in role.member_ids:
             raise EmbedErrorMessage(
-                    ctx.author,
-                    f"{member.mention} is not a member of this role!",
+                ctx.author,
+                f"{member.mention} is not a member of this role!",
             )
         role.member_ids.remove(member.id)
         await role.save()
@@ -672,8 +713,8 @@ class Roles(commands.Cog):
         nation, alliance, can = await manage_roles_command_check(ctx, alliance, True)
         if alliance is None:
             raise EmbedErrorMessage(
-                    ctx.author,
-                    "You're not in an alliance and didn't specify one so I don't know where to look! Please try again with an alliance.",
+                ctx.author,
+                "You're not in an alliance and didn't specify one so I don't know where to look! Please try again with an alliance.",
             )
         if can:
             privacy_levels = {
@@ -690,12 +731,15 @@ class Roles(commands.Cog):
             for i in cache.roles
             if i.alliance_id == alliance.id
             and i.privacy_level in privacy_levels
-            and member.id in i.member_ids
+            and (
+                ctx.author.id in i.member_ids
+                or nation.alliance_position in i.alliance_positions
+            )
         }
         if not roles:
             raise EmbedErrorMessage(
-                    ctx.author,
-                    f"{member.mention} doesn't have any roles in this alliance!",
+                ctx.author,
+                f"{member.mention} doesn't have any roles in this alliance!",
             )
         enabled_permissions = ", ".join(
             f"`{i['name']}`"
