@@ -20,6 +20,12 @@ class Flags:
             setattr(flags, flag, value)
         return flags
 
+    def __add__(self, other: Flags) -> Flags:
+        return Flags(self.flags | other.flags)
+
+    def __sub__(self, other: Flags) -> Flags:
+        return Flags(self.flags & ~other.flags)
+
 
 class flag:
     def __init__(self, func: Callable[[Any], int]):
