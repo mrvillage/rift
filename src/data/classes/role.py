@@ -34,6 +34,7 @@ class Role:
         "permissions",
         "member_ids",
         "privacy_level",
+        "alliance_positions",
     )
 
     def __init__(self, data: RoleData) -> None:
@@ -45,6 +46,7 @@ class Role:
         self.permissions: RolePermissions = RolePermissions(data["permissions"])
         self.member_ids: List[int] = data["members"]
         self.privacy_level: PrivacyLevel = PrivacyLevel(data["privacy_level"])
+        self.alliance_positions: List[int] = data["alliance_positions"]
 
     @classmethod
     async def convert(cls, ctx: RiftContext, argument: str) -> Role:
@@ -58,8 +60,12 @@ class Role:
             pass
         try:
             nation = await Nation.convert(ctx, None)
-            roles = [i for i in cache.roles if i.alliance_id == nation.alliance_id]
-            roles = [i for i in roles if i.name.lower() == argument.lower()]
+            roles = [
+                i
+                for i in cache.roles
+                if i.alliance_id == nation.alliance_id
+                and i.name.lower() == argument.lower()
+            ]
             if len(roles) == 1:
                 return roles[0]
         except StopIteration:
@@ -77,7 +83,7 @@ class Role:
     async def save(self) -> None:
         if self.id:
             await execute_query(
-                "UPDATE roles SET name = $2, description = $3, alliance = $4, rank = $5, permissions = $6, members = $7, privacy_level = $8 WHERE id = $1;",
+                "UPDATE roles SET name = $2, description = $3, alliance = $4, rank = $5, permissions = $6, members = $7, privacy_level = $8, alliance_positions = $9 WHERE id = $1;",
                 self.id,
                 self.name,
                 self.description,
@@ -86,10 +92,11 @@ class Role:
                 self.permissions.flags,
                 self.member_ids,
                 self.privacy_level.value,
+                self.alliance_positions,
             )
         else:
             id = await execute_read_query(
-                "INSERT INTO roles (name, description, alliance, rank, permissions, members, privacy_level) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;",
+                "INSERT INTO roles (name, description, alliance, rank, permissions, members, privacy_level, alliance_positions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id;",
                 self.name,
                 self.description,
                 self.alliance_id,
@@ -97,6 +104,7 @@ class Role:
                 self.permissions.flags,
                 self.member_ids,
                 self.privacy_level.value,
+                self.alliance_positions,
             )
             self.id = id[0]["id"]
             cache.add_role(self)
@@ -120,6 +128,7 @@ class Role:
         rank: int,
         starting_members: List[Snowflake],
         privacy: PrivacyLevel,
+        alliance_positions: List[int],
     ) -> Role:
         return cls(
             {
@@ -131,6 +140,7 @@ class Role:
                 "members": [i.id for i in starting_members],
                 "permissions": 0,
                 "privacy_level": privacy.value,
+                "alliance_positions": alliance_positions,
             }
         )
 

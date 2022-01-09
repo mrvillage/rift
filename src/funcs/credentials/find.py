@@ -4,7 +4,6 @@ from typing import List, Optional
 
 from ...cache import cache
 from ...data.classes import Alliance, Credentials
-from ..utils import get_alliance_position_id
 
 __all__ = ("find_alliance_credentials", "find_highest_alliance_credentials")
 
@@ -31,5 +30,5 @@ def find_highest_alliance_credentials(
     if credentials:
         return max(
             credentials,
-            key=lambda c: get_alliance_position_id(c.nation.alliance_position),  # type: ignore
+            key=lambda c: c.nation.alliance_position,  # type: ignore
         )

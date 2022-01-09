@@ -134,13 +134,13 @@ class EventMessages(commands.Cog):
                 )
                 and before.alliance_position != after.alliance_position
                 and (
-                    before.alliance_position in {"Officer", "Heir", "Leader"}
-                    or after.alliance_position in {"Officer", "Heir", "Leader"}
+                    before.alliance_position >= 3
+                    or after.alliance_position >= 3
                     or "ALLIANCE_POSITION_ALL" in sub.sub_types
                 )
             ):
                 changes.append(
-                    f"- Alliance position changed from {before.alliance_position} to {after.alliance_position}."
+                    f"- Alliance position changed from {funcs.utils.get_alliance_position(before.alliance_position)} to {funcs.utils.get_alliance_position(after.alliance_position)}."
                 )
             if ("VACATION_MODE" in sub.sub_types) and before.v_mode != after.v_mode:
                 if after.v_mode:

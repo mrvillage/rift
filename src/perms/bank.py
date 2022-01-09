@@ -19,7 +19,7 @@ async def check_bank_perms(*, nation: Nation, author: Union[Member, User], actio
                 "SELECT * FROM bankpermissions WHERE allianceid = 3683;"
             )
         )[0]
-        nation_position = get_alliance_position_id(nation.alliance_position)
+        nation_position = nation.alliance_position
         alliance_position = get_alliance_position_id(perm[f"{action}rank"])
         await nation.make_attrs("alliance")
         if nation.alliance is None:

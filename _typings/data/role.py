@@ -14,3 +14,4 @@ class RoleData(TypedDict):
     permissions: int
     members: List[int]
     privacy_level: int
+    alliance_positions: List[int]
