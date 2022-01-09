@@ -8,6 +8,7 @@ from discord.ext import commands
 
 from .env import (
     APPLICATION_ID,
+    DEBUG,
     DEBUG_APPLICATION_ID,
     PNW_EMAIL,
     PNW_PASSWORD,
@@ -74,9 +75,8 @@ intents = discord.Intents(
     guilds=True,
     members=True,
 )
-debug = False
 
-ID = DEBUG_APPLICATION_ID if debug else APPLICATION_ID
+ID = DEBUG_APPLICATION_ID if DEBUG else APPLICATION_ID
 bot = Rift(
     command_prefix=commands.when_mentioned_or("?"),
     intents=intents,
@@ -92,7 +92,7 @@ bot = Rift(
     application_id=ID,
     debug_command_prefix="!!",
     debug_guild_id=654109011473596417,
-    debug=debug,
+    debug=DEBUG,
     chunk_guilds_at_startup=True,
 )
 
