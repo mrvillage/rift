@@ -4,8 +4,8 @@ from enum import Enum
 
 __all__ = ("GrantPayoff",)
 
+
 class GrantPayoff(Enum):
     NONE = 0
-    TIME = 1
-    DEPOSIT = 2
-    # TAXES = 3
+    DEPOSIT = 1
+    # TAXES = 2
