@@ -232,7 +232,7 @@ class Roles(commands.Cog):
         alliance: Optional[Alliance] = None,
         privacy_level: Literal["PUBLIC", "PRIVATE", "PROTECTED"] = "PUBLIC",
         alliance_positions: List[str] = [],
-    ): # sourcery no-metrics
+    ):  # sourcery no-metrics
         nation, alliance = await manage_roles_command_check_with_message(ctx, alliance)
         alliance_positions = [i.capitalize() for i in alliance_positions]
         try:
@@ -498,7 +498,7 @@ class Roles(commands.Cog):
             nation.alliance_id == alliance.id and nation.alliance_position >= 4
         )
         max_rank = max(i.rank for i in roles)
-        if rank >= max_rank and not leadership:
+        if rank is not MISSING and rank >= max_rank and not leadership:
             raise EmbedErrorMessage(
                 ctx.author,
                 "You can't edit a role to have a rank higher than the highest rank you have!",
