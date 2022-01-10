@@ -115,3 +115,4 @@ class Grant:
             cache.add_grant(self)
 
     async def send(self) -> None:
+        ...
