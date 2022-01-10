@@ -24,6 +24,7 @@ __all__ = (
     "convert_int",
     "check_resource",
     "parse_time",
+    "parse_time_to_seconds",
     "convert_seconds_to_text",
     "escape_quoted_string",
     "generate_custom_id",
@@ -217,6 +218,16 @@ def parse_time(time: str) -> Mapping[str, int]:
         value = time[indexes[keys[index - 1]] + 1 : indexes[keys[index]]]
         kwargs[duration] = int(value)
     return kwargs
+
+
+def parse_time_to_seconds(time: str) -> int:
+    parsed = parse_time(time)
+    seconds = parsed.get("seconds", 0)
+    seconds += parsed.get("minutes", 0) * 60
+    seconds += parsed.get("hours", 0) * 60 * 60
+    seconds += parsed.get("days", 0) * 24 * 60 * 60
+    seconds += parsed.get("weeks", 0) * 7 * 24 * 60 * 60
+    return seconds
 
 
 def convert_seconds_to_text(seconds: float) -> str:
