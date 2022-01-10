@@ -227,12 +227,14 @@ class Roles(commands.Cog):
         ctx: RiftContext,
         name: str,
         rank: int,
-        starting_members: List[discord.Member] = [],
+        starting_members: List[discord.Member] = MISSING,
         description: Optional[str] = None,
         alliance: Optional[Alliance] = None,
         privacy_level: Literal["PUBLIC", "PRIVATE", "PROTECTED"] = "PUBLIC",
-        alliance_positions: List[str] = [],
+        alliance_positions: List[str] = MISSING,
     ):  # sourcery no-metrics
+        starting_members = starting_members or []
+        alliance_positions = alliance_positions or []
         nation, alliance = await manage_roles_command_check_with_message(ctx, alliance)
         alliance_positions = [i.capitalize() for i in alliance_positions]
         try:
