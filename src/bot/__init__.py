@@ -43,7 +43,13 @@ def setup_logging():
 
 @bot.event
 async def on_message(message: discord.Message):
-    await bot.process_commands(message)
+    if message.author.bot:
+        return
+    ctx = await bot.get_context(interaction)  # type: ignore
+    try:
+        await bot.invoke(ctx)  # type: ignore
+    except Exception as error:
+        await funcs.handler(ctx, error)  # type: ignore
 
 
 @bot.event
@@ -63,7 +69,13 @@ async def on_raw_message_edit(payload: discord.RawMessageUpdateEvent):
 
 @bot.event
 async def on_interaction(interaction: discord.Interaction):
-    await bot.process_commands(interaction)
+    if interaction.type != discord.InteractionType.application_command:
+        return
+    ctx = await bot.get_interaction_context(interaction)  # type: ignore
+    try:
+        await bot.invoke(ctx)  # type: ignore
+    except Exception as error:
+        await funcs.handler(ctx, error)  # type: ignore
 
 
 @bot.event
