@@ -271,7 +271,6 @@ class TransactionRequestManualAcceptButton(discord.ui.Button[TransactionRequestV
         alliance_settings = await AllianceSettings.fetch(transaction.from_.alliance_id)
         offshore = alliance_settings.offshore
         transaction.from_.resources -= transaction.resources
-        await transaction.from_.save()
         view = discord.ui.View()
         note = urllib.parse.quote(
             f"Rift Withdrawal from Account #{transaction.from_.id} and note: {transaction.note}"
@@ -309,6 +308,7 @@ class TransactionRequestManualAcceptButton(discord.ui.Button[TransactionRequestV
             view=view,
             ephemeral=True,
         )
+        await transaction.from_.save()
         await transaction.save()
 
 
