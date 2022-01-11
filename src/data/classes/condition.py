@@ -17,29 +17,32 @@ T = TypeVar("T")
 
 
 class Condition:
-    __slots__ = ("id", "name", "owner_id", "condition")
+    __slots__ = ("id", "name", "owner_id", "condition", "public")
 
     def __init__(self, data: ConditionData) -> None:
         self.id: int = data["id"]
         self.name: Optional[str] = data["name"]
-        self.owner_id: Optional[int] = data["owner"]
+        self.owner_id: int = data["owner"]
         self.condition: List[Any] = data["condition"]
+        self.public: bool = data["public"]
 
     async def save(self) -> None:
         if self.id:
             await execute_query(
-                "UPDATE conditions SET name = $2, owner = $3, condition = $4 WHERE id = $1;",
+                "UPDATE conditions SET name = $2, owner = $3, condition = $4, public = $5 WHERE id = $1;",
                 self.id,
                 self.name,
                 self.owner_id,
                 self.condition,
+                self.public,
             )
         else:
             id = await execute_read_query(
-                "INSERT INTO conditions (name, owner, condition) VALUES ($1, $2, $3) RETURNING id;",
+                "INSERT INTO conditions (name, owner, condition, public) VALUES ($1, $2, $3, $4) RETURNING id;",
                 self.name,
                 self.owner_id,
                 self.condition,
+                self.public,
             )
             self.id = id[0]["id"]
             cache.add_condition(self)
@@ -80,7 +83,7 @@ class Condition:
             num = funcs.utils.convert_int(value)
             condition = cache.get_condition(num)
             if condition is not None and (
-                condition.owner_id == user_id or condition.owner_id is None
+                condition.owner_id == user_id or condition.public
             ):
                 return condition
         except ValueError:
@@ -89,7 +92,7 @@ class Condition:
             return next(
                 i
                 for i in cache.conditions
-                if i.name == value and (i.owner_id == user_id or i.owner_id is None)
+                if i.name == value and (i.owner_id == user_id or i.public)
             )
         except StopIteration:
             return
@@ -159,7 +162,7 @@ class Condition:
 
     @classmethod
     def validate_and_create(
-        cls, condition: List[Any], user_id: int = -1, /
+        cls, condition: List[Any], user_id: int = 0, public: bool = False
     ) -> Condition:
         return cls(
             {
@@ -167,15 +170,18 @@ class Condition:
                 "name": None,
                 "owner": user_id,
                 "condition": cls.validate_condition(condition, user_id),
+                "public": public,
             }
         )
 
     @classmethod
-    def parse(cls, condition: str, user_id: int = -1, /) -> Condition:
+    def parse(cls, condition: str, user_id: int = 0, public: bool = False) -> Condition:
         from ...funcs import parse_condition_string
 
         try:
-            return cls.validate_and_create(parse_condition_string(condition), user_id)
+            return cls.validate_and_create(
+                parse_condition_string(condition), user_id, public
+            )
         except Exception:
             raise InvalidConditionError(condition)
 
