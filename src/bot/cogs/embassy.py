@@ -63,13 +63,12 @@ class Embassies(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         category = category or None
-        data = {
-            "category_id": category.id if category else None,
-            "guild_id": ctx.guild.id,
+        data: EmbassyConfigData = {
+            "id": 0,
+            "category": category.id if category else None,
+            "guild": ctx.guild.id,
             "start_message": start,
         }
-        if TYPE_CHECKING:
-            assert isinstance(data, EmbassyConfigData)
         config = EmbassyConfig(data)
         await config.save()
         await ctx.reply(
