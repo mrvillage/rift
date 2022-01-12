@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands
+from discord.utils import MISSING
 
 from src.errors.notfound import NotFoundError
 
@@ -48,9 +49,10 @@ async def print_handler(ctx: RiftContext, error: Exception) -> None:
             await channel.send(
                 embed=get_embed_author_member(
                     ctx.author,
-                    f"Error encountered by {ctx.author.mention} in guild {ctx.guild and ctx.guild.name} ({ctx.guild and ctx.guild.id})\n\n"
+                    f"Error encountered by {ctx.author.mention} in guild {ctx.guild and ctx.guild.name} ({ctx.guild and ctx.guild.id}) and channel <#{ctx.channel.id}>\n\n"
                     f"Command: {ctx.command and ctx.command.qualified_name}\n"
-                    f"ID: {ctx.message.id if ctx.message else ctx.interaction.id}\n\n"
+                    f"Arguments: {ctx.options or ctx.kwargs}\n"
+                    f"{'Interaction' if ctx.interaction is not MISSING else 'Message'} ID: {ctx.message.id if ctx.message else ctx.interaction.id}\n\n"
                     f"```py\n{f.getvalue()}\n```",
                     color=discord.Color.red(),
                 )
