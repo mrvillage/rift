@@ -45,7 +45,7 @@ def setup_logging():
 async def on_message(message: discord.Message):
     if message.author.bot:
         return
-    ctx = await bot.get_context(interaction)  # type: ignore
+    ctx = await bot.get_context(message)  # type: ignore
     try:
         await bot.invoke(ctx)  # type: ignore
     except Exception as error:
