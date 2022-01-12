@@ -25,7 +25,7 @@ class Forums(commands.Cog):
     @tasks.loop(minutes=1)
     async def check_alliance_affairs(self):
         try:
-            await asyncio.wait_for(self._check_alliance_affairs(), timeout=300)
+            await asyncio.wait_for(self._check_alliance_affairs(), timeout=600)
         except asyncio.TimeoutError:
             await self.send_loop_error("check_alliance_affairs")
         except Exception:
@@ -70,7 +70,7 @@ class Forums(commands.Cog):
     @tasks.loop(minutes=1)
     async def check_orbis_central(self):
         try:
-            await asyncio.wait_for(self._check_orbis_central(), timeout=300)
+            await asyncio.wait_for(self._check_orbis_central(), timeout=600)
         except asyncio.TimeoutError:
             await self.send_loop_error("check_orbis_central")
         except Exception:
