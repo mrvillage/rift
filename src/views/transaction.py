@@ -40,10 +40,11 @@ class TransactionRequestView(discord.ui.View):
         if transaction is None:
             return
         self.user_id: int = user_id
-        self.add_item(TransactionRequestAcceptButton(transaction, custom_id=request.accept_custom_id))  # type: ignore
+        end = 100 if user_id == 0 else 90
+        self.add_item(TransactionRequestAcceptButton(transaction, custom_id=request.accept_custom_id[:end]))  # type: ignore
         if transaction.type is TransactionType.WITHDRAW:
-            self.add_item(TransactionRequestManualAcceptButton(transaction, request.accept_custom_id[:99]))  # type: ignore
-        self.add_item(TransactionRequestRejectButton(transaction, custom_id=request.reject_custom_id))  # type: ignore
+            self.add_item(TransactionRequestManualAcceptButton(transaction, request.accept_custom_id[: end - 1]))  # type: ignore
+        self.add_item(TransactionRequestRejectButton(transaction, custom_id=request.reject_custom_id[:end]))  # type: ignore
         if transaction.to is not None and user_id == transaction.to.owner_id:
             self.add_item(  # type: ignore
                 TransactionRequestCancelButton(
