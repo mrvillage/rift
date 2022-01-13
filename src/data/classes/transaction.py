@@ -264,7 +264,7 @@ class TransactionRequest:
     def view(self) -> TransactionRequestView:
         from ...views import TransactionRequestView
 
-        return TransactionRequestView(self, self.user_id)
+        return TransactionRequestView(self, 0)
 
     @classmethod
     async def create(
