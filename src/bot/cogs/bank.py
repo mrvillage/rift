@@ -904,7 +904,7 @@ class Bank(commands.Cog):
             "transaction": "The pending transaction to review.",
         },
     )
-    async def bank_account_review(
+    async def bank_transaction_review(
         self, ctx: RiftContext, transaction: Transaction
     ):  # sourcery no-metrics
         if transaction.status is not TransactionStatus.PENDING:
