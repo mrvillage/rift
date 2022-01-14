@@ -738,20 +738,19 @@ class Roles(commands.Cog):
                 or nation.alliance_position in i.alliance_positions
             )
         }
-        if not roles:
-            raise EmbedErrorMessage(
-                ctx.author,
-                f"{member.mention} doesn't have any roles in this alliance!",
-            )
+        permissions = alliance.permissions_for(member)
         enabled_permissions = ", ".join(
             f"`{i['name']}`"
             for i in ROLE_PERMISSIONS
-            if any(getattr(role.permissions, i["value"]) for role in roles)
+            if getattr(permissions, i["value"])
         )
         await ctx.reply(
             embed=funcs.get_embed_author_member(
-                ctx.author,
-                f"Privacy Level: `{max(privacy_levels, key=lambda x: x.value).name}`\n\nRank: {max(roles, key=lambda x: x.rank).rank:,}\nAlliance: {repr(alliance)}\nRoles: {', '.join(f'{i.id} - {i.name}' for i in roles) or 'None'}\nPermissions: {enabled_permissions}",
+                member,
+                f"Privacy Level: `{max(privacy_levels, key=lambda x: x.value).name}`\n\n"
+                f"Rank: {max(roles, key=lambda x: x.rank).rank:,}\n"
+                f"Alliance: {repr(alliance)}\nRoles: {', '.join(f'{i.id} - {i.name}' for i in roles) or 'None'}\n"
+                f"Permissions: {enabled_permissions}",
                 color=discord.Color.blue(),
             ),
             ephemeral=True,

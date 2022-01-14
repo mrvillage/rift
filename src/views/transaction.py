@@ -60,10 +60,24 @@ class TransactionRequestView(discord.ui.View):
                 self.request.transaction is None
                 or self.request.transaction.from_ is None
             ):
+                await interaction.response.send_message(
+                    embed=funcs.get_embed_author_member(
+                        interaction.user, "No transaction found."
+                    ),
+                    ephemeral=True,
+                )
                 return False
             alliance_id = self.request.transaction.from_.alliance_id
             permissions = Alliance.permissions_for_id(alliance_id, interaction.user)
-            return permissions.leadership or permissions.manage_bank_accounts
+            if permissions.leadership or permissions.manage_bank_accounts:
+                return True
+            await interaction.response.send_message(
+                embed=funcs.get_embed_author_member(
+                    interaction.user, "You do not have permission to use ."
+                ),
+                ephemeral=True,
+            )
+            return False
         if interaction.user.id == self.user_id:
             return True
         await interaction.response.send_message(
