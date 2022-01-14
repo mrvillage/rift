@@ -750,7 +750,7 @@ class Roles(commands.Cog):
                 f"Privacy Level: `{max(privacy_levels, key=lambda x: x.value).name}`\n\n"
                 f"Rank: {max(roles, key=lambda x: x.rank).rank:,}\n"
                 f"Alliance: {repr(alliance)}\nRoles: {', '.join(f'{i.id} - {i.name}' for i in roles) or 'None'}\n"
-                f"Permissions: {enabled_permissions}",
+                f"Permissions: {enabled_permissions or 'None'}",
                 color=discord.Color.blue(),
             ),
             ephemeral=True,
