@@ -9,3 +9,5 @@ class AccountType(Enum):
     ACCOUNT = 1
     NATION = 2
     ALLIANCE = 3
+    USER = 4
+    GRANT = 5
