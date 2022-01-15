@@ -398,7 +398,7 @@ class MenuInterface:
 
     async def delete(self) -> None:
         await execute_query(
-            "DELETE FROM menu_interface WHERE menu = $1 AND message = $2 AND channel = $3",
+            "DELETE FROM menu_interfaces WHERE menu = $1 AND message = $2 AND channel = $3",
             self.menu_id,
             self.message_id,
             self.channel_id,
