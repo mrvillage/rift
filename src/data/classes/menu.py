@@ -390,7 +390,7 @@ class MenuInterface:
 
     async def save(self) -> None:
         await execute_query(
-            "INSERT INTO menu_interface (menu, message, channel) VALUES ($1, $2, $3);",
+            "INSERT INTO menu_interfaces (menu, message, channel) VALUES ($1, $2, $3);",
             self.menu_id,
             self.message_id,
             self.channel_id,
