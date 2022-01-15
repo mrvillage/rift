@@ -10,7 +10,10 @@ class GrantData(TypedDict):
     time: str
     recipient: int
     resources: str
+    alliance: int
     payoff: int
     note: Optional[str]
     deadline: Optional[str]
     paid: str
+    status: int
+    code: str
