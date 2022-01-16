@@ -495,5 +495,4 @@ class Alliance(Makeable):
         )
         if alliance_position >= 4:
             permissions.leadership = True
-        permissions.max_rank = max(i.rank for i in roles) if roles else 0
         return permissions
