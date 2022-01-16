@@ -131,6 +131,11 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                     ctx.author,
                     f"You gave too many arguments!\n\n`{get_command_signature(ctx)}`",
                 )
+            elif isinstance(error, commands.MaxConcurrencyReached):
+                raise EmbedErrorMessage(
+                    ctx.author,
+                    "Due to how much strain that command has on the server, you can only use that command once at a time!",
+                )
             elif isinstance(error, NoCredentialsError):
                 raise EmbedErrorMessage(
                     ctx.author,

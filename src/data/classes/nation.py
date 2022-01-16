@@ -538,6 +538,8 @@ class Nation(Makeable):
                 for i in valid
                 if (t := cache.get_target(i.id)) is None or t and t.turn_passed(dt)
             ]
+            if len(revenue_valid) > 1000:
+                raise ValueError("L")
             revenues = await bulk_fetch_nation_revenues(revenue_valid)
         else:
             revenues = {}

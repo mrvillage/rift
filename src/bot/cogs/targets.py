@@ -211,6 +211,7 @@ class Targets(commands.Cog):
             "attack": "Whether to attack the nation rather than find attacks for it (ignores loot), defaults to false.",
         },
     )
+    @commands.max_concurrency(1, commands.BucketType.user)
     async def target_find_custom(
         self,
         ctx: RiftContext,
@@ -270,6 +271,7 @@ class Targets(commands.Cog):
             "attack": "Whether to attack the nation rather than find attacks for it (ignores loot), defaults to false.",
         },
     )
+    @commands.max_concurrency(1, commands.BucketType.user)
     async def target_find_raid(
         self,
         ctx: RiftContext,
@@ -321,6 +323,7 @@ class Targets(commands.Cog):
             "attack": "Whether to attack the nation rather than find attacks for it (ignores loot), defaults to false.",
         },
     )
+    @commands.max_concurrency(1, commands.BucketType.user)
     async def target_find_nuke(
         self,
         ctx: RiftContext,
@@ -375,6 +378,7 @@ class Targets(commands.Cog):
             "attack": "Whether to attack the nation rather than find attacks for it (ignores loot), defaults to false.",
         },
     )
+    @commands.max_concurrency(1, commands.BucketType.user)
     async def target_find_military(
         self,
         ctx: RiftContext,

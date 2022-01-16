@@ -63,7 +63,20 @@ async def find_targets(
                 condition = default_condition
             else:
                 condition = Condition.union(condition, default_condition)
-    targets = await nation.find_targets(condition, loot=count_loot)
+    try:
+        targets = await nation.find_targets(condition, loot=count_loot)
+    except ValueError as e:
+        if e.args[0] == "L":
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You tried to fetch nation loot for too many targets! Please try again with a more restrictive condition.\n\n"
+                "For example, `nation.beige_turns == 0 && nation.v_mode == 0 && nation.defensive_wars == 0` is "
+                "an excellent condition to limit the number of targets. `nation.alliance.id == 0` is also a good segment to add if you "
+                "don't want targets in an alliance.\n\n"
+                "This error happens because it can take upwards of fifteen minutes to fetch nation revenue and can cause severe issues for the bot "
+                "when responding to other commands.",
+            )
+        raise
     ratings: List[Tuple[float, Target]] = []
     for index, i in enumerate(targets):
         if i.nation is None:
