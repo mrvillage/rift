@@ -187,7 +187,7 @@ async def manage_roles_command_check(
     ctx: RiftContext, alliance: Optional[Alliance] = None, suppress: bool = False
 ) -> Tuple[Nation, Optional[Alliance], bool]:
     nation = await Nation.convert(ctx, None)
-    if alliance is None:
+    if alliance is None or alliance is MISSING:
         alliance = nation.alliance
     if alliance is None:
         return nation, alliance, False
