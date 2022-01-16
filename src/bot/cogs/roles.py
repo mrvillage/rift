@@ -709,11 +709,11 @@ class Roles(commands.Cog):
         self,
         ctx: RiftContext,
         member: Union[discord.Member, discord.User] = MISSING,
-        alliance: Optional[Alliance] = None,
+        alliance: Alliance = MISSING,
     ):
         member = member or ctx.author
-        nation, alliance, can = await manage_roles_command_check(ctx, alliance, True)
-        if alliance is None:
+        nation, alliance_, can = await manage_roles_command_check(ctx, alliance, True)
+        if alliance_ is None:
             raise EmbedErrorMessage(
                 ctx.author,
                 "You're not in an alliance and didn't specify one so I don't know where to look! Please try again with an alliance.",
@@ -724,21 +724,21 @@ class Roles(commands.Cog):
                 PrivacyLevel.PRIVATE,
                 PrivacyLevel.PROTECTED,
             }
-        elif nation.alliance_id == alliance.id:
+        elif nation.alliance_id == alliance_.id:
             privacy_levels = {PrivacyLevel.PUBLIC, PrivacyLevel.PRIVATE}
         else:
             privacy_levels = {PrivacyLevel.PUBLIC}
         roles = {
             i
             for i in cache.roles
-            if i.alliance_id == alliance.id
+            if i.alliance_id == alliance_.id
             and i.privacy_level in privacy_levels
             and (
                 ctx.author.id in i.member_ids
                 or nation.alliance_position in i.alliance_positions
             )
         }
-        permissions = alliance.permissions_for(member)
+        permissions = alliance_.permissions_for(member)
         enabled_permissions = ", ".join(
             f"`{i['name']}`"
             for i in ROLE_PERMISSIONS
@@ -749,7 +749,7 @@ class Roles(commands.Cog):
                 member,
                 f"Privacy Level: `{max(privacy_levels, key=lambda x: x.value).name}`\n\n"
                 f"Rank: {max(roles, key=lambda x: x.rank).rank if roles else 0:,}\n"
-                f"Alliance: {repr(alliance)}\nRoles: {', '.join(f'{i.id} - {i.name}' for i in roles) or 'None'}\n"
+                f"Alliance: {repr(alliance_)}\nRoles: {', '.join(f'{i.id} - {i.name}' for i in roles) or 'None'}\n"
                 f"Permissions: {enabled_permissions or 'None'}",
                 color=discord.Color.blue(),
             ),
