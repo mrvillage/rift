@@ -10,6 +10,7 @@ class TransactionType(Enum):
     DEPOSIT = 1
     WITHDRAW = 2
     GRANT = 3
+    GRANT_WITHDRAW = 4
 
 
 class TransactionStatus(Enum):
