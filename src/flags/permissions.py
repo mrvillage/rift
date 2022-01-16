@@ -64,6 +64,8 @@ class CredentialsPermissions(Flags):
 
 
 class RolePermissions(Flags):
+    max_rank: int
+
     @flag
     def manage_roles(self):
         return 1 << 0
