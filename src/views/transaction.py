@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import discord
 
 from .. import funcs
+from ..cache import cache
 from ..data.classes import Alliance, AllianceSettings, Transaction
 from ..enums import AccountType, TransactionStatus, TransactionType
 from ..errors import NoCredentialsError
@@ -56,33 +57,81 @@ class TransactionRequestView(discord.ui.View):
         if TYPE_CHECKING:
             assert interaction.user is not None
         if self.user_id == 0:
-            if (
-                self.request.transaction is None
-                or self.request.transaction.from_ is None
-            ):
+            if self.request.transaction is None:
                 await interaction.response.send_message(
                     embed=funcs.get_embed_author_member(
-                        interaction.user, "No transaction found."
+                        interaction.user,
+                        "No transaction found.",
+                        color=discord.Color.red(),
                     ),
                     ephemeral=True,
                 )
                 return False
-            alliance_id = self.request.transaction.from_.alliance_id
-            permissions = Alliance.permissions_for_id(alliance_id, interaction.user)
-            if permissions.leadership or permissions.manage_bank_accounts:
-                return True
-            await interaction.response.send_message(
-                embed=funcs.get_embed_author_member(
-                    interaction.user, "You do not have permission to use ."
-                ),
-                ephemeral=True,
-            )
-            return False
+            if (
+                self.request.transaction.type is TransactionType.WITHDRAW
+                or self.request.transaction.type is TransactionType.TRANSFER
+            ):
+                if self.request.transaction.from_ is None:
+                    await interaction.response.send_message(
+                        embed=funcs.get_embed_author_member(
+                            interaction.user,
+                            "No transaction found.",
+                            color=discord.Color.red(),
+                        ),
+                        ephemeral=True,
+                    )
+                    return False
+                alliance_id = self.request.transaction.from_.alliance_id
+                permissions = Alliance.permissions_for_id(alliance_id, interaction.user)
+                if permissions.leadership or permissions.manage_bank_accounts:
+                    return True
+                await interaction.response.send_message(
+                    embed=funcs.get_embed_author_member(
+                        interaction.user,
+                        "You do not have permission to use this menu.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+                return False
+            elif (
+                self.request.transaction.type is TransactionType.GRANT_WITHDRAW
+                or self.request.transaction.type is TransactionType.GRANT
+            ):
+                if self.request.transaction.from_grant is None:
+                    await interaction.response.send_message(
+                        embed=funcs.get_embed_author_member(
+                            interaction.user,
+                            "No grant found.",
+                            color=discord.Color.red(),
+                        ),
+                        ephemeral=True,
+                    )
+                    return False
+                alliance_id = self.request.transaction.from_grant.alliance_id
+                permissions = Alliance.permissions_for_id(alliance_id, interaction.user)
+                if (
+                    permissions.leadership
+                    or permissions.manage_grants
+                    or permissions.approve_grants
+                ):
+                    return True
+                await interaction.response.send_message(
+                    embed=funcs.get_embed_author_member(
+                        interaction.user,
+                        "You do not have permission to use this menu.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+                return False
         if interaction.user.id == self.user_id:
             return True
         await interaction.response.send_message(
             embed=funcs.get_embed_author_member(
-                interaction.user, "You're not allowed to use this menu!"
+                interaction.user,
+                "You're not allowed to use this menu!",
+                color=discord.Color.red(),
             ),
             ephemeral=True,
         )
@@ -150,11 +199,22 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                 ),
                 ephemeral=True,
             )
-        elif transaction.type is TransactionType.WITHDRAW:
+        elif (
+            transaction.type is TransactionType.WITHDRAW
+            or transaction.type is TransactionType.GRANT_WITHDRAW
+        ):
             if (
-                transaction.from_ is None
-                or transaction.to_nation is None
-                or transaction.from_.alliance is None
+                (
+                    transaction.from_ is None
+                    or transaction.to_nation is None
+                    or transaction.from_.alliance is None
+                )
+                if transaction.type is TransactionType.WITHDRAW
+                else (
+                    transaction.from_grant is None
+                    or transaction.to_nation is None
+                    or transaction.from_grant.alliance is None
+                )
             ):
                 transaction.status = TransactionStatus.FAILED
                 return await interaction.response.send_message(
@@ -166,9 +226,18 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                     ephemeral=True,
                 )
             await interaction.response.defer(ephemeral=True)
-            if any(
-                value < getattr(transaction.resources, key)
-                for key, value in transaction.from_.resources.to_dict().items()
+            if TYPE_CHECKING:
+                assert transaction.from_ is not None
+                assert transaction.from_grant is not None
+                assert transaction.from_.alliance is not None
+                assert transaction.from_grant.alliance is not None
+            if (
+                any(
+                    value < getattr(transaction.resources, key)
+                    for key, value in transaction.from_.resources.to_dict().items()
+                )
+                if transaction.type is TransactionType.WITHDRAW
+                else False
             ):
                 transaction.status = TransactionStatus.FAILED
                 return await interaction.followup.send(
@@ -192,7 +261,9 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                         transaction.resources,
                         transaction.to_nation,
                         credentials,
-                        note=f"Rift Withdrawal from Account #{transaction.from_.id} and note: {transaction.note}",
+                        note=f"Rift Withdrawal from Account #{transaction.from_.id} and note: {transaction.note}"
+                        if transaction.type is TransactionType.WITHDRAW
+                        else f"Rift Grant #{transaction.from_grant.id} and note: {transaction.note}",
                     )
                 else:
                     success = False
@@ -208,7 +279,9 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                     transaction.resources,
                     transaction.to_nation,
                     credentials,
-                    note=f"Rift Withdrawal from Account #{transaction.from_.id} and note: {transaction.note}",
+                    note=f"Rift Withdrawal from Account #{transaction.from_.id} and note: {transaction.note}"
+                    if transaction.type is TransactionType.WITHDRAW
+                    else f"Rift Grant #{transaction.from_grant.id} and note: {transaction.note}",
                 )
             if not success:
                 transaction.status = TransactionStatus.PENDING
@@ -225,10 +298,51 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
             await interaction.edit_original_message(
                 embed=funcs.get_embed_author_member(
                     interaction.user,
-                    f"Withdrawal of {transaction.resources} from account #{transaction.from_.id:,} approved by {interaction.user.mention}!",
+                    f"Withdrawal of {transaction.resources} from account #{transaction.from_.id:,} approved by {interaction.user.mention}!"
+                    if transaction.type is TransactionType.WITHDRAW
+                    else f"Grant #{transaction.from_grant.id} of {transaction.resources} approved by {interaction.user.mention}!",
                     color=discord.Color.green(),
                 ),
                 view=None,
+            )
+        elif transaction.type is TransactionType.GRANT:
+            grant = self.transaction.from_grant
+            if grant is None:
+                return
+            user = self.transaction.to_user
+            if user is None:
+                return
+            link = cache.get_user(grant.recipient_id)
+            if link is None or (nation := cache.get_nation(link.nation_id)) is None:
+                transaction.status = TransactionStatus.PENDING
+                return await interaction.response.send_message(
+                    embed=funcs.get_embed_author_member(
+                        interaction.user,
+                        "You're not linked so I can't infer what nation to grant this to! Please link with the `/link` command or use `/grant accept` to accept the grant for a specific nation.",
+                        color=discord.Color.red(),
+                    ),
+                    ephemeral=True,
+                )
+            transaction = await Transaction.create(
+                datetime.datetime.utcnow(),
+                TransactionStatus.PENDING,
+                TransactionType.GRANT_WITHDRAW,
+                user,
+                nation,
+                grant,
+                self.transaction.resources,
+                self.transaction.note,
+                to_type=AccountType.NATION,
+                from_type=AccountType.GRANT,
+            )
+            await transaction.send_for_approval()
+            await interaction.response.send_message(
+                embed=funcs.get_embed_author_member(
+                    interaction.user,
+                    f"Grant {grant.id} has been sent to have the resources transferred.",
+                    color=discord.Color.green(),
+                ),
+                ephemeral=True,
             )
         await transaction.save()
 

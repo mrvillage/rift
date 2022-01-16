@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from ...views import TransactionRequestView
     from .account import Account
     from .alliance import Alliance
+    from .grant import Grant
     from .nation import Nation
 
 
@@ -101,8 +102,8 @@ class Transaction:
         status: TransactionStatus,
         type: TransactionType,
         creator: Union[discord.Member, discord.User],
-        to: Union[Account, Alliance, Nation],
-        from_: Union[Account, Alliance, Nation],
+        to: Union[Account, Alliance, Nation, discord.Member, discord.User],
+        from_: Union[Account, Alliance, Nation, discord.Member, discord.User, Grant],
         resources: Resources,
         note: Optional[str] = None,
         *,
@@ -156,6 +157,14 @@ class Transaction:
         return cache.get_alliance(self.to_id)
 
     @property
+    def to_user(self) -> Optional[discord.User]:
+        return bot.get_user(self.to_id)
+
+    @property
+    def to_grant(self) -> Optional[Grant]:
+        return cache.get_grant(self.to_id)
+
+    @property
     def from_(self) -> Optional[Account]:
         return cache.get_account(self.from_id)
 
@@ -166,6 +175,14 @@ class Transaction:
     @property
     def from_alliance(self) -> Optional[Alliance]:
         return cache.get_alliance(self.from_id)
+
+    @property
+    def from_user(self) -> Optional[discord.User]:
+        return bot.get_user(self.from_id)
+
+    @property
+    def from_grant(self) -> Optional[Grant]:
+        return cache.get_grant(self.from_id)
 
     @property
     def field(self) -> Field:
@@ -205,7 +222,8 @@ class Transaction:
         if self.type is TransactionType.WITHDRAW:
             if self.from_ is None:
                 return
-            if self.creator is None:
+            creator = self.creator
+            if creator is None:
                 return
             settings = await AllianceSettings.fetch(self.from_.alliance_id)
             request = await TransactionRequest.create(self, None)
@@ -213,29 +231,50 @@ class Transaction:
                 try:
                     await channel.send(
                         embed=get_embed_author_member(
-                            self.creator,
-                            f"{self.creator.mention} wants to withdraw {self.resources} from account #{self.from_.id:,}. Please accept or deny it below.",
+                            creator,
+                            f"{creator.mention} wants to withdraw {self.resources} from account #{self.from_.id:,}. Please accept or deny it below.",
                             color=discord.Color.orange(),
                         ),
                         view=request.view,
                     )
                 except discord.Forbidden:
                     pass
-
         if self.type is TransactionType.GRANT:
-            if self.to is None or self.creator is None:
-                return
-            user = self.to.owner
+            user = self.to_user
             if user is None:
+                return
+            grant = self.from_grant
+            if grant is None:
                 return
             request = await TransactionRequest.create(self, user)
             await user.send(
                 embed=get_embed_author_member(
                     user,
-                    f"{self.creator.mention} has sent you a grant of {self.resources}. Please accept or deny it below.",
+                    f"Alliance {grant.alliance} has sent you a grant of {grant.resources} with a payoff method of `{grant.payoff}` and {'no deadline' if grant.deadline is None else f'is due <t:{grant.deadline.timestamp()}:R>'} and a note of {grant.note}.",
                 ),
                 view=request.view,
             )
+        if self.type is TransactionType.GRANT_WITHDRAW:
+            grant = self.from_grant
+            if grant is None:
+                return
+            creator = self.creator
+            if creator is None:
+                return
+            settings = await AllianceSettings.fetch(grant.alliance_id)
+            request = await TransactionRequest.create(self, None)
+            for channel in settings.withdraw_channels_:
+                try:
+                    await channel.send(
+                        embed=get_embed_author_member(
+                            creator,
+                            f"Grant {grant.id} needs {self.resources} to be sent to {self.to_nation}. Please send them below.",
+                            color=discord.Color.orange(),
+                        ),
+                        view=request.view,
+                    )
+                except discord.Forbidden:
+                    pass
 
 
 class TransactionRequest:
