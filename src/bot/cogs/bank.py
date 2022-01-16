@@ -62,8 +62,8 @@ class Bank(commands.Cog):
         note: Optional[str] = None,
     ):
         recipient_ = await funcs.convert_nation_or_alliance(ctx, recipient)
-        alliance_ = alliance or await Alliance.convert(ctx, None)
-        if alliance_ is None:
+        alliance = alliance or await Alliance.convert(ctx, None)
+        if alliance is None:
             raise EmbedErrorMessage(
                 ctx.author,
                 "You're not in an alliance and didn't specify one to send from! Please try again with an alliance.",
@@ -79,12 +79,12 @@ class Bank(commands.Cog):
             )
         permissions = alliance.permissions_for(ctx.author)
         if not (permissions.leadership or permissions.send_alliance_bank):
-            raise NoRolesError(alliance_, "Send Alliance Bank")
+            raise NoRolesError(alliance, "Send Alliance Bank")
         view = Confirm(defer=True)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Are you sure you want to transfer {resources} to the **{type(recipient_).__name__.lower()}** of **{repr(recipient_)}** from the alliance of **{repr(alliance_)}**",
+                f"Are you sure you want to transfer {resources} to the **{type(recipient_).__name__.lower()}** of **{repr(recipient_)}** from the alliance of **{repr(alliance)}**",
                 color=discord.Color.orange(),
             ),
             view=view,
@@ -104,7 +104,7 @@ class Bank(commands.Cog):
             return await ctx.interaction.edit_original_message(
                 embed=funcs.get_embed_author_member(
                     ctx.author,
-                    f"You have cancelled the transfer of {resources} from **{repr(alliance_)}** to the **{type(recipient_).__name__.lower()}** of **{repr(recipient_)}**.",
+                    f"You have cancelled the transfer of {resources} from **{repr(alliance)}** to the **{type(recipient_).__name__.lower()}** of **{repr(recipient_)}**.",
                     color=discord.Color.red(),
                 ),
                 view=None,
@@ -112,13 +112,13 @@ class Bank(commands.Cog):
         await ctx.interaction.edit_original_message(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Sending {resources} from **{repr(alliance_)}** to the **{type(recipient_).__name__.lower()}** of **{repr(recipient_)}**...",
+                f"Sending {resources} from **{repr(alliance)}** to the **{type(recipient_).__name__.lower()}** of **{repr(recipient_)}**...",
                 color=discord.Color.orange(),
             ),
             view=None,
         )
         credentials = funcs.credentials.find_highest_alliance_credentials(
-            alliance_, "send_alliance_bank"
+            alliance, "send_alliance_bank"
         )
         if credentials is None or (
             credentials.username is None and credentials.password is None
@@ -141,7 +141,7 @@ class Bank(commands.Cog):
         await ctx.interaction.edit_original_message(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"You successfully transferred {resources} from **{repr(alliance_)}** to the **{type(recipient_).__name__.lower()}** of **{repr(recipient_)}**.",
+                f"You successfully transferred {resources} from **{repr(alliance)}** to the **{type(recipient_).__name__.lower()}** of **{repr(recipient_)}**.",
                 color=discord.Color.green(),
             )
         )
