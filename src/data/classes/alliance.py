@@ -484,18 +484,16 @@ class Alliance(Makeable):
             else 0
         )
         roles = (
-                i
-                for i in cache.roles
-                if i.alliance_id == alliance_id
-                and (
-                    user.id in i.member_ids or alliance_position in i.alliance_positions
-                )
-            )
+            i
+            for i in cache.roles
+            if i.alliance_id == alliance_id
+            and (user.id in i.member_ids or alliance_position in i.alliance_positions)
+        )
         permissions = sum(
             (i.permissions for i in roles),
             RolePermissions(),
         )
         if alliance_position >= 4:
             permissions.leadership = True
-        permissions.max_rank = max(i.rank for i in roles)
+        permissions.max_rank = max(i.rank for i in roles) if roles else 0
         return permissions
