@@ -18,7 +18,7 @@ def standard_dispatch(conn: Connection, pid: int, channel: str, payload: str) ->
 
 
 listeners: Dict[str, Callable[[Connection, int, str, Any], None]] = {
-    "credentials_create": standard_dispatch,
-    "credentials_update": standard_dispatch,
-    "credentials_delete": standard_dispatch,
+    "insert_credentials": standard_dispatch,
+    "update_credentials": standard_dispatch,
+    "delete_credentials": standard_dispatch,
 }
