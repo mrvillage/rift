@@ -80,6 +80,13 @@ class Bank(commands.Cog):
         permissions = alliance.permissions_for(ctx.author)
         if not (permissions.leadership or permissions.send_alliance_bank):
             raise NoRolesError(alliance, "Send Alliance Bank")
+        credentials = funcs.credentials.find_highest_alliance_credentials(
+            alliance, "send_alliance_bank"
+        )
+        if credentials is None or (
+            credentials.username is None and credentials.password is None
+        ):
+            raise NoCredentialsError()
         view = Confirm(defer=True)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -117,13 +124,6 @@ class Bank(commands.Cog):
             ),
             view=None,
         )
-        credentials = funcs.credentials.find_highest_alliance_credentials(
-            alliance, "send_alliance_bank"
-        )
-        if credentials is None or (
-            credentials.username is None and credentials.password is None
-        ):
-            raise NoCredentialsError()
         complete = await funcs.withdraw(
             resources,
             recipient_,

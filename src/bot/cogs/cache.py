@@ -226,11 +226,11 @@ class Cache(commands.Cog):
         await discord.utils.sleep_until(wait)
 
     @commands.Cog.listener()
-    async def on_credentials_create(self, data: CredentialsData):
+    async def on_insert_credentials(self, data: CredentialsData):
         cache.add_credentials(Credentials(data))
 
     @commands.Cog.listener()
-    async def on_credentials_update(self, data: CredentialsData):
+    async def on_update_credentials(self, data: CredentialsData):
         credentials = cache.get_credentials(data["nation"])
         if credentials is None:
             cache.add_credentials(Credentials(data))
@@ -238,7 +238,7 @@ class Cache(commands.Cog):
             credentials.update(data)
 
     @commands.Cog.listener()
-    async def on_credentials_delete(self, data: CredentialsData):
+    async def on_delete_credentials(self, data: CredentialsData):
         credentials = cache.get_credentials(data["nation"])
         if credentials is not None:
             cache.remove_credentials(credentials)
