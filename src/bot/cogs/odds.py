@@ -94,7 +94,11 @@ class Odds(commands.Cog):
         brief="calculate the odds of a battle winning or losing",
         type=commands.CommandType.chat_input,
     )
+    async def odds_battles(self, ctx: RiftContext):
+        ...
+
     @odds_battles.command(  # type: ignore
+        name="naval",
         brief="Calculate naval battle odds between two nations",
         type=commands.CommandType.chat_input,
     )
