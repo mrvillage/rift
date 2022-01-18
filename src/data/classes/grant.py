@@ -142,7 +142,9 @@ class Grant:
             self.id = id[0]["id"]
             cache.add_grant(self)
 
-    async def send(self, creator: Union[discord.Member, discord.User], request: bool = True) -> None:
+    async def send(
+        self, creator: Union[discord.Member, discord.User], request: bool = True
+    ) -> None:
         transaction = await Transaction.create(
             self.time,
             TransactionStatus.PENDING,

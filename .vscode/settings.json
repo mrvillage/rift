@@ -1,7 +1,8 @@
 {
     "python.formatting.provider": "black",
     "python.sortImports.args": [
-        "--profile black"
+        "--profile",
+        "black"
     ],
     "python.analysis.typeCheckingMode": "strict",
     "python.analysis.completeFunctionParens": true,
