@@ -24,7 +24,7 @@ def getattackchance(attackerval: int, defenderval: int):
     phyric = chance * unchance * unchance * 3
     failure = unchance ** 3
     return {
-        "Faliure": failure,
+        "Failure": failure,
         "phyric": phyric,
         "moderate": moderate,
         "immense": immense,
@@ -166,7 +166,7 @@ class Odds(commands.Cog):
 
     @odds_battles.command(  # type: ignore
         name="air",
-        brief="Calculate air battle odds between two n  ations",
+        brief="Calculate air battle odds between two nations",
         type=commands.CommandType.chat_input,
     )
     async def odds_battles_air(
