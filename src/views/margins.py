@@ -15,7 +15,7 @@ class Margins(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(
+    @discord.ui.button(  # type: ignore
         label="Refresh", style=discord.ButtonStyle.gray, custom_id="MARGINS_REFRESH_1"
     )
     async def refresh(

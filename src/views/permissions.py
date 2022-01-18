@@ -34,7 +34,7 @@ class PermissionsSelector(discord.ui.View):
             return False
         return interaction.user.id == self.owner_id
 
-    @discord.ui.button(label="Save", row=4, style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Save", row=4, style=discord.ButtonStyle.green)  # type: ignore
     async def save_button(
         self,
         button: discord.ui.Button[PermissionsSelector],
