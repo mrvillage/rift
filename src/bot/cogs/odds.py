@@ -12,7 +12,7 @@ from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 
-def get_attack_chance(attackerval: int, defenderval: int) -> Dict[str, float]:
+def get_attack_chance(attackerval: float, defenderval: float) -> Dict[str, float]:
     nwins: int = 0
     decplaces = 1000
     for i in range(decplaces):
@@ -112,16 +112,26 @@ class Odds(commands.Cog):
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)
 
-        navalChance = get_attack_chance(attacker.ships, defender.ships)
-
-        groundChance = get_attack_chance(attacker.ships, defender.ships)
-        print(groundChance)
+        groundChance = get_attack_chance(
+            (float(attacker.soldiers) * 1.75) + (attacker.tanks * 40),
+            (float(defender.soldiers) * 1.75) + (attacker.tanks * 40),
+        )
+        navalChance = get_attack_chance(attacker.ships * 4, defender.ships * 4)
+        airChance = get_attack_chance(attacker.aircraft * 3, defender.aircraft * 3)
 
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"{attacker} vs {defender}\n{attacker.ships} Spies vs {defender.ships} Spies\nOdds are ordered for safety level 1, 2, 3 (Quick and Dirty, Normal Precautions, Extremely Covert).",
+                f"{attacker} vs {defender}\n",
                 fields=[
+                    {
+                        "name": "Ground Battle",
+                        "value": f"Immense:{groundChance['immense']*100}%, Moderate:{groundChance['moderate']*100}%, Phyric:{groundChance['phyric']*100}%, Failure:{groundChance['failure']*100}%,",
+                    },
+                    {
+                        "name": "Air Battle",
+                        "value": f"Immense:{airChance['immense']*100}%, Moderate:{airChance['moderate']*100}%, Phyric:{airChance['phyric']*100}%, Failure:{airChance['failure']*100}%,",
+                    },
                     {
                         "name": "Naval Battle",
                         "value": f"Immense:{navalChance['immense']*100}%, Moderate:{navalChance['moderate']*100}%, Phyric:{navalChance['phyric']*100}%, Failure:{navalChance['failure']*100}%,",
