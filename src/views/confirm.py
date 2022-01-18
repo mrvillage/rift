@@ -25,7 +25,7 @@ class Confirm(discord.ui.View):
         if self.defer:
             await interaction.response.defer()
 
-    @discord.ui.button(label="Yes", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Yes", style=discord.ButtonStyle.green) # type: ignore
     async def yes(
         self,
         button: discord.ui.Button[discord.ui.View],
@@ -36,7 +36,7 @@ class Confirm(discord.ui.View):
         await self.hook(interaction)
         self.stop()
 
-    @discord.ui.button(label="No", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="No", style=discord.ButtonStyle.red) # type: ignore
     async def no(
         self,
         button: discord.ui.Button[discord.ui.View],
