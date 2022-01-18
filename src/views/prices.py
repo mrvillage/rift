@@ -16,7 +16,7 @@ class Prices(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button( # type: ignore
+    @discord.ui.button(  # type: ignore
         label="Refresh", style=discord.ButtonStyle.gray, custom_id="PRICES_REFRESH_1"
     )
     async def refresh(
