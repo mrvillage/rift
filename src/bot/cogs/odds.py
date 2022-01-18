@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+from typing import Dict
+
 import discord
 from discord.ext import commands
 from discord.utils import MISSING
+
 from ... import funcs
 from ...data.classes import Nation
 from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 
-def getattackchance(attackerval: int, defenderval: int):
+def get_attack_chance(attackerval: int, defenderval: int) -> Dict[str, float]:
     nwins: int = 0
     decplaces = 1000
     for i in range(decplaces):
@@ -21,11 +24,11 @@ def getattackchance(attackerval: int, defenderval: int):
     unchance = 1 - chance
     immense = chance ** 3
     moderate = chance * chance * unchance * 3
-    phyric = chance * unchance * unchance * 3
+    pyrrhic = chance * unchance * unchance * 3
     failure = unchance ** 3
     return {
         "failure": failure,
-        "phyric": phyric,
+        "pyrrhic": pyrrhic,
         "moderate": moderate,
         "immense": immense,
     }
@@ -109,10 +112,11 @@ class Odds(commands.Cog):
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)
 
-        navalChance = getattackchance(attacker.ships, defender.ships)
+        navalChance = get_attack_chance(attacker.ships, defender.ships)
 
-        groundChance = getattackchance(attacker.ships, defender.ships)
+        groundChance = get_attack_chance(attacker.ships, defender.ships)
         print(groundChance)
+
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
