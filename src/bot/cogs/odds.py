@@ -3,13 +3,25 @@ from __future__ import annotations
 import discord
 from discord.ext import commands
 from discord.utils import MISSING
-
 from ... import funcs
 from ...data.classes import Nation
 from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
-
+def getattackchance( attackerval: int,defenderval: int):
+        nwins: int = 0
+        decplaces = 1000
+        for i in range(decplaces):
+            for n in range(decplaces):
+                nwins += (attackerval - ((i * 0.6) / decplaces * attackerval) > defenderval - (
+                            (n * 0.6) / decplaces * defenderval))
+        chance = nwins / (decplaces ** 2)
+        unchance = 1 - chance
+        immense = chance ** 3
+        moderate = chance * chance * unchance * 3
+        phyric = chance * unchance * unchance * 3
+        failure = unchance ** 3
+        return ({"Faliure":failure,"phyric":phyric,"moderate":moderate,"immense":immense})
 class Odds(commands.Cog):
     def __init__(self, bot: Rift):
         self.bot = bot
@@ -67,6 +79,100 @@ class Odds(commands.Cog):
                 color=discord.Color.blue(),
             )
         )
+    @commands.group(
+        name = "battles",
+        brief = "calculate the odds of a battle winning or losing",
+        type=commands.CommandType.chat_input,
+
+
+
+
+    )
+    @odds_battles.command(  # type: ignore
+        name = "naval"
+        brief="Calculate naval battle odds between two nations",
+        type=commands.CommandType.chat_input,
+    )
+    async def odds_battles_naval(
+        self,
+        ctx: RiftContext,
+        attacker: Nation = MISSING,
+        defender: Nation = MISSING,
+    ):
+        await ctx.response.defer()    # type: ignore
+        if attacker is MISSING and defender is MISSING:
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You must specify at least one nation.",
+            )
+        attacker = attacker or await Nation.convert(ctx, attacker)
+        defender = defender or await Nation.convert(ctx, defender)
+        
+        response = getattackchance(attacker.ships, defender.ships)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"{attacker} vs {defender}\n{attacker.ships} Spies vs {defender.ships} Spies\nOdds are ordered for safety level 1, 2, 3 (Quick and Dirty, Normal Precautions, Extremely Covert).",
+                fields=[
+                    {
+                        "name": "Immense Triumph",
+                        "value": f"{response['immense']}",
+                    },
+                    {
+                        "name": "Moderate Success",
+                        "value": f"{response['moderate']}",
+                    },
+                    {
+                        "name": "Phyric Victory",
+                        "value": f"{response['phyric']}",
+                    },
+                    {
+                        "name": "Utter Failure",
+                        "value": f"{response['failure']}",
+                    },
+                ],
+                color=discord.Color.blue(),
+            )
+        )
+    @odds_battles.command(  # type: ignore
+        name = "ground"
+        brief="Calculate ground battle odds between two nations",
+        type=commands.CommandType.chat_input,
+    )
+    async def odds_battles_ground(
+        self,
+        ctx: RiftContext,
+        attacker: Nation = MISSING,
+        defender: Nation = MISSING,
+    ):
+        await ctx.response.defer()    # type: ignore
+        if attacker is MISSING and defender is MISSING:
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You must specify at least one nation.",
+            )
+        attacker = attacker or await Nation.convert(ctx, attacker)
+        defender = defender or await Nation.convert(ctx, defender)
+
+    @odds_battles.command(  # type: ignore
+        name = "air"
+        brief="Calculate air battle odds between two nations",
+        type=commands.CommandType.chat_input,
+    )
+    async def odds_battles_air(
+        self,
+        ctx: RiftContext,
+        attacker: Nation = MISSING,
+        defender: Nation = MISSING,
+    ):
+        await ctx.response.defer()    # type: ignore
+        if attacker is MISSING and defender is MISSING:
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You must specify at least one nation.",
+            )
+        attacker = attacker or await Nation.convert(ctx, attacker)
+        defender = defender or await Nation.convert(ctx, defender)
 
 
 def setup(bot: Rift):
