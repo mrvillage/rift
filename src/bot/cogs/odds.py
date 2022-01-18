@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+from typing import Dict
+
 import discord
 from discord.ext import commands
 from discord.utils import MISSING
+
 from ... import funcs
 from ...data.classes import Nation
 from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 
-def getattackchance(attackerval: int, defenderval: int):
+def get_attack_chance(attackerval: int, defenderval: int) -> Dict[str, float]:
     nwins: int = 0
     decplaces = 1000
     for i in range(decplaces):
@@ -21,11 +24,11 @@ def getattackchance(attackerval: int, defenderval: int):
     unchance = 1 - chance
     immense = chance ** 3
     moderate = chance * chance * unchance * 3
-    phyric = chance * unchance * unchance * 3
+    pyrrhic = chance * unchance * unchance * 3
     failure = unchance ** 3
     return {
-        "Failure": failure,
-        "phyric": phyric,
+        "failure": failure,
+        "pyrrhic": pyrrhic,
         "moderate": moderate,
         "immense": immense,
     }
@@ -89,7 +92,7 @@ class Odds(commands.Cog):
             )
         )
 
-    @commands.group(
+    @odds.group(
         name="battles",
         brief="calculate the odds of a battle winning or losing",
         type=commands.CommandType.chat_input,
@@ -117,7 +120,7 @@ class Odds(commands.Cog):
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)
 
-        response = getattackchance(attacker.ships, defender.ships)
+        response = get_attack_chance(attacker.ships, defender.ships)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
@@ -132,8 +135,8 @@ class Odds(commands.Cog):
                         "value": f"{response['moderate']}",
                     },
                     {
-                        "name": "Phyric Victory",
-                        "value": f"{response['phyric']}",
+                        "name": "Pyrrhic Victory",
+                        "value": f"{response['pyrrhic']}",
                     },
                     {
                         "name": "Utter Failure",
