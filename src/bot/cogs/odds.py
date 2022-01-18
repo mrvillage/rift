@@ -24,7 +24,7 @@ def getattackchance(attackerval: int, defenderval: int):
     phyric = chance * unchance * unchance * 3
     failure = unchance ** 3
     return {
-        "Failure": failure,
+        "failure": failure,
         "phyric": phyric,
         "moderate": moderate,
         "immense": immense,
@@ -89,17 +89,9 @@ class Odds(commands.Cog):
             )
         )
 
-    @commands.group(
-        name="battles",
-        brief="calculate the odds of a battle winning or losing",
-        type=commands.CommandType.chat_input,
-    )
-    async def odds_battles(self, ctx: RiftContext):
-        ...
-
-    @odds_battles.command(  # type: ignore
-        name="naval",
-        brief="Calculate naval battle odds between two nations",
+    @odds.command(  # type: ignore
+        name="attacks",
+        brief="Calculate the odds of 2 nations fighting",
         type=commands.CommandType.chat_input,
     )
     async def odds_battles_naval(
@@ -117,72 +109,23 @@ class Odds(commands.Cog):
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)
 
-        response = getattackchance(attacker.ships, defender.ships)
+        navalChance = getattackchance(attacker.ships, defender.ships)
+
+        groundChance = getattackchance(attacker.ships, defender.ships)
+        print(groundChance)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"{attacker} vs {defender}\n{attacker.ships} Spies vs {defender.ships} Spies\nOdds are ordered for safety level 1, 2, 3 (Quick and Dirty, Normal Precautions, Extremely Covert).",
                 fields=[
                     {
-                        "name": "Immense Triumph",
-                        "value": f"{response['immense']}",
-                    },
-                    {
-                        "name": "Moderate Success",
-                        "value": f"{response['moderate']}",
-                    },
-                    {
-                        "name": "Phyric Victory",
-                        "value": f"{response['phyric']}",
-                    },
-                    {
-                        "name": "Utter Failure",
-                        "value": f"{response['failure']}",
+                        "name": "Naval Battle",
+                        "value": f"Immense:{navalChance['immense']*100}%, Moderate:{navalChance['moderate']*100}%, Phyric:{navalChance['phyric']*100}%, Failure:{navalChance['failure']*100}%,",
                     },
                 ],
                 color=discord.Color.blue(),
             )
         )
-
-    @odds_battles.command(  # type: ignore
-        name="ground",
-        brief="Calculate ground battle odds between two nations",
-        type=commands.CommandType.chat_input,
-    )
-    async def odds_battles_ground(
-        self,
-        ctx: RiftContext,
-        attacker: Nation = MISSING,
-        defender: Nation = MISSING,
-    ):
-        await ctx.response.defer()  # type: ignore
-        if attacker is MISSING and defender is MISSING:
-            raise EmbedErrorMessage(
-                ctx.author,
-                "You must specify at least one nation.",
-            )
-        attacker = attacker or await Nation.convert(ctx, attacker)
-        defender = defender or await Nation.convert(ctx, defender)
-
-    @odds_battles.command(  # type: ignore
-        name="air",
-        brief="Calculate air battle odds between two nations",
-        type=commands.CommandType.chat_input,
-    )
-    async def odds_battles_air(
-        self,
-        ctx: RiftContext,
-        attacker: Nation = MISSING,
-        defender: Nation = MISSING,
-    ):
-        await ctx.response.defer()  # type: ignore
-        if attacker is MISSING and defender is MISSING:
-            raise EmbedErrorMessage(
-                ctx.author,
-                "You must specify at least one nation.",
-            )
-        attacker = attacker or await Nation.convert(ctx, attacker)
-        defender = defender or await Nation.convert(ctx, defender)
 
 
 def setup(bot: Rift):
