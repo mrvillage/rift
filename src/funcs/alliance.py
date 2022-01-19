@@ -15,6 +15,7 @@ __all__ = ("search_alliance",)
 async def search_alliance(
     ctx: RiftContext, search: str, advanced: bool = False
 ) -> Alliance:
+    search = search or str(ctx.author.id)
     try:
         search = convert_link(search)
     except LinkError:

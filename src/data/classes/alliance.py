@@ -10,8 +10,8 @@ from pnwkit.async_ import AsyncKit
 
 from ...cache import cache
 from ...errors import AllianceNotFoundError, NoCredentialsError
-from ...find import search_alliance
 from ...flags import RolePermissions
+from ...funcs import search_alliance
 from ...ref import RiftContext
 from .base import Makeable
 from .city import City
