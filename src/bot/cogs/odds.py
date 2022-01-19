@@ -12,14 +12,33 @@ from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 
-def get_attack_chance(attackerval: float, defenderval: float) -> Dict[str, float]:
+def get_casualties(attacker_val: float, defender_val: float):
+    attacker_low = attacker_val * 0.4
+    defender_low = defender_val * 0.4
+    chance_for_three = (
+        0.01375 * 3
+    )  # leaving this in here so we aren't confused looking back on the future
+    # its attacker for defender because casualties are based on the opponents units
+    return {
+        "attacker": {
+            "low": defender_low * chance_for_three,
+            "high": defender_val * chance_for_three,
+        },
+        "defender": {
+            "low": attacker_low * chance_for_three,
+            "high": attacker_val * chance_for_three,
+        },
+    }
+
+
+def get_attack_chance(attacker_val: float, defender_val: float) -> Dict[str, float]:
     nwins: int = 0
     decplaces = 1000
     for i in range(decplaces):
         for n in range(decplaces):
-            nwins += attackerval - (
-                (i * 0.6) / decplaces * attackerval
-            ) > defenderval - ((n * 0.6) / decplaces * defenderval)
+            nwins += attacker_val - (
+                (i * 0.6) / decplaces * attacker_val
+            ) > defender_val - ((n * 0.6) / decplaces * defender_val)
     chance = nwins / (decplaces ** 2)
     unchance = 1 - chance
     immense = chance ** 3
@@ -111,7 +130,7 @@ class Odds(commands.Cog):
             )
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)
-        #FIXME doesnt include population reisistance
+        # FIXME doesnt include population reisistance
         ground_chance = get_attack_chance(
             (float(attacker.soldiers) * 1.75) + (attacker.tanks * 40),
             (float(defender.soldiers) * 1.75) + (defender.tanks * 40),
