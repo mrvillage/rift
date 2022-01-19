@@ -176,6 +176,7 @@ class Targets(commands.Cog):
                 await channel.send(
                     content=f"{repr(after)} is no longer on beige!\n{reminder.mentions}",
                     embed=embed,
+                    view=after.get_info_view(),
                 )
             if reminder.direct_message:
                 owner = self.bot.get_user(reminder.owner_id)
@@ -184,6 +185,7 @@ class Targets(commands.Cog):
                 await owner.send(
                     content=f"{repr(after)} is no longer on beige!",
                     embed=after.get_info_embed(TargetContext(owner, None)),  # type: ignore
+                    view=after.get_info_view(),
                 )
 
     @target.group(  # type: ignore

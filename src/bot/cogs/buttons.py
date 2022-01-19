@@ -52,6 +52,7 @@ class Buttons(commands.Cog):
                     raise EmbedErrorMessage(interaction.user, "No nation found.")
                 await interaction.response.send_message(
                     embed=nation.get_info_embed(ctx),
+                    view=nation.get_info_view(),
                     ephemeral=True,
                 )
             elif model == "alliance":

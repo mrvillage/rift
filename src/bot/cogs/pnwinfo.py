@@ -38,7 +38,7 @@ class PnWInfo(commands.Cog):
     )
     async def nation(self, ctx: RiftContext, *, nation: Nation = MISSING):
         nation = nation or await Nation.convert(ctx, nation)
-        await ctx.reply(embed=nation.get_info_embed(ctx))
+        await ctx.reply(embed=nation.get_info_embed(ctx), view=nation.get_info_view())
 
     @commands.command(
         name="me",
