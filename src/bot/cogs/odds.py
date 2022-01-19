@@ -126,15 +126,15 @@ class Odds(commands.Cog):
                 fields=[
                     {
                         "name": "Ground Battle",
-                        "value": f"Immense:{groundChance['immense']*100:.2%}, Moderate:{groundChance['moderate']*100:.2%}, Pyrrhic:{groundChance['pyrrhic']*100:.2%}, Failure:{groundChance['failure']*100:.2%}",
+                        "value": f"Immense:{groundChance['immense']*100:.2%}\n Moderate:{groundChance['moderate']*100:.2%}\n Pyrrhic:{groundChance['pyrrhic']*100:.2%}\n Failure:{groundChance['failure']*100:.2%}",
                     },
                     {
                         "name": "Air Battle",
-                        "value": f"Immense:{airChance['immense']*100:.2%}, Moderate:{airChance['moderate']*100:.2%}, Pyrrhic:{airChance['pyrrhic']*100:.2%}, Failure:{airChance['failure']*100:.2%}",
+                        "value": f"Immense:{airChance['immense']*100:.2%}\n Moderate:{airChance['moderate']*100:.2%}\n Pyrrhic:{airChance['pyrrhic']*100:.2%}\n Failure:{airChance['failure']*100:.2%}",
                     },
                     {
                         "name": "Naval Battle",
-                        "value": f"Immense:{navalChance['immense']*100:.2%}, Moderate:{navalChance['moderate']*100:.2%}, Pyrrhic:{navalChance['pyrrhic']*100:.2%}, Failure:{navalChance['failure']*100:.2%}",
+                        "value": f"Immense:{navalChance['immense']*100:.2%}\n Moderate:{navalChance['moderate']*100:.2%}\n Pyrrhic:{navalChance['pyrrhic']*100:.2%}\n Failure:{navalChance['failure']*100:.2%}",
                     },
                 ],
                 color=discord.Color.blue(),
