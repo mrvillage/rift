@@ -240,7 +240,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                 else False
             ):
                 transaction.status = TransactionStatus.FAILED
-                return await interaction.followup.send(
+                await interaction.followup.send(
                     embed=funcs.get_embed_author_member(
                         interaction.user,
                         "The sending account does not have enough resources to complete this transaction! Please try sending a new transaction again.",
@@ -248,6 +248,16 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                     ),
                     ephemeral=True,
                 )
+                owner = transaction.from_.owner
+                if owner is not None:
+                    await owner.send(
+                        embed=funcs.get_embed_author_member(
+                            interaction.user,
+                            f"Your {'grant ' if transaction.type is TransactionType.GRANT_WITHDRAW else ''}withdrawl request has failed. Transaction #{transaction.id}.",
+                            color=discord.Color.red(),
+                        )
+                    )
+                return
             alliance_settings = await AllianceSettings.fetch(
                 transaction.from_.alliance_id
             )
@@ -305,6 +315,15 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                 ),
                 view=None,
             )
+            owner = transaction.from_.owner
+            if owner is not None:
+                await owner.send(
+                    embed=funcs.get_embed_author_member(
+                        interaction.user,
+                        f"Your {'grant ' if transaction.type is TransactionType.GRANT_WITHDRAW else ''}withdrawl request has been approved and the resources sent! Transaction #{transaction.id}.",
+                        color=discord.Color.green(),
+                    )
+                )
         elif transaction.type is TransactionType.GRANT:
             grant = self.transaction.from_grant
             if grant is None:
@@ -377,6 +396,7 @@ class TransactionRequestManualAcceptButton(discord.ui.Button[TransactionRequestV
             or transaction.to_nation is None
             or transaction.from_.alliance is None
         ):
+            transaction.status = TransactionStatus.FAILED
             return await interaction.response.send_message(
                 embed=funcs.get_embed_author_member(
                     interaction.user,
@@ -389,7 +409,8 @@ class TransactionRequestManualAcceptButton(discord.ui.Button[TransactionRequestV
             value < getattr(transaction.resources, key)
             for key, value in transaction.from_.resources.to_dict().items()
         ):
-            return await interaction.response.send_message(
+            transaction.status = TransactionStatus.FAILED
+            await interaction.response.send_message(
                 embed=funcs.get_embed_author_member(
                     interaction.user,
                     "The sending account does not have enough resources to complete this transaction! Please try sending a new transaction again.",
@@ -397,6 +418,16 @@ class TransactionRequestManualAcceptButton(discord.ui.Button[TransactionRequestV
                 ),
                 ephemeral=True,
             )
+            owner = transaction.from_.owner
+            if owner is not None:
+                await owner.send(
+                    embed=funcs.get_embed_author_member(
+                        interaction.user,
+                        f"Your withdrawl request has failed. Transaction #{transaction.id}.",
+                        color=discord.Color.red(),
+                    )
+                )
+            return
         alliance_settings = await AllianceSettings.fetch(transaction.from_.alliance_id)
         offshore = alliance_settings.offshore
         transaction.from_.resources -= transaction.resources
@@ -437,6 +468,15 @@ class TransactionRequestManualAcceptButton(discord.ui.Button[TransactionRequestV
             view=view,
             ephemeral=True,
         )
+        owner = transaction.from_.owner
+        if owner is not None:
+            await owner.send(
+                embed=funcs.get_embed_author_member(
+                    interaction.user,
+                    f"Your withdrawl request has been approved! Please wait for the resources to be sent. Transaction #{transaction.id}.",
+                    color=discord.Color.red(),
+                )
+            )
         await transaction.from_.save()
         await transaction.save()
 
@@ -461,6 +501,22 @@ class TransactionRequestRejectButton(discord.ui.Button[TransactionRequestView]):
             ),
             view=None,
         )
+        if (
+            self.transaction.type is TransactionType.WITHDRAW
+            or self.transaction.type is TransactionType.GRANT_WITHDRAW
+        ):
+            if self.transaction.from_ is None:
+                return
+            owner = self.transaction.from_.owner
+            if owner is not None:
+                await owner.send(
+                    embed=funcs.get_embed_author_member(
+                        interaction.user,
+                        f"Your {'grant ' if self.transaction.type is TransactionType.GRANT_WITHDRAW else ''}withdrawl request has been approved! Please wait for the resources to be sent. Transaction #{self.transaction.id}.",
+                        color=discord.Color.red(),
+                    )
+                )
+            return
 
 
 class TransactionRequestCancelButton(discord.ui.Button[TransactionRequestView]):
