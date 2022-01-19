@@ -94,10 +94,10 @@ class Odds(commands.Cog):
 
     @odds.command(  # type: ignore
         name="attacks",
-        brief="Calculate the odds of 2 nations fighting",
+        brief="Calculate the odds of two nations fighting",
         type=commands.CommandType.chat_input,
     )
-    async def odds_battles_naval(
+    async def odds_attacks(
         self,
         ctx: RiftContext,
         attacker: Nation = MISSING,
@@ -111,15 +111,12 @@ class Odds(commands.Cog):
             )
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)
-
-
         ground_chance = get_attack_chance(
             (float(attacker.soldiers) * 1.75) + (attacker.tanks * 40),
             (float(defender.soldiers) * 1.75) + (defender.tanks * 40),
         )
         naval_chance = get_attack_chance(attacker.ships * 4, defender.ships * 4)
         air_chance = get_attack_chance(attacker.aircraft * 3, defender.aircraft * 3)
-
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
