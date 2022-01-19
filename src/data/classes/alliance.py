@@ -8,10 +8,10 @@ import discord
 import pnwkit
 from pnwkit.async_ import AsyncKit
 
+from ... import funcs
 from ...cache import cache
 from ...errors import AllianceNotFoundError, NoCredentialsError
 from ...flags import RolePermissions
-from ...funcs import convert_alliance
 from ...ref import RiftContext
 from .base import Makeable
 from .city import City
@@ -55,7 +55,7 @@ class Alliance(Makeable):
 
     @classmethod
     async def convert(cls, ctx: RiftContext, search: Any, stage: int = 0) -> Alliance:
-        return await convert_alliance(ctx, search, stage)
+        return await funcs.convert_alliance(ctx, search, stage)
 
     @classmethod
     async def fetch(cls, alliance_id: int) -> Alliance:
