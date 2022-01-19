@@ -241,6 +241,10 @@ class Odds(commands.Cog):
         air_chance = get_attack_chance(attacker.aircraft * 3, defender.aircraft * 3)
 
         naval_cas = get_casualties_naval(attacker.ships, defender.ships)
+        ground_cas = get_casualties_ground(
+            attacker.soldiers, attacker.tanks, defender.soldiers, defender.tanks
+        )
+
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
@@ -248,7 +252,7 @@ class Odds(commands.Cog):
                 fields=[
                     {
                         "name": "Ground Battle",
-                        "value": f"Immense:{ground_chance['immense']:.2%}\n Moderate:{ground_chance['moderate']:.2%}\n Pyrrhic:{ground_chance['pyrrhic']:.2%}\n Failure:{ground_chance['failure']:.2%}",
+                        "value": f"Immense:{ground_chance['immense']:.2%}\n Moderate:{ground_chance['moderate']:.2%}\n Pyrrhic:{ground_chance['pyrrhic']:.2%}\n Failure:{ground_chance['failure']:.2%}\nAttacker Casualties: Soldiers: {math.floor(ground_cas['attacker']['soldiers_low'])}-{math.ceil(ground_cas['attacker']['soldiers_high'])} Tanks: {math.floor(ground_cas['attacker']['tanks_low'])}-{math.ceil(ground_cas['attacker']['tanks_high'])}\nDefender Casualties: Soldiers{math.floor(ground_cas['defender']['soldiers_low'])}-{math.ceil(ground_cas['defender']['soldiers_high'])} Tanks:{math.floor(ground_cas['defender']['tanks_low'])}-{math.ceil(ground_cas['defender']['tanks_high'])}",
                     },
                     {
                         "name": "Air Battle",
