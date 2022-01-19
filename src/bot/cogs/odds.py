@@ -112,12 +112,13 @@ class Odds(commands.Cog):
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)
 
-        groundChance = get_attack_chance(
+
+        ground_chance = get_attack_chance(
             (float(attacker.soldiers) * 1.75) + (attacker.tanks * 40),
             (float(defender.soldiers) * 1.75) + (defender.tanks * 40),
         )
-        navalChance = get_attack_chance(attacker.ships * 4, defender.ships * 4)
-        airChance = get_attack_chance(attacker.aircraft * 3, defender.aircraft * 3)
+        naval_chance = get_attack_chance(attacker.ships * 4, defender.ships * 4)
+        air_chance = get_attack_chance(attacker.aircraft * 3, defender.aircraft * 3)
 
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -126,15 +127,15 @@ class Odds(commands.Cog):
                 fields=[
                     {
                         "name": "Ground Battle",
-                        "value": f"Immense:{groundChance['immense']:.2%}\n Moderate:{groundChance['moderate']:.2%}\n Pyrrhic:{groundChance['pyrrhic']:.2%}\n Failure:{groundChance['failure']:.2%}",
+                        "value": f"Immense: {ground_chance['immense']:.2%}\nModerate: {ground_chance['moderate']:.2%}\nPyrrhic: {ground_chance['pyrrhic']:.2%}\nFailure: {ground_chance['failure']:.2%}",
                     },
                     {
                         "name": "Air Battle",
-                        "value": f"Immense:{airChance['immense']:.2%}\n Moderate:{airChance['moderate']:.2%}\n Pyrrhic:{airChance['pyrrhic']:.2%}\n Failure:{airChance['failure']:.2%}",
+                        "value": f"Immense: {air_chance['immense']:.2%}\nModerate: {air_chance['moderate']:.2%}\nPyrrhic: {air_chance['pyrrhic']:.2%}\nFailure: {air_chance['failure']:.2%}",
                     },
                     {
                         "name": "Naval Battle",
-                        "value": f"Immense:{navalChance['immense']:.2%}\n Moderate:{navalChance['moderate']:.2%}\n Pyrrhic:{navalChance['pyrrhic']:.2%}\n Failure:{navalChance['failure']:.2%}",
+                        "value": f"Immense: {naval_chance['immense']:.2%}\nModerate: {naval_chance['moderate']:.2%}\nPyrrhic: {naval_chance['pyrrhic']:.2%}\nFailure: {naval_chance['failure']:.2%}",
                     },
                 ],
                 color=discord.Color.blue(),
