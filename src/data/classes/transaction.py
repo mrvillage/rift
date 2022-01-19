@@ -200,7 +200,6 @@ class Transaction:
     async def send_for_approval(self) -> None:
         from ...funcs import get_embed_author_member
 
-        # all requests will log in the transaction_request table for use with persistent views
         if self.status is not TransactionStatus.PENDING:
             return
         if self.type is TransactionType.TRANSFER:
@@ -213,7 +212,7 @@ class Transaction:
             await user.send(
                 embed=get_embed_author_member(
                     user,
-                    f"{self.creator.mention} has sent you a transfer request of {self.resources}. Please accept or deny it below.",
+                    f"{self.creator.mention} has sent you a transfer request of {self.resources} as transaction #{self.id}. Please accept or reject it below.",
                 ),
                 view=request.view,
             )
@@ -232,7 +231,7 @@ class Transaction:
                     await channel.send(
                         embed=get_embed_author_member(
                             creator,
-                            f"{creator.mention} wants to withdraw {self.resources} from account #{self.from_.id:,}. Please accept or deny it below.",
+                            f"{creator.mention} wants to withdraw {self.resources} from account #{self.from_.id} as transaction #{self.id}. Please accept or reject it below.",
                             color=discord.Color.orange(),
                         ),
                         view=request.view,
@@ -250,7 +249,7 @@ class Transaction:
             await user.send(
                 embed=get_embed_author_member(
                     user,
-                    f"Alliance {grant.alliance} has sent you a grant of {grant.resources} with a payoff method of `{grant.payoff}` and {'no deadline' if grant.deadline is None else f'is due <t:{grant.deadline.timestamp()}:R>'} and a note of {grant.note}.",
+                    f"Alliance {grant.alliance} has sent you a grant of {grant.resources} with a payoff method of `{grant.payoff}` and {'no deadline' if grant.deadline is None else f'is due <t:{grant.deadline.timestamp()}:R>'} and a note of {grant.note}. Please accept or reject it below.",
                 ),
                 view=request.view,
             )

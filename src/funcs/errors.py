@@ -150,7 +150,7 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 if str(error.args[0]) == str(ctx.author.id) or error.args[0] is None:
                     raise EmbedErrorMessage(
                         ctx.author,
-                        "You're not linked so I can't infer your nation!",
+                        "You're not linked so I can't infer your nation! Use `/link` and provide your nation to get linked.",
                     )
                 else:
                     raise EmbedErrorMessage(
@@ -161,7 +161,7 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 if str(error.args[0]) == str(ctx.author.id) or error.args[0] is None:
                     raise EmbedErrorMessage(
                         ctx.author,
-                        "You're not linked so I can't infer your alliance!",
+                        "You're not linked so I can't infer your alliance! Use `/link` and provide your nation to get linked.",
                     )
                 else:
                     raise EmbedErrorMessage(
@@ -172,7 +172,7 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                 if error.args[0] == str(ctx.author.id):
                     raise EmbedErrorMessage(
                         ctx.author,
-                        "You're not linked so I can't infer your nation!",
+                        "You're not linked so I can't infer your nation! Use `/link` and provide your nation to get linked.",
                     )
                 else:
                     raise EmbedErrorMessage(

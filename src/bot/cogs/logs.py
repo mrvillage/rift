@@ -4,7 +4,7 @@ import json
 
 from discord.ext import commands
 
-from ... import logs
+from ... import funcs
 from ...ref import Rift, RiftContext
 
 
@@ -15,7 +15,7 @@ class Logs(commands.Cog):
     @commands.Cog.listener()
     async def on_command(self, ctx: RiftContext):
         if ctx.interaction:
-            return await logs.insert_log(
+            return await funcs.insert_log(
                 "Unknown",
                 ctx.interaction.id,
                 ctx.channel.id,
@@ -26,7 +26,7 @@ class Logs(commands.Cog):
                 json.dumps([str(i) for i in ctx.args]),
                 json.dumps(ctx.options),
             )
-        await logs.insert_log(
+        await funcs.insert_log(
             str(ctx.message.edited_at or ctx.message.created_at),
             ctx.message.id,
             ctx.channel.id,
@@ -41,7 +41,7 @@ class Logs(commands.Cog):
     @commands.Cog.listener()
     async def on_command_completion(self, ctx: RiftContext):
         if ctx.interaction:
-            return await logs.edit_log(
+            return await funcs.edit_log(
                 "Unknown",
                 ctx.interaction.id,
                 ctx.channel.id,
@@ -51,7 +51,7 @@ class Logs(commands.Cog):
                 ctx.command and ctx.command.qualified_name,  # type: ignore
                 True,
             )
-        await logs.edit_log(
+        await funcs.edit_log(
             str(ctx.message.edited_at or ctx.message.created_at),
             ctx.message.id,
             ctx.channel.id,
@@ -65,7 +65,7 @@ class Logs(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx: RiftContext, error: commands.CommandError):
         if ctx.interaction:
-            return await logs.edit_log(
+            return await funcs.edit_log(
                 "Unknown",
                 ctx.interaction.id,
                 ctx.channel.id,
@@ -76,7 +76,7 @@ class Logs(commands.Cog):
                 False,
                 str(error),
             )
-        await logs.edit_log(
+        await funcs.edit_log(
             str(ctx.message.edited_at or ctx.message.created_at),
             ctx.message.id,
             ctx.channel.id,

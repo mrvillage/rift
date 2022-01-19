@@ -9,11 +9,10 @@ import pnwkit
 from bs4 import BeautifulSoup
 from discord.utils import MISSING
 
+from ... import funcs
 from ...cache import cache
 from ...data.db import execute_read_query
 from ...errors import NationNotFoundError
-from ...find import search_nation
-from ...funcs import utils
 from ...ref import RiftContext, bot
 from .base import Makeable
 from .city import FullCity
@@ -27,6 +26,7 @@ if TYPE_CHECKING:
 
     from _typings import Field, NationData, RevenueDict
 
+    from ...views import Info
     from .alliance import Alliance
     from .city import City
     from .condition import Condition
@@ -67,10 +67,12 @@ class Nation(Makeable):
         self.id: int = data["id"]
         self.name: str = data["name"]
         self.leader: str = data["leader"]
-        self.continent: str = utils.get_continent(data["continent"])
-        self.war_policy: str = utils.get_war_policy(data["war_policy"])
-        self.domestic_policy: str = utils.get_domestic_policy(data["domestic_policy"])
-        self.color: str = utils.get_color(data["color"])
+        self.continent: str = funcs.utils.get_continent(data["continent"])
+        self.war_policy: str = funcs.utils.get_war_policy(data["war_policy"])
+        self.domestic_policy: str = funcs.utils.get_domestic_policy(
+            data["domestic_policy"]
+        )
+        self.color: str = funcs.utils.get_color(data["color"])
         self.alliance_id: int = data["alliance_id"]
         self.alliance_position: int = data["alliance_position"]
         self.cities: int = data["cities"]
@@ -90,10 +92,8 @@ class Nation(Makeable):
         self.nukes: int = data["nukes"]
 
     @classmethod
-    async def convert(
-        cls, ctx: RiftContext, search: Any, advanced: bool = True
-    ) -> Nation:
-        return await search_nation(ctx, search, advanced)
+    async def convert(cls, ctx: RiftContext, search: Any, stage: int = 0) -> Nation:
+        return await funcs.convert_nation(ctx, search, stage)
 
     @classmethod
     async def fetch(cls, nation_id: int) -> Nation:
@@ -106,10 +106,12 @@ class Nation(Makeable):
         self.id: int = data["id"]
         self.name: str = data["name"]
         self.leader: str = data["leader"]
-        self.continent: str = utils.get_continent(data["continent"])
-        self.war_policy: str = utils.get_war_policy(data["war_policy"])
-        self.domestic_policy: str = utils.get_domestic_policy(data["domestic_policy"])
-        self.color: str = utils.get_color(data["color"])
+        self.continent: str = funcs.utils.get_continent(data["continent"])
+        self.war_policy: str = funcs.utils.get_war_policy(data["war_policy"])
+        self.domestic_policy: str = funcs.utils.get_domestic_policy(
+            data["domestic_policy"]
+        )
+        self.color: str = funcs.utils.get_color(data["color"])
         self.alliance_id: int = data["alliance_id"]
         self.alliance_position: int = data["alliance_position"]
         self.cities: int = data["cities"]
@@ -226,7 +228,7 @@ class Nation(Makeable):
             },
             {
                 "name": "Alliance Position",
-                "value": utils.get_alliance_position(self.alliance_position),
+                "value": funcs.utils.get_alliance_position(self.alliance_position),
             },
             {
                 "name": "Cities",
@@ -302,6 +304,13 @@ class Nation(Makeable):
                 fields=fields,
                 color=discord.Color.blue(),
             )
+        )
+
+    def get_info_view(self) -> Info:
+        from ...views import Info
+
+        return Info().add_button(
+            "Alliance Information", f"info-alliance-{self.alliance_id}"
         )
 
     async def fetch_cities(self) -> List[FullCity]:

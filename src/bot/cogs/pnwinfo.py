@@ -38,7 +38,7 @@ class PnWInfo(commands.Cog):
     )
     async def nation(self, ctx: RiftContext, *, nation: Nation = MISSING):
         nation = nation or await Nation.convert(ctx, nation)
-        await ctx.reply(embed=nation.get_info_embed(ctx))
+        await ctx.reply(embed=nation.get_info_embed(ctx), view=nation.get_info_view())
 
     @commands.command(
         name="me",
@@ -76,29 +76,27 @@ class PnWInfo(commands.Cog):
             try:
                 return await ctx.invoke(
                     self.nation,
-                    nation=await Nation.convert(ctx, search, False),
+                    nation=await Nation.convert(ctx, search, 0),
                 )
             except NationNotFoundError:
                 raise NationOrAllianceNotFoundError(search)
         try:
-            await ctx.invoke(
-                self.nation, nation=await Nation.convert(ctx, search, False)
-            )
+            await ctx.invoke(self.nation, nation=await Nation.convert(ctx, search, 1))
         except NationNotFoundError:
             try:
                 await ctx.invoke(
-                    self.alliance, alliance=await Alliance.convert(ctx, search, False)
+                    self.alliance, alliance=await Alliance.convert(ctx, search, 1)
                 )
             except AllianceNotFoundError:
                 try:
                     await ctx.invoke(
-                        self.nation, nation=await Nation.convert(ctx, search, True)
+                        self.nation, nation=await Nation.convert(ctx, search, 2)
                     )
                 except NationNotFoundError:
                     try:
                         await ctx.invoke(
                             self.alliance,
-                            alliance=await Alliance.convert(ctx, search, True),
+                            alliance=await Alliance.convert(ctx, search, 2),
                         )
                     except AllianceNotFoundError:
                         raise NationOrAllianceNotFoundError(search)

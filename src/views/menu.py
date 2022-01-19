@@ -176,7 +176,7 @@ class MenuButton(discord.ui.Button):
                 return await interaction.followup.send(
                     embed=get_embed_author_member(
                         interaction.user,
-                        "You must be linked to create an embassy.",
+                        "You must be linked to create an embassy. Use `/link` and provide your nation to get linked.",
                         color=discord.Color.red(),
                     ),
                     ephemeral=True,
@@ -186,7 +186,7 @@ class MenuButton(discord.ui.Button):
                 return await interaction.followup.send(
                     embed=get_embed_author_member(
                         interaction.user,
-                        "You must be linked to create an embassy.",
+                        "You must be linked to create an embassy. Use `/link` and provide your nation to get linked.",
                         color=discord.Color.red(),
                     ),
                     ephemeral=True,

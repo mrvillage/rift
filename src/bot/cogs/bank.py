@@ -837,6 +837,7 @@ class Bank(commands.Cog):
             "account": "The bank account to check the history of, defaults to your primary account.",
             "page": "The page of the history to view.",
             "status": "The status of transactions to view, defaults to all.",
+            "type": "The type of transactions to view, defaults to all.",
         },
     )
     async def bank_account_history(
@@ -845,6 +846,9 @@ class Bank(commands.Cog):
         account: Account = MISSING,
         page: int = 1,
         status: Literal["PENDING", "ACCEPTED", "REJECTED", "CANCELLED"] = MISSING,
+        type: Literal[
+            "TRANSFER", "DEPOSIT", "WITHDRAW", "GRANT", "GRANT_WITHDRAW"
+        ] = MISSING,
     ):
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         if not accounts:
@@ -855,7 +859,9 @@ class Bank(commands.Cog):
         account = account or next(i for i in accounts if i.primary)
         permissions = Alliance.permissions_for_id(account.alliance_id, ctx.author)
         if account.owner_id != ctx.author.id and not (
-            permissions.leadership or permissions.manage_bank_accounts
+            permissions.leadership
+            or permissions.manage_bank_accounts
+            or permissions.view_bank_accounts
         ):
             raise EmbedErrorMessage(
                 ctx.author,
@@ -870,6 +876,9 @@ class Bank(commands.Cog):
         if status is not MISSING:
             status = getattr(TransactionStatus, status)
             transactions = [i for i in transactions if i.status is status]
+        if type is not MISSING:
+            type = getattr(TransactionType, type)
+            transactions = [i for i in transactions if i.type is type]
         if not transactions:
             raise EmbedErrorMessage(
                 ctx.author,
@@ -982,6 +991,82 @@ class Bank(commands.Cog):
                 ),
                 view=None,
             )
+
+    @bank_transaction.command(  # type: ignore
+        name="history",
+        brief="Check the transaction history of an alliance.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "alliance": "The alliance to check the history of, defaults to your alliance.",
+            "page": "The page of the history to view.",
+            "status": "The status of transactions to view, defaults to all.",
+            "type": "The type of transactions to view, defaults to all.",
+        },
+    )
+    async def bank_transaction_history(
+        self,
+        ctx: RiftContext,
+        alliance: Alliance = MISSING,
+        page: int = 1,
+        status: Literal["PENDING", "ACCEPTED", "REJECTED", "CANCELLED"] = MISSING,
+        type: Literal[
+            "TRANSFER", "DEPOSIT", "WITHDRAW", "GRANT", "GRANT_WITHDRAW"
+        ] = MISSING,
+    ):
+        alliance = alliance or await Alliance.convert(ctx, alliance)
+        permissions = alliance.permissions_for(ctx.author)
+        if not (
+            permissions.leadership
+            or permissions.manage_bank_accounts
+            or permissions.view_bank_accounts
+        ):
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You don't have permission to view the transaction history of that alliance!",
+            )
+        transactions = [
+            i
+            for i in cache.transactions
+            if (
+                (i.to_id == alliance.id and i.to_type is AccountType.ALLIANCE)
+                or (i.from_id == alliance.id and i.from_type is AccountType.ALLIANCE)
+            )
+            or (
+                (
+                    (to := i.to) is not None
+                    and to.alliance_id == alliance.id
+                    and i.to_type is AccountType.ACCOUNT
+                )
+                or (
+                    (from_ := i.from_) is not None
+                    and from_.alliance_id == alliance.id
+                    and i.from_type is AccountType.ACCOUNT
+                )
+            )
+        ]
+        if status is not MISSING:
+            status = getattr(TransactionStatus, status)
+            transactions = [i for i in transactions if i.status is status]
+        if type is not MISSING:
+            type = getattr(TransactionType, type)
+            transactions = [i for i in transactions if i.type is type]
+        if not transactions:
+            raise EmbedErrorMessage(
+                ctx.author,
+                "There are no transactions for that alliance!",
+            )
+        transactions.sort(key=lambda x: x.id, reverse=True)
+        view = TransactionHistoryView(
+            ctx.author,
+            transactions,
+            f"Showing transactions for alliance {alliance}.\n"
+            f"{len(transactions)} transactions found.\n"
+            "Page **{page}** of **{pages}**.",
+            page,
+        )
+        await ctx.reply(embed=view.get_embed(ctx.author), view=view)
+        if await view.wait():
+            await ctx.interaction.edit_original_message(view=None)
 
 
 def setup(bot: Rift):

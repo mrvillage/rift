@@ -243,26 +243,29 @@ class Condition:
 
     @classmethod
     async def evaluate_condition(cls, obj: Any, condition: List[Any], /) -> bool:
-        if isinstance(condition[0], list):
-            current = await cls.evaluate_condition(obj, condition[0])  # type: ignore
-            skip = 2
-        else:
-            current = cls.evaluate_expression(
-                obj, condition[0], condition[1], condition[2]
-            )
-            skip = 4
-        for index, i in enumerate(condition):
-            if skip > 0:
-                skip -= 1
-                continue
-            if isinstance(i, list):
+        try:
+            if isinstance(condition[0], list):
+                current = await cls.evaluate_condition(obj, condition[0])  # type: ignore
                 skip = 2
-                value = await cls.evaluate_condition(obj, i)  # type: ignore
             else:
-                skip = 3
-                value = cls.evaluate_expression(obj, condition[index], condition[index + 1], condition[index + 2])  # type: ignore
-            current = cls.evaluate_boolean_operator(current, condition[index - 1], value)  # type: ignore
-        return current
+                current = cls.evaluate_expression(
+                    obj, condition[0], condition[1], condition[2]
+                )
+                skip = 4
+            for index, i in enumerate(condition):
+                if skip > 0:
+                    skip -= 1
+                    continue
+                if isinstance(i, list):
+                    skip = 2
+                    value = await cls.evaluate_condition(obj, i)  # type: ignore
+                else:
+                    skip = 3
+                    value = cls.evaluate_expression(obj, condition[index], condition[index + 1], condition[index + 2])  # type: ignore
+                current = cls.evaluate_boolean_operator(current, condition[index - 1], value)  # type: ignore
+            return current
+        except (AttributeError, ValueError):
+            raise InvalidConditionError(cls.convert_to_string(condition))
 
     async def evaluate(self, *values: Any) -> List[bool]:
         evaluated: List[bool] = []

@@ -43,7 +43,7 @@ def setup_logging():
 
 @bot.event
 async def on_message(message: discord.Message):
-    if message.author.bot:
+    if message.author.bot or bot.is_owner(message.author):  # type: ignore
         return
     ctx = await bot.get_context(message)  # type: ignore
     try:
