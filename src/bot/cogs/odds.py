@@ -18,6 +18,8 @@ def get_casualties_ground(
     defender_soldiers: float,
     defender_tanks: float,
 ):
+    # TODO ADD ZERO PROTECTION
+    # TODO SIMPLIFY
     attacker_val = (attacker_soldiers * 1.75) + (attacker_tanks * 40)
     defender_val = (defender_soldiers * 1.75) + (defender_tanks * 40)
 
@@ -44,20 +46,46 @@ def get_casualties_ground(
             "tanks_high": 0,
         },
     }
+    response["attacker"]["soldiers_low"] = (defender_soldiers_low * 0.0084) + (
+        defender_tanks_low * 0.0092
+    ) * 3
+    response["attacker"]["soldiers_high"] = (defender_soldiers_val * 0.0084) + (
+        defender_tanks_val * 0.0092
+    ) * 3
+    response["defender"]["soldiers_low"] = (attacker_soldiers_low * 0.0084) + (
+        attacker_tanks_low * 0.0092
+    ) * 3
+    response["defender"]["soldiers_high"] = (attacker_soldiers_val * 0.0084) + (
+        attacker_tanks_val * 0.0092
+    ) * 3
     if attacker_val > defender_val:
         response["attacker"]["tanks_low"] = (defender_soldiers_low * 0.0004060606) + (
-            defender_tanks_low * 0.00066666666
-        )
+            (defender_tanks_low * 0.00066666666)
+        ) * 3
         response["attacker"]["tanks_high"] = (defender_soldiers_val * 0.0004060606) + (
-            defender_tanks_val * 0.00066666666
-        )
+            (defender_tanks_val * 0.00066666666)
+        ) * 3
 
         response["defender"]["tanks_low"] = (attacker_soldiers_low * 0.00043225806) + (
-            attacker_tanks_low * 0.00070967741
-        )
+            (attacker_tanks_low * 0.00070967741)
+        ) * 3
         response["defender"]["tanks_high"] = (attacker_soldiers_val * 0.00043225806) + (
-            attacker_tanks_val * 0.00070967741
-        )
+            (attacker_tanks_val * 0.00070967741)
+        ) * 3
+    else:
+        response["attacker"]["tanks_low"] = (attacker_soldiers_low * 0.00043225806) + (
+            (attacker_tanks_low * 0.00070967741)
+        ) * 3
+        response["attacker"]["tanks_high"] = (attacker_soldiers_val * 0.00043225806) + (
+            (attacker_tanks_val * 0.00070967741)
+        ) * 3
+        response["defender"]["tanks_low"] = (defender_soldiers_low * 0.0004060606) + (
+            (defender_tanks_low * 0.00066666666)
+        ) * 3
+        response["defender"]["tanks_high"] = (defender_soldiers_val * 0.0004060606) + (
+            (defender_tanks_val * 0.00066666666)
+        ) * 3
+
     return response
 
 
