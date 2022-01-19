@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Dict
 
 import discord
+import math
 from discord.ext import commands
 from discord.utils import MISSING
 
@@ -255,7 +256,7 @@ class Odds(commands.Cog):
                     },
                     {
                         "name": "Naval Battle",
-                        "value": f"Immense:{naval_chance['immense']:.2%}\n Moderate:{naval_chance['moderate']:.2%}\n Pyrrhic:{naval_chance['pyrrhic']:.2%}\n Failure:{naval_chance['failure']:.2%} \nAttacker Casualties:{int(naval_cas['attacker']['low'])}-{int(naval_cas['attacker']['high'])}\nDefender Casualties:{int(naval_cas['defender']['low'])}-{int(naval_cas['defender']['high'])}",
+                        "value": f"Immense:{naval_chance['immense']:.2%}\n Moderate:{naval_chance['moderate']:.2%}\n Pyrrhic:{naval_chance['pyrrhic']:.2%}\n Failure:{naval_chance['failure']:.2%} \nAttacker Casualties:{math.floor(naval_cas['attacker']['low'])}-{math.ceil()(naval_cas['attacker']['high'])}\nDefender Casualties:{math.floor(naval_cas['defender']['low'])}-{math.ceil(naval_cas['defender']['high'])}",
                     },
                 ],
                 color=discord.Color.blue(),
