@@ -111,7 +111,7 @@ class Odds(commands.Cog):
             )
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)
-
+        # FIXME doesnt include population resistance
         groundChance = get_attack_chance(
             (float(attacker.soldiers) * 1.75) + (attacker.tanks * 40),
             (float(defender.soldiers) * 1.75) + (defender.tanks * 40),
