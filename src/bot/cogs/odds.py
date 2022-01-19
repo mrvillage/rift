@@ -255,7 +255,7 @@ class Odds(commands.Cog):
                     },
                     {
                         "name": "Naval Battle",
-                    "value": f"Immense:{naval_chance['immense']:.2%}\n Moderate:{naval_chance['moderate']:.2%}\n Pyrrhic:{naval_chance['pyrrhic']:.2%}\n Failure:{naval_chance['failure']:.2%} \nAttacker Casualties:{naval_cas['attacker']['low']:.2%}-{naval_cas['attacker']['high']:.2%}\nDefender Casualties:{naval_cas['defender']['low']:.2%}-{naval_cas['defender']['high']:.2%}",
+                        "value": f"Immense:{naval_chance['immense']:.2%}\n Moderate:{naval_chance['moderate']:.2%}\n Pyrrhic:{naval_chance['pyrrhic']:.2%}\n Failure:{naval_chance['failure']:.2%} \nAttacker Casualties:{int(naval_cas['attacker']['low'])}-{int(naval_cas['attacker']['high'])}\nDefender Casualties:{int(naval_cas['defender']['low'])}-{int(naval_cas['defender']['high'])}",
                     },
                 ],
                 color=discord.Color.blue(),
