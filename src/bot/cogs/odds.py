@@ -18,7 +18,6 @@ def get_casualties_ground(
     defender_soldiers: float,
     defender_tanks: float,
 ):
-    # TODO ADD ZERO PROTECTION
     # TODO SIMPLIFY
     attacker_val = (attacker_soldiers * 1.75) + (attacker_tanks * 40)
     defender_val = (defender_soldiers * 1.75) + (defender_tanks * 40)
@@ -46,50 +45,71 @@ def get_casualties_ground(
             "tanks_high": 0,
         },
     }
-    response["attacker"]["soldiers_low"] = (defender_soldiers_low * 0.0084) + (
-        defender_tanks_low * 0.0092
-    ) * 3
-    response["attacker"]["soldiers_high"] = (defender_soldiers_val * 0.0084) + (
-        defender_tanks_val * 0.0092
-    ) * 3
-    response["defender"]["soldiers_low"] = (attacker_soldiers_low * 0.0084) + (
-        attacker_tanks_low * 0.0092
-    ) * 3
-    response["defender"]["soldiers_high"] = (attacker_soldiers_val * 0.0084) + (
-        attacker_tanks_val * 0.0092
-    ) * 3
+    response["attacker"]["soldiers_low"] = max(
+        (defender_soldiers_low * 0.0084) + (defender_tanks_low * 0.0092) * 3,
+        attacker_soldiers,
+    )
+    response["attacker"]["soldiers_high"] = max(
+        (defender_soldiers_val * 0.0084) + (defender_tanks_val * 0.0092) * 3,
+        attacker_soldiers,
+    )
+    response["defender"]["soldiers_low"] = max(
+        (attacker_soldiers_low * 0.0084) + (attacker_tanks_low * 0.0092) * 3,
+        defender_soldiers,
+    )
+    response["defender"]["soldiers_high"] = max(
+        (attacker_soldiers_val * 0.0084) + (attacker_tanks_val * 0.0092) * 3,
+        defender_soldiers,
+    )
     if attacker_val > defender_val:
-        response["attacker"]["tanks_low"] = (defender_soldiers_low * 0.0004060606) + (
-            (defender_tanks_low * 0.00066666666)
-        ) * 3
-        response["attacker"]["tanks_high"] = (defender_soldiers_val * 0.0004060606) + (
-            (defender_tanks_val * 0.00066666666)
-        ) * 3
 
-        response["defender"]["tanks_low"] = (attacker_soldiers_low * 0.00043225806) + (
-            (attacker_tanks_low * 0.00070967741)
-        ) * 3
-        response["defender"]["tanks_high"] = (attacker_soldiers_val * 0.00043225806) + (
-            (attacker_tanks_val * 0.00070967741)
-        ) * 3
+        response["attacker"]["tanks_low"] = max(
+            (defender_soldiers_low * 0.0004060606)
+            + ((defender_tanks_low * 0.00066666666)) * 3,
+            attacker_tanks,
+        )
+        response["attacker"]["tanks_high"] = max(
+            (defender_soldiers_val * 0.0004060606)
+            + ((defender_tanks_val * 0.00066666666)) * 3,
+            attacker_tanks,
+        )
+        response["defender"]["tanks_low"] = max(
+            (attacker_soldiers_low * 0.00043225806)
+            + ((attacker_tanks_low * 0.00070967741)) * 3,
+            defender_tanks,
+        )
+        response["defender"]["tanks_high"] = max(
+            (attacker_soldiers_val * 0.00043225806)
+            + ((attacker_tanks_val * 0.00070967741)) * 3,
+            defender_tanks,
+        )
     else:
-        response["attacker"]["tanks_low"] = (attacker_soldiers_low * 0.00043225806) + (
-            (attacker_tanks_low * 0.00070967741)
-        ) * 3
-        response["attacker"]["tanks_high"] = (attacker_soldiers_val * 0.00043225806) + (
-            (attacker_tanks_val * 0.00070967741)
-        ) * 3
-        response["defender"]["tanks_low"] = (defender_soldiers_low * 0.0004060606) + (
-            (defender_tanks_low * 0.00066666666)
-        ) * 3
-        response["defender"]["tanks_high"] = (defender_soldiers_val * 0.0004060606) + (
-            (defender_tanks_val * 0.00066666666)
-        ) * 3
-
+        response["defender"]["tanks_low"] = max(
+            (defender_soldiers_low * 0.0004060606)
+            + ((defender_tanks_low * 0.00066666666)) * 3,
+            attacker_tanks,
+        )
+        response["defender"]["tanks_high"] = max(
+            (defender_soldiers_val * 0.0004060606)
+            + ((defender_tanks_val * 0.00066666666)) * 3,
+            attacker_tanks,
+        )
+        response["attacker"]["tanks_low"] = max(
+            (attacker_soldiers_low * 0.00043225806)
+            + ((attacker_tanks_low * 0.00070967741)) * 3,
+            defender_tanks,
+        )
+        response["attacker"]["tanks_high"] = max(
+            (attacker_soldiers_val * 0.00043225806)
+            + ((attacker_tanks_val * 0.00070967741)) * 3,
+            defender_tanks,
+        )
     return response
 
 
-def get_casualties_naval(attacker_val: float, defender_val: float):
+def get_casualties_naval(attacker_ships: float, defender_ships: float):
+    attacker_val = attacker_ships * 4
+    defender_val = defender_ships * 4
     attacker_low = attacker_val * 0.4
     defender_low = defender_val * 0.4
     chance_for_three = (
@@ -102,12 +122,12 @@ def get_casualties_naval(attacker_val: float, defender_val: float):
     # the real number of casultys because this is only dealing with ships atm
     return {
         "attacker": {
-            "low": max(defender_low * chance_for_three, attacker_val / 4),
-            "high": max(defender_val * chance_for_three, attacker_val / 4),
+            "low": max(defender_low * chance_for_three, attacker_ships),
+            "high": max(defender_val * chance_for_three, attacker_ships),
         },
         "defender": {
-            "low": max(attacker_low * chance_for_three, defender_val / 4),
-            "high": max(attacker_val * chance_for_three, defender_val / 4),
+            "low": max(attacker_low * chance_for_three, defender_ships),
+            "high": max(attacker_val * chance_for_three, defender_ships),
         },
     }
 
@@ -219,6 +239,7 @@ class Odds(commands.Cog):
         naval_chance = get_attack_chance(attacker.ships * 4, defender.ships * 4)
         air_chance = get_attack_chance(attacker.aircraft * 3, defender.aircraft * 3)
 
+        naval_cas = get_casualties_naval(attacker.ships, defender.ships)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
@@ -234,7 +255,7 @@ class Odds(commands.Cog):
                     },
                     {
                         "name": "Naval Battle",
-                        "value": f"Immense:{naval_chance['immense']:.2%}\n Moderate:{naval_chance['moderate']:.2%}\n Pyrrhic:{naval_chance['pyrrhic']:.2%}\n Failure:{naval_chance['failure']:.2%}",
+                    "value": f"Immense:{naval_chance['immense']:.2%}\n Moderate:{naval_chance['moderate']:.2%}\n Pyrrhic:{naval_chance['pyrrhic']:.2%}\n Failure:{naval_chance['failure']:.2%} \nAttacker Casualties:{naval_cas['attacker']['low']:.2%}-{naval_cas['attacker']['high']:.2%}\nDefender Casualties:{naval_cas['defender']['low']:.2%}-{naval_cas['defender']['high']:.2%}",
                     },
                 ],
                 color=discord.Color.blue(),
