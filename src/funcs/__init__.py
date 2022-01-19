@@ -7,6 +7,7 @@ from .convert import *
 from .database_cache import *
 from .embeds import *
 from .errors import *
+from .logs import *
 from .nation import *
 from .parse import *
 from .projects import *
