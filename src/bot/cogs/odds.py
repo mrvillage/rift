@@ -130,7 +130,7 @@ class Odds(commands.Cog):
                     },
                     {
                         "name": "Air Battle",
-                        "value": f"Immense:{airChance['immense']*100}%, Moderate:{airChance['moderate']*100}%, Pyrrhic:{airChance['pyrrhic ']*100}%, Failure:{airChance['failure']*100}%,",
+                        "value": f"Immense:{airChance['immense']*100}%, Moderate:{airChance['moderate']*100}%, Pyrrhic:{airChance['pyrrhic']*100}%, Failure:{airChance['failure']*100}%,",
                     },
                     {
                         "name": "Naval Battle",
