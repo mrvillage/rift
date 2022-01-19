@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 
     from _typings import Field, NationData, RevenueDict
 
+    from ...views import Info
     from .alliance import Alliance
     from .city import City
     from .condition import Condition
@@ -303,6 +304,13 @@ class Nation(Makeable):
                 fields=fields,
                 color=discord.Color.blue(),
             )
+        )
+
+    def get_info_view(self) -> Info:
+        from ...views import Info
+
+        return Info().add_button(
+            "Alliance Information", f"info-alliance-{self.alliance_id}"
         )
 
     async def fetch_cities(self) -> List[FullCity]:

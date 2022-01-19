@@ -2,6 +2,7 @@ from .alliances import *
 from .colors import *
 from .confirm import *
 from .events import *
+from .info import *
 from .margins import *
 from .menu import *
 from .permissions import *
