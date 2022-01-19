@@ -114,7 +114,7 @@ class Odds(commands.Cog):
 
         groundChance = get_attack_chance(
             (float(attacker.soldiers) * 1.75) + (attacker.tanks * 40),
-            (float(defender.soldiers) * 1.75) + (attacker.tanks * 40),
+            (float(defender.soldiers) * 1.75) + (defender.tanks * 40),
         )
         navalChance = get_attack_chance(attacker.ships * 4, defender.ships * 4)
         airChance = get_attack_chance(attacker.aircraft * 3, defender.aircraft * 3)
