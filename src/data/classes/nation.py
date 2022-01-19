@@ -90,9 +90,9 @@ class Nation(Makeable):
 
     @classmethod
     async def convert(
-        cls, ctx: RiftContext, search: Any, advanced: bool = True
+        cls, ctx: RiftContext, search: Any, stage: int = 0
     ) -> Nation:
-        return await convert_nation(ctx, search, advanced)
+        return await convert_nation(ctx, search, stage)
 
     @classmethod
     async def fetch(cls, nation_id: int) -> Nation:

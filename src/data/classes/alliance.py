@@ -54,10 +54,8 @@ class Alliance(Makeable):
         self.ircchan: Optional[str] = data["ircchan"]
 
     @classmethod
-    async def convert(
-        cls, ctx: RiftContext, search: Any, advanced: bool = True
-    ) -> Alliance:
-        return await convert_alliance(ctx, search, advanced)
+    async def convert(cls, ctx: RiftContext, search: Any, stage: int = 0) -> Alliance:
+        return await convert_alliance(ctx, search, stage)
 
     @classmethod
     async def fetch(cls, alliance_id: int) -> Alliance:
