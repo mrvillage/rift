@@ -51,14 +51,16 @@ class Buttons(commands.Cog):
                 if nation is None:
                     raise EmbedErrorMessage(interaction.user, "No nation found.")
                 await interaction.response.send_message(
-                    embed=nation.get_info_embed(ctx)
+                    embed=nation.get_info_embed(ctx),
+                    ephemeral=True,
                 )
             elif model == "alliance":
                 alliance = cache.get_alliance(model_id)
                 if alliance is None:
                     raise EmbedErrorMessage(interaction.user, "No alliance found.")
                 await interaction.response.send_message(
-                    embed=alliance.get_info_embed(ctx)
+                    embed=alliance.get_info_embed(ctx),
+                    ephemeral=True,
                 )
         except EmbedErrorMessage as e:
             await interaction.response.send_message(
