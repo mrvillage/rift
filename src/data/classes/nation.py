@@ -12,7 +12,7 @@ from discord.utils import MISSING
 from ...cache import cache
 from ...data.db import execute_read_query
 from ...errors import NationNotFoundError
-from ...funcs import search_nation, utils
+from ...funcs import convert_nation, utils
 from ...ref import RiftContext, bot
 from .base import Makeable
 from .city import FullCity
@@ -92,7 +92,7 @@ class Nation(Makeable):
     async def convert(
         cls, ctx: RiftContext, search: Any, advanced: bool = True
     ) -> Nation:
-        return await search_nation(ctx, search, advanced)
+        return await convert_nation(ctx, search, advanced)
 
     @classmethod
     async def fetch(cls, nation_id: int) -> Nation:

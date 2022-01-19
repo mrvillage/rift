@@ -11,7 +11,7 @@ from pnwkit.async_ import AsyncKit
 from ...cache import cache
 from ...errors import AllianceNotFoundError, NoCredentialsError
 from ...flags import RolePermissions
-from ...funcs import search_alliance
+from ...funcs import convert_alliance
 from ...ref import RiftContext
 from .base import Makeable
 from .city import City
@@ -57,7 +57,7 @@ class Alliance(Makeable):
     async def convert(
         cls, ctx: RiftContext, search: Any, advanced: bool = True
     ) -> Alliance:
-        return await search_alliance(ctx, search, advanced)
+        return await convert_alliance(ctx, search, advanced)
 
     @classmethod
     async def fetch(cls, alliance_id: int) -> Alliance:
