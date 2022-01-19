@@ -12,21 +12,25 @@ from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 
-def get_casualties(attacker_val: float, defender_val: float):
+def get_casualties_naval(attacker_val: float, defender_val: float):
     attacker_low = attacker_val * 0.4
     defender_low = defender_val * 0.4
     chance_for_three = (
         0.01375 * 3
     )  # leaving this in here so we aren't confused looking back on the future
+
     # its attacker for defender because casualties are based on the opponents units
+
+    # origanl vals are to make sure it doesnt go below zero, and its devided by 4 to get
+    # the real number of casultys because this is only dealing with ships atm
     return {
         "attacker": {
-            "low": defender_low * chance_for_three,
-            "high": defender_val * chance_for_three,
+            "low": max(defender_low * chance_for_three, attacker_val / 4),
+            "high": max(defender_val * chance_for_three, attacker_val / 4),
         },
         "defender": {
-            "low": attacker_low * chance_for_three,
-            "high": attacker_val * chance_for_three,
+            "low": max(attacker_low * chance_for_three, defender_val / 4),
+            "high": max(attacker_val * chance_for_three, defender_val / 4),
         },
     }
 
