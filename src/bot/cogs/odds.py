@@ -13,6 +13,23 @@ from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 
+def get_casualties_air(attacker_aircraft: float, defender_aircraft: float):
+    attacker_val = attacker_aircraft * 3
+    defender_val = defender_aircraft * 3
+    attacker_low = attacker_val * 0.4
+    defender_low = defender_val * 0.4
+    return {
+        "attacker": {
+            "low": min(defender_low * 0.01 * 3, attacker_aircraft),
+            "high": min(defender_val * 0.01 * 3, attacker_aircraft),
+        },
+        "defender": {
+            "low": min(attacker_low * 0.018337 * 3, defender_aircraft),
+            "high": min(attacker_val * 0.018337 * 3, defender_aircraft),
+        },
+    }
+
+
 def get_casualties_ground(
     attacker_soldiers: float,
     attacker_tanks: float,
@@ -244,6 +261,7 @@ class Odds(commands.Cog):
         ground_cas = get_casualties_ground(
             attacker.soldiers, attacker.tanks, defender.soldiers, defender.tanks
         )
+        air_cas = get_casualties_air(attacker.aircraft, defender.aircraft)
 
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -256,7 +274,7 @@ class Odds(commands.Cog):
                     },
                     {
                         "name": "Air Battle",
-                        "value": f"Immense:{air_chance['immense']:.2%}\n Moderate:{air_chance['moderate']:.2%}\n Pyrrhic:{air_chance['pyrrhic']:.2%}\n Failure:{air_chance['failure']:.2%}",
+                        "value": f"Immense:{air_chance['immense']:.2%}\n Moderate:{air_chance['moderate']:.2%}\n Pyrrhic:{air_chance['pyrrhic']:.2%}\n Failure:{air_chance['failure']:.2%} \nAttacker Casualties:{math.floor(air_cas['attacker']['low'])}-{math.ceil(air_cas['attacker']['high'])}\nDefender Casualties:{math.floor(air_cas['defender']['low'])}-{math.ceil(air_cas['defender']['high'])}",
                     },
                     {
                         "name": "Naval Battle",
