@@ -239,7 +239,11 @@ class EventMessages(commands.Cog):
                     f"**War created!**\n[{war.attacker}](https://politicsandwar.com/nation/id={(war.attacker and war.attacker.id) or 0}) of {f'alliance [{war.attacker.alliance}](https://politicsandwar.com/alliance/id={war.attacker.alliance_id})' if war.attacker is not None else 'no alliance'} declared war on [{repr(war.defender)}](https://politicsandwar.com/nation/id={(war.defender and war.defender.id) or 0}) of {f'alliance [{war.defender.alliance}](https://politicsandwar.com/alliance/id={war.defender.alliance_id})' if war.defender is not None else 'no alliance'}.",
                     color=discord.Color.blue(),
                 ),
-                view=Info().add_url("War Page", f"https://politicsandwar.com/nation/war/timeline/war={war.id}")
+                view=Info()
+                .add_url(
+                    "War Page",
+                    f"https://politicsandwar.com/nation/war/timeline/war={war.id}",
+                )
                 .add_button("Attacker Information", f"info-nation-{war.attacker_id}")
                 .add_button("Defender Information", f"info-nation-{war.defender_id}"),
             )
