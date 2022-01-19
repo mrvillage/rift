@@ -12,6 +12,55 @@ from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 
+def get_casualties_ground(
+    attacker_soldiers: float,
+    attacker_tanks: float,
+    defender_soldiers: float,
+    defender_tanks: float,
+):
+    attacker_val = (attacker_soldiers * 1.75) + (attacker_tanks * 40)
+    defender_val = (defender_soldiers * 1.75) + (defender_tanks * 40)
+
+    attacker_soldiers_val = attacker_soldiers * 1.75
+    attacker_tanks_val = attacker_tanks * 40
+    defender_soldiers_val = defender_soldiers * 1.75
+    defender_tanks_val = defender_tanks * 40
+
+    attacker_soldiers_low = attacker_soldiers * 1.75 * 0.4
+    attacker_tanks_low = attacker_tanks * 40 * 0.4
+    defender_soldiers_low = defender_soldiers * 1.75 * 0.4
+    defender_tanks_low = defender_tanks * 40 * 0.4
+    response: Dict[str, Dict[str, float]] = {
+        "attacker": {
+            "soldiers_low": 0,
+            "soldiers_high": 0,
+            "tanks_low": 0.0,
+            "tanks_high": 0,
+        },
+        "defender": {
+            "soldiers_low": 0,
+            "soldiers_high": 0,
+            "tanks_low": 0,
+            "tanks_high": 0,
+        },
+    }
+    if attacker_val > defender_val:
+        response["attacker"]["tanks_low"] = (defender_soldiers_low * 0.0004060606) + (
+            defender_tanks_low * 0.00066666666
+        )
+        response["attacker"]["tanks_high"] = (defender_soldiers_val * 0.0004060606) + (
+            defender_tanks_val * 0.00066666666
+        )
+
+        response["defender"]["tanks_low"] = (attacker_soldiers_low * 0.00043225806) + (
+            attacker_tanks_low * 0.00070967741
+        )
+        response["defender"]["tanks_high"] = (attacker_soldiers_val * 0.00043225806) + (
+            attacker_tanks_val * 0.00070967741
+        )
+    return response
+
+
 def get_casualties_naval(attacker_val: float, defender_val: float):
     attacker_low = attacker_val * 0.4
     defender_low = defender_val * 0.4
