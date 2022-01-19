@@ -318,7 +318,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                 return await interaction.response.send_message(
                     embed=funcs.get_embed_author_member(
                         interaction.user,
-                        "You're not linked so I can't infer what nation to grant this to! Please link with the `/link` command or use `/grant accept` to accept the grant for a specific nation.",
+                        "You're not linked so I can't infer what nation to grant this to! Please link your nation with the `/link` command or use `/grant accept` to accept the grant for a specific nation.",
                         color=discord.Color.red(),
                     ),
                     ephemeral=True,
