@@ -45,61 +45,61 @@ def get_casualties_ground(
             "tanks_high": 0,
         },
     }
-    response["attacker"]["soldiers_low"] = max(
+    response["attacker"]["soldiers_low"] = min(
         (defender_soldiers_low * 0.0084) + (defender_tanks_low * 0.0092) * 3,
         attacker_soldiers,
     )
-    response["attacker"]["soldiers_high"] = max(
+    response["attacker"]["soldiers_high"] = min(
         (defender_soldiers_val * 0.0084) + (defender_tanks_val * 0.0092) * 3,
         attacker_soldiers,
     )
-    response["defender"]["soldiers_low"] = max(
+    response["defender"]["soldiers_low"] = min(
         (attacker_soldiers_low * 0.0084) + (attacker_tanks_low * 0.0092) * 3,
         defender_soldiers,
     )
-    response["defender"]["soldiers_high"] = max(
+    response["defender"]["soldiers_high"] = min(
         (attacker_soldiers_val * 0.0084) + (attacker_tanks_val * 0.0092) * 3,
         defender_soldiers,
     )
     if attacker_val > defender_val:
 
-        response["attacker"]["tanks_low"] = max(
+        response["attacker"]["tanks_low"] = min(
             (defender_soldiers_low * 0.0004060606)
             + ((defender_tanks_low * 0.00066666666)) * 3,
             attacker_tanks,
         )
-        response["attacker"]["tanks_high"] = max(
+        response["attacker"]["tanks_high"] = min(
             (defender_soldiers_val * 0.0004060606)
             + ((defender_tanks_val * 0.00066666666)) * 3,
             attacker_tanks,
         )
-        response["defender"]["tanks_low"] = max(
+        response["defender"]["tanks_low"] = min(
             (attacker_soldiers_low * 0.00043225806)
             + ((attacker_tanks_low * 0.00070967741)) * 3,
             defender_tanks,
         )
-        response["defender"]["tanks_high"] = max(
+        response["defender"]["tanks_high"] = min(
             (attacker_soldiers_val * 0.00043225806)
             + ((attacker_tanks_val * 0.00070967741)) * 3,
             defender_tanks,
         )
     else:
-        response["defender"]["tanks_low"] = max(
+        response["defender"]["tanks_low"] = min(
             (defender_soldiers_low * 0.0004060606)
             + ((defender_tanks_low * 0.00066666666)) * 3,
             attacker_tanks,
         )
-        response["defender"]["tanks_high"] = max(
+        response["defender"]["tanks_high"] = min(
             (defender_soldiers_val * 0.0004060606)
             + ((defender_tanks_val * 0.00066666666)) * 3,
             attacker_tanks,
         )
-        response["attacker"]["tanks_low"] = max(
+        response["attacker"]["tanks_low"] = min(
             (attacker_soldiers_low * 0.00043225806)
             + ((attacker_tanks_low * 0.00070967741)) * 3,
             defender_tanks,
         )
-        response["attacker"]["tanks_high"] = max(
+        response["attacker"]["tanks_high"] = min(
             (attacker_soldiers_val * 0.00043225806)
             + ((attacker_tanks_val * 0.00070967741)) * 3,
             defender_tanks,
@@ -122,12 +122,12 @@ def get_casualties_naval(attacker_ships: float, defender_ships: float):
     # the real number of casultys because this is only dealing with ships atm
     return {
         "attacker": {
-            "low": max(defender_low * chance_for_three, attacker_ships),
-            "high": max(defender_val * chance_for_three, attacker_ships),
+            "low": min(defender_low * chance_for_three, attacker_ships),
+            "high": min(defender_val * chance_for_three, attacker_ships),
         },
         "defender": {
-            "low": max(attacker_low * chance_for_three, defender_ships),
-            "high": max(attacker_val * chance_for_three, defender_ships),
+            "low": min(attacker_low * chance_for_three, defender_ships),
+            "high": min(attacker_val * chance_for_three, defender_ships),
         },
     }
 
