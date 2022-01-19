@@ -43,7 +43,7 @@ def setup_logging():
 
 @bot.event
 async def on_message(message: discord.Message):
-    if message.author.bot or await bot.is_owner(message.author):  # type: ignore
+    if not await bot.is_owner(message.author):  # type: ignore
         return
     ctx = await bot.get_context(message)  # type: ignore
     try:
@@ -65,7 +65,7 @@ async def on_raw_message_edit(payload: discord.RawMessageUpdateEvent):
         return
     if TYPE_CHECKING:
         assert isinstance(message.edited_at, datetime.datetime)
-    if message.author.bot or await bot.is_owner(message.author):  # type: ignore
+    if not await bot.is_owner(message.author):  # type: ignore
         return
     try:
         if message.created_at + datetime.timedelta(minutes=10) >= message.edited_at:
