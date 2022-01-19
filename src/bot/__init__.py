@@ -147,7 +147,6 @@ async def main() -> None:
                 bot.unload_extension("src.bot.cogs.database_cache")
             if not bot.debug:
                 bot.unload_extension("src.bot.cogs.grants")
-                bot.unload_extension("src.bot.cogs.odds")
             print("Loaded cogs!", flush=True)
 
             await bot.register_application_commands()
