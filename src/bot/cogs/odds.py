@@ -13,6 +13,10 @@ from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 
+def get_infrastructure_lost():
+    ...
+
+
 def get_casualties_air(attacker_aircraft: float, defender_aircraft: float):
     attacker_val = attacker_aircraft * 3
     defender_val = defender_aircraft * 3
@@ -248,11 +252,17 @@ class Odds(commands.Cog):
             )
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)
+
         await ctx.response.defer()  # type: ignore
+
+        cities = await defender.fetch_cities()
+
         # FIXME doesnt include population reisistance
         ground_chance = get_attack_chance(
             (float(attacker.soldiers) * 1.75) + (attacker.tanks * 40),
-            (float(defender.soldiers) * 1.75) + (defender.tanks * 40),
+            (float(defender.soldiers) * 1.75)
+            + (defender.tanks * 40)
+            + (float(sum(i.population for i in cities)) / 400),
         )
         naval_chance = get_attack_chance(attacker.ships * 4, defender.ships * 4)
         air_chance = get_attack_chance(attacker.aircraft * 3, defender.aircraft * 3)
