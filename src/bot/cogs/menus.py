@@ -133,7 +133,8 @@ class Menus(commands.Cog):
                     flags = await MenuItem.format_flags(ctx, flags)
                     item = MenuItem(
                         {  # type: ignore
-                            "guild_id": ctx.guild.id,
+                        "id": 0,
+                            "guild": ctx.guild.id,
                             "type_": "button",
                             "data_": flags,
                         }
@@ -327,7 +328,8 @@ class Menus(commands.Cog):
                     flags = await MenuItem.format_flags(ctx, flags)
                     item = MenuItem(
                         {  # type: ignore
-                            "guild_id": ctx.guild.id,
+                            "id": 0,
+                            "guild": ctx.guild.id,
                             "type_": "button",
                             "data_": flags,
                         }

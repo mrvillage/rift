@@ -48,9 +48,9 @@ class Rift(commands.Bot):
         ...
 
     async def close(self):
-        from .data.db.connect import connection, notify_connection
+        from .data.db.connect import connection, notify_connection  # type: ignore
 
-        await connection.close()
+        await connection.close()  # type: ignore
         await notify_connection.close()  # type: ignore
         await self.pnw_session.close()
         await super().close()

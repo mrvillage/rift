@@ -13,9 +13,6 @@ from ...data.classes import Ticket, TicketConfig
 from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
-if TYPE_CHECKING:
-    from _typings import TicketConfigData
-
 
 class Tickets(commands.Cog):
     def __init__(self, bot: Rift):
@@ -115,19 +112,23 @@ class Tickets(commands.Cog):
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
-        data = {
-            "category_id": category.id if category else None,
-            "guild_id": ctx.guild.id,
-            "start_message": start,
-            "archive_category_id": archive_category and archive_category.id,
-            "role_mentions": [i.id for i in mentions if isinstance(i, discord.Role)],
-            "user_mentions": [
-                i.id for i in mentions if isinstance(i, (discord.Member, discord.User))
-            ],
-        }
-        if TYPE_CHECKING:
-            assert isinstance(data, TicketConfigData)
-        config = TicketConfig(data)
+        config = TicketConfig(
+            {
+                "id": 0,
+                "category": category.id if category else None,
+                "guild": ctx.guild.id,
+                "start_message": start,
+                "archive_category": archive_category and archive_category.id,
+                "role_mentions": [
+                    i.id for i in mentions if isinstance(i, discord.Role)
+                ],
+                "user_mentions": [
+                    i.id
+                    for i in mentions
+                    if isinstance(i, (discord.Member, discord.User))
+                ],
+            }
+        )
         await config.save()
         await ctx.reply(
             embed=funcs.get_embed_author_member(

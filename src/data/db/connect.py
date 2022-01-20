@@ -17,7 +17,7 @@ async def init(conn: Connection) -> Connection:
 
 
 async def _create_connection() -> Pool:
-    return await create_pool(  # type: ignore
+p    return await create_pool(  # type: ignore
         host=DB_HOST,
         port=DB_PORT,
         user=DB_USER,

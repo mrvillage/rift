@@ -13,9 +13,6 @@ from ...data.classes import Alliance, Embassy, EmbassyConfig, Nation
 from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
-if TYPE_CHECKING:
-    from _typings import EmbassyConfigData, EmbassyData
-
 
 class Embassies(commands.Cog):
     def __init__(self, bot: Rift):
@@ -63,13 +60,14 @@ class Embassies(commands.Cog):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         category = category or None
-        data: EmbassyConfigData = {
-            "id": 0,
-            "category": category.id if category else None,
-            "guild": ctx.guild.id,
-            "start_message": start,
-        }
-        config = EmbassyConfig(data)
+        config = EmbassyConfig(
+            {
+                "id": 0,
+                "category": category.id if category else None,
+                "guild": ctx.guild.id,
+                "start_message": start,
+            }
+        )
         await config.save()
         await ctx.reply(
             embed=funcs.get_embed_author_member(
@@ -132,16 +130,15 @@ class Embassies(commands.Cog):
                 ctx.channel, discord.TextChannel
             )
         channel = channel or ctx.channel
-        data = {
-            "id": channel.id,
-            "alliance_id": alliance.id,
-            "config_id": config.id,
-            "guild_id": ctx.guild.id,
-            "open": True,
-        }
-        if TYPE_CHECKING:
-            assert isinstance(data, EmbassyData)
-        embassy = Embassy(data)
+        embassy = Embassy(
+            {
+                "id": channel.id,
+                "alliance": alliance.id,
+                "config": config.id,
+                "guild": ctx.guild.id,
+                "open": True,
+            }
+        )
         await embassy.save()
         await ctx.reply(
             embed=funcs.get_embed_author_member(
