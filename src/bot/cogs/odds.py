@@ -232,10 +232,10 @@ class Odds(commands.Cog):
 
     @odds.command(  # type: ignore
         name="attacks",
-        brief="Calculate the odds of 2 nations fighting",
+        brief="Calculate the odds of two nations fighting",
         type=commands.CommandType.chat_input,
     )
-    async def odds_battles_naval(
+    async def odds_attacks(
         self,
         ctx: RiftContext,
         attacker: Nation = MISSING,
@@ -270,15 +270,15 @@ class Odds(commands.Cog):
                 fields=[
                     {
                         "name": "Ground Battle",
-                        "value": f"Immense:{ground_chance['immense']:.2%}\n Moderate:{ground_chance['moderate']:.2%}\n Pyrrhic:{ground_chance['pyrrhic']:.2%}\n Failure:{ground_chance['failure']:.2%}\nAttacker Casualties: Soldiers: {math.floor(ground_cas['attacker']['soldiers_low'])}-{math.ceil(ground_cas['attacker']['soldiers_high'])} Tanks: {math.floor(ground_cas['attacker']['tanks_low'])}-{math.ceil(ground_cas['attacker']['tanks_high'])}\nDefender Casualties: Soldiers{math.floor(ground_cas['defender']['soldiers_low'])}-{math.ceil(ground_cas['defender']['soldiers_high'])} Tanks:{math.floor(ground_cas['defender']['tanks_low'])}-{math.ceil(ground_cas['defender']['tanks_high'])}",
+                        "value": f"Immense: {ground_chance['immense']:.2%}\nModerate:{ground_chance['moderate']:.2%}\nPyrrhic: {ground_chance['pyrrhic']:.2%}\nFailure:{ground_chance['failure']:.2%}\nAttacker Casualties: {math.floor(ground_cas['attacker']['soldiers_low']):,}-{math.ceil(ground_cas['attacker']['soldiers_high']):,} soldiers; {math.floor(ground_cas['attacker']['tanks_low']):,}-{math.ceil(ground_cas['attacker']['tanks_high']):,} tanks\nDefender Casualties: {math.floor(ground_cas['defender']['soldiers_low']):,}-{math.ceil(ground_cas['defender']['soldiers_high']):,} soldiers; {math.floor(ground_cas['defender']['tanks_low']):,%}-{math.ceil(ground_cas['defender']['tanks_high']):,} tanks",
                     },
                     {
                         "name": "Air Battle",
-                        "value": f"Immense:{air_chance['immense']:.2%}\n Moderate:{air_chance['moderate']:.2%}\n Pyrrhic:{air_chance['pyrrhic']:.2%}\n Failure:{air_chance['failure']:.2%} \nAttacker Casualties:{math.floor(air_cas['attacker']['low'])}-{math.ceil(air_cas['attacker']['high'])}\nDefender Casualties:{math.floor(air_cas['defender']['low'])}-{math.ceil(air_cas['defender']['high'])}",
+                        "value": f"Immense: {air_chance['immense']:.2%}\nModerate: {air_chance['moderate']:.2%}\nPyrrhic: {air_chance['pyrrhic']:.2%}\nFailure: {air_chance['failure']:.2%}\nAttacker Casualties: {math.floor(air_cas['attacker']['low']):,}-{math.ceil(air_cas['attacker']['high']):,} aircraft\nDefender Casualties: {math.floor(air_cas['defender']['low']):,}-{math.ceil(air_cas['defender']['high']):,} aircraft",
                     },
                     {
                         "name": "Naval Battle",
-                        "value": f"Immense:{naval_chance['immense']:.2%}\n Moderate:{naval_chance['moderate']:.2%}\n Pyrrhic:{naval_chance['pyrrhic']:.2%}\n Failure:{naval_chance['failure']:.2%} \nAttacker Casualties:{math.floor(naval_cas['attacker']['low'])}-{math.ceil(naval_cas['attacker']['high'])}\nDefender Casualties:{math.floor(naval_cas['defender']['low'])}-{math.ceil(naval_cas['defender']['high'])}",
+                        "value": f"Immense: {naval_chance['immense']:.2%}\nModerate: {naval_chance['moderate']:.2%}\nPyrrhic: {naval_chance['pyrrhic']:.2%}\nFailure: {naval_chance['failure']:.2%}\nAttacker Casualties:{math.floor(naval_cas['attacker']['low']):,}-{math.ceil(naval_cas['attacker']['high']):,}\nDefender Casualties: {math.floor(naval_cas['defender']['low']):,}-{math.ceil(naval_cas['defender']['high']):,} ships",
                     },
                 ],
                 color=discord.Color.blue(),
