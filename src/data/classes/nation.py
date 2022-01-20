@@ -9,13 +9,15 @@ import pnwkit
 from bs4 import BeautifulSoup
 from discord.utils import MISSING
 
+from ... import funcs
 from ...cache import cache
 from ...data.db import execute_read_query
 from ...errors import NationNotFoundError
-from ...find import search_nation
-from ...funcs import utils
 from ...ref import RiftContext, bot
 from .base import Makeable
+from .city import FullCity
+from .color import Color
+from .resources import Resources
 
 __all__ = ("Nation",)
 
@@ -24,6 +26,7 @@ if TYPE_CHECKING:
 
     from _typings import Field, NationData, RevenueDict
 
+    from ...views import Info
     from .alliance import Alliance
     from .city import City
     from .condition import Condition
@@ -64,10 +67,12 @@ class Nation(Makeable):
         self.id: int = data["id"]
         self.name: str = data["name"]
         self.leader: str = data["leader"]
-        self.continent: str = utils.get_continent(data["continent"])
-        self.war_policy: str = utils.get_war_policy(data["war_policy"])
-        self.domestic_policy: str = utils.get_domestic_policy(data["domestic_policy"])
-        self.color: str = utils.get_color(data["color"])
+        self.continent: str = funcs.utils.get_continent(data["continent"])
+        self.war_policy: str = funcs.utils.get_war_policy(data["war_policy"])
+        self.domestic_policy: str = funcs.utils.get_domestic_policy(
+            data["domestic_policy"]
+        )
+        self.color: str = funcs.utils.get_color(data["color"])
         self.alliance_id: int = data["alliance_id"]
         self.alliance_position: int = data["alliance_position"]
         self.cities: int = data["cities"]
@@ -87,10 +92,8 @@ class Nation(Makeable):
         self.nukes: int = data["nukes"]
 
     @classmethod
-    async def convert(
-        cls, ctx: RiftContext, search: Any, advanced: bool = True
-    ) -> Nation:
-        return await search_nation(ctx, search, advanced)
+    async def convert(cls, ctx: RiftContext, search: Any, stage: int = 0) -> Nation:
+        return await funcs.convert_nation(ctx, search, stage)
 
     @classmethod
     async def fetch(cls, nation_id: int) -> Nation:
@@ -103,10 +106,12 @@ class Nation(Makeable):
         self.id: int = data["id"]
         self.name: str = data["name"]
         self.leader: str = data["leader"]
-        self.continent: str = utils.get_continent(data["continent"])
-        self.war_policy: str = utils.get_war_policy(data["war_policy"])
-        self.domestic_policy: str = utils.get_domestic_policy(data["domestic_policy"])
-        self.color: str = utils.get_color(data["color"])
+        self.continent: str = funcs.utils.get_continent(data["continent"])
+        self.war_policy: str = funcs.utils.get_war_policy(data["war_policy"])
+        self.domestic_policy: str = funcs.utils.get_domestic_policy(
+            data["domestic_policy"]
+        )
+        self.color: str = funcs.utils.get_color(data["color"])
         self.alliance_id: int = data["alliance_id"]
         self.alliance_position: int = data["alliance_position"]
         self.cities: int = data["cities"]
@@ -223,7 +228,7 @@ class Nation(Makeable):
             },
             {
                 "name": "Alliance Position",
-                "value": utils.get_alliance_position(self.alliance_position),
+                "value": funcs.utils.get_alliance_position(self.alliance_position),
             },
             {
                 "name": "Cities",
@@ -301,6 +306,87 @@ class Nation(Makeable):
             )
         )
 
+    def get_info_view(self) -> Info:
+        from ...views import Info
+
+        return Info().add_button(
+            "Alliance Information", f"info-alliance-{self.alliance_id}"
+        )
+
+    async def fetch_cities(self) -> List[FullCity]:
+        raw_data = await pnwkit.async_nation_query(  # type: ignore
+            {"id": self.id},
+            "id",
+            "ironw",
+            "bauxitew",
+            "armss",
+            "egr",
+            "massirr",
+            "itc",
+            "mlp",
+            "nrf",
+            "irond",
+            "vds",
+            "cia",
+            "cfce",
+            "propb",
+            "uap",
+            "city_planning",
+            "adv_city_planning",
+            "space_program",
+            "spy_satellite",
+            "moon_landing",
+            "pirate_economy",
+            "recycling_initiative",
+            "telecom_satellite",
+            "green_tech",
+            "arable_land_agency",
+            "clinical_research_center",
+            "specialized_police_training",
+            "adv_engineering_corps",
+            {
+                "cities": (
+                    "id",
+                    "name",
+                    "date",
+                    "infrastructure",
+                    "land",
+                    "powered",
+                    "oilpower",
+                    "windpower",
+                    "coalpower",
+                    "nuclearpower",
+                    "coalmine",
+                    "oilwell",
+                    "uramine",
+                    "barracks",
+                    "farm",
+                    "policestation",
+                    "hospital",
+                    "recyclingcenter",
+                    "subway",
+                    "supermarket",
+                    "bank",
+                    "mall",
+                    "stadium",
+                    "leadmine",
+                    "ironmine",
+                    "bauxitemine",
+                    "gasrefinery",
+                    "aluminumrefinery",
+                    "steelmill",
+                    "munitionsfactory",
+                    "factory",
+                    "airforcebase",
+                    "drydock",
+                )
+            },
+        )
+        if TYPE_CHECKING:
+            assert isinstance(raw_data, tuple)
+        data = raw_data[0]
+        return [FullCity(i, data) for i in data.cities]  # type: ignore
+
     async def calculate_revenue(
         self,
         prices: Optional[TradePrices] = None,
@@ -309,85 +395,13 @@ class Nation(Makeable):
     ) -> RevenueDict:
         # sourcery no-metrics
         from ...funcs import calculate_spies
-        from .city import FullCity
-        from .color import Color
-        from .resources import Resources
 
         spies = await calculate_spies(self) if fetch_spies else 0
         prices = prices or cache.prices
-        if not data:
-            raw_data = await pnwkit.async_nation_query(  # type: ignore
-                {"id": self.id},
-                "id",
-                "ironw",
-                "bauxitew",
-                "armss",
-                "egr",
-                "massirr",
-                "itc",
-                "mlp",
-                "nrf",
-                "irond",
-                "vds",
-                "cia",
-                "cfce",
-                "propb",
-                "uap",
-                "city_planning",
-                "adv_city_planning",
-                "space_program",
-                "spy_satellite",
-                "moon_landing",
-                "pirate_economy",
-                "recycling_initiative",
-                "telecom_satellite",
-                "green_tech",
-                "arable_land_agency",
-                "clinical_research_center",
-                "specialized_police_training",
-                "adv_engineering_corps",
-                {
-                    "cities": (
-                        "id",
-                        "name",
-                        "date",
-                        "infrastructure",
-                        "land",
-                        "powered",
-                        "oilpower",
-                        "windpower",
-                        "coalpower",
-                        "nuclearpower",
-                        "coalmine",
-                        "oilwell",
-                        "uramine",
-                        "barracks",
-                        "farm",
-                        "policestation",
-                        "hospital",
-                        "recyclingcenter",
-                        "subway",
-                        "supermarket",
-                        "bank",
-                        "mall",
-                        "stadium",
-                        "leadmine",
-                        "ironmine",
-                        "bauxitemine",
-                        "gasrefinery",
-                        "aluminumrefinery",
-                        "steelmill",
-                        "munitionsfactory",
-                        "factory",
-                        "airforcebase",
-                        "drydock",
-                    )
-                },
-            )
-            if TYPE_CHECKING:
-                assert isinstance(raw_data, tuple)
-            data = raw_data[0]
-        cities = [FullCity(i, data) for i in data.cities]  # type: ignore
+        if data is None:
+            cities = await self.fetch_cities()
+        else:
+            cities = [FullCity(i, data) for i in data.cities]  # type: ignore
         revenues = [i.calculate_income() for i in cities]
         revenue: RevenueDict = {  # type: ignore
             "gross_income": sum(

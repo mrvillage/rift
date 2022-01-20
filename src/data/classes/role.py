@@ -59,15 +59,7 @@ class Role:
         except ValueError:
             pass
         try:
-            nation = await Nation.convert(ctx, None)
-            roles = [
-                i
-                for i in cache.roles
-                if i.alliance_id == nation.alliance_id
-                and i.name.lower() == argument.lower()
-            ]
-            if len(roles) == 1:
-                return roles[0]
+            return next(i for i in cache.roles if i.name.lower() == argument.lower())
         except StopIteration:
             pass
         raise RoleNotFoundError(argument)

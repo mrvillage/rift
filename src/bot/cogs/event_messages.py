@@ -9,6 +9,7 @@ from ... import funcs
 from ...cache import cache
 from ...data.classes import Alliance, ForumPost, Nation, Treaty, War
 from ...ref import Rift, bot
+from ...views import Info
 
 
 class EventMessages(commands.Cog):
@@ -34,7 +35,10 @@ class EventMessages(commands.Cog):
                     bot.user,
                     f"**Alliance created!**\n[{repr(alliance)}](https://politicsandwar.com/alliance/id={alliance.id})",
                     color=discord.Color.blue(),
-                )
+                ),
+                view=Info().add_button(
+                    "Extra Information", f"info-alliance-{alliance.id}"
+                ),
             )
 
     @commands.Cog.listener()
@@ -57,7 +61,6 @@ class EventMessages(commands.Cog):
                     f"**Alliance deleted!**\n[{repr(alliance)}](https://politicsandwar.com/alliance/id={alliance.id})",
                     color=discord.Color.blue(),
                 ),
-                False,
             )
 
     @commands.Cog.listener()
@@ -78,7 +81,6 @@ class EventMessages(commands.Cog):
                     f'**Forum Post Created!**\nForum: {post.forum.name}\n[{title}]({post.link} "{post.link}")',
                     color=discord.Color.blue(),
                 ),
-                False,
             )
 
     @commands.Cog.listener()
@@ -100,7 +102,8 @@ class EventMessages(commands.Cog):
                     bot.user,
                     f"**Nation created!**\n[{repr(nation)}](https://politicsandwar.com/nation/id={nation.id})",
                     color=discord.Color.blue(),
-                )
+                ),
+                view=Info().add_button("Extra Information", f"info-nation-{nation.id}"),
             )
 
     @commands.Cog.listener()
@@ -155,6 +158,9 @@ class EventMessages(commands.Cog):
                         f"**Nation updated!**\n[{repr(after)}](https://politicsandwar.com/nation/id={after.id})\n\n**Changes**\n{str_changes}",
                         color=discord.Color.blue(),
                     ),
+                    view=Info().add_button(
+                        "Extra Information", f"info-nation-{after.id}"
+                    ),
                 )
 
     @commands.Cog.listener()
@@ -177,7 +183,6 @@ class EventMessages(commands.Cog):
                     f"**Nation deleted!**\n[{repr(nation)}](https://politicsandwar.com/nation/id={nation.id})",
                     color=discord.Color.blue(),
                 ),
-                False,
             )
 
     @commands.Cog.listener()
@@ -196,7 +201,6 @@ class EventMessages(commands.Cog):
                     f"**Treaty created!**\n{treaty.treaty_type} from [{repr(treaty.from_)}](https://politicsandwar.com/alliance/id={treaty.from_.id if treaty.from_ else 0}) to [{repr(treaty.to_)}](https://politicsandwar.com/alliance/id={treaty.to_.id if treaty.to_ else 0}).",
                     color=discord.Color.blue(),
                 ),
-                False,
             )
 
     @commands.Cog.listener()
@@ -215,7 +219,6 @@ class EventMessages(commands.Cog):
                     f"**Treaty deleted!**\n{treaty.treaty_type} from [{repr(treaty.from_)}](https://politicsandwar.com/alliance/id={treaty.from_.id if treaty.from_ else 0}) to [{repr(treaty.to_)}](https://politicsandwar.com/alliance/id={treaty.to_.id if treaty.to_ else 0}).",
                     color=discord.Color.blue(),
                 ),
-                False,
             )
 
     @commands.Cog.listener()
@@ -233,10 +236,16 @@ class EventMessages(commands.Cog):
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
-                    f"**War created!**\n[{war.attacker}](https://politicsandwar.com/nation/id={(war.attacker and war.attacker.id) or 0}) of {f'alliance [{war.attacker.alliance}](https://politicsandwar.com/alliance/id={war.attacker.alliance_id}' if war.attacker is not None else 'no alliance'} declared war on [{repr(war.defender)}](https://politicsandwar.com/nation/id={(war.defender and war.defender.id) or 0}) of {f'alliance [{war.defender.alliance}](https://politicsandwar.com/alliance/id={war.defender.alliance_id}' if war.defender is not None else 'no alliance'}.\n[War Page](https://politicsandwar.com/nation/war/timeline/war={war.id})",
+                    f"**War created!**\n[{war.attacker}](https://politicsandwar.com/nation/id={(war.attacker and war.attacker.id) or 0}) of {f'alliance [{war.attacker.alliance}](https://politicsandwar.com/alliance/id={war.attacker.alliance_id})' if war.attacker is not None else 'no alliance'} declared war on [{repr(war.defender)}](https://politicsandwar.com/nation/id={(war.defender and war.defender.id) or 0}) of {f'alliance [{war.defender.alliance}](https://politicsandwar.com/alliance/id={war.defender.alliance_id})' if war.defender is not None else 'no alliance'}.",
                     color=discord.Color.blue(),
                 ),
-                False,
+                view=Info()
+                .add_url(
+                    "War Page",
+                    f"https://politicsandwar.com/nation/war/timeline/war={war.id}",
+                )
+                .add_button("Attacker Information", f"info-nation-{war.attacker_id}")
+                .add_button("Defender Information", f"info-nation-{war.defender_id}"),
             )
 
 

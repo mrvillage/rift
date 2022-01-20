@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional, Type
+from typing import TYPE_CHECKING, List, Optional
 
 import discord
 from discord.utils import MISSING
@@ -141,16 +141,10 @@ class Subscription:
     async def send(
         self,
         embed: discord.Embed,
-        send_view: bool = True,
-        view: Type[discord.ui.View] = MISSING,
-        /,
+        view: discord.ui.View = MISSING,
     ) -> None:
-        from ...views import EventExtraInformationView
-
-        view = view or EventExtraInformationView
         try:
-            v: discord.ui.View = view() if send_view else MISSING
-            await self.webhook.send(embed=embed, view=v)
+            await self.webhook.send(embed=embed, view=view)
         except discord.NotFound as e:
             if e.code == 10015:
                 await self.delete()

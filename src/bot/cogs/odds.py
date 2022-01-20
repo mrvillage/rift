@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import math
 from typing import Dict
 
 import discord
-import math
 from discord.ext import commands
 from discord.utils import MISSING
 
@@ -199,7 +199,6 @@ class Odds(commands.Cog):
         attacker: Nation = MISSING,
         defender: Nation = MISSING,
     ):
-        await ctx.response.defer()  # type: ignore
         if attacker is MISSING and defender is MISSING:
             raise EmbedErrorMessage(
                 ctx.author,
@@ -207,6 +206,7 @@ class Odds(commands.Cog):
             )
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)
+        await ctx.response.defer()  # type: ignore
         attacker_spies = await attacker.calculate_spies()
         defender_spies = await defender.calculate_spies()
         odds_1 = 1 * 25 + (attacker_spies * 100 / ((defender_spies * 3) + 1))
@@ -245,7 +245,6 @@ class Odds(commands.Cog):
         attacker: Nation = MISSING,
         defender: Nation = MISSING,
     ):
-        await ctx.response.defer()  # type: ignore
         if attacker is MISSING and defender is MISSING:
             raise EmbedErrorMessage(
                 ctx.author,
@@ -253,7 +252,9 @@ class Odds(commands.Cog):
             )
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)
+
         cities = await defender.fetch_cities()
+        await ctx.response.defer()  # type: ignore
         # FIXME doesnt include population reisistance
         ground_chance = get_attack_chance(
             (float(attacker.soldiers) * 1.75) + (attacker.tanks * 40),
@@ -277,7 +278,7 @@ class Odds(commands.Cog):
                 fields=[
                     {
                         "name": "Ground Battle",
-                        "value": f"Immense: {ground_chance['immense']:.2%}\nModerate:{ground_chance['moderate']:.2%}\nPyrrhic: {ground_chance['pyrrhic']:.2%}\nFailure:{ground_chance['failure']:.2%}\nAttacker Casualties: {math.floor(ground_cas['attacker']['soldiers_low']):,}-{math.ceil(ground_cas['attacker']['soldiers_high']):,} soldiers; {math.floor(ground_cas['attacker']['tanks_low']):,}-{math.ceil(ground_cas['attacker']['tanks_high']):,} tanks\nDefender Casualties: {math.floor(ground_cas['defender']['soldiers_low']):,}-{math.ceil(ground_cas['defender']['soldiers_high']):,} soldiers; {math.floor(ground_cas['defender']['tanks_low']):,%}-{math.ceil(ground_cas['defender']['tanks_high']):,} tanks",
+                        "value": f"Immense: {ground_chance['immense']:.2%}\nModerate:{ground_chance['moderate']:.2%}\nPyrrhic: {ground_chance['pyrrhic']:.2%}\nFailure:{ground_chance['failure']:.2%}\nAttacker Casualties: {math.floor(ground_cas['attacker']['soldiers_low']):,}-{math.ceil(ground_cas['attacker']['soldiers_high']):,} soldiers; {math.floor(ground_cas['attacker']['tanks_low']):,}-{math.ceil(ground_cas['attacker']['tanks_high']):,} tanks\nDefender Casualties: {math.floor(ground_cas['defender']['soldiers_low']):,}-{math.ceil(ground_cas['defender']['soldiers_high']):,} soldiers; {math.floor(ground_cas['defender']['tanks_low']):,}-{math.ceil(ground_cas['defender']['tanks_high']):,} tanks",
                     },
                     {
                         "name": "Air Battle",

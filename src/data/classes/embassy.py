@@ -105,7 +105,7 @@ class EmbassyConfig:
     )
 
     def __init__(self, data: EmbassyConfigData) -> None:
-        self.id: int = data.get("id")
+        self.id: int = data["id"]
         self.category_id: Optional[int] = data["category"]
         self.guild_id: int = data["guild"]
         self.start_message: str = data["start_message"]

@@ -146,7 +146,7 @@ class GuildWelcomeSettings(Makeable):
             )
         else:
             message = f"Welcome to {member.guild.name}!"
-        if not verified:
+        if not verified and not member.bot:
             message += "\n\nIt doesn't look like you're linked! Be sure to run `/link` and provide your nation to get linked."
         return get_embed_author_member(member, message, color=discord.Color.blue())
 

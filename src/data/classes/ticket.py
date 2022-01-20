@@ -119,7 +119,7 @@ class TicketConfig:
     )
 
     def __init__(self, data: TicketConfigData) -> None:
-        self.id = data.get("id")
+        self.id = data["id"]
         self.category_id = data["category"]
         self.guild_id = data["guild"]
         self.start_message = data["start_message"]

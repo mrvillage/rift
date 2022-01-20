@@ -162,7 +162,7 @@ class MenuItem:
     __slots__ = ("id", "guild_id", "type", "data")
 
     def __init__(self, data: MenuItemData) -> None:
-        self.id: int = data.get("id")
+        self.id: int = data["id"]
         self.guild_id: int = data["guild"]
         self.type: str = data["type_"]
         self.data: Dict[str, Any] = data["data_"] or {}
