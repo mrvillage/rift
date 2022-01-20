@@ -252,7 +252,7 @@ class Odds(commands.Cog):
             )
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)
-
+        cities = await defender.fetch_cities()
         await ctx.response.defer()  # type: ignore
 
         cities = await defender.fetch_cities()
