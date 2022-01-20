@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import math
 from typing import Dict
 
 import discord
-import math
 from discord.ext import commands
 from discord.utils import MISSING
 
@@ -270,7 +270,7 @@ class Odds(commands.Cog):
                 fields=[
                     {
                         "name": "Ground Battle",
-                        "value": f"Immense: {ground_chance['immense']:.2%}\nModerate:{ground_chance['moderate']:.2%}\nPyrrhic: {ground_chance['pyrrhic']:.2%}\nFailure:{ground_chance['failure']:.2%}\nAttacker Casualties: {math.floor(ground_cas['attacker']['soldiers_low']):,}-{math.ceil(ground_cas['attacker']['soldiers_high']):,} soldiers; {math.floor(ground_cas['attacker']['tanks_low']):,}-{math.ceil(ground_cas['attacker']['tanks_high']):,} tanks\nDefender Casualties: {math.floor(ground_cas['defender']['soldiers_low']):,}-{math.ceil(ground_cas['defender']['soldiers_high']):,} soldiers; {math.floor(ground_cas['defender']['tanks_low']):,%}-{math.ceil(ground_cas['defender']['tanks_high']):,} tanks",
+                        "value": f"Immense: {ground_chance['immense']:.2%}\nModerate:{ground_chance['moderate']:.2%}\nPyrrhic: {ground_chance['pyrrhic']:.2%}\nFailure:{ground_chance['failure']:.2%}\nAttacker Casualties: {math.floor(ground_cas['attacker']['soldiers_low']):,}-{math.ceil(ground_cas['attacker']['soldiers_high']):,} soldiers; {math.floor(ground_cas['attacker']['tanks_low']):,}-{math.ceil(ground_cas['attacker']['tanks_high']):,} tanks\nDefender Casualties: {math.floor(ground_cas['defender']['soldiers_low']):,}-{math.ceil(ground_cas['defender']['soldiers_high']):,} soldiers; {math.floor(ground_cas['defender']['tanks_low']):,}-{math.ceil(ground_cas['defender']['tanks_high']):,} tanks",
                     },
                     {
                         "name": "Air Battle",
