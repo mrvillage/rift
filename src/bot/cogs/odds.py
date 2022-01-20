@@ -195,7 +195,6 @@ class Odds(commands.Cog):
         attacker: Nation = MISSING,
         defender: Nation = MISSING,
     ):
-        await ctx.response.defer()  # type: ignore
         if attacker is MISSING and defender is MISSING:
             raise EmbedErrorMessage(
                 ctx.author,
@@ -203,6 +202,7 @@ class Odds(commands.Cog):
             )
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)
+        await ctx.response.defer()  # type: ignore
         attacker_spies = await attacker.calculate_spies()
         defender_spies = await defender.calculate_spies()
         odds_1 = 1 * 25 + (attacker_spies * 100 / ((defender_spies * 3) + 1))
@@ -241,7 +241,6 @@ class Odds(commands.Cog):
         attacker: Nation = MISSING,
         defender: Nation = MISSING,
     ):
-        await ctx.response.defer()  # type: ignore
         if attacker is MISSING and defender is MISSING:
             raise EmbedErrorMessage(
                 ctx.author,
@@ -249,6 +248,7 @@ class Odds(commands.Cog):
             )
         attacker = attacker or await Nation.convert(ctx, attacker)
         defender = defender or await Nation.convert(ctx, defender)
+        await ctx.response.defer()  # type: ignore
         # FIXME doesnt include population reisistance
         ground_chance = get_attack_chance(
             (float(attacker.soldiers) * 1.75) + (attacker.tanks * 40),
