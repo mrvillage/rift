@@ -1,4 +1,5 @@
 from __future__ import annotations
+from audioop import mul
 
 import math
 from typing import Dict
@@ -7,14 +8,55 @@ import discord
 from discord.ext import commands
 from discord.utils import MISSING
 
+from src.data.classes.city import FullCity
+
 from ... import funcs
 from ...data.classes import Nation
 from ...errors import EmbedErrorMessage
 from ...ref import Rift, RiftContext
 
 
-def get_infrastructure_lost():
-    ...
+def get_infrastructure_lost(
+    defender_cities: list[FullCity], attacker: Nation, defender: Nation
+):
+    highest_infra = 0
+    for city in defender_cities:
+        if city.infrastructure > highest_infra:
+            highest_infra = city.infrastructure
+    response: dict[str, dict[str, float]] = {
+        "ground": {"high": 0, "low": 0},
+        "naval": {"high": 0, "low": 0},
+        "air": {"high": 0, "low": 0},
+    }
+    low_victory = {"ground": 0, "naval": 0, "air": 0}
+    high_victory = {"ground": 3, "naval": 3, "air": 3}
+    multiplier = {"ground": 3, "naval": 2.625, "air": 0.35353535}
+    battle_types = ["ground", "naval", "air"]
+    for btltype in battle_types:
+        response[btltype]["low"] = max(
+            min(
+                attacker.aircraft
+                - (defender.aircraft * 0.5)
+                * multiplier[btltype]
+                * 0.85
+                * (low_victory[btltype] / 3),
+                highest_infra * 0.5 + 100,
+            ),
+            0,
+        )
+        response[btltype]["high"] = max(
+            min(
+                attacker.aircraft
+                - (defender.aircraft * 0.5)
+                * multiplier[btltype]
+                * 1.05
+                * (high_victory[btltype] / 3),
+                highest_infra * 0.5 + 100,
+            ),
+            0,
+        )
+
+    return response
 
 
 def get_casualties_air(attacker_aircraft: float, defender_aircraft: float):
@@ -256,7 +298,7 @@ class Odds(commands.Cog):
         await ctx.response.defer()  # type: ignore
 
         cities = await defender.fetch_cities()
-
+        infra_lost_vals = get_infrastructure_lost(cities, attacker, defender)
         # FIXME doesnt include population reisistance
         ground_chance = get_attack_chance(
             (float(attacker.soldiers) * 1.75) + (attacker.tanks * 40),
