@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+    paths:
+      - "web/**"
+      - "docs/**"
 
 jobs:
   build_and_deploy:
