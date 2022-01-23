@@ -1,3 +1,3 @@
 # Welcome to Rift!
 
-Rift is a general purpose Politics and War Discord bot that is free for everyone to use. Check out more information [here](https://rift.mrvillage.dev)!
+Rift is a free-to-use general purpose Discord bot for Politics and War. Check out more information [here](https://rift.mrvillage.dev)!

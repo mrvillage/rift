@@ -100,7 +100,7 @@ async def about(ctx: RiftContext):
     await ctx.reply(
         embed=funcs.get_embed_author_member(
             ctx.author,
-            f'**Welcome to Rift!**\n\nRift is a multi-purpose bot for Politics and War created by <@!258298021266063360>!\n\nIf you have any questions feel free to join the Rift server [here](https://discord.gg/dGeVksJnKg "https://discord.gg/dGeVksJnKg") or send a DM to <@!258298021266063360>!\n\nRift Current Version: {__version__}',
+            f"**Welcome to Rift!**\n\nRift is a free-to-use general purpose Discord bot for Politics and War created by <@!258298021266063360>!\n\nIf you have any questions feel free to join the Rift server [here](https://rift.mrvillage.dev/discord) or send a DM to <@!258298021266063360>! Check out more information on the website [here](https://rift.mrvillage.dev), read the documentation [here](https://rift.mrvillage.dev/docs), or check out the code on GitHub [here](https://rift.mrvillage.dev/github).\n\nRift Current Version: {__version__}\n\nRift is licensed under under [GNU GPL v3](https://rift.mrvillage.dev/https://license/) and comes with absolutely no warranty.",
             color=discord.Color.blue(),
         )
     )
