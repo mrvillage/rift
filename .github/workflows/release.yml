@@ -14,7 +14,6 @@ jobs:
 
       - uses: mrvillage/github-action-ssh-docker-compose@master
         name: Docker-Compose Remote Deployment
-        working-directory: ./bot
         with:
           ssh_host: ${{ secrets.SSH_HOST }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}

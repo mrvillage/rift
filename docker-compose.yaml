@@ -1,7 +1,7 @@
 version: "2"
 services:
   rift:
-    build: .
+    build: ./bot
     volumes:
       - /home/host/rift/.env:/.env
       - /home/host/rift/private.pem:/private.pem
