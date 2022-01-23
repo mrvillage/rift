@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Rift: start",
+            "type": "python",
+            "request": "launch",
+            "program": "bot/start.py",
+            "console": "integratedTerminal"
+            // "justMyCode": false
+        },
+        {
+              "name": "Rift: start-venv",
+              "type": "python",
+              "request": "launch",
+              "program": "bot/start.py",
+              "console": "integratedTerminal",
+              "justMyCode": false
+        }
+    ]
+}
