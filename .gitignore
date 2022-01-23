@@ -1,6 +1,1 @@
-__pycache__
-*.env
 .VSCodeCounter
-*.log
-*.crt
-private.pem
