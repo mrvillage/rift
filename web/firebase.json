@@ -19,6 +19,11 @@
         "source": "/discord",
         "destination": "https://discord.gg/dGeVksJnKg",
         "type": 301
+      },
+      {
+        "source": "/github",
+        "destination": "https://github.com/mrvillage/rift",
+        "type": 301
       }
     ]
   }
