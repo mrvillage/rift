@@ -24,6 +24,11 @@
         "source": "/github",
         "destination": "https://github.com/mrvillage/rift",
         "type": 301
+      },
+      {
+        "source": "/license",
+        "destination": "https://www.gnu.org/licenses/gpl-3.0.en.html",
+        "type": 301
       }
     ]
   }
