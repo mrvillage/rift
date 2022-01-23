@@ -23,28 +23,13 @@
       </div>
 
       <v-spacer />
-      <v-btn
-        class="ml-3"
-        color="gray"
-        href="https://discord.gg/dGeVksJnKg"
-        target="_blank"
-      >
+      <v-btn class="ml-3" color="gray" href="/discord" target="_blank">
         Support Server
       </v-btn>
-      <v-btn
-        class="ml-3"
-        color="gray"
-        href="https://docs.rift.mrvillage.dev"
-        target="_blank"
-      >
+      <v-btn class="ml-3" color="gray" href="/docs" target="_blank">
         Documentation
       </v-btn>
-      <v-btn
-        class="ml-3"
-        color="primary"
-        href="https://getrift.mrvillage.dev"
-        target="_blank"
-      >
+      <v-btn class="ml-3" color="primary" href="/get" target="_blank">
         Add to Server
       </v-btn>
       <div v-if="!user">

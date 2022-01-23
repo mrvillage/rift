@@ -2,15 +2,23 @@
   "hosting": {
     "public": "dist",
     "cleanUrls": true,
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
         "source": "**",
         "destination": "/index.html"
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/get",
+        "destination": "https://discord.com/api/oauth2/authorize?client_id=804833318956302377&permissions=542176177264&scope=bot%20applications.commands",
+        "type": 301
+      },
+      {
+        "source": "/discord",
+        "destination": "https://discord.gg/dGeVksJnKg",
+        "type": 301
       }
     ]
   }
