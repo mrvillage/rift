@@ -19,7 +19,7 @@ class Loop(commands.Cog):
 
     @pnw_session_refresh.before_loop
     async def pnw_session_refresh_wait(self):
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
         wait = now.replace(minute=5, second=0)
         while wait < now:
             wait += datetime.timedelta(minutes=10)

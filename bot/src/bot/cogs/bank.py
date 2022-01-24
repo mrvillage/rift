@@ -319,7 +319,7 @@ class Bank(commands.Cog):
         else:
             status = TransactionStatus.PENDING
         transaction = await Transaction.create(
-            datetime.datetime.utcnow(),
+            datetime.datetime.now(tz=datetime.timezone.utc),
             status,
             TransactionType.TRANSFER,
             ctx.author,
@@ -683,7 +683,7 @@ class Bank(commands.Cog):
             )
         resources = Resources.from_dict(deposit)
         transaction = await Transaction.create(
-            datetime.datetime.utcnow(),
+            datetime.datetime.now(tz=datetime.timezone.utc),
             TransactionStatus.ACCEPTED,
             TransactionType.DEPOSIT,
             ctx.author,
@@ -788,7 +788,7 @@ class Bank(commands.Cog):
                 )
             if success:
                 transaction = await Transaction.create(
-                    datetime.datetime.utcnow(),
+                    datetime.datetime.now(tz=datetime.timezone.utc),
                     TransactionStatus.ACCEPTED,
                     TransactionType.WITHDRAW,
                     ctx.author,
@@ -809,7 +809,7 @@ class Bank(commands.Cog):
                     ephemeral=True,
                 )
         transaction = await Transaction.create(
-            datetime.datetime.utcnow(),
+            datetime.datetime.now(tz=datetime.timezone.utc),
             TransactionStatus.PENDING,
             TransactionType.WITHDRAW,
             ctx.author,

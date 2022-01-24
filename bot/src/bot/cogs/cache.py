@@ -219,7 +219,7 @@ class Cache(commands.Cog):
     @verify_cache_integrity.before_loop
     async def before_verify_cache_integrity(self):
         await self.bot.wait_until_ready()
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
         wait = now.replace(minute=59, second=45)
         while wait < now:
             wait += datetime.timedelta(hours=1)

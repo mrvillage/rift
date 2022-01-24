@@ -546,7 +546,7 @@ class Nation(Makeable):
         if condition is not MISSING:
             valid = await condition.reduce(*valid)
         if loot:
-            dt = datetime.datetime.utcnow()
+            dt = datetime.datetime.now(tz=datetime.timezone.utc)
             revenue_valid = [
                 i
                 for i in valid
@@ -559,7 +559,10 @@ class Nation(Makeable):
             revenues = {}
         targets: List[Target] = []
         valid_nation_ids = {i.id for i in valid}
-        days_ago = str(datetime.datetime.utcnow() - datetime.timedelta(days=14))
+        days_ago = str(
+            datetime.datetime.now(tz=datetime.timezone.utc)
+            - datetime.timedelta(days=14)
+        )
         if wars is None:
             wars = [
                 War(i)

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import datetime
 import math
-from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
 
 import cachetools
@@ -13,9 +13,8 @@ from .resources import Resources
 __all__ = ("City", "FullCity")
 
 if TYPE_CHECKING:
-    from pnwkit.data import Nation as PnWKitNation
-
     from _typings import CityData
+    from pnwkit.data import Nation as PnWKitNation
 
     from .nation import Nation
 
@@ -119,7 +118,10 @@ class FullCity:
         self.id: int = data.get("city_id") or data["id"]
         self.name: Optional[str] = data.get("name")
         self.nation_id: int = int(nation.id)
-        self.age: int = (datetime.utcnow() - datetime.fromisoformat(data["date"])).days
+        self.age: int = (
+            datetime.datetime.now(tz=datetime.timezone.utc)
+            - datetime.datetime.fromisoformat(data["date"])
+        ).days
         self.infrastructure: float = data["infrastructure"]
         self.land: float = data["land"]
         self.powered: bool = data["powered"]
