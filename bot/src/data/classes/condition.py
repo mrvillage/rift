@@ -216,7 +216,7 @@ class Condition:
                 attr = "None"
             else:
                 attr = getattr(attr, a)
-        attr = cls.convert_attribute_value(attributes, attr)
+        value = cls.convert_attribute_value(attributes, value)
         if operator == "==":
             return attr == value
         elif operator == "!=":
