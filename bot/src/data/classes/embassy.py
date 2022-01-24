@@ -91,7 +91,9 @@ class Embassy:
         await channel.send(
             user.mention,
             embed=get_embed_author_member(
-                user, config.start_message.replace("\\n", "\n")
+                user,
+                config.start_message.replace("\\n", "\n"),
+                color=discord.Color.purple(),
             ),
         )
 
