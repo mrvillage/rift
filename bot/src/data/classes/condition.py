@@ -169,7 +169,9 @@ class Condition:
                 "id": 0,
                 "name": None,
                 "owner": user_id,
-                "condition": cls.convert_to_string(cls.validate_condition(condition, user_id)),
+                "condition": cls.convert_to_string(
+                    cls.validate_condition(condition, user_id)
+                ),
                 "public": public,
             }
         )
