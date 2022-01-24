@@ -74,7 +74,7 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         settings.default_raid_condition = (
-            Condition.convert_to_string(condition.condition) if condition else None
+            condition.condition if condition else None
         )
         await settings.save()
         if condition:
@@ -132,7 +132,7 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         settings.default_nuke_condition = (
-            Condition.convert_to_string(condition.condition) if condition else None
+            condition.condition if condition else None
         )
         await settings.save()
         if condition:
@@ -190,9 +190,8 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         settings.default_military_condition = (
-            Condition.convert_to_string(condition.condition) if condition else None
+            condition.condition if condition else None
         )
-        await settings.save()
         if condition:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
@@ -248,7 +247,7 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         settings.default_attack_raid_condition = (
-            Condition.convert_to_string(condition.condition) if condition else None
+            condition.condition if condition else None
         )
         await settings.save()
         if condition:
@@ -306,7 +305,7 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         settings.default_attack_nuke_condition = (
-            Condition.convert_to_string(condition.condition) if condition else None
+            condition.condition if condition else None
         )
         await settings.save()
         if condition:
@@ -364,7 +363,7 @@ class Settings(commands.Cog):
                     ephemeral=True,
                 )
         settings.default_attack_military_condition = (
-            Condition.convert_to_string(condition.condition) if condition else None
+            condition.condition if condition else None
         )
         await settings.save()
         if condition:

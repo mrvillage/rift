@@ -23,7 +23,7 @@ class Condition:
         self.id: int = data["id"]
         self.name: Optional[str] = data["name"]
         self.owner_id: int = data["owner"]
-        self.condition: List[Any] = data["condition"]
+        self.condition: str = data["condition"]
         self.public: bool = data["public"]
 
     async def save(self) -> None:
@@ -65,7 +65,7 @@ class Condition:
         return f"c-{self.id}"
 
     def __str__(self) -> str:
-        return self.convert_to_string(self.condition)
+        return self.condition
 
     @classmethod
     def convert_to_string(cls, condition: List[Any]) -> str:
@@ -169,7 +169,7 @@ class Condition:
                 "id": 0,
                 "name": None,
                 "owner": user_id,
-                "condition": cls.validate_condition(condition, user_id),
+                "condition": str(cls.validate_condition(condition, user_id)),
                 "public": public,
             }
         )
@@ -269,16 +269,22 @@ class Condition:
 
     async def evaluate(self, *values: Any) -> List[bool]:
         evaluated: List[bool] = []
+        from ...funcs import parse_condition_string
+
+        condition = parse_condition_string(self.condition)
         for index, i in enumerate(values):
-            evaluated.append(await self.evaluate_condition(i, self.condition))
+            evaluated.append(await self.evaluate_condition(i, condition))
             if index % 100:
                 await asyncio.sleep(0)
         return evaluated
 
     async def reduce(self, *values: T) -> List[T]:
         reduced: List[T] = []
+        from ...funcs import parse_condition_string
+
+        condition = parse_condition_string(self.condition)
         for index, i in enumerate(values):
-            if await self.evaluate_condition(i, self.condition):
+            if await self.evaluate_condition(i, condition):
                 reduced.append(i)
             if index % 100:
                 await asyncio.sleep(0)
