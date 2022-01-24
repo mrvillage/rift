@@ -102,7 +102,7 @@ class Transaction:
         status: TransactionStatus,
         type: TransactionType,
         creator: Union[discord.Member, discord.User],
-        to: Union[Account, Alliance, Nation, discord.Member, discord.User],
+        to: Union[Account, Alliance, Nation, discord.Member, discord.User, Grant],
         from_: Union[Account, Alliance, Nation, discord.Member, discord.User, Grant],
         resources: Resources,
         note: Optional[str] = None,
@@ -249,7 +249,8 @@ class Transaction:
             await user.send(
                 embed=get_embed_author_member(
                     user,
-                    f"Alliance {grant.alliance} has sent you a grant of {grant.resources} with a payoff method of `{grant.payoff}` and {'no deadline' if grant.deadline is None else f'is due <t:{grant.deadline.timestamp()}:R>'} and a note of {grant.note}. Please accept or reject it below.",
+                    f"Alliance {grant.alliance} has sent you a grant of {grant.resources} with a payoff method of `{grant.payoff.name}` and {'no deadline' if grant.deadline is None else f'is due <t:{int(grant.deadline.timestamp())}:R>'} and {f'a note of {grant.note}' if grant.note else 'no note'}. Please accept or reject it below.\nGrant ID: {grant.id}",
+                    color=discord.Color.orange(),
                 ),
                 view=request.view,
             )
@@ -302,7 +303,7 @@ class TransactionRequest:
     def view(self) -> TransactionRequestView:
         from ...views import TransactionRequestView
 
-        return TransactionRequestView(self, 0)
+        return TransactionRequestView(self, self.user_id)
 
     @classmethod
     async def create(

@@ -446,6 +446,10 @@ class Cache:
         return set(self._forums.values())
 
     @property
+    def grants(self) -> Set[Grant]:
+        return set(self._grants.values())
+
+    @property
     def guild_settings(self) -> Set[GuildSettings]:
         return set(self._guild_settings.values())
 

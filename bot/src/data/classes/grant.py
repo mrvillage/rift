@@ -25,7 +25,6 @@ if TYPE_CHECKING:
     from typing import Union
 
     import discord
-
     from _typings import GrantData
 
     from ...ref import RiftContext
@@ -112,7 +111,7 @@ class Grant:
     async def save(self) -> None:
         if self.id:
             await execute_query(
-                "UPDATE grants SET recipient = $2, time = $3, resources = $4, alliance = $5, payoff = $6, note = $7, deadline = $8, paid = $8, status = $9, code = $10 WHERE id = $1;",
+                "UPDATE grants SET recipient = $2, time = $3, resources = $4, alliance = $5, payoff = $6, note = $7, deadline = $8, paid = $9, status = $10, code = $11 WHERE id = $1;",
                 self.id,
                 self.recipient_id,
                 str(self.time),
@@ -127,7 +126,7 @@ class Grant:
             )
         else:
             id = await execute_read_query(
-                "INSERT INTO grants (recipient, time, resources, alliance, payoff, note, deadline, paid, status, code) VALUES ($1, $2, $3, $4, $6, $7, $8, $9, $10) RETURNING id;",
+                "INSERT INTO grants (recipient, time, resources, alliance, payoff, note, deadline, paid, status, code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id;",
                 self.recipient_id,
                 str(self.time),
                 str(self.resources),
@@ -162,3 +161,6 @@ class Grant:
     @property
     def alliance(self) -> Optional[Alliance]:
         return cache.get_alliance(self.alliance_id)
+
+    def regenerate_code(self) -> None:
+        self.code = funcs.utils.generate_code(20)

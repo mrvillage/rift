@@ -67,7 +67,7 @@ class Target:
                 attacks = []
                 for i in attacks_:
                     attacks.extend(i)
-            dt = datetime.datetime.utcnow()
+            dt = datetime.datetime.now(tz=datetime.timezone.utc)
             if target is not None and target.last_turn_fetched is not None:
                 last_turn_fetched = datetime.datetime.fromisoformat(
                     target.last_turn_fetched
@@ -236,7 +236,7 @@ class Target:
             rating += self.resources.money / 5_000_000
             rating += self.resources.food / 10_000
         if count_activity:
-            dt = datetime.datetime.utcnow()
+            dt = datetime.datetime.now(tz=datetime.timezone.utc)
             last_active = datetime.datetime.fromisoformat(target.last_active)
             delta = dt - last_active
             rating += min(delta.days, 10)
