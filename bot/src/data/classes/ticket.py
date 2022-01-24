@@ -97,7 +97,8 @@ class Ticket:
             + "".join(f"<@{i}>" for i in (config.user_mentions or []))
             + "".join(f"<@&{i}>" for i in (config.role_mentions or [])),
             embed=get_embed_author_member(
-                user, config.start_message.replace("\\n", "\n"),
+                user,
+                config.start_message.replace("\\n", "\n"),
                 color=discord.Color.purple(),
             ),
         )
