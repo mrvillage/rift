@@ -76,6 +76,23 @@ class Menu(Makeable):
 
     async def save(self) -> None:
         if self.id:
+            await execute_query(
+                "UPDATE menus SET id = $1, guild = $2, name = $3, description = $4, items = $5 WHERE id = $1;",
+                self.id,
+                self.guild_id,
+                self.name,
+                self.description,
+                [[i.id for i in row] for row in self.items]
+                if self.items
+                else [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                ],
+            )
+        else:
             id = await execute_read_query(
                 "INSERT INTO menus (guild, name, description, items) VALUES ($1, $2, $3, $4) RETURNING id;",
                 self.guild_id,
@@ -93,23 +110,6 @@ class Menu(Makeable):
             )
             self.id = id[0]["id"]
             cache.add_menu(self)
-        else:
-            await execute_query(
-                "UPDATE menus SET id = $1, guild = $2, name = $3, description = $4, items = $5 WHERE id = $1;",
-                self.id,
-                self.guild_id,
-                self.name,
-                self.description,
-                [[i.id for i in row] for row in self.items]
-                if self.items
-                else [
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                ],
-            )
 
     def add_item(self, item: MenuItem, row: int) -> None:
         self.item_ids[row].append(item.id)
