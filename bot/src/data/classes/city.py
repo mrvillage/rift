@@ -119,8 +119,7 @@ class FullCity:
         self.name: Optional[str] = data.get("name")
         self.nation_id: int = int(nation.id)
         self.age: int = (
-            datetime.datetime.now(tz=datetime.timezone.utc)
-            - datetime.datetime.fromisoformat(data["date"])
+            datetime.datetime.utcnow() - datetime.datetime.fromisoformat(data["date"])
         ).days
         self.infrastructure: float = data["infrastructure"]
         self.land: float = data["land"]

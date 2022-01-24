@@ -22,9 +22,8 @@ from .resources import Resources
 __all__ = ("Nation",)
 
 if TYPE_CHECKING:
-    from pnwkit.data import Nation as PnWKitNation
-
     from _typings import Field, NationData, RevenueDict
+    from pnwkit.data import Nation as PnWKitNation
 
     from ...views import Info
     from .alliance import Alliance
@@ -559,10 +558,7 @@ class Nation(Makeable):
             revenues = {}
         targets: List[Target] = []
         valid_nation_ids = {i.id for i in valid}
-        days_ago = str(
-            datetime.datetime.now(tz=datetime.timezone.utc)
-            - datetime.timedelta(days=14)
-        )
+        days_ago = str(datetime.datetime.utcnow() - datetime.timedelta(days=14))
         if wars is None:
             wars = [
                 War(i)
