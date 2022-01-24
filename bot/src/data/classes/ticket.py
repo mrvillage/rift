@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 
 import discord
-
 from src.ref import RiftContext
 
 from ...cache import cache
@@ -96,7 +95,7 @@ class Ticket:
         await channel.send(
             user.mention
             + "".join(f"<@{i}>" for i in (config.user_mentions or []))
-            + "".join(f"<@&{i}" for i in (config.role_mentions or [])),
+            + "".join(f"<@&{i}>" for i in (config.role_mentions or [])),
             embed=get_embed_author_member(
                 user, config.start_message.replace("\\n", "\n")
             ),
