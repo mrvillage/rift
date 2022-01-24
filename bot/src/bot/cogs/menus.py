@@ -229,10 +229,11 @@ class Menus(commands.Cog):
     @commands.guild_only()
     @has_manage_permissions()
     async def menu_info(self, ctx: RiftContext, *, menu: Menu):
+        desc = str(menu.description).replace("\\n", "\n")
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Menu ID: {menu.id}\nDescription:\n\n{menu.description}\n",
+                f"Menu ID: {menu.id}\nDescription:\n\n{desc}\n",
                 fields=[
                     {"name": "\u200b", "value": str(j)} for i in menu.items for j in i
                 ],
