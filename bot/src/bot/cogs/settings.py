@@ -73,9 +73,7 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        settings.default_raid_condition = (
-            condition.condition if condition else None
-        )
+        settings.default_raid_condition = condition.condition if condition else None
         await settings.save()
         if condition:
             await ctx.reply(
@@ -131,9 +129,7 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        settings.default_nuke_condition = (
-            condition.condition if condition else None
-        )
+        settings.default_nuke_condition = condition.condition if condition else None
         await settings.save()
         if condition:
             await ctx.reply(
@@ -189,9 +185,7 @@ class Settings(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-        settings.default_military_condition = (
-            condition.condition if condition else None
-        )
+        settings.default_military_condition = condition.condition if condition else None
         if condition:
             await ctx.reply(
                 embed=funcs.get_embed_author_member(
