@@ -95,7 +95,7 @@ class Menu(Makeable):
             cache.add_menu(self)
         else:
             await execute_query(
-                "UPDATE menus SET id = $1, guild_id = $2, name = $3, description = $4, items = $5, permissions = $6 WHERE id = $1;",
+                "UPDATE menus SET id = $1, guild = $2, name = $3, description = $4, items = $5, permissions = $6 WHERE id = $1;",
                 self.id,
                 self.guild_id,
                 self.name,
