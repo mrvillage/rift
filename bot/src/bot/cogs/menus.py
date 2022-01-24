@@ -315,6 +315,7 @@ class Menus(commands.Cog):
                                 int(flags["id"][0]), ctx.guild.id
                             )
                             items[row].append(item)
+                            new_menu.item_ids[row].append(item.id)
                             continue
                         except MenuItemNotFoundError:
                             pass
@@ -335,6 +336,7 @@ class Menus(commands.Cog):
                         }
                     )
                     items[row].append(item)
+                    new_menu.item_ids[row].append(item.id)
                 elif lower.startswith("select "):
                     flags = SelectFlags.parse_flags(message.content[7:])
                     row = await funcs.utils.get_row(
@@ -361,12 +363,12 @@ class Menus(commands.Cog):
                     ctx.author,
                     "You didn't add any items!",
                 )
-            menu.item_ids = new_menu.item_ids
+            menu.item_ids = [[], [], [], [], []]
             menu.description = new_menu.description
             menu.name = new_menu.name
             for index, row in enumerate(items):
                 for item in row:
-                    if item.id is None:
+                    if item.id == 0:
                         await item.save()
                     menu.add_item(item, index)
             await menu.save()
