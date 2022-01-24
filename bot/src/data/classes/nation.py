@@ -545,7 +545,7 @@ class Nation(Makeable):
         if condition is not MISSING:
             valid = await condition.reduce(*valid)
         if loot:
-            dt = datetime.datetime.now(tz=datetime.timezone.utc)
+            dt = datetime.datetime.utcnow()
             revenue_valid = [
                 i
                 for i in valid
