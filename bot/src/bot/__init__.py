@@ -147,8 +147,6 @@ async def main() -> None:
                 bot.unload_extension("src.bot.cogs.logs")
                 bot.unload_extension("src.bot.cogs.event_messages")
                 bot.unload_extension("src.bot.cogs.database_cache")
-            if not bot.debug:
-                bot.unload_extension("src.bot.cogs.grants")
             print("Loaded cogs!", flush=True)
 
             await bot.register_application_commands()
