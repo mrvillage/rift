@@ -241,8 +241,18 @@ class Bank(commands.Cog):
                 "You can only delete your own accounts!",
             )
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
+        if not accounts:
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You don't have any bank accounts!",
+            )
         primary_account = next(i for i in accounts if i.primary)
         account = account or primary_account
+        if account.primary and len(accounts) != 1:
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You cannot delete your primary account while there are other accounts!",
+            )
         if account.primary and account.resources:
             raise EmbedErrorMessage(
                 ctx.author,
