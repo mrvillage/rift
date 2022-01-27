@@ -71,7 +71,7 @@ class Condition:
     def convert_to_string(cls, condition: List[Any]) -> str:
         if len(condition) == 1:
             return condition[0]
-        return " ".join(cls.convert_to_string(i) if isinstance(i, list) else f"({str(i)[1:-1]})" if isinstance(i, tuple) else str(i) for i in condition)  # type: ignore
+        return " ".join(cls.convert_to_string(i) if isinstance(i, list) else f"[{str(i)[1:-1]}]" if isinstance(i, tuple) else str(i) for i in condition)  # type: ignore
 
     @staticmethod
     def sync_convert(value: str, user_id: int) -> Optional[Condition]:
@@ -201,6 +201,8 @@ class Condition:
                 converter: Any = converter[attributes[2]]
         else:
             return
+        if isinstance(value, tuple):
+            return tuple(converter(i) for i in value)  # type: ignore
         return converter(value)
 
     @classmethod
