@@ -197,13 +197,13 @@ class Grants(commands.Cog):
                 ctx.author,
                 f"ID: {grant.id}\n"
                 f"Recipient: <@{grant.recipient_id}>\n"
-                f"Resources: {grant.resources}\n"
+                f"Resources: {grant.resources or 'None'}\n"
                 f"Payoff: `{grant.payoff.name}`\n"
                 f"Deadline: {'None' if grant.deadline is None else f'<t:{int(grant.deadline.timestamp())}:f>'}\n"
                 f"Note: {grant.note}\n"
                 f"Status: `{grant.status.name}`"
                 + (
-                    f"\nPaid: {grant.paid}\nCode: {grant.code}"
+                    f"\nPaid: {grant.paid or 'None'}\nCode: {grant.code}"
                     if grant.payoff is GrantPayoff.DEPOSIT
                     else ""
                 ),
