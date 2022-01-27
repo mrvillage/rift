@@ -526,6 +526,24 @@ class Settings(commands.Cog):
                 ),
                 ephemeral=True,
             )
+        if alliance is MISSING:
+            offshore = settings.offshore
+            if offshore is None:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        f"{nation_alliance} has no offshore.",
+                        color=discord.Color.blue(),
+                    ),
+                )
+            else:
+                return await ctx.reply(
+                    embed=funcs.get_embed_author_member(
+                        ctx.author,
+                        f"{nation_alliance} has an offshore of {offshore}.",
+                        color=discord.Color.blue(),
+                    ),
+                )
         view = Confirm()
         leaders = [u for i in alliance.leaders if (u := i.user) is not None]
         if not leaders:
