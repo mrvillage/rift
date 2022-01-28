@@ -11,8 +11,8 @@
         service or Rift no longer has access to the data (for example, with
         Discord models).<br />
         3. To request data deletion, please contact @Village#0001
-        (258298021266063360) on Discord or open a ticket on the [support
-        server](https://rift.mrvillage.dev/discord). <br />
+        (258298021266063360) on Discord or open a ticket on the
+        <a href="https://rift.mrvillage.dev/discord">support server</a>. <br />
         4. This policy may be changed at any time.
       </v-container>
     </v-card>
