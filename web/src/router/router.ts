@@ -17,6 +17,16 @@ const routes: Array<RouteConfig> = [
     name: "About",
     component: () => import("@/views/About.vue"),
   },
+  {
+    path: "/terms",
+    name: "Terms",
+    component: () => import("@/views/Terms.vue"),
+  },
+  {
+    path: "/privacy",
+    name: "Privacy",
+    component: () => import("@/views/Privacy.vue"),
+  },
   ...modules,
   {
     path: "*",
