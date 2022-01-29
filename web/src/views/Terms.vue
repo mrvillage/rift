@@ -2,7 +2,7 @@
   <v-container>
     <v-card>
       <v-container class="ma-5">
-        <h1>Terms of Service</h1>
+        <h1>Terms and Conditions</h1>
         1. Users of Rift are required the Politics and War Game Rules found
         <a href="https://politicsandwar.com/rules/">here</a>. <br />
         2. No guarantee is provided of the accuracy of any content provided
@@ -10,7 +10,8 @@
         3. Rift is licensed under the GNU General Public License 3.0 which can
         be found
         <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">here</a>. <br />
-        4. This policy may be changed at any time.
+        4. Rift will not be used in an abusive or unlawful manner.<br />
+        5. This policy may be changed at any time.
       </v-container></v-card
     >
     <v-spacer></v-spacer>
