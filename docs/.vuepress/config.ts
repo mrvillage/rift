@@ -44,10 +44,12 @@ export default defineConfig4CustomTheme<ThemeConfig>({
   theme: "default-prefers-color-scheme",
   themeConfig: {
     overrideTheme: "dark",
-    repo: "",
+    repo: "mrvillage/rift",
+    repoLabel: "Contribute to Rift!",
+    docsDir: "docs",
+    docsBranch: "master",
     editLinks: true,
-    editLinkText: "Something to add?",
-    docsDir: "",
+    editLinkText: "Help us improve this page!",
     lastUpdated: "Last Updated",
     searchPlaceholder: "Looking for something?",
     nav: [
