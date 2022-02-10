@@ -735,7 +735,7 @@ class Roles(commands.Cog):
             and i.privacy_level in privacy_levels
             and (
                 ctx.author.id in i.member_ids
-                or nation.alliance_position in i.alliance_positions
+                or (nation.alliance_position in i.alliance_positions and nation.alliance_id == i.alliance_id)
             )
         }
         permissions = alliance_.permissions_for(member)
@@ -749,7 +749,8 @@ class Roles(commands.Cog):
                 member,
                 f"Privacy Level: `{max(privacy_levels, key=lambda x: x.value).name}`\n\n"
                 f"Rank: {max(roles, key=lambda x: x.rank).rank if roles else 0:,}\n"
-                f"Alliance: {repr(alliance_)}\nRoles: {', '.join(f'{i.id} - {i.name}' for i in roles) or 'None'}\n"
+                f"Alliance: {repr(alliance_)}\n"
+                f"Roles: {', '.join(f'{i.id} - {i.name}' for i in roles) or 'None'}\n"
                 f"Permissions: {enabled_permissions or 'None'}",
                 color=discord.Color.blue(),
             ),
