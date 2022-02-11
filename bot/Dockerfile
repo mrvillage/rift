@@ -10,8 +10,6 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y git
 
-ARG TEST
-
 RUN pip3 install -r requirements.txt
 
 COPY . .
