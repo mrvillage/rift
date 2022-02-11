@@ -22,4 +22,3 @@ profile = "black"
 reportMissingTypeStubs = false
 reportImportCycles = false
 typeCheckingMode = "strict"
-exclude = ["bot/src/help.py", "bot/src/overrides.py", "bot/src/data/db/**"]
