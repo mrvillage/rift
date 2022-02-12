@@ -170,12 +170,12 @@ class Embassies(commands.Cog):
         embassy, start = await config.create_embassy(ctx.author, nation.alliance)
         if start:
             await embassy.start(ctx.author, config)
-            await ctx.reply(
-                embed=funcs.get_embed_author_member(
-                    ctx.author, f"Embassy:\n<#{embassy.id}>"
-                ),
-                ephemeral=True,
-            )
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author, f"Embassy:\n<#{embassy.id}>"
+            ),
+            ephemeral=True,
+        )
 
 
 def setup(bot: Rift) -> None:
