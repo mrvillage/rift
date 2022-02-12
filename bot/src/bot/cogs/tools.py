@@ -251,7 +251,7 @@ class Tools(commands.Cog):
         )
         projects = (
             await pnwkit.async_nation_query(
-                {"id": nation.id}, "cfce", "adv_engineering_corps"
+                {"id": nation.id, "first": 1}, "cfce", "adv_engineering_corps"
             )
         )[0]
         if nation.domestic_policy == "Urbanization":
@@ -298,7 +298,7 @@ class Tools(commands.Cog):
         )
         projects = (
             await pnwkit.async_nation_query(
-                {"id": nation.id}, "arable_land_agency", "adv_engineering_corps"
+                {"id": nation.id, "first": 1}, "arable_land_agency", "adv_engineering_corps"
             )
         )[0]
         if nation.domestic_policy == "Rapid Expansion":
@@ -334,7 +334,7 @@ class Tools(commands.Cog):
         raw_cost = cost = funcs.calculate_city_value(nation.cities, after)
         projects = (
             await pnwkit.async_nation_query(
-                {"id": nation.id}, "uap", "adv_city_planning"
+                {"id": nation.id, "first": 1}, "uap", "adv_city_planning"
             )
         )[0]
         if projects.uap:

@@ -314,7 +314,7 @@ class Nation(Makeable):
 
     async def fetch_cities(self) -> List[FullCity]:
         raw_data = await pnwkit.async_nation_query(  # type: ignore
-            {"id": self.id},
+            {"id": self.id, "first": 1},
             "id",
             "ironw",
             "bauxitew",
@@ -492,7 +492,7 @@ class Nation(Makeable):
     async def fetch_projects(self) -> PnWKitNation:
         return (
             await pnwkit.async_nation_query(  # type: ignore
-                {"id": self.id},
+                {"id": self.id, "first": 1},
                 "id",
                 "ironw",
                 "bauxitew",

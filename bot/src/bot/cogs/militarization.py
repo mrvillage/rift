@@ -148,7 +148,7 @@ class Militarization(commands.Cog):
         author = nation.user or ctx.author
         militarization = nation.get_militarization()
         nation_data = await pnwkit.async_nation_query(
-            {"id": nation.id},
+            {"id": nation.id, "first": 1},
             {"cities": ["barracks", "factory", "airforcebase", "drydock"]},
         )
         if TYPE_CHECKING:

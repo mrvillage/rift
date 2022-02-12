@@ -630,7 +630,7 @@ class Bank(commands.Cog):
         await ctx.interaction.response.defer(ephemeral=True)
         nation = await Nation.convert(ctx, None)
         data = await pnwkit.async_nation_query(
-            {"id": nation.id},
+            {"id": nation.id, "first": 1},
             {
                 "sent_bankrecs": [
                     "id",

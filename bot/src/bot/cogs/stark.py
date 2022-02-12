@@ -173,7 +173,7 @@ class HouseStark(commands.Cog):
     async def stockpile(self, ctx: RiftContext, *, nation: Nation = MISSING):
         nation = nation or await Nation.convert(ctx, nation)
         nat = await pnwkit.async_nation_query(
-            {"id": nation.id},
+            {"id": nation.id, "first": 1},
             "money",
             "food",
             "uranium",
