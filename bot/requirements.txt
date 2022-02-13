@@ -1,0 +1,14 @@
+git+git://github.com/mrvillage/quarrel.git
+asyncpg=0.22.*
+pnwkit-py=2.*
+cryptography=36.0.*
+attrs=21.4.*
+feedparser=6.0.*
+
+# will need
+pytest
+pytest-asyncio
+
+# might need
+cachetools
+beautifulsoup4

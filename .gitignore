@@ -1,1 +1,3 @@
 .VSCodeCounter
+.env
+volumes/db/data
