@@ -12,4 +12,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD python3 -OO rift
+CMD python3 -O rift
