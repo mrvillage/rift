@@ -3,7 +3,7 @@ version: "3.8"
 services:
   rift:
     container_name: rift-bot
-    image: mrvillage/rift:latest
+    build: ./bot
     depends_on:
       - db
     restart: unless-stopped
