@@ -197,9 +197,9 @@ class Nation(Makeable):
         ) as response:
             return [
                 i.contents[1].text  # type: ignore
-                for i in BeautifulSoup(await response.text(), "html.parser").find_all(
-                    "tr", class_="notranslate"
-                )
+                for i in BeautifulSoup(
+                    await response.text(), "html.parser", from_encoding="latin-1"
+                ).find_all("tr", class_="notranslate")
                 if any("Discord Username:" in str(j) for j in i.contents)  # type: ignore
             ][0]
 
