@@ -10,7 +10,7 @@ from discord.utils import MISSING
 
 from ... import funcs
 from ...cache import cache
-from ...data.classes import Alliance, Nation
+from ...data.classes import Alliance, Nation, Resources
 from ...env import (
     HS_AIRCRAFT_MMR,
     HS_ALUMINUM_REQ,
@@ -184,7 +184,9 @@ class HouseStark(commands.Cog):
         )
         if TYPE_CHECKING:
             assert isinstance(nat, tuple)
-        nat = nat[0]
+        nat = Resources(**nat[0]) + sum(
+            i.resources for i in cache.accounts if i.alliance_id == 3683 and i.war_chest
+        )
         author_nation = await Nation.convert(ctx, None)
         if nation.alliance_id not in {3683, 8139, HS_OFFSHORE_ID}:
             await ctx.reply(
