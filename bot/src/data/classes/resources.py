@@ -260,7 +260,7 @@ class Resources:
                 }
             )
         return Resources(
-            **{key: value ** other for key, value in self.to_dict().items()}
+            **{key: value**other for key, value in self.to_dict().items()}
         )
 
     def __iadd__(self, other: Union[float, int]) -> Resources:

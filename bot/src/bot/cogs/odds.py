@@ -158,12 +158,12 @@ def get_attack_chance(attacker_val: float, defender_val: float) -> Dict[str, flo
             nwins += attacker_val - (
                 (i * 0.6) / decplaces * attacker_val
             ) > defender_val - ((n * 0.6) / decplaces * defender_val)
-    chance = nwins / (decplaces ** 2)
+    chance = nwins / (decplaces**2)
     unchance = 1 - chance
-    immense = chance ** 3
+    immense = chance**3
     moderate = chance * chance * unchance * 3
     pyrrhic = chance * unchance * unchance * 3
-    failure = unchance ** 3
+    failure = unchance**3
     return {
         "failure": failure,
         "pyrrhic": pyrrhic,

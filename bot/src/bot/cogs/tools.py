@@ -298,7 +298,9 @@ class Tools(commands.Cog):
         )
         projects = (
             await pnwkit.async_nation_query(
-                {"id": nation.id, "first": 1}, "arable_land_agency", "adv_engineering_corps"
+                {"id": nation.id, "first": 1},
+                "arable_land_agency",
+                "adv_engineering_corps",
             )
         )[0]
         if nation.domestic_policy == "Rapid Expansion":
