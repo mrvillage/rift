@@ -530,7 +530,7 @@ class Bank(commands.Cog):
                     i.primary = False
                     await i.save()
         if resources is not MISSING:
-            if not permissions.manage_bank_accounts:
+            if not (permissions.leadership or permissions.manage_bank_accounts):
                 raise EmbedErrorMessage(
                     ctx.author,
                     "You do not have permission to edit resources on this account!",
