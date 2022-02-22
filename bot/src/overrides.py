@@ -12,7 +12,7 @@ from discord.ext.commands import (
     converter,
 )
 from discord.ext.commands.converter import CONVERTER_MAPPING
-from pnwkit.data import _RELATION_MAP, Bankrec, Nation
+from pnwkit import data
 
 
 async def _actual_conversion(
@@ -74,10 +74,12 @@ async def _actual_conversion(
         ) from exc
 
 
+class Nation(data.Nation):
+    __slots__ = ("sent_bankrecs", "received_bankrecs")
+
+
 def override():
     converter._actual_conversion = _actual_conversion  # type: ignore
-    _RELATION_MAP["sent_bankrecs"] = Bankrec
-    _RELATION_MAP["received_bankrecs"] = Bankrec
-    Nation.__slots__ = tuple(
-        list(Nation.__slots__).extend(["sent_bankrecs", "received_bankrecs"])
-    )
+    data._RELATION_MAP["sent_bankrecs"] = data.Bankrec
+    data._RELATION_MAP["received_bankrecs"] = data.Bankrec
+    data.Nation = Nation
