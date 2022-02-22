@@ -12,7 +12,7 @@ from discord.ext.commands import (
     converter,
 )
 from discord.ext.commands.converter import CONVERTER_MAPPING
-from pnwkit import data
+from pnwkit import async_, data, sync
 
 
 async def _actual_conversion(
@@ -83,3 +83,5 @@ def override():
     data._RELATION_MAP["sent_bankrecs"] = data.Bankrec
     data._RELATION_MAP["received_bankrecs"] = data.Bankrec
     data.Nation = Nation
+    async_.Nation = Nation
+    sync.Nation = Nation
