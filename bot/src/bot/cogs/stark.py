@@ -172,6 +172,7 @@ class HouseStark(commands.Cog):
     )
     async def stockpile(self, ctx: RiftContext, *, nation: Nation = MISSING):
         nation = nation or await Nation.convert(ctx, nation)
+        user = nation.user
         nat = await pnwkit.async_nation_query(
             {"id": nation.id, "first": 1},
             "money",
@@ -184,8 +185,15 @@ class HouseStark(commands.Cog):
         )
         if TYPE_CHECKING:
             assert isinstance(nat, tuple)
-        nat = Resources(**nat[0].to_dict()) + sum((
-            i.resources for i in cache.accounts if i.alliance_id == 3683 and i.war_chest), Resources()
+        nat = Resources(**nat[0].to_dict()) + sum(
+            (
+                i.resources
+                for i in cache.accounts
+                if i.alliance_id == 3683
+                and i.war_chest
+                and i.owner_id == (user and user.id)
+            ),
+            Resources(),
         )
         author_nation = await Nation.convert(ctx, None)
         if nation.alliance_id not in {3683, 8139, HS_OFFSHORE_ID}:
