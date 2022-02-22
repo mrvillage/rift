@@ -184,8 +184,8 @@ class HouseStark(commands.Cog):
         )
         if TYPE_CHECKING:
             assert isinstance(nat, tuple)
-        nat = Resources(**nat[0]) + sum(
-            i.resources for i in cache.accounts if i.alliance_id == 3683 and i.war_chest
+        nat = Resources(**nat[0].to_dict()) + sum((
+            i.resources for i in cache.accounts if i.alliance_id == 3683 and i.war_chest), Resources()
         )
         author_nation = await Nation.convert(ctx, None)
         if nation.alliance_id not in {3683, 8139, HS_OFFSHORE_ID}:
