@@ -341,9 +341,9 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                 await interaction.edit_original_message(
                     embed=funcs.get_embed_author_member(
                         interaction.user,
-                        f"Withdrawal of {transaction.resources} from account #{transaction.from_.id:,} approved by {interaction.user.mention}!"
+                        f"Withdrawal of {transaction.resources} from account #{transaction.from_.id:,} approved by {interaction.user.mention}! Transaction #{transaction.id}."
                         if transaction.type is TransactionType.WITHDRAW
-                        else f"Grant #{transaction.from_grant.id} of {transaction.resources} approved by {interaction.user.mention}!",
+                        else f"Grant #{transaction.from_grant.id} of {transaction.resources} approved by {interaction.user.mention}! Transaction #{transaction.id}.",
                         color=discord.Color.green(),
                     ),
                     view=None,
@@ -540,9 +540,9 @@ class TransactionRequestManualAcceptButton(discord.ui.Button[TransactionRequestV
             await interaction.response.edit_message(
                 embed=funcs.get_embed_author_member(
                     interaction.user,
-                    f"Withdrawal of {transaction.resources} from account #{transaction.from_.id:,} approved by {interaction.user.mention}!"
+                    f"Withdrawal of {transaction.resources} from account #{transaction.from_.id:,} approved by {interaction.user.mention}! Transaction #{transaction.id}."
                     if transaction.type is TransactionType.WITHDRAW
-                    else f"Grant #{transaction.from_grant.id} of {transaction.resources} approved by {interaction.user.mention}!",
+                    else f"Grant #{transaction.from_grant.id} of {transaction.resources} approved by {interaction.user.mention}! Transaction #{transaction.id}.",
                     color=discord.Color.green(),
                 ),
                 view=None,
