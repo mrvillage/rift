@@ -523,12 +523,12 @@ class Bank(commands.Cog):
                     ctx.author,
                     "You can't unset your primary account!",
                 )
-            account.primary = primary
             accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
             for i in accounts:
                 if i.primary:
                     i.primary = False
                     await i.save()
+            account.primary = primary
         if resources is not MISSING:
             if not (permissions.leadership or permissions.manage_bank_accounts):
                 raise EmbedErrorMessage(
