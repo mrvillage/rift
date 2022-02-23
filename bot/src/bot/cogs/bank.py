@@ -8,8 +8,6 @@ import pnwkit
 from discord.ext import commands
 from discord.utils import MISSING
 
-from bot.src.flags.permissions import RolePermissions
-
 from ... import funcs
 from ...cache import cache
 from ...data.classes import (
@@ -23,6 +21,7 @@ from ...data.classes import (
 )
 from ...enums import AccountType, TransactionStatus, TransactionType
 from ...errors import EmbedErrorMessage, NoCredentialsError, NoRolesError
+from ...flags import RolePermissions
 from ...ref import Rift, RiftContext
 from ...views import (
     Confirm,
