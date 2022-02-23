@@ -1015,7 +1015,7 @@ class Bank(commands.Cog):
             "type": "The type of transactions to view, defaults to all.",
         },
     )
-    async def bank_transaction_info(
+    async def bank_transaction_history(
         self,
         ctx: RiftContext,
         alliance: Alliance = MISSING,
@@ -1088,7 +1088,7 @@ class Bank(commands.Cog):
             "transaction": "The transaction to view information of.",
         },
     )
-    async def bank_transaction_history(
+    async def bank_transaction_info(
         self,
         ctx: RiftContext,
         transaction: Transaction,
