@@ -1096,12 +1096,12 @@ class Bank(commands.Cog):
         to = transaction.to
         to_alliance = (
             from_.alliance
-            if transaction.from_type is AccountType.ALLIANCE and from_ is not None
+            if transaction.from_type is AccountType.ACCOUNT and from_ is not None
             else None
         )
         from_alliance = (
             to.alliance
-            if transaction.to_type is AccountType.ALLIANCE and to is not None
+            if transaction.to_type is AccountType.ACCOUNT and to is not None
             else None
         )
         permissions = (
