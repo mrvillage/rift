@@ -1092,8 +1092,18 @@ class Bank(commands.Cog):
         ctx: RiftContext,
         transaction: Transaction,
     ):
-        to_alliance = transaction.to_alliance
-        from_alliance = transaction.from_alliance
+        from_ = transaction.from_
+        to = transaction.to
+        to_alliance = (
+            from_.alliance
+            if transaction.from_type is AccountType.ALLIANCE and from_ is not None
+            else None
+        )
+        from_alliance = (
+            to.alliance
+            if transaction.to_type is AccountType.ALLIANCE and to is not None
+            else None
+        )
         permissions = (
             to_alliance.permissions_for(ctx.author)
             if to_alliance is not None
