@@ -8,6 +8,8 @@ import pnwkit
 from discord.ext import commands
 from discord.utils import MISSING
 
+from bot.src.flags.permissions import RolePermissions
+
 from ... import funcs
 from ...cache import cache
 from ...data.classes import (
@@ -1013,7 +1015,7 @@ class Bank(commands.Cog):
             "type": "The type of transactions to view, defaults to all.",
         },
     )
-    async def bank_transaction_history(
+    async def bank_transaction_info(
         self,
         ctx: RiftContext,
         alliance: Alliance = MISSING,
@@ -1077,6 +1079,46 @@ class Bank(commands.Cog):
         await ctx.reply(embed=view.get_embed(ctx.author), view=view)
         if await view.wait():
             await ctx.interaction.edit_original_message(view=None)
+
+    @bank_transaction.command(  # type: ignore
+        name="info",
+        brief="Check information of a transaction.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "transaction": "The transaction to view information of.",
+        },
+    )
+    async def bank_transaction_history(
+        self,
+        ctx: RiftContext,
+        transaction: Transaction,
+    ):
+        to_alliance = transaction.to_alliance
+        from_alliance = transaction.from_alliance
+        permissions = (
+            to_alliance.permissions_for(ctx.author)
+            if to_alliance is not None
+            else RolePermissions()
+        ) + (
+            from_alliance.permissions_for(ctx.author)
+            if from_alliance is not None
+            else RolePermissions()
+        )
+        if not (
+            permissions.leadership
+            or permissions.manage_bank_accounts
+            or permissions.view_bank_accounts
+        ):
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You don't have permission to view that transaction!",
+            )
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Transaction #{transaction.id}\n\n{transaction.field['value']}",
+            ),
+        )
 
 
 def setup(bot: Rift):
