@@ -1126,6 +1126,7 @@ class Bank(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"Transaction #{transaction.id}\n\n{transaction.field['value']}",
+                color=discord.Color.blue(),
             ),
         )
 
