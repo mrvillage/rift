@@ -5,10 +5,9 @@ from datetime import datetime
 from typing import TYPE_CHECKING, List
 
 import discord
+from _typings import Field
 from discord.ext import commands
 from discord.utils import MISSING
-
-from _typings import Field
 
 from ... import funcs
 from ...cache import cache
@@ -251,7 +250,7 @@ class PnWInfo(commands.Cog):
                     else ""
                 )
                 + (
-                    f"\nNew Player Bonus: ${rev['new_player_bonus']:,}"
+                    f"\nNew Player Bonus: ${rev['new_player_bonus']:,.2f}"
                     if "new_player_bonus" in rev
                     else ""
                 ),
