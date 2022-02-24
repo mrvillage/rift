@@ -173,7 +173,7 @@ class HouseStark(commands.Cog):
     async def stockpile(self, ctx: RiftContext, *, nation: Nation = MISSING):
         nation = nation or await Nation.convert(ctx, nation)
         user = nation.user
-        nat = await pnwkit.async_nation_query(
+        data = await pnwkit.async_nation_query(
             {"id": nation.id, "first": 1},
             "money",
             "food",
@@ -183,9 +183,7 @@ class HouseStark(commands.Cog):
             "gasoline",
             "munitions",
         )
-        if TYPE_CHECKING:
-            assert isinstance(nat, tuple)
-        nat = Resources(**nat[0].to_dict()) + sum(
+        nat = sum(
             (
                 i.resources
                 for i in cache.accounts
@@ -193,7 +191,22 @@ class HouseStark(commands.Cog):
                 and i.war_chest
                 and i.owner_id == (user and user.id)
             ),
-            Resources(),
+            Resources.from_dict(
+                {
+                    "money": getattr(data[0], "money", 0),
+                    "food": getattr(data[0], "food", 0),
+                    "coal": getattr(data[0], "coal", 0),
+                    "oil": getattr(data[0], "oil", 0),
+                    "uranium": getattr(data[0], "uranium", 0),
+                    "lead": getattr(data[0], "lead", 0),
+                    "iron": getattr(data[0], "iron", 0),
+                    "bauxite": getattr(data[0], "bauxite", 0),
+                    "gasoline": getattr(data[0], "gasoline", 0),
+                    "munitions": getattr(data[0], "munitions", 0),
+                    "steel": getattr(data[0], "steel", 0),
+                    "aluminum": getattr(data[0], "aluminum", 0),
+                }
+            ),
         )
         author_nation = await Nation.convert(ctx, None)
         if nation.alliance_id not in {3683, 8139, HS_OFFSHORE_ID}:
