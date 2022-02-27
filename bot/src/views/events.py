@@ -17,7 +17,7 @@ class FakeContext:
         self.guild = guild
 
 
-class EventExtraInformationButton(discord.ui.Button):
+class EventExtraInformationButton(discord.ui.Button["EventExtraInformationView"]):
     def __init__(self):
         super().__init__(
             label="Extra Information",

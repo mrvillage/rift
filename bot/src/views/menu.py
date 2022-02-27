@@ -29,7 +29,7 @@ class MenuView(discord.ui.View):
         )
 
 
-class MenuButton(discord.ui.Button):
+class MenuButton(discord.ui.Button[MenuView]):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.action: str = kwargs.pop("action")
         self.options: List[int] = kwargs.pop("options")
@@ -249,7 +249,7 @@ class MenuButton(discord.ui.Button):
             ...
 
 
-class MenuSelect(discord.ui.Select):
+class MenuSelect(discord.ui.Select[MenuView]):
     async def callback(self, interaction: discord.Interaction) -> None:
         values = self.values.copy()  # type: ignore
 
