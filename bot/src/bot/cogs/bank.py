@@ -398,6 +398,7 @@ class Bank(commands.Cog):
                 f"Owner: <@{account.owner_id}>\n"
                 f"Alliance: {repr(account.alliance)}\n"
                 f"Resources: {account.resources or None}\n"
+                f"Converted Value: ${account.resources.calculate_value(cache.prices):,.2f}\n"
                 f"Single Use Deposit Code:\n"
                 f"{account.deposit_code}\n"
                 f"Primary: {account.primary}\n"
