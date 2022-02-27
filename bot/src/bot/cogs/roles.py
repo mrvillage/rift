@@ -734,7 +734,7 @@ class Roles(commands.Cog):
             if i.alliance_id == alliance_.id
             and i.privacy_level in privacy_levels
             and (
-                ctx.author.id in i.member_ids
+                member.id in i.member_ids
                 or (
                     nation.alliance_position in i.alliance_positions
                     and nation.alliance_id == i.alliance_id
