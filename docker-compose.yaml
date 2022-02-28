@@ -16,6 +16,11 @@ services:
       DEV_TOKEN: ${DEV_TOKEN}
       DEV_APPLICATION_ID: ${DEV_APPLICATION_ID}
       VERIFIED_BOT_KEY: ${VERIFIED_BOT_KEY}
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${DB_NAME:-postgres}
     volumes:
       - ${CREDENTIALS_PRIVATE_KEY_PATH}:/private.pem
 

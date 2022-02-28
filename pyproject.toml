@@ -1,3 +1,7 @@
+[tool.pytest.ini_options]
+addopts = "--cov=bot/gatekeeper"
+asyncio_mode = "auto"
+
 [tool.black]
 exclude = '''
 /(

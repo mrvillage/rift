@@ -9,5 +9,5 @@ pytest-asyncio==0.18.*
 pytest-cov==3.0.*
 
 # might need
-cachetools
-beautifulsoup4
+# cachetools
+# beautifulsoup4
