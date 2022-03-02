@@ -108,8 +108,9 @@ class Tickets(commands.Cog):
         start: str,
         category: discord.CategoryChannel = MISSING,
         archive_category: discord.CategoryChannel = MISSING,
-        mentions: List[Union[discord.Member, discord.User, discord.Role]] = [],
+        mentions: List[Union[discord.Member, discord.User, discord.Role]] = MISSING,
     ):
+        mentions = mentions or []
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
         config = TicketConfig(
@@ -118,7 +119,7 @@ class Tickets(commands.Cog):
                 "category": category.id if category else None,
                 "guild": ctx.guild.id,
                 "start_message": start,
-                "archive_category": archive_category and archive_category.id,
+                "archive_category": (archive_category and archive_category.id) or None,
                 "role_mentions": [
                     i.id for i in mentions if isinstance(i, discord.Role)
                 ],
