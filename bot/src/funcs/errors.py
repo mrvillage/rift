@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 import discord
 from discord.ext import commands
 from discord.utils import MISSING
-
 from src.errors.notfound import NotFoundError
 
 from ..data.classes import Alliance, Nation
@@ -210,8 +209,8 @@ async def handler(ctx: RiftContext, error: Exception) -> None:
                         "Unknown Fatal Error. Please try again. If this problem persists please contact <@!258298021266063360> for assistance.\nPlease remember the bot is still in Beta, there is a good chance new features may result in new bugs to older features. To report an issue please send a message to <@!258298021266063360> so it can be addressed as soon as possible.",
                     )
             elif isinstance(error, discord.NotFound):
+                await print_handler(ctx, error)
                 if error.code != 10062:
-                    await print_handler(ctx, error)
                     raise EmbedErrorMessage(
                         ctx.author,
                         "Unknown Fatal Error. Please try again. If this problem persists please contact <@!258298021266063360> for assistance.\nPlease remember the bot is still in Beta, there is a good chance new features may result in new bugs to older features. To report an issue please send a message to <@!258298021266063360> so it can be addressed as soon as possible.",
