@@ -426,7 +426,7 @@ class Grants(commands.Cog):
         transaction = await Transaction.create(
             datetime.datetime.now(tz=datetime.timezone.utc),
             TransactionStatus.ACCEPTED,
-            TransactionType.DEPOSIT,
+            TransactionType.GRANT_DEPOSIT,
             ctx.author,
             grant,
             nation,
