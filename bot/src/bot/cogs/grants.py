@@ -464,10 +464,13 @@ class Grants(commands.Cog):
         user = user or ctx.author
         alliance = alliance or await Alliance.convert(ctx, None)
         permissions = alliance.permissions_for(ctx.author)
-        if not (
-            permissions.leadership
-            or permissions.view_grants
-            or permissions.manage_grants
+        if (
+            not (
+                permissions.leadership
+                or permissions.view_grants
+                or permissions.manage_grants
+            )
+            and ctx.author.id != user.id
         ):
             raise EmbedErrorMessage(
                 ctx.author,
