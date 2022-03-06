@@ -1,12 +1,18 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, List, Optional
+import os.path
+from calendar import leapdays
+from typing import TYPE_CHECKING, Any, List, Optional
 
 import discord
 import pnwkit
 from discord.ext import commands, tasks
 from discord.utils import MISSING
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
 
 from ... import funcs
 from ...cache import cache
@@ -23,6 +29,7 @@ from ...env import (
     HS_OFFSHORE_ID,
     HS_SHIP_MMR,
     HS_SOLDIER_MMR,
+    HS_SPREADSHEET_ID,
     HS_STEEL_REQ,
     HS_TANK_MMR,
     HS_URANIUM_REQ,
@@ -320,6 +327,108 @@ class HouseStark(commands.Cog):
         await self.bot.update_pnw_session()
         await discord.utils.sleep_until(wait)
 
+    @commands.command(
+        name="bank-sheet",
+        aliases=["bsheet"],
+        help="Update the deposits sheet.",
+    )
+    async def bank_sheet(self, ctx: RiftContext):
+        alliance = cache.get_alliance(3683)
+        if alliance is None:
+            return
+        permissions = alliance.permissions_for(ctx.author)
+        if not (
+            permissions.leadership
+            or permissions.manage_bank_accounts
+            or permissions.view_bank_accounts
+        ):
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You don't have permission to use that command!!",
+                    color=discord.Color.red(),
+                )
+            )
+        accounts = [i for i in cache.accounts if i.alliance_id == 3683]
+        users = {i.owner_id for i in accounts}
+        links = {
+            i.user_id: n
+            for i in cache.users
+            if i.user_id in users and (n := cache.get_nation(i.nation_id)) is not None
+        }
+        deposits: List[List[Any]] = []
+        for user in users:
+            nation = links.get(user)
+            accounts_ = [i for i in accounts if i.owner_id == user]
+            resources = sum((i.resources for i in accounts_), Resources())
+            deposits.append(
+                [
+                    nation and nation.id,
+                    nation and nation.name,
+                    nation and nation.leader,
+                    user,
+                    1,
+                    "",
+                    len(accounts_),
+                    resources.money,
+                    resources.food,
+                    resources.coal,
+                    resources.oil,
+                    resources.uranium,
+                    resources.lead,
+                    resources.iron,
+                    resources.bauxite,
+                    resources.gasoline,
+                    resources.munitions,
+                    resources.steel,
+                    resources.aluminum,
+                ]
+            )
+        write_deposits(deposits)
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                "Deposits sheet updated!",
+                color=discord.Color.green(),
+            )
+        )
+
 
 def setup(bot: Rift) -> None:
     bot.add_cog(HouseStark(bot))
+
+
+# this code is almost entirely from the sample code provided by Google
+# i'm lazy
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+SAMPLE_RANGE_NAME = "Deposits!A2:E"
+
+
+def write_deposits(deposits: Any) -> None:
+    creds = None
+    if os.path.exists("token.json"):
+        creds = Credentials.from_authorized_user_file("token.json", SCOPES)  # type: ignore
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:  # type: ignore
+            creds.refresh(Request())  # type: ignore
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)  # type: ignore
+            creds = flow.run_local_server(port=0)  # type: ignore
+        # Save the credentials for the next run
+        with open("token.json", "w") as token:
+            token.write(creds.to_json())  # type: ignore
+
+    service = build("sheets", "v4", credentials=creds)  # type: ignore
+
+    body = {"values": deposits}
+    sheet = service.spreadsheets()  # type: ignore
+    (
+        sheet.values()  # type: ignore
+        .update(
+            spreadsheetId=HS_SPREADSHEET_ID,
+            range="Deposits!A2:S",
+            valueInputOption="USER_ENTERED",
+            body=body,
+        )
+        .execute()
+    )

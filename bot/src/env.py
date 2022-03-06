@@ -61,3 +61,4 @@ HS_STEEL_REQ = int(os.getenv("HS_STEEL_REQ"))  # type: ignore
 HS_ALUMINUM_REQ = int(os.getenv("HS_ALUMINUM_REQ"))  # type: ignore
 HS_GASOLINE_REQ = int(os.getenv("HS_GASOLINE_REQ"))  # type: ignore
 HS_MUNITIONS_REQ = int(os.getenv("HS_MUNITIONS_REQ"))  # type: ignore
+HS_SPREADSHEET_ID = str(os.getenv("HS_SPREADSHEET_ID"))

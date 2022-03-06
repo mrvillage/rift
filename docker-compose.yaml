@@ -5,3 +5,5 @@ services:
     volumes:
       - /home/host/rift/.env:/.env
       - /home/host/rift/private.pem:/private.pem
+      - /home/host/rift/credentials.json:/credentials.json
+      - /home/host/rift/token.json:/token.json

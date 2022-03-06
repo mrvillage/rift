@@ -4,3 +4,5 @@ __pycache__
 *.log
 *.crt
 private.pem
+credentials.json
+token.json
