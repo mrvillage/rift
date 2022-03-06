@@ -328,7 +328,15 @@ class HouseStark(commands.Cog):
 
     @commands.command(
         name="bank-sheet",
-        aliases=["bsheet"],
+        aliases=[
+            "bsheet",
+            "banksheet",
+            "deposits-sheet",
+            "dsheet",
+            "deposit-sheet",
+            "depositssheet",
+            "depositsheet",
+        ],
         help="Update the deposits sheet.",
     )
     async def bank_sheet(self, ctx: RiftContext):
