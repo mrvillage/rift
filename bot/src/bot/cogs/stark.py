@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime
 import os.path
-from calendar import leapdays
 from typing import TYPE_CHECKING, Any, List, Optional
 
 import discord
@@ -408,7 +407,7 @@ def write_deposits(deposits: Any) -> None:
     creds = None
     if os.path.exists("token.json"):
         creds = Credentials.from_authorized_user_file("token.json", SCOPES)  # type: ignore
-    if not creds or not creds.valid:
+    if not creds or not creds.valid:  # type: ignore
         if creds and creds.expired and creds.refresh_token:  # type: ignore
             creds.refresh(Request())  # type: ignore
         else:
