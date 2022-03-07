@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import decimal
 import re
-import time
 from enum import Enum
 from typing import TYPE_CHECKING
 
-import errors
 import lark
+
+from . import errors
 
 __all__ = ("parse_expression", "parse_script")
 
