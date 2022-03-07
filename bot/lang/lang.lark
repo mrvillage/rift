@@ -1,5 +1,5 @@
 script : expr+
-expr : [condition conditional] condition
+expr : [expr conditional] condition
 
 conditional : conditional_or | conditional_and
 conditional_or : "or" | "||"
@@ -7,15 +7,17 @@ conditional_and : "and" | "&&"
  
 condition : [condition operator] addition_expression
 
-operator : operator_lr | operator_le | operator_ge | operator_gt | operator_eq | operator_ne | operator_in | operator_is
-operator_lr : "<"
+operator : operator_lt | operator_le | operator_ge | operator_gt | operator_eq | operator_ne | operator_in | operator_not_in | operator_is | operator_is_not
+operator_lt : "<"
 operator_le : "<="
 operator_ge : ">="
 operator_gt : ">"
 operator_eq : "=="
-operator_ne : "!="
+operator_ne : "!=" | "<>"
 operator_in : "in"
-operator_is : "is"
+operator_not_in : "not in"
+operator_is : "is" | "==="
+operator_is_not : "is not" | "!=="
 
 addition_expression : [addition_expression addition] multiplication_expression
 
@@ -25,11 +27,12 @@ addition_sub : "-"
 
 multiplication_expression : [multiplication_expression multiplication] unary_expression
 
-multiplication : multiplication_mul | multiplication_div | multiplication_mod | multiplication_floor
+multiplication : multiplication_mul | multiplication_div | multiplication_mod | multiplication_floor | multiplication_pow
 multiplication_mul : "*"
 multiplication_div : "/"
 multiplication_mod : "%"
 multiplication_floor : "//"
+multiplication_pow : "**"
 
 unary_expression : [unary] primary_expression
 
@@ -37,17 +40,19 @@ unary : unary_not | unary_neg
 unary_not : "not" | "!"
 unary_neg : "-"
 
-primary_expression : member | literal | "(" [expr] ")"
+primary_expression : member | literal | nested_expr
+nested_expr : "(" expr ")"
 
 member : member_name | member_call | member_index
 member_name : [member "."] NAME
 member_call : member "(" [csv] ")"
 member_index : member "[" index "]"
 
-literal : LITERAL_STRING | LITERAL_INT | LITERAL_FLOAT | LITERAL_BOOL | LITERAL_NULL | literal_array | literal_object | literal_set
+literal : LITERAL_STRING | LITERAL_INT | LITERAL_FLOAT | LITERAL_DECIMAL | LITERAL_BOOL | LITERAL_NULL | literal_array | literal_object | literal_set
 LITERAL_STRING : STRING | LONG_STRING
 LITERAL_INT : ["+" | "-"] ("0".."9")+
 LITERAL_FLOAT :  ["+" | "-"] ("0".."9")* "." ("0".."9")*
+LITERAL_DECIMAL :  "d" ["+" | "-"] ("0".."9")* "." ("0".."9")*
 LITERAL_BOOL : /"true"/i | /"false"/i
 LITERAL_NULL : /"null"/i | /"none"/i
 literal_array : "[" [csv] "]"
@@ -56,16 +61,16 @@ literal_set : "{" csv "}"
 
 
 csv : expr ("," [expr])*
-index : [expr] (":" [expr])*
+index : expr (":" expr)*
 map : [expr ":" expr] ("," [expr ":" expr])*
 
 NAME: /[_a-zA-Z][_a-zA-Z0-9]*/
 STRING: /("(?!"").*?(?<!\\)(\\\\)*?"|'(?!'').*?(?<!\\)(\\\\)*?')/i
 LONG_STRING: /(""".*?(?<!\\)(\\\\)*?"""|'''.*?(?<!\\)(\\\\)*?''')/is
 
-WHITESPACE     : ("\t" | "\n" | "\f" | "\r" | " ")+
+WHITESPACE : ("\t" | "\n" | "\f" | "\r" | " ")+
 
-COMMENT        : /\/\/.*/
+COMMENT : /\/\/.*/ | /#.*/
 
 %ignore WHITESPACE
 %ignore COMMENT
