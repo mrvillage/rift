@@ -7,7 +7,7 @@ conditional_and : "and" | "&&"
  
 condition : [condition operator] addition_expression
 
-operator : operator_lr | operator_le | operator_ge | operator_gt | operator_eq | operator_ne | operator_in
+operator : operator_lr | operator_le | operator_ge | operator_gt | operator_eq | operator_ne | operator_in | operator_is
 operator_lr : "<"
 operator_le : "<="
 operator_ge : ">="
@@ -15,6 +15,7 @@ operator_gt : ">"
 operator_eq : "=="
 operator_ne : "!="
 operator_in : "in"
+operator_is : "is"
 
 addition_expression : [addition_expression addition] multiplication_expression
 
@@ -43,14 +44,15 @@ member_name : [member "."] NAME
 member_call : member "(" [csv] ")"
 member_index : member "[" index "]"
 
-literal : LITERAL_STRING | LITERAL_INT | LITERAL_FLOAT | LITERAL_BOOL | LITERAL_NULL | literal_array | literal_object
+literal : LITERAL_STRING | LITERAL_INT | LITERAL_FLOAT | LITERAL_BOOL | LITERAL_NULL | literal_array | literal_object | literal_set
 LITERAL_STRING : STRING | LONG_STRING
 LITERAL_INT : ["+" | "-"] ("0".."9")+
 LITERAL_FLOAT :  ["+" | "-"] ("0".."9")* "." ("0".."9")*
-LITERAL_BOOL : "true" | "false"
-LITERAL_NULL : "null" | "None"
+LITERAL_BOOL : /"true"/i | /"false"/i
+LITERAL_NULL : /"null"/i | /"None"/i
 literal_array : "[" [csv] "]"
 literal_object : "{" [map] "}"
+literal_set : "{" csv "}"
 
 
 csv : expr ("," [expr])*
