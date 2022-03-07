@@ -263,6 +263,8 @@ class Grants(commands.Cog):
         permissions = alliance.permissions_for_id(grant.alliance_id, ctx.author)
         if not (permissions.leadership or permissions.manage_grants):
             raise NoRolesError(alliance, "Manage Grants")
+        if grant.status is GrantStatus.PENDING:
+            raise EmbedErrorMessage(ctx.author, "This grant is pending.")
         if paid is not MISSING:
             grant.paid = paid
         if deadline is not MISSING:
