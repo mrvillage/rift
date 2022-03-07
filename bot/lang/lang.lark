@@ -49,7 +49,7 @@ LITERAL_STRING : STRING | LONG_STRING
 LITERAL_INT : ["+" | "-"] ("0".."9")+
 LITERAL_FLOAT :  ["+" | "-"] ("0".."9")* "." ("0".."9")*
 LITERAL_BOOL : /"true"/i | /"false"/i
-LITERAL_NULL : /"null"/i | /"None"/i
+LITERAL_NULL : /"null"/i | /"none"/i
 literal_array : "[" [csv] "]"
 literal_object : "{" [map] "}"
 literal_set : "{" csv "}"
