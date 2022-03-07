@@ -4,11 +4,8 @@ expr : [condition conditional] condition
 conditional : conditional_or | conditional_and
 conditional_or : "or" | "||"
 conditional_and : "and" | "&&"
-
-condition : [statement comparator] statement
-
-comparator : 
-statement : [expression operator] expression
+ 
+condition : [condition operator] addition_expression
 
 operator : operator_lr | operator_le | operator_ge | operator_gt | operator_eq | operator_ne | operator_in
 operator_lr : "<"
@@ -19,7 +16,7 @@ operator_eq : "=="
 operator_ne : "!="
 operator_in : "in"
 
-expression : [expression addition] multiplication_expression
+addition_expression : [addition_expression addition] multiplication_expression
 
 addition : addition_add | addition_sub
 addition_add : "+"
@@ -33,7 +30,7 @@ multiplication_div : "/"
 multiplication_mod : "%"
 multiplication_floor : "//"
 
-unary_expression : [unary_expression unary] primary_expression
+unary_expression : [unary] primary_expression
 
 unary : unary_not | unary_sub
 unary_not : "not" | "!"
