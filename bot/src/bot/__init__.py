@@ -44,7 +44,7 @@ def setup_logging():
 @bot.event
 async def on_message(message: discord.Message):
     ctx = await bot.get_context(message)  # type: ignore
-    if not await bot.is_owner(message.author) and ctx.command is not None and ctx.command.name not in {"mmr", "stockpile"}:  # type: ignore
+    if not await bot.is_owner(message.author) and ctx.command is not None and ctx.command.name not in {"mmr", "stockpile", "mmr-check", "stockpile-check"}:  # type: ignore
         return
     try:
         await bot.invoke(ctx)  # type: ignore
