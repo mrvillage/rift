@@ -172,6 +172,58 @@ class HouseStark(commands.Cog):
         )
 
     @commands.command(
+        name="mmr-check",
+        aliases=["mmrcheck", "mmrc"],
+        help="See all nations that do not meet MMR.",
+    )
+    async def mmr_check(self, ctx: RiftContext):
+        author_nation = await Nation.convert(ctx, None)
+        if author_nation.alliance_id not in {3683, 8139, HS_OFFSHORE_ID}:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You don't have permission to use that command!!",
+                    color=discord.Color.red(),
+                )
+            )
+            return
+        main = cache.get_alliance(3683)
+        if main is None:
+            return
+        nations = main.members
+        offshore = cache.get_alliance(HS_OFFSHORE_ID)
+        if offshore is not None:
+            nations += offshore.members
+        amounts: List[str] = []
+        for nation in sorted(nations, key=lambda x: x.id):
+            mmr = {
+                "soldiers": HS_SOLDIER_MMR * 3000 * nation.cities,
+                "tanks": HS_TANK_MMR * 250 * nation.cities,
+                "aircraft": HS_AIRCRAFT_MMR * 15 * nation.cities,
+                "ships": HS_SHIP_MMR * 5 * nation.cities,
+            }
+            if all(getattr(nation, key) >= mmr[key] for key in mmr):
+                continue
+            amounts.append(
+                f"**{nation}** - {', '.join(f'{getattr(nation, key):,}/{mmr[key]:,} {key}' for key in mmr if getattr(nation, key) < mmr[key])}"
+            )
+        if not amounts:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author, "All nations meet MMR!", color=discord.Color.green()
+                )
+            )
+            return
+        newline = "\n"
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"{len(amounts)} nations don't meet MMR!\n\n{newline.join(amounts)}",
+                color=discord.Color.orange(),
+            )
+        )
+
+    @commands.command(
         name="stockpile",
         aliases=["stockpiles"],
         help="Check to see if a nation meets stockpile requirements.",
@@ -274,6 +326,131 @@ class HouseStark(commands.Cog):
             embed=funcs.get_embed_author_member(
                 ctx.author,
                 f"{nation} doesn't meet stockpiles!\n\n{amounts_str}\n\n**Total:** ${cost:,.2f}",
+                color=discord.Color.orange(),
+            )
+        )
+
+    @commands.command(
+        name="stockpile-check",
+        aliases=[
+            "stockpilecheck",
+            "stockpilec",
+            "stockpiles-check",
+            "stockpilescheck",
+            "stockpilesc",
+        ],
+        help="See all nations that do not meet stockpile requirements.",
+    )
+    async def stockpile_check(self, ctx: RiftContext):
+        author_nation = await Nation.convert(ctx, None)
+        if author_nation.alliance_id not in {3683, 8139, HS_OFFSHORE_ID}:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You don't have permission to use that command!!",
+                    color=discord.Color.red(),
+                )
+            )
+            return
+        main = cache.get_alliance(3683)
+        if main is None:
+            return
+        nations = main.members
+        offshore = cache.get_alliance(HS_OFFSHORE_ID)
+        if offshore is not None:
+            nations += offshore.members
+        amounts: List[str] = []
+        for nation in sorted(nations, key=lambda x: x.id):
+            user = nation.user
+            data = await pnwkit.async_nation_query(
+                {"id": nation.id, "first": 1},
+                "money",
+                "food",
+                "uranium",
+                "steel",
+                "aluminum",
+                "gasoline",
+                "munitions",
+            )
+            nat = sum(
+                (
+                    i.resources
+                    for i in cache.accounts
+                    if i.alliance_id == 3683
+                    and i.war_chest
+                    and i.owner_id == (user and user.id)
+                ),
+                Resources.from_dict(
+                    {
+                        "money": getattr(data[0], "money", 0),
+                        "food": getattr(data[0], "food", 0),
+                        "coal": getattr(data[0], "coal", 0),
+                        "oil": getattr(data[0], "oil", 0),
+                        "uranium": getattr(data[0], "uranium", 0),
+                        "lead": getattr(data[0], "lead", 0),
+                        "iron": getattr(data[0], "iron", 0),
+                        "bauxite": getattr(data[0], "bauxite", 0),
+                        "gasoline": getattr(data[0], "gasoline", 0),
+                        "munitions": getattr(data[0], "munitions", 0),
+                        "steel": getattr(data[0], "steel", 0),
+                        "aluminum": getattr(data[0], "aluminum", 0),
+                    }
+                ),
+            )
+            stockpile = {
+                "money": HS_MONEY_REQ * nation.cities,
+                "food": HS_FOOD_REQ_START + (HS_FOOD_REQ * nation.cities),
+                "uranium": HS_URANIUM_REQ * nation.cities,
+                "steel": HS_STEEL_REQ * nation.cities,
+                "aluminum": HS_ALUMINUM_REQ * nation.cities,
+                "gasoline": HS_GASOLINE_REQ * nation.cities,
+                "munitions": HS_MUNITIONS_REQ * nation.cities,
+            }
+            if all(getattr(nat, key) >= stockpile[key] for key in stockpile):
+                continue
+            prices = cache.prices
+            amounts_: List[str] = []
+            cost = 0
+            for key, needs in stockpile.items():
+                has = getattr(nat, key)
+                if has < needs:
+                    if key != "money":
+                        price = getattr(prices, key)
+                        amount = (needs - has) * price.lowest_sell.price
+                        amounts_.append(f"{has:,.2f}/{needs:,.2f} {key}")
+                    else:
+                        amount = needs - has
+                        amounts_.append(f"{has:,.2f}/{needs:,.2f} {key}")
+                    cost += amount
+            amounts.append(f"**{nation}** - {', '.join(amounts_)}")
+        if not amounts:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "All nations meet stockpile requirements!",
+                    color=discord.Color.green(),
+                )
+            )
+            return
+        newline = "\n"
+        if (
+            len(
+                f"{len(amounts)} nations don't meet stockpile requirements!\n\n{newline.join(amounts)}"
+            )
+            >= 5900
+        ):
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "Too many nations to display!",
+                    color=discord.Color.red(),
+                )
+            )
+            return
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"{len(amounts)} nations don't meet stockpile requirements!\n\n{newline.join(amounts)}",
                 color=discord.Color.orange(),
             )
         )
