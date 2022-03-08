@@ -538,7 +538,11 @@ class Grants(commands.Cog):
             if fully_paid:
                 grants = [i for i in grants if i.paid >= i.resources]
             else:
-                grants = [i for i in grants if i.paid < i.resources]
+                grants = [
+                    i
+                    for i in grants
+                    if i.paid < i.resources and i.payoff is not GrantPayoff.NONE
+                ]
         if not grants:
             raise EmbedErrorMessage(
                 ctx.author,
