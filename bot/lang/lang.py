@@ -205,6 +205,8 @@ class Expression:
         return self.operator.evaluate(left, right)
 
     def __str__(self) -> str:
+        if self.expr:
+            return f"({to_string_value(self.left)} {self.operator.value} {to_string_value(self.right)})"
         return f"{to_string_value(self.left)} {self.operator.value} {to_string_value(self.right)}"
 
 
