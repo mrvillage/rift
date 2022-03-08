@@ -14,12 +14,12 @@ from ..enums import AccountType, GrantStatus, TransactionStatus, TransactionType
 __all__ = (
     "TransactionRequestView",
     "DepositConfirm",
-    "TransactionHistoryView",
+    "HistoryView",
     "PayConfirm",
 )
 
 if TYPE_CHECKING:
-    from typing import List, Optional, Union
+    from typing import Any, List, Optional, Union
 
     from _typings import Field
 
@@ -28,7 +28,6 @@ if TYPE_CHECKING:
         Credentials,
         Grant,
         Resources,
-        Transaction,
         TransactionRequest,
     )
 
@@ -776,19 +775,19 @@ class DepositConfirmCancelButton(discord.ui.Button[DepositConfirm]):
         self.view.stop()
 
 
-class TransactionHistoryView(discord.ui.View):
+class HistoryView(discord.ui.View):
     def __init__(
         self,
         user: Union[discord.Member, discord.User],
-        transactions: List[Transaction],
+        items: List[Any],
         description: str,
         page: int,
     ) -> None:
         super().__init__(timeout=300)
         self.user: Union[discord.Member, discord.User] = user
-        self.transactions: List[Transaction] = transactions
+        self.items: List[Any] = items
         self.page: int = page
-        self.pages: int = (len(transactions) // 9) + (len(transactions) % 12 > 0)
+        self.pages: int = (len(items) // 9) + (len(items) % 12 > 0)
         self.description: str = description
         if self.pages == 1:
             self.back_button.disabled = True  # type: ignore
@@ -801,7 +800,7 @@ class TransactionHistoryView(discord.ui.View):
 
     def get_embed(self, user: Union[discord.Member, discord.User]) -> discord.Embed:
         fields: List[Field] = [
-            i.field for i in self.transactions[(self.page - 1) * 9 : (self.page) * 9]
+            i.field for i in self.items[(self.page - 1) * 9 : (self.page) * 9]
         ]
         return funcs.get_embed_author_member(
             user,
@@ -812,7 +811,7 @@ class TransactionHistoryView(discord.ui.View):
 
     async def callback(
         self,
-        button: discord.ui.Button[TransactionHistoryView],
+        button: discord.ui.Button[HistoryView],
         interaction: discord.Interaction,
         page: int,
     ):
@@ -839,7 +838,7 @@ class TransactionHistoryView(discord.ui.View):
     )
     async def back_button(
         self,
-        button: discord.ui.Button[TransactionHistoryView],
+        button: discord.ui.Button[HistoryView],
         interaction: discord.Interaction,
     ):
         await self.callback(button, interaction, self.page - 1)
@@ -850,7 +849,7 @@ class TransactionHistoryView(discord.ui.View):
     )
     async def forward_button(
         self,
-        button: discord.ui.Button[TransactionHistoryView],
+        button: discord.ui.Button[HistoryView],
         interaction: discord.Interaction,
     ):
         await self.callback(button, interaction, self.page + 1)

@@ -27,7 +27,7 @@ from ...enums import (
 )
 from ...errors import EmbedErrorMessage, NoRolesError
 from ...ref import Rift, RiftContext
-from ...views import PayConfirm
+from ...views import HistoryView, PayConfirm
 
 
 class Grants(commands.Cog):
@@ -499,6 +499,63 @@ class Grants(commands.Cog):
                 color=discord.Color.green(),
             )
         )
+
+    @grant.command(  # type: ignore
+        name="history",
+        brief="Check the grant history of an alliance.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "alliance": "The alliance to check the history of, defaults to your alliance.",
+            "page": "The page of the history to view.",
+            "status": "The status of grants to view, defaults to all.",
+            "fully_paid": "Whether to only show fully paid grants.",
+        },
+    )
+    async def grant_history(
+        self,
+        ctx: RiftContext,
+        alliance: Alliance = MISSING,
+        page: int = 1,
+        status: Literal["PENDING", "SENT", "REJECTED", "CANCELLED"] = MISSING,
+        fully_paid: bool = MISSING,
+    ):
+        alliance = alliance or await Alliance.convert(ctx, alliance)
+        permissions = alliance.permissions_for(ctx.author)
+        if not (
+            permissions.leadership
+            or permissions.manage_grants
+            or permissions.view_grants
+        ):
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You don't have permission to view the grants history of that alliance!",
+            )
+        grants = [i for i in cache.grants if i.alliance_id == alliance.id]
+        if status is not MISSING:
+            status = getattr(GrantStatus, status)
+            grants = [i for i in grants if i.status is status]
+        if fully_paid is not MISSING:
+            if fully_paid:
+                grants = [i for i in grants if i.paid >= i.resources]
+            else:
+                grants = [i for i in grants if i.paid < i.resources]
+        if not grants:
+            raise EmbedErrorMessage(
+                ctx.author,
+                "There are no grants for that alliance!",
+            )
+        grants.sort(key=lambda x: x.id, reverse=True)
+        view = HistoryView(
+            ctx.author,
+            grants,
+            f"Showing grants for alliance {alliance}.\n"
+            f"{len(grants)} grants found.\n"
+            "Page **{page}** of **{pages}**.",
+            page,
+        )
+        await ctx.reply(embed=view.get_embed(ctx.author), view=view)
+        if await view.wait():
+            await ctx.interaction.edit_original_message(view=None)
 
 
 def setup(bot: Rift):

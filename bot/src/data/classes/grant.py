@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from typing import Union
 
     import discord
-    from _typings import GrantData
+    from _typings import Field, GrantData
 
     from ...ref import RiftContext
     from .alliance import Alliance
@@ -161,6 +161,23 @@ class Grant:
     @property
     def alliance(self) -> Optional[Alliance]:
         return cache.get_alliance(self.alliance_id)
+
+    @property
+    def field(self) -> Field:
+        return {
+            "name": f"ID: {self.id}\n",
+            "value": f"Recipient: <@{self.recipient_id}>\n"
+            f"Resources: {self.resources or 'None'}\n"
+            f"Payoff: `{self.payoff.name}`\n"
+            f"Deadline: {'None' if self.deadline is None else f'<t:{int(self.deadline.timestamp())}:f>'}\n"
+            f"Note: {self.note}\n"
+            f"Status: `{self.status.name}`"
+            + (
+                f"\nPaid: {self.paid or 'None'}\nCode: {self.code}"
+                if self.payoff is GrantPayoff.DEPOSIT
+                else ""
+            ),
+        }
 
     def regenerate_code(self) -> None:
         self.code = funcs.utils.generate_code(20)

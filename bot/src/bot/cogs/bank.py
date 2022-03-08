@@ -23,12 +23,7 @@ from ...enums import AccountType, TransactionStatus, TransactionType
 from ...errors import EmbedErrorMessage, NoCredentialsError, NoRolesError
 from ...flags import RolePermissions
 from ...ref import Rift, RiftContext
-from ...views import (
-    Confirm,
-    DepositConfirm,
-    TransactionHistoryView,
-    TransactionRequestView,
-)
+from ...views import Confirm, DepositConfirm, HistoryView, TransactionRequestView
 
 
 class Bank(commands.Cog):
@@ -897,7 +892,7 @@ class Bank(commands.Cog):
                 "There are no transactions for that account!",
             )
         transactions.sort(key=lambda x: x.id, reverse=True)
-        view = TransactionHistoryView(
+        view = HistoryView(
             ctx.author,
             transactions,
             f"Showing transactions for account #{account.id:,} owned by <@{account.owner_id}>.\n"
@@ -1068,7 +1063,7 @@ class Bank(commands.Cog):
                 "There are no transactions for that alliance!",
             )
         transactions.sort(key=lambda x: x.id, reverse=True)
-        view = TransactionHistoryView(
+        view = HistoryView(
             ctx.author,
             transactions,
             f"Showing transactions for alliance {alliance}.\n"
