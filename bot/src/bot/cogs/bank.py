@@ -231,11 +231,6 @@ class Bank(commands.Cog):
         },
     )
     async def bank_account_delete(self, ctx: RiftContext, account: Account = MISSING):
-        if account.owner_id != ctx.author.id:
-            raise EmbedErrorMessage(
-                ctx.author,
-                "You can only delete your own accounts!",
-            )
         accounts = [i for i in cache.accounts if i.owner_id == ctx.author.id]
         if not accounts:
             raise EmbedErrorMessage(
@@ -244,6 +239,11 @@ class Bank(commands.Cog):
             )
         primary_account = next(i for i in accounts if i.primary)
         account = account or primary_account
+        if account.owner_id != ctx.author.id:
+            raise EmbedErrorMessage(
+                ctx.author,
+                "You can only delete your own accounts!",
+            )
         if account.primary and len(accounts) != 1:
             raise EmbedErrorMessage(
                 ctx.author,
