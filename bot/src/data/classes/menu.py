@@ -114,7 +114,7 @@ class Menu(Makeable):
     def add_item(self, item: MenuItem, row: int) -> None:
         self.item_ids[row].append(item.id)
 
-    def remove_item(self, item_id: str) -> None:
+    def remove_item(self, item_id: int) -> None:
         for i in self.items:
             for j in i:
                 if j.id == item_id:
