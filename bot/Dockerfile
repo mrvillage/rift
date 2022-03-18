@@ -6,7 +6,7 @@ COPY requirements.txt requirements.txt
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y git libffi-dev
+    apt-get install -y git gcc libc-dev libffi-dev
 
 RUN pip install -r requirements.txt
 
