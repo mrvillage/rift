@@ -1,4 +1,4 @@
-git+git://github.com/mrvillage/quarrel.git
+git+https://github.com/mrvillage/quarrel.git
 asyncpg==0.25.*
 pnwkit-py==2.*
 cryptography==36.0.*
