@@ -22,7 +22,7 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: ${DB_NAME:-postgres}
     volumes:
-      - ${CREDENTIALS_PRIVATE_KEY_PATH}:/private.pem
+      - ./private.pem:/private.pem
 
   studio:
     container_name: rift-studio
@@ -50,7 +50,7 @@ services:
       KONG_DNS_ORDER: LAST,A,CNAME
       KONG_PLUGINS: request-transformer,cors,key-auth,acl
     volumes:
-      - ./docker/kong.yml:/var/lib/kong/kong.yml
+      - ./volumes/api/kong.yml:/var/lib/kong/kong.yml
 
   auth:
     container_name: rift-auth
