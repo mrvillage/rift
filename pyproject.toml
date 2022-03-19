@@ -1,5 +1,5 @@
 [tool.pytest.ini_options]
-addopts = "--cov=bot/gatekeeper"
+addopts = "--cov=bot/rift"
 asyncio_mode = "auto"
 
 [tool.black]
