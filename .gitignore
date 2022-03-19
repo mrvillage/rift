@@ -1,4 +1,4 @@
 .VSCodeCounter
-.env
+/.env
 volumes/db/data
 .coverage
