@@ -154,6 +154,38 @@ class FullCity:
         self.nation: Nation = cache.get_nation(self.nation_id)  # type: ignore
         self.projects: PnWKitNation = nation
 
+    def to_audit_dict(self) -> Dict[str, Any]:
+        return {
+            "nation_id": self.nation_id,
+            "coalpower": self.coal_power,
+            "oilpower": self.oil_power,
+            "nuclearpower": self.nuclear_power,
+            "windpower": self.wind_power,
+            "coalmine": self.coal_mines,
+            "leadmine": self.lead_mines,
+            "bauxitemine": self.bauxite_mines,
+            "oilwell": self.oil_wells,
+            "uramine": self.uranium_mines,
+            "ironmine": self.iron_mines,
+            "farm": self.farms,
+            "gasrefinery": self.oil_refineries,
+            "steelmill": self.steel_mills,
+            "aluminumrefinery": self.aluminum_refineries,
+            "munitionsfactory": self.munitions_factories,
+            "policestation": self.police_stations,
+            "hospital": self.hospitals,
+            "recyclingcenter": self.recycling_centers,
+            "subway": self.subways,
+            "supermarket": self.supermarkets,
+            "bank": self.banks,
+            "mall": self.shopping_malls,
+            "stadium": self.stadiums,
+            "barracks": self.barracks,
+            "factory": self.factories,
+            "airforcebase": self.hangars,
+            "drydock": self.drydocks,
+        }
+
     @property
     @cachetools.cached(cache=cachetools.TTLCache(1024, 30))  # type: ignore
     def population(self) -> float:
@@ -229,6 +261,7 @@ class FullCity:
             + self.banks * 5
             + self.shopping_malls * 9
             + self.stadiums * 12
+            + self.subways * 8
             + self.projects.telecom_satellite * 2
         )
         if self.projects.telecom_satellite:

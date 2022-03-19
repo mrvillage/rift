@@ -455,6 +455,127 @@ class HouseStark(commands.Cog):
             )
         )
 
+    @commands.command(
+        name="audit", help="Check to see if a nation meets audit requirements."
+    )
+    async def audit(self, ctx: RiftContext, *, nation: Nation = MISSING):
+        nation = nation or await Nation.convert(ctx, nation)
+        author_nation = await Nation.convert(ctx, None)
+        if nation.alliance_id not in {3683, 8139, HS_OFFSHORE_ID}:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "Audits don't apply to that nation!",
+                    color=discord.Color.red(),
+                )
+            )
+            return
+        if author_nation.alliance_id not in {3683, 8139, HS_OFFSHORE_ID}:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    "You don't have permission to use that command!!",
+                    color=discord.Color.red(),
+                )
+            )
+            return
+        failures: List[str] = []
+
+        mmr = {
+            "soldiers": HS_SOLDIER_MMR * 3000 * nation.cities,
+            "tanks": HS_TANK_MMR * 250 * nation.cities,
+            "aircraft": HS_AIRCRAFT_MMR * 15 * nation.cities,
+            "ships": HS_SHIP_MMR * 5 * nation.cities,
+        }
+        if not all(getattr(nation, key) >= mmr[key] for key in mmr):
+            failures.append("Does not meet MMR")
+
+        cities = await nation.fetch_cities()
+        if not all(i.to_audit_dict() == cities[0].to_audit_dict() for i in cities):
+            failures.append("Does not have consistent city builds")
+
+        if nation.color != "Olive" and nation.color != "Beige":
+            failures.append("Is not on Olive or Beige")
+
+        if any(i.disease > 2 for i in cities):
+            failures.append("Has greater than 2% disease")
+
+        if any(i.crime > 0 for i in cities):
+            failures.append("Has greater than 0% crime")
+
+        if any(not i.powered for i in cities):
+            failures.append("Has not powered all cities")
+
+        if any(i.oil_power > 0 or i.coal_power > 0 or i.wind_power > 0 for i in cities):
+            failures.append("Has non-nuclear power")
+
+        infra_cap = (
+            2000
+            if nation.cities <= 20
+            else 2250
+            if nation.cities <= 25
+            else 2500
+            if nation.cities <= 30
+            else 2750
+        )
+        if any(i.infrastructure > infra_cap for i in cities):
+            failures.append(f"Has greater than {infra_cap:,} infrastructure")
+
+        commerce = (
+            100
+            if not cities[0].projects.itc
+            else 114
+            if not cities[0].projects.telecom_satellite
+            else 125
+        )
+        if any(i.commerce < commerce for i in cities):
+            failures.append(f"Has less than {commerce:,} commerce")
+
+        if any(
+            0 < i.oil_refineries < 5
+            or 0 < i.steel_mills < 5
+            or 0 < i.aluminum_refineries < 5
+            or 0 < i.munitions_factories < 5
+            for i in cities
+        ):
+            failures.append("Has between 1 and 4 manufactured resource improvements")
+
+        # If 5 factories, have as many raws make that manu as possible, provided Disease remains less than 2%, crime = 0 commerce remains 100 114 or 125% and MMR is not affected.
+        if any(
+            i.oil_refineries
+            or i.steel_mills
+            or i.aluminum_refineries
+            or i.munitions_factories
+            for i in cities
+        ):
+            ...
+
+        if (
+            any(i.farms > 0 and i.land < 3000 for i in cities)
+            and not cities[0].projects.massirr
+        ):
+            failures.append("Has farms with less than 3000 land or no mass irrigation")
+
+        # If not producing Manu or Food, a raw should be maxed before producing a second raw
+
+        if failures:
+            message = "\n".join(failures)
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"{nation} did not pass the audit!\n\n{message}",
+                    color=discord.Color.red(),
+                )
+            )
+        else:
+            await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    f"{nation} passed the audit!",
+                    color=discord.Color.green(),
+                )
+            )
+
     @tasks.loop(hours=24)
     async def bank_send_task(self):
         channel = self.bot.get_channel(239099900174925824)

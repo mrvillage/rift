@@ -393,14 +393,23 @@ class Nation(Makeable):
         fetch_spies: bool = False,
     ) -> RevenueDict:
         # sourcery no-metrics
-        from ...funcs import calculate_spies
-
-        spies = await calculate_spies(self) if fetch_spies else 0
-        prices = prices or cache.prices
         if data is None:
             cities = await self.fetch_cities()
         else:
             cities = [FullCity(i, data) for i in data.cities]  # type: ignore
+
+        return await self.actual_calculate_revenue(prices, cities, fetch_spies)
+
+    async def actual_calculate_revenue(
+        self,
+        prices: Optional[TradePrices],
+        cities: List[FullCity],
+        fetch_spies: bool = False,
+    ) -> RevenueDict:
+        from ...funcs import calculate_spies
+
+        spies = await calculate_spies(self) if fetch_spies else 0
+        prices = prices or cache.prices
         revenues = [i.calculate_income() for i in cities]
         revenue: RevenueDict = {  # type: ignore
             "gross_income": sum(
