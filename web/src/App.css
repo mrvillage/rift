@@ -1,6 +1,8 @@
 .App {
   text-align: center;
-  /* @apply bg-primary; */
+  height: 100%;
+  width: 100%;
+  @apply bg-bg-primary-dark;
 }
 
 .App-header {

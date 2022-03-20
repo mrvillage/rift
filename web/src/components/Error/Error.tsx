@@ -1,5 +1,4 @@
 import { Button, IconXCircle, Modal, Space } from "@supabase/ui";
-
 interface ErrorProps {
   title: string;
   children?: React.ReactNode;
@@ -19,7 +18,7 @@ const Error = ({ title, children, showing, setShowing }: ErrorProps) => {
         // onConfirm={() => setShowing(false)}
         layout="vertical"
         customFooter={[
-          <Space style={{ width: "100%" }}>
+          <Space key="0" style={{ width: "100%" }}>
             <Button
               danger={true}
               size="medium"
@@ -30,9 +29,7 @@ const Error = ({ title, children, showing, setShowing }: ErrorProps) => {
             </Button>
           </Space>,
         ]}
-      >
-        {children}
-      </Modal>
+      />
     </>
   );
 };
