@@ -3,3 +3,4 @@ __pycache__
 *.crt
 private.pem
 .pytest_cache
+.env
