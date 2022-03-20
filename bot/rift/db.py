@@ -47,7 +47,7 @@ async def create_notify_connection() -> Connection:
         database=DB_NAME,
     )
     await init(NOTIFY_CONNECTION)
-    for channel, callback in LISTENERS.items():
+    for channel, callback in listeners.items():
         await NOTIFY_CONNECTION.add_listener(channel, callback)  # type: ignore
     return NOTIFY_CONNECTION
 
@@ -61,7 +61,7 @@ def standard_dispatch(conn: Connection, pid: int, channel: str, payload: str) ->
     bot.dispatch(channel, json.loads(payload))
 
 
-LISTENERS: dict[str, Callable[[Connection, int, str, Any], None]] = {}
+listeners: dict[str, Callable[[Connection, int, str, Any], None]] = {}
 # will not be None after init
 POOL: Pool = None  # type: ignore
 NOTIFY_CONNECTION: Connection = None  # type: ignore

@@ -26,11 +26,14 @@ class ModelProtocol(Protocol):
 
 def model(class_: T) -> T:
     g: dict[str, Any] = {"db": db}
+    primary_key = getattr(class_, "PRIMARY_KEY", "id")
+    if isinstance(primary_key, str):
+        primary_key = (primary_key,)
     exec(
         f"""
 async def save(self) -> None:
     if self.id:
-        await db.query("UPDATE {class_.TABLE} SET {", ".join(f"{name} = ${i+1}" for i, name in enumerate(class_.__slots__))} WHERE id = ${class_.__slots__.index("id")+1};",
+        await db.query("UPDATE {class_.TABLE} SET {", ".join(f"{name} = ${i+1}" for i, name in enumerate(class_.__slots__))} WHERE {' AND '.join(f'{name} = ${class_.__slots__.index(name)+1}' for name in primary_key)});",
         {", ".join(f"self.{name}" for name in class_.__slots__)},
         )
     else:

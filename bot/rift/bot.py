@@ -11,7 +11,7 @@ class Bot(quarrel.Bot):
     ...
 
 
-intents = quarrel.Intents(guild_members=True)
+intents = quarrel.Intents(guilds=True, members=True)
 bot = Bot(
     env.PROD_APPLICATION_ID
     if env.ENVIRONMENT == "prod"
