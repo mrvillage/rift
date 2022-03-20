@@ -49,13 +49,12 @@ const coolGray = {
 };
 
 module.exports = {
-  mode: "jit",
   content: [
     "./index.html",
     "./src/**/**/*.{js,ts,jsx,tsx}",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: "class",
+  darkMode: true,
   theme: {
     borderColor: (theme) => ({
       ...theme("colors"),
@@ -193,7 +192,7 @@ module.exports = {
   plugins: [
     // require("@tailwindcss/forms"),
     // require("@tailwindcss/typography"),
-    require("tailwindcss"),
-    require("autoprefixer"),
+    // require("tailwindcss"),
+    // require("autoprefixer"),
   ],
 };
