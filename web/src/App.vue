@@ -23,6 +23,9 @@
       </div>
 
       <v-spacer />
+      <v-btn class="ml-3" color="gray" href="/github" target="_blank">
+        GitHub
+      </v-btn>
       <v-btn class="ml-3" color="gray" href="/discord" target="_blank">
         Support Server
       </v-btn>
