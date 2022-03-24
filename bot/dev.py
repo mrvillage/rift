@@ -5,7 +5,8 @@ import os
 
 from dotenv import load_dotenv
 
-load_dotenv("../.env")
+load_dotenv(".env")
+load_dotenv(".env.dev")
 os.environ["DB_PASSWORD"] = os.environ["POSTGRES_PASSWORD"]
 
 from src import commands as commands  # noqa: E402
