@@ -2,3 +2,4 @@
 /.env
 volumes/db/data
 .coverage
+/.env.dev
