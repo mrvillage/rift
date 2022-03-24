@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import asyncio
 
-from rift import commands as commands
-from rift import db
-from rift.bot import bot
-from rift.cache import cache
+from src import commands as commands
+from src import db
+from src.bot import bot
+from src.cache import cache
 
 
 async def main() -> None:

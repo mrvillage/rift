@@ -5,13 +5,13 @@ import os
 
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv("../.env")
 os.environ["DB_PASSWORD"] = os.environ["POSTGRES_PASSWORD"]
 
-from rift import commands as commands  # noqa: E402
-from rift import db  # noqa: E402
-from rift.bot import bot  # noqa: E402
-from rift.cache import cache  # noqa: E402
+from src import commands as commands  # noqa: E402
+from src import db  # noqa: E402
+from src.bot import bot  # noqa: E402
+from src.cache import cache  # noqa: E402
 
 
 async def main() -> None:
