@@ -177,4 +177,4 @@ services:
     volumes:
       - ./volumes/db/data:/var/lib/postgresql/data
       - ./volumes/db/init:/docker-entrypoint-initdb.d
-      - ./volumes/db/data/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./volumes/db/postgresql.conf:/etc/postgresql/postgresql.conf
