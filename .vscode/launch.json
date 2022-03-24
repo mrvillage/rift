@@ -1,20 +1,36 @@
 {
-    "configurations": [
-        {
-            "name": "Rift: start",
-            "type": "python",
-            "request": "launch",
-            "program": "bot/start.py",
-            "console": "integratedTerminal"
-            // "justMyCode": false
-        },
-        {
-              "name": "Rift: start-venv",
-              "type": "python",
-              "request": "launch",
-              "program": "bot/start.py",
-              "console": "integratedTerminal",
-              "justMyCode": false
-        }
-    ]
+  "configurations": [
+    {
+      "name": "Rift: start",
+      "type": "python",
+      "request": "launch",
+      "program": "bot/start.py",
+      "console": "integratedTerminal"
+      // "justMyCode": false
+    },
+    {
+      "name": "Rift: start-venv",
+      "type": "python",
+      "request": "launch",
+      "program": "bot/start.py",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Rift: dev",
+      "type": "python",
+      "request": "launch",
+      "program": "bot/dev.py",
+      "console": "integratedTerminal"
+      // "justMyCode": false
+    },
+    {
+      "name": "Rift: dev-venv",
+      "type": "python",
+      "request": "launch",
+      "program": "bot/dev.py",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    }
+  ]
 }
