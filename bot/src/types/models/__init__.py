@@ -1,11 +1,9 @@
-from .resources import *
-
 # types = {
 #     "integer": "int",
 #     "text": "str",
 #     "boolean": "bool",
-#     "smallint": "ENUM",
-#     "resources": "models.Resources",
+#     "smallint": "int",
+#     "resources": "Resources",
 #     "numeric": "decimal.Decimal",
 #     "timestamp with time zone": "datetime.datetime",
 #     "bigint": "int",
