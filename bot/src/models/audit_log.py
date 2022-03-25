@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 class AuditLog:
     TABLE: ClassVar[str] = "audit_logs"
     id: int
+    config_id: int
     guild_id: int
     channel_id: int
     user_id: int

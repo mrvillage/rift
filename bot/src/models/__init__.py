@@ -2,6 +2,7 @@ from .account import *
 from .alliance_settings import *
 from .audit import *
 from .audit_log import *
+from .audit_log_config import *
 from .auto_role import *
 from .blitz import *
 from .blitz_target import *
