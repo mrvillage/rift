@@ -28,7 +28,7 @@ class cached_slotted_property(property, Generic[R]):  # noqa: N801
     def __get__(self, instance: Any, owner: type[T]) -> R:
         ...
 
-    def __get__(self, instance: Optional[Any], owner: type[T]) -> Any:
+    def __get__(self, instance: Optional[Any], owner: type[T] = None) -> Any:
         if instance is None:
             return self
         try:
