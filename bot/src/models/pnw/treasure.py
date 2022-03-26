@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Treasure:
     TABLE: ClassVar[str] = "treasures"
+    PRIMARY_KEY: ClassVar[str] = "name"
     name: str
     color: enums.Color = attrs.field(converter=enums.Color)
     continent: enums.Continent = attrs.field(converter=enums.Continent)
