@@ -4,8 +4,7 @@ from typing import TYPE_CHECKING
 
 import attrs
 
-from ... import enums, utils
-from ...cache import cache
+from ... import cache, enums, utils
 
 __all__ = ("Nation",)
 

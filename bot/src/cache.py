@@ -1061,3 +1061,7 @@ class Cache:
 
 
 cache = Cache()
+
+
+def __getattr__(name: str) -> Any:
+    return getattr(cache, name)

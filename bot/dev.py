@@ -9,10 +9,10 @@ load_dotenv(".env")
 load_dotenv(".env.dev")
 os.environ["DB_PASSWORD"] = os.environ["POSTGRES_PASSWORD"]
 
-from src import commands as commands  # noqa: E402
+from src import cache  # noqa: E402
 from src import db  # noqa: E402
+from src import commands as commands  # noqa: E402
 from src.bot import bot  # noqa: E402
-from src.cache import cache  # noqa: E402
 
 
 async def main() -> None:
