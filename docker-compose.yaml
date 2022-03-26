@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  rift:
+  bot:
     container_name: rift-bot
     build: ./bot
     depends_on:
