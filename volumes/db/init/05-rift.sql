@@ -788,9 +788,9 @@ COMMENT ON COLUMN "blitz_targets"."nation_id" IS 'the id of the target nation';
 
 COMMENT ON COLUMN "blitz_targets"."attacker_ids" IS 'the nation IDs of the attacking nations';
 
-COMMENT ON COLUMN "inactive_alerts"."last_alert" IS 'will be used to store the last time an alert was sent, ensures that alerts aren't repeated every time data updates';
+COMMENT ON COLUMN "inactive_alerts"."last_alert" IS 'will be used to store the last time an alert was sent, ensures that alerts arent repeated every time data updates';
 
-COMMENT ON COLUMN "audit_checks"."city" IS 'whether to apply the check to each of the nation's cities instead of the nation itself';
+COMMENT ON COLUMN "audit_checks"."city" IS 'whether to apply the check to each of the nations cities instead of the nation itself';
 
 COMMENT ON COLUMN "audit_runs"."checks" IS 'map of check ID to success boolean';
 
