@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, overload
 
 __all__ = ("CommonFlags",)
 
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from typing import Any, Optional, TypeVar, overload
+    from typing import Any, Optional, TypeVar
 
     T = TypeVar("T", bound="CommonFlags")
 
