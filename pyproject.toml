@@ -28,3 +28,4 @@ reportImportCycles = false
 reportUnnecessaryTypeIgnoreComment = true
 typeCheckingMode = "strict"
 reportPrivateImportUsage = false
+exclude = ["bot/dev.py", "bot/start.py", "bot/src/db.py"]
