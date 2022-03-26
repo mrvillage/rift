@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class AllianceSettings:
     TABLE: ClassVar[str] = "alliance_settings"
+    PRIMARY_KEY: ClassVar[str] = "alliance_id"
     alliance_id: int
     default_raid_condition: str
     default_nuke_condition: str

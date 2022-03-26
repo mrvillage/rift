@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class GuildSettings:
     TABLE: ClassVar[str] = "guild_settings"
+    PRIMARY_KEY: ClassVar[str] = "guild_id"
     guild_id: int
     purpose: enums.Purpose = attrs.field(converter=enums.Purpose)
     purpose_argument: str
