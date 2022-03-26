@@ -9,7 +9,7 @@ import lark
 
 from . import errors
 
-__all__ = ("parse_expression", "parse_script")
+__all__ = ("parse_expression",)
 
 if TYPE_CHECKING:
     from typing import Any, Dict, Final, Optional
@@ -40,11 +40,6 @@ def evaluate_if_abstract(value: Any, scope: Scope) -> Any:
 def parse_expression(text: str) -> Expression:
     # the tree_class option is not properly implemented with a TypeVar
     return EXPRESSION_PARSER.parse(text, "expr")  # type: ignore
-
-
-def parse_script(text: str) -> lark.Tree:
-    # the tree_class option is not properly implemented with a TypeVar
-    return SCRIPT_PARSER.parse(text, "script")
 
 
 def to_string_value(value: Any) -> str:
