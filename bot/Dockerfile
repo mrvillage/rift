@@ -6,7 +6,7 @@ COPY requirements.txt requirements.txt
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y git
+    apt-get install -y git gcc
 
 RUN pip install -r requirements.txt
 

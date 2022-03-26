@@ -1,5 +1,6 @@
 git+https://github.com/mrvillage/quarrel.git
-git+https://github.com/MagicStack/asyncpg.git@fb3b6bf7d6557b87370eff28141e02aea6256954
+asyncpg==0.25.*
+# git+https://github.com/MagicStack/asyncpg.git@fb3b6bf7d6557b87370eff28141e02aea6256954
 pnwkit-py==2.*
 cryptography==36.0.*
 attrs==21.4.*
