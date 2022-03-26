@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import decimal
 from typing import TYPE_CHECKING
 
 import attrs
@@ -7,25 +8,23 @@ import attrs
 __all__ = ("Resources",)
 
 if TYPE_CHECKING:
-    import decimal
-
     from ..types.resources import Resources as ResourcesData
 
 
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Resources:
-    money: decimal.Decimal
-    coal: decimal.Decimal
-    oil: decimal.Decimal
-    uranium: decimal.Decimal
-    iron: decimal.Decimal
-    bauxite: decimal.Decimal
-    lead: decimal.Decimal
-    gasoline: decimal.Decimal
-    munitions: decimal.Decimal
-    steel: decimal.Decimal
-    aluminum: decimal.Decimal
-    food: decimal.Decimal
+    money: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
+    coal: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
+    oil: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
+    uranium: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
+    iron: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
+    bauxite: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
+    lead: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
+    gasoline: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
+    munitions: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
+    steel: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
+    aluminum: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
+    food: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
 
     @classmethod
     def from_dict(cls, data: ResourcesData) -> Resources:
