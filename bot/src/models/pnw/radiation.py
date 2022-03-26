@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Radiation:
     TABLE: ClassVar[str] = "radiations"
+    PRIMARY_KEY: ClassVar[str] = "date"
     date: datetime.datetime
     north_america: decimal.Decimal
     south_america: decimal.Decimal
