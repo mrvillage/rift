@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class ConditionalAutoRole:
     TABLE: ClassVar[str] = "conditional_auto_roles"
+    id: int
     role_id: int
     guild_id: int
     condition: str

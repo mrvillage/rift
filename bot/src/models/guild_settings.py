@@ -38,3 +38,7 @@ class GuildSettings:
     @classmethod
     def from_dict(cls, data: GuildSettingsData) -> GuildSettings:
         ...
+
+    @property
+    def key(self) -> int:
+        return self.guild_id

@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class MenuInterface:
     TABLE: ClassVar[str] = "menu_interfaces"
+    id: int
     menu_id: int
     message_id: int
     channel_id: int

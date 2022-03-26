@@ -6,6 +6,7 @@ __all__ = ("MenuInterface",)
 
 
 class MenuInterface(TypedDict):
+    id: int
     menu_id: int
     message_id: int
     channel_id: int

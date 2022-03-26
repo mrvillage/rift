@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Roster:
     TABLE: ClassVar[str] = "rosters"
+    id: int
     nation_id: int
     alliance_id: int
     join_date: datetime.datetime

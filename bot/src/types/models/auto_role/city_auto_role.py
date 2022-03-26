@@ -6,6 +6,7 @@ __all__ = ("CityAutoRole",)
 
 
 class CityAutoRole(TypedDict):
+    id: int
     role_id: int
     guild_id: int
     min_city: int

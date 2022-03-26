@@ -8,6 +8,7 @@ __all__ = ("Roster",)
 
 
 class Roster(TypedDict):
+    id: int
     nation_id: int
     alliance_id: int
     join_date: datetime.datetime

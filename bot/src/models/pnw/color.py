@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Color:
     TABLE: ClassVar[str] = "colors"
-    id: enums.Color = attrs.field(converter=enums.Color)
+    color: enums.Color = attrs.field(converter=enums.Color)
     bloc_name: str
     turn_bonus: int
 
@@ -28,3 +28,7 @@ class Color:
     @classmethod
     def from_dict(cls, data: ColorData) -> Color:
         ...
+
+    @property
+    def key(self) -> int:
+        return self.color.value

@@ -6,6 +6,7 @@ __all__ = ("AllianceAutoRole",)
 
 
 class AllianceAutoRole(TypedDict):
+    id: int
     role_id: int
     guild_id: int
     alliance_id: int
