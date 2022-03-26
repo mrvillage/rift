@@ -28,4 +28,4 @@ jobs:
           node-version: "14"
 
       - name: Run pyright
-        run: npm i -g pyright && pip install -r bot/requirements.txt && pyright .
+        run: npm i -g pyright && pip install -r bot/requirements.txt -r bot/dev_requirements.txt && pyright .
