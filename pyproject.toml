@@ -27,3 +27,4 @@ reportMissingTypeStubs = false
 reportImportCycles = false
 reportUnnecessaryTypeIgnoreComment = true
 typeCheckingMode = "strict"
+reportPrivateImportUsage = false
