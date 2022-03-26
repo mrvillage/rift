@@ -44,7 +44,7 @@ def parse_expression(text: str) -> Expression:
 
 def parse_script(text: str) -> lark.Tree:
     # the tree_class option is not properly implemented with a TypeVar
-    return SCRIPT_PARSER.parse(text, "script")  # type: ignore
+    return SCRIPT_PARSER.parse(text, "script")
 
 
 def to_string_value(value: Any) -> str:
@@ -219,9 +219,11 @@ class UnaryExpression:
 
     @classmethod
     def new(cls, operator: Operator, value: Any) -> Any:
-        if not getattr(value, "__lang_abstract__", False):
-            return operator.evaluate(value)
-        return cls(operator, value)
+        return (
+            cls(operator, value)
+            if getattr(value, "__lang_abstract__", False)
+            else operator.evaluate(value)
+        )
 
     def evaluate(self, scope: Scope) -> Any:
         return self.operator.evaluate(self.value.evaluate(scope))
@@ -374,10 +376,7 @@ class LangTransformer:
     # handle addition
 
     def addition_expression(self, tree: list[Any]) -> Any:
-        if len(tree) == 1:
-            return tree[0]
-        else:
-            return Expression.new(tree[0], tree[1], tree[2])
+        return tree[0] if len(tree) == 1 else Expression.new(tree[0], tree[1], tree[2])
 
     def addition(self, tree: list[Any]) -> Any:
         return tree[0]
