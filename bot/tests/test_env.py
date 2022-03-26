@@ -1,5 +1,5 @@
 def test_env():
-    from rift import env
+    from src import env
 
     assert env.ENVIRONMENT == "dev"
     assert env.PROD_APPLICATION_ID == 1
