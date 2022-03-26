@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Color:
     TABLE: ClassVar[str] = "colors"
+    PRIMARY_KEY: ClassVar[str] = "color"
     color: enums.Color = attrs.field(converter=enums.Color)
     bloc_name: str
     turn_bonus: int
