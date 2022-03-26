@@ -3,8 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import attrs
-
-from rift import utils
+from src import utils
 
 if TYPE_CHECKING:
     from typing import ClassVar
