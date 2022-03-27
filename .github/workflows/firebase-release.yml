@@ -21,5 +21,5 @@ jobs:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_THIRD_CONTAINER_312001 }}"
           channelId: live
-          projectId: third-container-312001
+          projectId: rift-beta
           entryPoint: web
