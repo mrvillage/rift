@@ -28,7 +28,7 @@ class ModelProtocol(Protocol):
 
 
 def model(class_: T) -> T:
-    g: dict[str, Any] = {"db": db, "Any": Any}
+    g: dict[str, Any] = {"db": db}
     primary_key = getattr(class_, "PRIMARY_KEY", "id")
     if isinstance(primary_key, str):
         primary_key = (primary_key,)
