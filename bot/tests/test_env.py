@@ -9,6 +9,8 @@ def test_env():
     assert env.DEV_APPLICATION_ID == 3
     assert env.DEV_TOKEN == "ghi789"
     assert env.DEV_GUILD_IDS == [1, 2, 3]
+    assert env.VERIFIED_BOT_KEY == "kjl012"
+    assert env.PNW_API_KEY == "mno345"
     assert env.DB_HOST == "localhost"
     assert env.DB_PORT == 5432
     assert env.DB_USER == "postgres"

@@ -19,6 +19,8 @@ def init_test_environment() -> None:
         "DEV_APPLICATION_ID": "3",
         "DEV_TOKEN": "ghi789",
         "DEV_GUILD_IDS": "1,2,3",
+        "VERIFIED_BOT_KEY": "kjl012",
+        "PNW_API_KEY": "mno345",
         "DB_HOST": "localhost",
         "DB_PORT": "5432",
         "DB_USER": "postgres",
