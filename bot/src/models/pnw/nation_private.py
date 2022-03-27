@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class NationPrivate:
     TABLE: ClassVar[str] = "nations_private"
-    id: Optional[int]
+    id: int
     update_tz: Optional[decimal.Decimal]
     spies: Optional[int]
     resources: Optional[models.Resources]
