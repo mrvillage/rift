@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import decimal
 import os
+
+import pnwkit
 
 __all__ = (
     "ENVIRONMENT",
@@ -27,3 +30,7 @@ DB_PORT = int(os.environ["DB_PORT"])
 DB_USER = os.environ["DB_USER"]
 DB_PASSWORD = os.environ["DB_PASSWORD"]
 DB_NAME = os.environ["DB_NAME"]
+
+pnwkit.set_key(PNW_API_KEY)
+pnwkit.set_bot_key(VERIFIED_BOT_KEY)
+pnwkit.async_pnwkit.parse_float = decimal.Decimal
