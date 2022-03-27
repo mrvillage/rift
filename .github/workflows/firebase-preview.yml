@@ -4,7 +4,6 @@ on:
   pull_request:
     paths:
       - "web/**"
-      - "docs/**"
 
 jobs:
   build_and_preview:
@@ -13,8 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: >-
-          cd web && npm ci && npm run build && cd ../docs && npm ci && npm run
-          build
+          cd web && npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
