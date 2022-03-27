@@ -13,6 +13,8 @@ if TYPE_CHECKING:
     import decimal
     from typing import ClassVar
 
+    from pnwkit.data import City as PnWKitCity
+
     from ...types.models.pnw.city import City as CityData
 
 
@@ -62,3 +64,46 @@ class City:
     @classmethod
     def from_dict(cls, data: CityData) -> City:
         ...
+
+    @classmethod
+    def from_data(cls, data: PnWKitCity) -> City:
+        if TYPE_CHECKING:
+            assert isinstance(data.infrastructure, decimal.Decimal)
+            assert isinstance(data.land, decimal.Decimal)
+        return cls(
+            id=int(data.id),
+            nation_id=int(data.nation_id),
+            name=data.name,
+            date=datetime.datetime.fromisoformat(data.date),
+            infrastructure=data.infrastructure,
+            land=data.land,
+            powered=data.powered,
+            coal_power=data.coalpower,
+            oil_power=data.oilpower,
+            nuclear_power=data.nuclearpower,
+            wind_power=data.windpower,
+            coal_mines=data.coalmine,
+            lead_mines=data.leadmine,
+            bauxite_mine=data.bauxitemine,
+            oil_well=data.oilwell,
+            uranium_mine=data.uramine,
+            iron_mines=data.ironmine,
+            farms=data.farm,
+            oil_refineries=data.gasrefinery,
+            steel_mills=data.steelmill,
+            aluminum_refineries=data.aluminumrefinery,
+            munitions_factories=data.munitionsfactory,
+            police_stations=data.policestation,
+            hospitals=data.hospital,
+            recycling_center=data.recyclingcenter,
+            subways=data.subway,
+            supermarkets=data.supermarket,
+            banks=data.bank,
+            shopping_malls=data.mall,
+            stadiums=data.stadium,
+            barracks=data.barracks,
+            factories=data.factory,
+            hangars=data.airforcebase,
+            drydocks=data.drydock,
+            nuke_date=datetime.datetime.fromisoformat(data.nukedate),
+        )

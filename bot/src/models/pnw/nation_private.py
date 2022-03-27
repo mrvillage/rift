@@ -10,7 +10,9 @@ __all__ = ("NationPrivate",)
 
 if TYPE_CHECKING:
     import decimal
-    from typing import ClassVar
+    from typing import ClassVar, Optional
+
+    from pnwkit.data import Nation as PnWKitNation
 
     from ... import models
     from ...types.models.pnw.nation_private import NationPrivate as NationPrivateData
@@ -20,10 +22,10 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class NationPrivate:
     TABLE: ClassVar[str] = "nations_private"
-    id: int
-    update_tz: decimal.Decimal
-    spies: int
-    resources: models.Resources
+    id: Optional[int]
+    update_tz: Optional[decimal.Decimal]
+    spies: Optional[int]
+    resources: Optional[models.Resources]
 
     async def save(self) -> None:
         ...
@@ -31,3 +33,41 @@ class NationPrivate:
     @classmethod
     def from_dict(cls, data: NationPrivateData) -> NationPrivate:
         ...
+
+    @classmethod
+    def from_data(cls, data: PnWKitNation) -> NationPrivate:
+        if data.money is None:
+            return cls(id=int(data.id), resources=None, update_tz=None, spies=None)
+        if TYPE_CHECKING:
+            assert isinstance(data.money, decimal.Decimal)
+            assert isinstance(data.coal, decimal.Decimal)
+            assert isinstance(data.oil, decimal.Decimal)
+            assert isinstance(data.uranium, decimal.Decimal)
+            assert isinstance(data.iron, decimal.Decimal)
+            assert isinstance(data.bauxite, decimal.Decimal)
+            assert isinstance(data.lead, decimal.Decimal)
+            assert isinstance(data.gasoline, decimal.Decimal)
+            assert isinstance(data.munitions, decimal.Decimal)
+            assert isinstance(data.steel, decimal.Decimal)
+            assert isinstance(data.aluminum, decimal.Decimal)
+            assert isinstance(data.food, decimal.Decimal)
+            assert isinstance(data.update_tz, decimal.Decimal)
+        return cls(
+            id=int(data.id),
+            resources=models.Resources(
+                money=data.money,
+                coal=data.coal,
+                oil=data.oil,
+                uranium=data.uranium,
+                iron=data.iron,
+                bauxite=data.bauxite,
+                lead=data.lead,
+                gasoline=data.gasoline,
+                munitions=data.munitions,
+                steel=data.steel,
+                aluminum=data.aluminum,
+                food=data.food,
+            ),
+            update_tz=data.update_tz,
+            spies=data.spies,
+        )

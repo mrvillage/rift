@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     import datetime
     from typing import ClassVar
 
+    from pnwkit.data import TaxBracket as PnWKitTaxBracket
+
     from ...types.models.pnw.tax_bracket import TaxBracket as TaxBracketData
 
 
@@ -34,3 +36,16 @@ class TaxBracket:
     @classmethod
     def from_dict(cls, data: TaxBracketData) -> TaxBracket:
         ...
+
+    @classmethod
+    def from_data(cls, data: PnWKitTaxBracket) -> TaxBracket:
+        return cls(
+            id=int(data.id),
+            alliance_id=int(data.alliance_id),
+            name=data.bracket_name,
+            date=datetime.datetime.fromisoformat(data.date),
+            date_modified=datetime.datetime.fromisoformat(data.date_modified),
+            last_modifier_id=int(data.last_modifier_id),
+            tax_rate=data.tax_rate,
+            resource_tax_rate=data.resource_tax_rate,
+        )

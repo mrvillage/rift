@@ -154,7 +154,7 @@ CREATE TABLE "wars" (
   "ground_control" integer,
   "air_superiority" integer,
   "naval_blockade" integer,
-  "winner" integer,
+  "winner_id" integer,
   "turns_left" integer,
   "attacker_action_points" integer,
   "defender_action_points" integer,
@@ -188,8 +188,8 @@ CREATE TABLE "wars" (
   "defender_missiles_used" integer,
   "attacker_nukes_used" integer,
   "defender_nukes_used" integer,
-  "attacker_infrastructure_destroyed_value" integer,
-  "defender_infrastructure_destroyed_value" integer
+  "attacker_infrastructure_destroyed_value" numeric,
+  "defender_infrastructure_destroyed_value" numeric
 );
 
 CREATE TABLE "war_attacks" (
@@ -199,7 +199,7 @@ CREATE TABLE "war_attacks" (
   "defender_id" integer,
   "type" smallint,
   "war_id" integer,
-  "victor" integer,
+  "victor_id" integer,
   "success" integer,
   "attcas1" integer,
   "attcas2" integer,

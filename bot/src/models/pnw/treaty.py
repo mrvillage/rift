@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     import datetime
     from typing import ClassVar
 
+    from pnwkit.data import Treaty as PnWKitTreaty
+
     from ...types.models.pnw.treaty import Treaty as TreatyData
 
 
@@ -32,3 +34,14 @@ class Treaty:
     @classmethod
     def from_dict(cls, data: TreatyData) -> Treaty:
         ...
+
+    @classmethod
+    def from_data(cls, data: PnWKitTreaty) -> Treaty:
+        return cls(
+            id=int(data.id),
+            date=datetime.datetime.fromisoformat(data.date),
+            type=getattr(enums.TreatyType, data.treaty_type.upper()),
+            turns_left=data.turns_left,
+            sender_id=int(data.alliance1_id),
+            receiver_id=int(data.alliance2_id),
+        )

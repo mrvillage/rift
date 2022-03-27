@@ -11,6 +11,8 @@ __all__ = ("Color",)
 if TYPE_CHECKING:
     from typing import ClassVar
 
+    from pnwkit.data import Color as PnWKitColor
+
     from ...types.models.pnw.color import Color as ColorData
 
 
@@ -33,3 +35,11 @@ class Color:
     @property
     def key(self) -> int:
         return self.color.value
+
+    @classmethod
+    def from_data(cls, data: PnWKitColor) -> Color:
+        return cls(
+            color=getattr(enums.Color, data.color.upper()).value,
+            bloc_name=data.bloc_name,
+            turn_bonus=data.turn_bonus,
+        )

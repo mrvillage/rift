@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     import datetime
     from typing import ClassVar
 
+    from pnwkit.data import Treasure as PnWKitTreasure
+
     from ...types.models.pnw.treasure import Treasure as TreasureData
 
 
@@ -33,3 +35,14 @@ class Treasure:
     @classmethod
     def from_dict(cls, data: TreasureData) -> Treasure:
         ...
+
+    @classmethod
+    def from_data(cls, data: PnWKitTreasure) -> Treasure:
+        return cls(
+            name=data.name,
+            color=getattr(enums.Color, data.color.upper()).value,
+            continent=getattr(enums.Continent, data.continent.upper()).value,
+            bonus=data.bonus,
+            spawn_date=datetime.datetime.fromisoformat(data.spawndate),
+            nation_id=int(data.nation.id),
+        )

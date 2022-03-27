@@ -14,7 +14,7 @@ class WarAttack(TypedDict):
     defender_id: int
     type: int
     war_id: int
-    victor: int
+    victor_id: int
     success: int
     attcas1: int
     attcas2: int

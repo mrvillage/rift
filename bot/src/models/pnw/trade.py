@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     import datetime
     from typing import ClassVar
 
+    from pnwkit.data import Trade as PnWKitTrade
+
     from ...types.models.pnw.trade import Trade as TradeData
 
 
@@ -36,3 +38,18 @@ class Trade:
     @classmethod
     def from_dict(cls, data: TradeData) -> Trade:
         ...
+
+    @classmethod
+    def from_data(cls, data: PnWKitTrade) -> Trade:
+        return cls(
+            id=int(data.id),
+            type=getattr(enums.TradeType, data.type),
+            date=datetime.datetime.fromisoformat(data.date),
+            sender_id=int(data.sid),
+            receiver_id=int(data.rid),
+            resource=getattr(enums.Resource, data.offer_resource.upper()),
+            amount=data.offer_amount,
+            action=getattr(enums.TradeAction, data.buy_or_sell.upper()),
+            accepted=data.accepted,
+            date_accepted=datetime.datetime.fromisoformat(data.date_accepted),
+        )

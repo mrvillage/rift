@@ -19,7 +19,7 @@ class War(TypedDict):
     ground_control: int
     air_superiority: int
     naval_blockade: int
-    winner: int
+    winner_id: int
     turns_left: int
     attacker_action_points: int
     defender_action_points: int
@@ -53,5 +53,5 @@ class War(TypedDict):
     defender_missiles_used: int
     attacker_nukes_used: int
     defender_nukes_used: int
-    attacker_infrastructure_destroyed_value: int
-    defender_infrastructure_destroyed_value: int
+    attacker_infrastructure_destroyed_value: decimal.Decimal
+    defender_infrastructure_destroyed_value: decimal.Decimal

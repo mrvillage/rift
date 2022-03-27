@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 import attrs
@@ -9,8 +10,9 @@ from ... import enums, utils
 __all__ = ("Bounty",)
 
 if TYPE_CHECKING:
-    import datetime
     from typing import ClassVar
+
+    from pnwkit.data import Bounty as PnWKitBounty
 
     from ...types.models.pnw.bounty import Bounty as BountyData
 
@@ -31,3 +33,13 @@ class Bounty:
     @classmethod
     def from_dict(cls, data: BountyData) -> Bounty:
         ...
+
+    @classmethod
+    def from_data(cls, data: PnWKitBounty) -> Bounty:
+        return cls(
+            id=int(data.id),
+            date=datetime.datetime.fromisoformat(data.date),
+            nation_id=int(data.nation_id),
+            amount=data.amount,
+            type=getattr(enums.BountyType, data.type),
+        )
