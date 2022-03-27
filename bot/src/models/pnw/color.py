@@ -32,6 +32,9 @@ class Color:
     def from_dict(cls, data: ColorData) -> Color:
         ...
 
+    def to_dict(self) -> ColorData:
+        ...
+
     @property
     def key(self) -> int:
         return self.color.value

@@ -42,6 +42,9 @@ class Alliance:
     def from_dict(cls, data: AllianceData) -> Alliance:
         ...
 
+    def to_dict(self) -> AllianceData:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitAlliance) -> Alliance:
         if TYPE_CHECKING:

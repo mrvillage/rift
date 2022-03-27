@@ -39,6 +39,9 @@ class Radiation:
     def from_dict(cls, data: RadiationData) -> Radiation:
         ...
 
+    def to_dict(self) -> RadiationData:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitRadiation, date: datetime.datetime) -> Radiation:
         if TYPE_CHECKING:

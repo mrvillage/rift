@@ -29,3 +29,6 @@ class Webhook:
     @classmethod
     def from_dict(cls, data: WebhookData) -> Webhook:
         ...
+
+    def to_dict(self) -> WebhookData:
+        ...

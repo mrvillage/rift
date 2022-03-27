@@ -40,6 +40,9 @@ class GuildSettings:
     def from_dict(cls, data: GuildSettingsData) -> GuildSettings:
         ...
 
+    def to_dict(self) -> GuildSettingsData:
+        ...
+
     @property
     def key(self) -> int:
         return self.guild_id

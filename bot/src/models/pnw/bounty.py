@@ -34,6 +34,9 @@ class Bounty:
     def from_dict(cls, data: BountyData) -> Bounty:
         ...
 
+    def to_dict(self) -> BountyData:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitBounty) -> Bounty:
         return cls(

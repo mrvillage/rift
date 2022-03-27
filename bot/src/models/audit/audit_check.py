@@ -33,3 +33,6 @@ class AuditCheck:
     @classmethod
     def from_dict(cls, data: AuditCheckData) -> AuditCheck:
         ...
+
+    def to_dict(self) -> AuditCheckData:
+        ...

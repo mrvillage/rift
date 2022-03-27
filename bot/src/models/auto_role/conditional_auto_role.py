@@ -31,3 +31,6 @@ class ConditionalAutoRole:
     @classmethod
     def from_dict(cls, data: ConditionalAutoRoleData) -> ConditionalAutoRole:
         ...
+
+    def to_dict(self) -> ConditionalAutoRoleData:
+        ...

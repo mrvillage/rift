@@ -39,3 +39,6 @@ class AllianceSettings:
     @classmethod
     def from_dict(cls, data: AllianceSettingsData) -> AllianceSettings:
         ...
+
+    def to_dict(self) -> AllianceSettingsData:
+        ...

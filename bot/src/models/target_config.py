@@ -34,3 +34,6 @@ class TargetConfig:
     @classmethod
     def from_dict(cls, data: TargetConfigData) -> TargetConfig:
         ...
+
+    def to_dict(self) -> TargetConfigData:
+        ...

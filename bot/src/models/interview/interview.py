@@ -30,3 +30,6 @@ class Interview:
     @classmethod
     def from_dict(cls, data: InterviewData) -> Interview:
         ...
+
+    def to_dict(self) -> InterviewData:
+        ...

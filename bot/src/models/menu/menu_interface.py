@@ -29,3 +29,6 @@ class MenuInterface:
     @classmethod
     def from_dict(cls, data: MenuInterfaceData) -> MenuInterface:
         ...
+
+    def to_dict(self) -> MenuInterfaceData:
+        ...

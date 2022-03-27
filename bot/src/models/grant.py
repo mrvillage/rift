@@ -40,3 +40,6 @@ class Grant:
     @classmethod
     def from_dict(cls, data: GrantData) -> Grant:
         ...
+
+    def to_dict(self) -> GrantData:
+        ...

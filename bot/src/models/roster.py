@@ -32,3 +32,6 @@ class Roster:
     @classmethod
     def from_dict(cls, data: RosterData) -> Roster:
         ...
+
+    def to_dict(self) -> RosterData:
+        ...

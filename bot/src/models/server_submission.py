@@ -32,3 +32,6 @@ class ServerSubmission:
     @classmethod
     def from_dict(cls, data: ServerSubmissionData) -> ServerSubmission:
         ...
+
+    def to_dict(self) -> ServerSubmissionData:
+        ...

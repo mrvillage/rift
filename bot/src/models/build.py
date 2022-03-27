@@ -59,3 +59,6 @@ class Build:
     @classmethod
     def from_dict(cls, data: BuildData) -> Build:
         ...
+
+    def to_dict(self) -> BuildData:
+        ...

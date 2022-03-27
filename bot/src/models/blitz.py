@@ -35,3 +35,6 @@ class Blitz:
     @classmethod
     def from_dict(cls, data: BlitzData) -> Blitz:
         ...
+
+    def to_dict(self) -> BlitzData:
+        ...

@@ -30,3 +30,6 @@ class AuditConfig:
     @classmethod
     def from_dict(cls, data: AuditConfigData) -> AuditConfig:
         ...
+
+    def to_dict(self) -> AuditConfigData:
+        ...

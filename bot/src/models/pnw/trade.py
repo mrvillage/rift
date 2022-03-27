@@ -39,6 +39,9 @@ class Trade:
     def from_dict(cls, data: TradeData) -> Trade:
         ...
 
+    def to_dict(self) -> TradeData:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitTrade) -> Trade:
         return cls(

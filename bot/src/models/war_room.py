@@ -33,3 +33,6 @@ class WarRoom:
     @classmethod
     def from_dict(cls, data: WarRoomData) -> WarRoom:
         ...
+
+    def to_dict(self) -> WarRoomData:
+        ...

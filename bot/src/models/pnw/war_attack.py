@@ -55,6 +55,9 @@ class WarAttack:
     def from_dict(cls, data: WarAttackData) -> WarAttack:
         ...
 
+    def to_dict(self) -> WarAttackData:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitWarAttack) -> WarAttack:
         if TYPE_CHECKING:

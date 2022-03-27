@@ -31,3 +31,6 @@ class Server:
     @classmethod
     def from_dict(cls, data: ServerData) -> Server:
         ...
+
+    def to_dict(self) -> ServerData:
+        ...

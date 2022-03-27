@@ -36,6 +36,9 @@ class Treasure:
     def from_dict(cls, data: TreasureData) -> Treasure:
         ...
 
+    def to_dict(self) -> TreasureData:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitTreasure) -> Treasure:
         return cls(

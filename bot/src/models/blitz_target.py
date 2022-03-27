@@ -30,3 +30,6 @@ class BlitzTarget:
     @classmethod
     def from_dict(cls, data: BlitzTargetData) -> BlitzTarget:
         ...
+
+    def to_dict(self) -> BlitzTargetData:
+        ...

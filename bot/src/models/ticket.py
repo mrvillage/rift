@@ -32,3 +32,6 @@ class Ticket:
     @classmethod
     def from_dict(cls, data: TicketData) -> Ticket:
         ...
+
+    def to_dict(self) -> TicketData:
+        ...

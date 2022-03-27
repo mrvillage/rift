@@ -34,3 +34,6 @@ class CityAutoRole:
     @classmethod
     def from_dict(cls, data: CityAutoRoleData) -> CityAutoRole:
         ...
+
+    def to_dict(self) -> CityAutoRoleData:
+        ...

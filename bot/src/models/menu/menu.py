@@ -29,3 +29,6 @@ class Menu:
     @classmethod
     def from_dict(cls, data: MenuData) -> Menu:
         ...
+
+    def to_dict(self) -> MenuData:
+        ...

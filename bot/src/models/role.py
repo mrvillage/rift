@@ -36,3 +36,6 @@ class Role:
     @classmethod
     def from_dict(cls, data: RoleData) -> Role:
         ...
+
+    def to_dict(self) -> RoleData:
+        ...

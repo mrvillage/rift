@@ -30,3 +30,6 @@ class Tag:
     @classmethod
     def from_dict(cls, data: TagData) -> Tag:
         ...
+
+    def to_dict(self) -> TagData:
+        ...

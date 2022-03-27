@@ -65,6 +65,9 @@ class City:
     def from_dict(cls, data: CityData) -> City:
         ...
 
+    def to_dict(self) -> CityData:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitCity) -> City:
         if TYPE_CHECKING:

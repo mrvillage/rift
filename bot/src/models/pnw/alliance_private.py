@@ -34,6 +34,9 @@ class AlliancePrivate:
     def from_dict(cls, data: AlliancePrivateData) -> AlliancePrivate:
         ...
 
+    def to_dict(self) -> AlliancePrivateData:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitAlliance) -> AlliancePrivate:
         if data.money is None:

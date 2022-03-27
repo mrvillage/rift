@@ -47,3 +47,6 @@ class TargetRater:
     @classmethod
     def from_dict(cls, data: TargetRaterData) -> TargetRater:
         ...
+
+    def to_dict(self) -> TargetRaterData:
+        ...

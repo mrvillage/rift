@@ -31,3 +31,6 @@ class Embassy:
     @classmethod
     def from_dict(cls, data: EmbassyData) -> Embassy:
         ...
+
+    def to_dict(self) -> EmbassyData:
+        ...

@@ -30,6 +30,9 @@ class InactiveAlert:
     def from_dict(cls, data: InactiveAlertData) -> InactiveAlert:
         ...
 
+    def to_dict(self) -> InactiveAlertData:
+        ...
+
     @property
     def key(self) -> int:
         return self.nation_id

@@ -33,3 +33,6 @@ class Subscription:
     @classmethod
     def from_dict(cls, data: SubscriptionData) -> Subscription:
         ...
+
+    def to_dict(self) -> SubscriptionData:
+        ...

@@ -30,3 +30,6 @@ class GuildRole:
     @classmethod
     def from_dict(cls, data: GuildRoleData) -> GuildRole:
         ...
+
+    def to_dict(self) -> GuildRoleData:
+        ...

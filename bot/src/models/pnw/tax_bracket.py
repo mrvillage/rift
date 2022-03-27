@@ -37,6 +37,9 @@ class TaxBracket:
     def from_dict(cls, data: TaxBracketData) -> TaxBracket:
         ...
 
+    def to_dict(self) -> TaxBracketData:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitTaxBracket) -> TaxBracket:
         return cls(

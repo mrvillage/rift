@@ -31,3 +31,6 @@ class Mention:
     @classmethod
     def from_dict(cls, data: MentionData) -> Mention:
         ...
+
+    def to_dict(self) -> MentionData:
+        ...

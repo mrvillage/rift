@@ -33,3 +33,6 @@ class AllianceAutoRole:
     @classmethod
     def from_dict(cls, data: AllianceAutoRoleData) -> AllianceAutoRole:
         ...
+
+    def to_dict(self) -> AllianceAutoRoleData:
+        ...

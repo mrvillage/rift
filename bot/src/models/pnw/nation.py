@@ -66,6 +66,9 @@ class Nation:
     def from_dict(cls, data: NationData) -> Nation:
         ...
 
+    def to_dict(self) -> NationData:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitNation) -> Nation:
         if TYPE_CHECKING:

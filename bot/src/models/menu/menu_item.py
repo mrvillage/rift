@@ -35,3 +35,6 @@ class MenuItem:
     @classmethod
     def from_dict(cls, data: MenuItemData) -> MenuItem:
         ...
+
+    def to_dict(self) -> MenuItemData:
+        ...

@@ -31,6 +31,9 @@ class User:
     def from_dict(cls, data: UserData) -> User:
         ...
 
+    def to_dict(self) -> UserData:
+        ...
+
     @property
     def key(self) -> int:
         return self.user_id

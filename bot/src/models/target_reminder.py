@@ -31,3 +31,6 @@ class TargetReminder:
     @classmethod
     def from_dict(cls, data: TargetReminderData) -> TargetReminder:
         ...
+
+    def to_dict(self) -> TargetReminderData:
+        ...

@@ -35,3 +35,6 @@ class TicketConfig:
     @classmethod
     def from_dict(cls, data: TicketConfigData) -> TicketConfig:
         ...
+
+    def to_dict(self) -> TicketConfigData:
+        ...

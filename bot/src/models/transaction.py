@@ -38,3 +38,6 @@ class Transaction:
     @classmethod
     def from_dict(cls, data: TransactionData) -> Transaction:
         ...
+
+    def to_dict(self) -> TransactionData:
+        ...

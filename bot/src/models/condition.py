@@ -31,3 +31,6 @@ class Condition:
     @classmethod
     def from_dict(cls, data: ConditionData) -> Condition:
         ...
+
+    def to_dict(self) -> ConditionData:
+        ...

@@ -28,4 +28,7 @@ class Resources:
 
     @classmethod
     def from_dict(cls, data: ResourcesData) -> Resources:
-        return cls(**data)
+        ...
+
+    def to_dict(self) -> ResourcesData:
+        ...urn cls(**data)

@@ -31,3 +31,6 @@ class AuditLogConfig:
     @classmethod
     def from_dict(cls, data: AuditLogConfigData) -> AuditLogConfig:
         ...
+
+    def to_dict(self) -> AuditLogConfigData:
+        ...

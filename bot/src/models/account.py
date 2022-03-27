@@ -34,3 +34,6 @@ class Account:
     @classmethod
     def from_dict(cls, data: AccountData) -> Account:
         ...
+
+    def to_dict(self) -> AccountData:
+        ...
