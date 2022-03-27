@@ -26,7 +26,7 @@ class ModelProtocol(Protocol):
     def to_dict(self) -> Any:
         ...
 
-    def update(self, data: ModelProtocol) -> ModelProtocol:
+    def update(self, data: Any) -> ModelProtocol:
         ...
 
 
