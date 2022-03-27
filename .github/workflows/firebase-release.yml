@@ -3,7 +3,7 @@ name: Firebase Hosting Release
 on:
   push:
     branches:
-      - master
+      - dev
     paths:
       - "web/**"
       - "docs/**"
