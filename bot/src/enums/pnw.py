@@ -4,11 +4,11 @@ import enum
 
 __all__ = (
     "AlliancePosition",
+    "BankrecParticipantType",
     "BountyType",
     "Color",
     "Continent",
     "DomesticPolicy",
-    "ModelType",
     "Resource",
     "TradeAction",
     "TradeType",
@@ -26,6 +26,15 @@ class AlliancePosition(enum.Enum):
     OFFICER = 3
     HEIR = 4
     LEADER = 5
+
+    # pnw aliases
+    NOALLIANCE = 0
+
+
+class BankrecParticipantType(enum.Enum):
+    NATION = 1
+    ALLIANCE = 2
+    TAXES = 3
 
 
 class BountyType(enum.Enum):
@@ -63,6 +72,14 @@ class Continent(enum.Enum):
     AUSTRALIA = 6
     ANTARCTICA = 7
 
+    # pnw aliases
+    na = 1
+    sa = 2
+    eu = 3
+    af = 4
+    au = 6
+    an = 7
+
 
 class DomesticPolicy(enum.Enum):
     MANIFEST_DESTINY = 1
@@ -70,11 +87,6 @@ class DomesticPolicy(enum.Enum):
     TECHNOLOGICAL_ADVANCEMENT = 3
     IMPERIALISM = 4
     URBANIZATIOn = 5
-
-
-class ModelType(enum.Enum):
-    NATION = 1
-    ALLIANCE = 2
 
 
 class Resource(enum.Enum):
@@ -130,6 +142,17 @@ class WarAttackType(enum.Enum):
     PEACE = 13
     VICTORY = 14
     ALLIANCE_LOOT = 15
+
+    # pnw aliases
+    AIRVINFRA = 0
+    AIRVSOLDIERS = 1
+    AIRVTANKS = 2
+    AIRVMONEY = 3
+    AIRVSHIPS = 4
+    AIRVAIR = 5
+    MISSILEFAIL = 8
+    NUKEFAIL = 10
+    ALLIANCELOOT = 15
 
 
 class WarPolicy(enum.Enum):
