@@ -43,6 +43,9 @@ class GuildSettings:
     def to_dict(self) -> GuildSettingsData:
         ...
 
+    def update(self, data: GuildSettings) -> GuildSettings:
+        ...
+
     @property
     def key(self) -> int:
         return self.guild_id

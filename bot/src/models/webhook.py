@@ -32,3 +32,6 @@ class Webhook:
 
     def to_dict(self) -> WebhookData:
         ...
+
+    def update(self, data: Webhook) -> Webhook:
+        ...

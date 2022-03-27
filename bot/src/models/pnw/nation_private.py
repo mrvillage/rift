@@ -37,6 +37,9 @@ class NationPrivate:
     def to_dict(self) -> NationPrivateData:
         ...
 
+    def update(self, data: NationPrivate) -> NationPrivate:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitNation) -> NationPrivate:
         if data.money is None:

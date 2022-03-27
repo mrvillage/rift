@@ -36,3 +36,6 @@ class AuditCheck:
 
     def to_dict(self) -> AuditCheckData:
         ...
+
+    def update(self, data: AuditCheck) -> AuditCheck:
+        ...

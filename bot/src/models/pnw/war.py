@@ -80,6 +80,9 @@ class War:
     def to_dict(self) -> WarData:
         ...
 
+    def update(self, data: War) -> War:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitWar) -> War:
         if TYPE_CHECKING:

@@ -34,3 +34,6 @@ class Mention:
 
     def to_dict(self) -> MentionData:
         ...
+
+    def update(self, data: Mention) -> Mention:
+        ...

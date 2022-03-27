@@ -39,3 +39,6 @@ class Role:
 
     def to_dict(self) -> RoleData:
         ...
+
+    def update(self, data: Role) -> Role:
+        ...

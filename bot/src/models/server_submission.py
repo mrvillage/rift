@@ -35,3 +35,6 @@ class ServerSubmission:
 
     def to_dict(self) -> ServerSubmissionData:
         ...
+
+    def update(self, data: ServerSubmission) -> ServerSubmission:
+        ...

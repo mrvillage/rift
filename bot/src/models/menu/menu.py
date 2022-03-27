@@ -32,3 +32,6 @@ class Menu:
 
     def to_dict(self) -> MenuData:
         ...
+
+    def update(self, data: Menu) -> Menu:
+        ...

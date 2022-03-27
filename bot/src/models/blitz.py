@@ -38,3 +38,6 @@ class Blitz:
 
     def to_dict(self) -> BlitzData:
         ...
+
+    def update(self, data: Blitz) -> Blitz:
+        ...

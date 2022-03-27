@@ -34,6 +34,9 @@ class User:
     def to_dict(self) -> UserData:
         ...
 
+    def update(self, data: User) -> User:
+        ...
+
     @property
     def key(self) -> int:
         return self.user_id

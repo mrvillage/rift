@@ -41,3 +41,6 @@ class Transaction:
 
     def to_dict(self) -> TransactionData:
         ...
+
+    def update(self, data: Transaction) -> Transaction:
+        ...

@@ -33,3 +33,6 @@ class AuditConfig:
 
     def to_dict(self) -> AuditConfigData:
         ...
+
+    def update(self, data: AuditConfig) -> AuditConfig:
+        ...

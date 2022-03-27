@@ -43,3 +43,6 @@ class Grant:
 
     def to_dict(self) -> GrantData:
         ...
+
+    def update(self, data: Grant) -> Grant:
+        ...

@@ -33,3 +33,6 @@ class Tag:
 
     def to_dict(self) -> TagData:
         ...
+
+    def update(self, data: Tag) -> Tag:
+        ...

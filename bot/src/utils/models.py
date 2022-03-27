@@ -26,6 +26,9 @@ class ModelProtocol(Protocol):
     def to_dict(self) -> Any:
         ...
 
+    def update(self, data: ModelProtocol) -> ModelProtocol:
+        ...
+
 
 def model(class_: T) -> T:
     g: dict[str, Any] = {"db": db}
@@ -60,7 +63,17 @@ def to_dict(self):
     """,
         g,
     )
+    newline_with_spaces = "\n    "
+    exec(
+        f"""
+def update(self, data):
+    {newline_with_spaces.join(f'self.{name} = data.{name}' for name in class_.__slots__)}
+    return self
+    """,
+        g,
+    )
     class_.save = g["save"]
     class_.from_dict = g["from_dict"]
     class_.to_dict = g["to_dict"]
+    class_.update = g["update"]
     return class_

@@ -37,3 +37,6 @@ class TargetConfig:
 
     def to_dict(self) -> TargetConfigData:
         ...
+
+    def update(self, data: TargetConfig) -> TargetConfig:
+        ...

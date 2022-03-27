@@ -62,3 +62,6 @@ class Build:
 
     def to_dict(self) -> BuildData:
         ...
+
+    def update(self, data: Build) -> Build:
+        ...

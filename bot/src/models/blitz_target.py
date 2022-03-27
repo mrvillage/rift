@@ -33,3 +33,6 @@ class BlitzTarget:
 
     def to_dict(self) -> BlitzTargetData:
         ...
+
+    def update(self, data: BlitzTarget) -> BlitzTarget:
+        ...

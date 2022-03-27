@@ -35,3 +35,6 @@ class Roster:
 
     def to_dict(self) -> RosterData:
         ...
+
+    def update(self, data: Roster) -> Roster:
+        ...

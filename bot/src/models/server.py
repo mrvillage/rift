@@ -34,3 +34,6 @@ class Server:
 
     def to_dict(self) -> ServerData:
         ...
+
+    def update(self, data: Server) -> Server:
+        ...

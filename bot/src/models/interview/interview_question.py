@@ -41,3 +41,6 @@ class InterviewQuestion:
 
     def to_dict(self) -> InterviewQuestionData:
         ...
+
+    def update(self, data: InterviewQuestion) -> InterviewQuestion:
+        ...

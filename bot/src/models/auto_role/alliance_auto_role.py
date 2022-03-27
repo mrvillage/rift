@@ -36,3 +36,6 @@ class AllianceAutoRole:
 
     def to_dict(self) -> AllianceAutoRoleData:
         ...
+
+    def update(self, data: AllianceAutoRole) -> AllianceAutoRole:
+        ...

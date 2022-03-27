@@ -33,3 +33,6 @@ class AuditRun:
 
     def to_dict(self) -> AuditRunData:
         ...
+
+    def update(self, data: AuditRun) -> AuditRun:
+        ...

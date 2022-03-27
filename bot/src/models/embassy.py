@@ -34,3 +34,6 @@ class Embassy:
 
     def to_dict(self) -> EmbassyData:
         ...
+
+    def update(self, data: Embassy) -> Embassy:
+        ...

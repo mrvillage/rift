@@ -36,3 +36,6 @@ class AuditLog:
 
     def to_dict(self) -> AuditLogData:
         ...
+
+    def update(self, data: AuditLog) -> AuditLog:
+        ...

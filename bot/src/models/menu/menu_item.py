@@ -38,3 +38,6 @@ class MenuItem:
 
     def to_dict(self) -> MenuItemData:
         ...
+
+    def update(self, data: MenuItem) -> MenuItem:
+        ...

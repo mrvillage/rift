@@ -36,3 +36,6 @@ class Subscription:
 
     def to_dict(self) -> SubscriptionData:
         ...
+
+    def update(self, data: Subscription) -> Subscription:
+        ...

@@ -38,3 +38,6 @@ class TicketConfig:
 
     def to_dict(self) -> TicketConfigData:
         ...
+
+    def update(self, data: TicketConfig) -> TicketConfig:
+        ...

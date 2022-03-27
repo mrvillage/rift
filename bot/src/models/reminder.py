@@ -37,3 +37,6 @@ class Reminder:
 
     def to_dict(self) -> ReminderData:
         ...
+
+    def update(self, data: Reminder) -> Reminder:
+        ...

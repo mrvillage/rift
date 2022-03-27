@@ -34,3 +34,6 @@ class TargetReminder:
 
     def to_dict(self) -> TargetReminderData:
         ...
+
+    def update(self, data: TargetReminder) -> TargetReminder:
+        ...

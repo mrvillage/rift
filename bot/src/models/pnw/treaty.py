@@ -38,6 +38,9 @@ class Treaty:
     def to_dict(self) -> TreatyData:
         ...
 
+    def update(self, data: Treaty) -> Treaty:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitTreaty) -> Treaty:
         return cls(

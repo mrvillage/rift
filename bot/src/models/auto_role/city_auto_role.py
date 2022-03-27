@@ -37,3 +37,6 @@ class CityAutoRole:
 
     def to_dict(self) -> CityAutoRoleData:
         ...
+
+    def update(self, data: CityAutoRole) -> CityAutoRole:
+        ...

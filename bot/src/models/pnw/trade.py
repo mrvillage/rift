@@ -42,6 +42,9 @@ class Trade:
     def to_dict(self) -> TradeData:
         ...
 
+    def update(self, data: Trade) -> Trade:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitTrade) -> Trade:
         return cls(

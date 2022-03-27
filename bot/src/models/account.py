@@ -37,3 +37,6 @@ class Account:
 
     def to_dict(self) -> AccountData:
         ...
+
+    def update(self, data: Account) -> Account:
+        ...

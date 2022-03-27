@@ -48,6 +48,9 @@ class Bankrec:
     def to_dict(self) -> BankrecData:
         ...
 
+    def update(self, data: Bankrec) -> Bankrec:
+        ...
+
     @classmethod
     def from_data(cls, data: PnWKitBankrec) -> Bankrec:
         if TYPE_CHECKING:

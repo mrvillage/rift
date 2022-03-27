@@ -33,3 +33,6 @@ class GuildRole:
 
     def to_dict(self) -> GuildRoleData:
         ...
+
+    def update(self, data: GuildRole) -> GuildRole:
+        ...

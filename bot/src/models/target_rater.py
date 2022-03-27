@@ -50,3 +50,6 @@ class TargetRater:
 
     def to_dict(self) -> TargetRaterData:
         ...
+
+    def update(self, data: TargetRater) -> TargetRater:
+        ...

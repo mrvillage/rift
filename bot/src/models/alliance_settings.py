@@ -42,3 +42,6 @@ class AllianceSettings:
 
     def to_dict(self) -> AllianceSettingsData:
         ...
+
+    def update(self, data: AllianceSettings) -> AllianceSettings:
+        ...

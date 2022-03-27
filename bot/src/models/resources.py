@@ -45,3 +45,18 @@ class Resources:
             "aluminum": self.aluminum,
             "food": self.food,
         }
+
+    def update(self, data: Resources) -> Resources:
+        self.money = data.money
+        self.coal = data.coal
+        self.oil = data.oil
+        self.uranium = data.uranium
+        self.iron = data.iron
+        self.bauxite = data.bauxite
+        self.lead = data.lead
+        self.gasoline = data.gasoline
+        self.munitions = data.munitions
+        self.steel = data.steel
+        self.aluminum = data.aluminum
+        self.food = data.food
+        return self

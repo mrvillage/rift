@@ -36,3 +36,6 @@ class WarRoom:
 
     def to_dict(self) -> WarRoomData:
         ...
+
+    def update(self, data: WarRoom) -> WarRoom:
+        ...

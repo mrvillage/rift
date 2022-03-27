@@ -33,3 +33,6 @@ class Interview:
 
     def to_dict(self) -> InterviewData:
         ...
+
+    def update(self, data: Interview) -> Interview:
+        ...

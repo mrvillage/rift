@@ -34,3 +34,6 @@ class AuditLogConfig:
 
     def to_dict(self) -> AuditLogConfigData:
         ...
+
+    def update(self, data: AuditLogConfig) -> AuditLogConfig:
+        ...

@@ -32,3 +32,6 @@ class MenuInterface:
 
     def to_dict(self) -> MenuInterfaceData:
         ...
+
+    def update(self, data: MenuInterface) -> MenuInterface:
+        ...

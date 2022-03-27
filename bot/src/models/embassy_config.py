@@ -38,3 +38,6 @@ class EmbassyConfig:
 
     def to_dict(self) -> EmbassyConfigData:
         ...
+
+    def update(self, data: EmbassyConfig) -> EmbassyConfig:
+        ...

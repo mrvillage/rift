@@ -35,3 +35,6 @@ class Ticket:
 
     def to_dict(self) -> TicketData:
         ...
+
+    def update(self, data: Ticket) -> Ticket:
+        ...

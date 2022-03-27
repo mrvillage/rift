@@ -40,3 +40,6 @@ class WarRoomConfig:
 
     def to_dict(self) -> WarRoomConfigData:
         ...
+
+    def update(self, data: WarRoomConfig) -> WarRoomConfig:
+        ...

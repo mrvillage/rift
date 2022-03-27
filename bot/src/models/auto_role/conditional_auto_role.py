@@ -34,3 +34,6 @@ class ConditionalAutoRole:
 
     def to_dict(self) -> ConditionalAutoRoleData:
         ...
+
+    def update(self, data: ConditionalAutoRole) -> ConditionalAutoRole:
+        ...

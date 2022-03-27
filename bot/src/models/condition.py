@@ -34,3 +34,6 @@ class Condition:
 
     def to_dict(self) -> ConditionData:
         ...
+
+    def update(self, data: Condition) -> Condition:
+        ...
