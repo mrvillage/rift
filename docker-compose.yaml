@@ -17,6 +17,7 @@ services:
       DEV_APPLICATION_ID: ${DEV_APPLICATION_ID}
       DEV_GUILD_IDS: ${DEV_GUILD_IDS}
       VERIFIED_BOT_KEY: ${VERIFIED_BOT_KEY}
+      PNW_API_KEY: ${PNW_API_KEY}
       DB_HOST: ${DB_HOST:-db}
       DB_PORT: ${DB_PORT:-5432}
       DB_USER: ${DB_USER:-postgres}
