@@ -28,7 +28,20 @@ class Resources:
 
     @classmethod
     def from_dict(cls, data: ResourcesData) -> Resources:
-        ...
+        return cls(**data)
 
     def to_dict(self) -> ResourcesData:
-        ...urn cls(**data)
+        return {
+            "money": self.money,
+            "coal": self.coal,
+            "oil": self.oil,
+            "uranium": self.uranium,
+            "iron": self.iron,
+            "bauxite": self.bauxite,
+            "lead": self.lead,
+            "gasoline": self.gasoline,
+            "munitions": self.munitions,
+            "steel": self.steel,
+            "aluminum": self.aluminum,
+            "food": self.food,
+        }
