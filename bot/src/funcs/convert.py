@@ -45,10 +45,10 @@ async def convert_alliance(
             pass
         try:
             user = await commands.MemberConverter().convert(ctx, search)  # type: ignore
-        except commands.MemberNotFound:
+        except (commands.MemberNotFound, IndexError):
             try:
                 user = await commands.UserConverter().convert(ctx, search)  # type: ignore
-            except commands.UserNotFound:
+            except (commands.UserNotFound, IndexError):
                 user = None
         if user is not None:
             link = cache.get_user(user.id)
@@ -168,10 +168,10 @@ async def convert_nation(ctx: RiftContext, search: str, stage: int = 0) -> Natio
             pass
         try:
             user = await commands.MemberConverter().convert(ctx, search)  # type: ignore
-        except commands.MemberNotFound:
+        except (commands.MemberNotFound, IndexError):
             try:
                 user = await commands.UserConverter().convert(ctx, search)  # type: ignore
-            except commands.UserNotFound:
+            except (commands.UserNotFound, IndexError):
                 user = None
         if user is not None:
             link = cache.get_user(user.id)
