@@ -87,7 +87,7 @@ class Nation:
         )
         return cls(
             id=int(data.id),
-            alliance_id=int(data.alliance),
+            alliance_id=int(data.alliance_id),
             alliance_position=getattr(enums.AlliancePosition, alliance_position),
             name=data.nation_name,
             leader=data.leader_name,
