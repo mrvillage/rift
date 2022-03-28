@@ -8,6 +8,7 @@ from .blitz import *
 from .blitz_target import *
 from .build import *
 from .condition import *
+from .credentials import *
 from .embassy import *
 from .embassy_config import *
 from .grant import *

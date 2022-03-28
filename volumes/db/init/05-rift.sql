@@ -730,6 +730,11 @@ CREATE TABLE "rosters" (
   "time_zone" numeric
 );
 
+CREATE TABLE "credentials" (
+  "nation_id" integer,
+  "api_key" text
+);
+
 COMMENT ON COLUMN "target_configs"."count" IS 'flags that show what can contain';
 
 COMMENT ON COLUMN "target_configs"."condition" IS 'condition to apply by default when using the config';
