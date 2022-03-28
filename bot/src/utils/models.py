@@ -48,6 +48,13 @@ async def save(self):
     """,
         g,
     )
+    exec(  # nosec
+        f"""
+async def delete(self):
+    await db.query("DELETE FROM {class_.TABLE} WHERE {' AND '.join(f'{name} = ${class_.__slots__.index(name)+1}' for name in primary_key)});")
+    """,
+        g,
+    )
     exec(
         f"""
 @classmethod
@@ -73,6 +80,7 @@ def update(self, data):
         g,
     )
     class_.save = g["save"]
+    class_.save = g["delete"]
     class_.from_dict = g["from_dict"]
     class_.to_dict = g["to_dict"]
     class_.update = g["update"]

@@ -44,6 +44,9 @@ class TargetRater:
     async def save(self) -> None:
         ...
 
+    async def delete(self) -> None:
+        ...
+
     @classmethod
     def from_dict(cls, data: TargetRaterData) -> TargetRater:
         ...

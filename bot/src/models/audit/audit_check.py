@@ -30,6 +30,9 @@ class AuditCheck:
     async def save(self) -> None:
         ...
 
+    async def delete(self) -> None:
+        ...
+
     @classmethod
     def from_dict(cls, data: AuditCheckData) -> AuditCheck:
         ...

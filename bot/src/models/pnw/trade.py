@@ -35,6 +35,9 @@ class Trade:
     async def save(self) -> None:
         ...
 
+    async def delete(self) -> None:
+        ...
+
     @classmethod
     def from_dict(cls, data: TradeData) -> Trade:
         ...
