@@ -65,3 +65,15 @@ class Radiation:
             australia=data.australia,
             antarctica=data.antarctica,
         )
+
+    @property
+    def global_(self) -> decimal.Decimal:
+        return (
+            self.north_america
+            + self.south_america
+            + self.europe
+            + self.africa
+            + self.asia
+            + self.australia
+            + self.antarctica
+        ) / 5
