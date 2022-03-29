@@ -196,7 +196,7 @@ class MenuItem:
                 if (l := self.data.get("label", None)) or self.data.get("emoji", None)
                 else "None",
                 disabled=self.data.get("disabled", False),
-                custom_id=custom_id if self.data.get("url", None) is not None else None,
+                custom_id=custom_id,
                 url=self.data.get("url", None),
                 emoji=self.data.get("emoji", None),
                 row=row,
