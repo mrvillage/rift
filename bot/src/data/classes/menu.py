@@ -197,7 +197,7 @@ class MenuItem:
                 else "None",
                 disabled=self.data.get("disabled", False),
                 custom_id=custom_id,
-                url=self.data.get("url", None),
+                # url=self.data.get("url", None),
                 emoji=self.data.get("emoji", None),
                 row=row,
                 action=self.data.get("action", None),
