@@ -3,7 +3,7 @@ import UserMenu from "./UserMenu";
 import SideBarItems from "./SideBarItems";
 import { useAppContext } from "../../context/AppContext";
 import { useNotifications } from "@mantine/notifications";
-import { Icon } from "../../utils";
+import { Icon, themePick } from "../../utils";
 
 interface SideBarProps {
   opened: boolean;
@@ -57,9 +57,10 @@ const SideBar = ({ opened }: SideBarProps) => {
         <Box
           sx={(theme) => ({
             paddingTop: theme.spacing.sm,
-            borderTop: `1px solid ${
-              theme.colorScheme === theme.colors.dark[4]
-            }`,
+            borderTop: `1px solid ${themePick(
+              theme.colors.dark[4],
+              theme.colors.gray[2]
+            )}`,
           })}
         >
           {!isSignedIn ? <SignInButton /> : <UserMenu />}

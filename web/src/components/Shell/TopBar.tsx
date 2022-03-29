@@ -28,12 +28,15 @@ const TopBar = ({ opened, setOpened }: TopBarProps) => {
             <Burger
               opened={opened}
               onClick={() => setOpened(!opened)}
-              color={theme.colors.gray[6]}
+              color={themePick(theme.colors.gray[6], theme.colors.dark[4])}
               mr="xl"
             />
           </MediaQuery>
           <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
-            <Icon.Aperture size={24} color={theme.colors.gray[6]} />
+            <Icon.Aperture
+              size={24}
+              color={themePick(theme.colors.gray[6], theme.colors.dark[4])}
+            />
           </MediaQuery>
         </Group>
         <Group>
@@ -41,16 +44,23 @@ const TopBar = ({ opened, setOpened }: TopBarProps) => {
             label="Discord"
             href="https://rift.mrvillage.dev/discord"
           >
-            <DiscordIcon color={theme.colors.gray[6]} />
+            <DiscordIcon
+              color={themePick(theme.colors.gray[6], theme.colors.dark[4])}
+            />
           </TopActionIcon>
           <TopActionIcon
             label="GitHub"
             href="https://rift.mrvillage.dev/github"
           >
-            <Icon.GitHub size={24} color={theme.colors.gray[6]} />
+            <Icon.GitHub
+              size={24}
+              color={themePick(theme.colors.gray[6], theme.colors.dark[4])}
+            />
           </TopActionIcon>
           <TopActionIcon label="Add Rift" href="https://rift.mrvillage.dev/get">
-            <Icon.Plus color={theme.colors.gray[6]} />
+            <Icon.Plus
+              color={themePick(theme.colors.gray[6], theme.colors.dark[4])}
+            />
           </TopActionIcon>
           <TopActionIcon
             label={themePick("Light Mode", "Dark Mode")}
@@ -58,7 +68,7 @@ const TopBar = ({ opened, setOpened }: TopBarProps) => {
           >
             {themePick(
               <Icon.Sun size={16} color={theme.colors.gray[6]} />,
-              <Icon.Moon size={16} color={theme.colors.gray[6]} />
+              <Icon.Moon size={16} color={theme.colors.dark[4]} />
             )}
           </TopActionIcon>
         </Group>

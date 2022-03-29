@@ -7,6 +7,7 @@ import {
 } from "@mantine/core";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { themePick } from "../../utils";
 export interface SideBarSubItemProps {
   label: string;
   path: string;
@@ -25,10 +26,12 @@ const SideBarSubItem = ({ label, path }: SideBarSubItemProps) => {
           width: "100%",
           padding: theme.spacing.xs,
           borderRadius: theme.radius.sm,
-          color: theme.colors.dark[0],
-
+          color: themePick(theme.colors.dark[0], theme.black),
           "&:hover": {
-            backgroundColor: theme.colors.dark[6],
+            backgroundColor: themePick(
+              theme.colors.dark[6],
+              theme.colors.gray[0]
+            ),
           },
         }}
         onClick={() => {

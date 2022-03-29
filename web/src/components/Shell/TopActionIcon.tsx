@@ -1,5 +1,6 @@
 import { ActionIcon, Tooltip, useMantineTheme } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
+import { themePick } from "../../utils";
 
 interface TopActionIconProps {
   label: string;

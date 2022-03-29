@@ -1,6 +1,7 @@
 import { Avatar, Box, Group, Text, UnstyledButton } from "@mantine/core";
 import { forwardRef } from "react";
 import * as Icon from "react-feather";
+import { themePick } from "../../utils";
 
 const UserButton = forwardRef<HTMLButtonElement>(({ ...others }, ref) => (
   <UnstyledButton
@@ -10,9 +11,9 @@ const UserButton = forwardRef<HTMLButtonElement>(({ ...others }, ref) => (
       width: "100%",
       padding: theme.spacing.xs,
       borderRadius: theme.radius.sm,
-      color: theme.colors.dark[0],
+      color: themePick(theme.colors.dark[0], theme.black),
       "&:hover": {
-        backgroundColor: theme.colors.dark[6],
+        backgroundColor: themePick(theme.colors.dark[6], theme.colors.gray[0]),
       },
     })}
     {...others}
