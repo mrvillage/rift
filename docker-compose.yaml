@@ -1,5 +1,16 @@
 version: "3.8"
 
+x-logging:
+  &default-logging
+  options:
+    max-size: "10MB"
+    max-file: "10"
+
+x-large-logging:
+  &large-logging
+  options:
+    max-size: "100MB"
+    max-file: "10"
 services:
   bot:
     container_name: rift-bot
@@ -25,6 +36,7 @@ services:
       DB_NAME: ${DB_NAME:-postgres}
     volumes:
       - ./private.pem:/private.pem
+    logging: *default-logging
 
   studio:
     container_name: rift-studio
@@ -37,6 +49,7 @@ services:
       STUDIO_PG_META_URL: http://meta:8080
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+    logging: *default-logging
 
   kong:
     container_name: rift-kong
@@ -53,6 +66,7 @@ services:
       KONG_PLUGINS: request-transformer,cors,key-auth,acl
     volumes:
       - ./volumes/api/kong.yml:/var/lib/kong/kong.yml
+    logging: *default-logging
 
   auth:
     container_name: rift-auth
@@ -95,6 +109,7 @@ services:
       GOTRUE_EXTERNAL_DISCORD_CLIENT_ID: ${EXTERNAL_DISCORD_CLIENT_ID}
       GOTRUE_EXTERNAL_DISCORD_SECRET: ${EXTERNAL_DISCORD_SECRET}
       GOTRUE_EXTERNAL_DISCORD_REDIRECT_URI: ${EXTERNAL_DISCORD_REDIRECT_URI}
+    logging: *default-logging
 
   rest:
     container_name: rift-rest
@@ -108,6 +123,7 @@ services:
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
       PGRST_DB_USE_LEGACY_GUCS: "false"
+    logging: *default-logging
 
   realtime:
     container_name: rift-realtime
@@ -131,6 +147,7 @@ services:
       TEMPORARY_SLOT: "true"
     command: >
       bash -c "./prod/rel/realtime/bin/realtime eval Realtime.Release.migrate && ./prod/rel/realtime/bin/realtime start"
+    logging: *default-logging
 
   storage:
     container_name: rift-storage
@@ -155,6 +172,7 @@ services:
       GLOBAL_S3_BUCKET: stub
     volumes:
       - ./volumes/storage:/var/lib/storage
+    logging: *default-logging
 
   meta:
     container_name: rift-meta
@@ -166,6 +184,7 @@ services:
       PG_META_PORT: 8080
       PG_META_DB_HOST: db
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    logging: *default-logging
 
   db:
     container_name: rift-db
@@ -180,3 +199,4 @@ services:
       - ./volumes/db/data:/var/lib/postgresql/data
       - ./volumes/db/init:/docker-entrypoint-initdb.d
       - ./volumes/db/postgresql.conf:/etc/postgresql/postgresql.conf
+    logging: *large-logging
