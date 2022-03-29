@@ -9,7 +9,9 @@ from .. import utils
 __all__ = ("CommonTask",)
 
 if TYPE_CHECKING:
-    ...
+    from typing import TypeVar
+
+    T = TypeVar("T", bound="CommonTask")
 
 
 class CommonTask:
@@ -29,8 +31,9 @@ class CommonTask:
     async def on_error(self, error: Exception) -> None:
         ...
 
-    def start(self) -> None:
+    def start(self: T) -> T:
         asyncio.create_task(self.run())
+        return self
 
     async def run(self) -> None:
         before = await utils.return_exception(self.before_task())

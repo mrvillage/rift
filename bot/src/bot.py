@@ -1,14 +1,20 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import quarrel
 
 from . import env
 
 __all__ = ("Bot", "bot")
 
+if TYPE_CHECKING:
+    from .tasks.common import CommonTask
+
 
 class Bot(quarrel.Bot):
-    ...
+    running_tasks: list[CommonTask]
+    __slots__ = ("running_tasks",)
 
 
 intents = quarrel.Intents(guilds=True, members=True)
