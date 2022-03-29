@@ -16,6 +16,8 @@
     "@mantine/notifications": "^4.0.7",
     "@mantine/rte": "^4.0.7",
     "@mantine/spotlight": "^4.0.7",
+    "@mdx-js/react": "^2.1.0",
+    "@mdx-js/rollup": "^2.1.0",
     "@supabase/supabase-js": "^1.31.1",
     "dayjs": "^1.11.0",
     "react": "^17.0.2",
@@ -25,6 +27,7 @@
     "react-router-dom": "^6.2.2"
   },
   "devDependencies": {
+    "@types/mdx": "^2.0.1",
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",
     "@vitejs/plugin-react": "^1.0.7",
