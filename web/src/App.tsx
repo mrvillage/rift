@@ -1,5 +1,5 @@
 import "./App.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Routes, Route } from "react-router-dom";
 import {
   MantineProvider,
   ColorSchemeProvider,
@@ -63,7 +63,9 @@ function App() {
                   }}
                 >
                   <Shell>
-                    <></>
+                    <Routes>
+                      {/* <Route path="/" element={<h1>Home</h1>} /> */}
+                    </Routes>
                   </Shell>
                 </SpotlightProvider>
               </NotificationsProvider>
