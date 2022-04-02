@@ -11,6 +11,7 @@ x-large-logging:
   options:
     max-size: "100MB"
     max-file: "10"
+
 services:
   bot:
     container_name: rift-bot
