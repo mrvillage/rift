@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import attrs
 
-from ... import enums, utils
+from ... import enums, models, utils
 
 __all__ = ("Bankrec",)
 
@@ -15,7 +15,6 @@ if TYPE_CHECKING:
 
     from pnwkit.data import Bankrec as PnWKitBankrec
 
-    from ... import models
     from ...types.models.pnw.bankrec import Bankrec as BankrecData
 
 
@@ -23,6 +22,8 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Bankrec:
     TABLE: ClassVar[str] = "bankrecs"
+    INCREMENT: ClassVar[tuple[str, ...]] = ()
+    ENUMS: ClassVar[tuple[str, ...]] = ("sender_type", "receiver_type")
     id: int
     date: datetime.datetime
     sender_id: int
@@ -38,7 +39,7 @@ class Bankrec:
     resources: models.Resources
     tax_id: int
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

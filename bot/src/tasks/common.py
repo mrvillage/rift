@@ -29,7 +29,9 @@ class CommonTask:
         ...
 
     async def on_error(self, error: Exception) -> None:
-        ...
+        utils.print_exception_with_header(
+            f"Ignoring exception in task {type(self).__name__}:", error
+        )
 
     def start(self: T) -> T:
         asyncio.create_task(self.run())

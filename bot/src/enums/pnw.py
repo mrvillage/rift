@@ -86,7 +86,8 @@ class DomesticPolicy(enum.Enum):
     OPEN_MARKETS = 2
     TECHNOLOGICAL_ADVANCEMENT = 3
     IMPERIALISM = 4
-    URBANIZATIOn = 5
+    URBANIZATION = 5
+    RAPID_EXPANSION = 6
 
 
 class Resource(enum.Enum):

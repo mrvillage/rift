@@ -22,6 +22,8 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class War:
     TABLE: ClassVar[str] = "wars"
+    INCREMENT: ClassVar[tuple[str, ...]] = ()
+    ENUMS: ClassVar[tuple[str, ...]] = ("type",)
     id: int
     date: datetime.datetime
     reason: str
@@ -70,7 +72,7 @@ class War:
     attacker_infrastructure_destroyed_value: decimal.Decimal
     defender_infrastructure_destroyed_value: decimal.Decimal
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

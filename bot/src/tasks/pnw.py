@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import datetime
+import time
 from typing import TYPE_CHECKING
 
 import attrs
@@ -25,9 +27,21 @@ async def handle_model_update(
     getter: Callable[[int], Any],
     remover: Callable[[Any], Any],
     no_compare: Optional[list[str]] = None,
+    *,
     delete: bool = True,
+    batch_size: int = 10,
 ) -> None:
-    data_dict = {int(i.id): model(i) async for i in paginator.batch(5)}
+    s = time.perf_counter()
+    # data_dict: dict[int, Any] = {}
+    # try:
+    #     async for i in paginator.batch(5):
+    #         data_dict[int(i.id)] = model.from_data(i)
+    # except Exception as error:
+    #     pass
+    data_dict = {
+        int(i.id): model.from_data(i) async for i in paginator.batch(batch_size)
+    }
+    e = time.perf_counter() - s
     ids = set(data_dict.keys())
     current_ids = {i.id for i in current}
     deleted_ids = current_ids - ids
@@ -43,7 +57,7 @@ async def handle_model_update(
     for i in created_ids:
         new = data_dict[i]
         adder(new)
-        await new.save()
+        await new.save(insert=True)
         bot.dispatch(f"{name}_create", new)
     for i in updated_ids:
         new = data_dict[i]
@@ -70,9 +84,10 @@ class PnWDataTask(CommonTask):
         next_run = next_run.replace(
             minute=(next_run.minute // 5) * 5, second=0, microsecond=0
         ) + datetime.timedelta(minutes=5)
-        await utils.sleep_until(next_run.timestamp())
+        # await utils.sleep_until(next_run.timestamp())
 
     async def task(self) -> None:
+        print("RUNNING PNW TASK", flush=True)
         # treasures = [
         #     models.Treasure.from_data(i)
         #     for i in await pnwkit.async_treasure_query(
@@ -110,132 +125,136 @@ class PnWDataTask(CommonTask):
         #     },
         # )
         # radiation = models.Radiation.from_data(game_info["radiation"])
-        await handle_model_update(
-            "alliance",
-            models.Alliance,
-            pnwkit.async_alliance_query(
-                {},
-                "id name acronym score color date acceptmem flag forumlink irclink",
-                paginator=True,
-            ),
-            cache.alliances,
-            cache.add_alliance,
-            cache.get_alliance,
-            cache.remove_alliance,
-            ["estimated_resources"],
-        )
-        await handle_model_update(
-            "bankrec",
-            models.Bankrec,
-            pnwkit.async_bankrec_query(
-                {
-                    "min_id": max(i.id for i in cache.bankrecs) + 1
-                    if cache.bankrecs
-                    else 0
-                },
-                "id date sid stype rid rtype pid note money coal oil uranium iron bauxite lead gasoline munitions steel aluminum food tax_id",
-                paginator=True,
-            ),
-            cache.bankrecs,
-            cache.add_bankrec,
-            cache.get_bankrec,
-            cache.remove_bankrec,
-        )
-        await handle_model_update(
-            "bounty",
-            models.Bounty,
-            pnwkit.async_bounty_query(
-                {},
-                "id date nation_id amount type",
-                paginator=True,
-            ),
-            cache.bounties,
-            cache.add_bounty,
-            cache.get_bounty,
-            cache.remove_bounty,
-        )
-        await handle_model_update(
-            "city",
-            models.City,
-            pnwkit.async_city_query(
-                {},
-                "id nation_id name date infrastructure land powered coalpower oilpower nuclearpower windpower coalmine leadmine bauxitemine oilwell uramine ironmine farm gasrefinery steelmill aluminumrefinery munitionsfactory policestation hospital recyclingcenter subway supermarket bank mall stadium barracks factory airforcebase drydock nukedate",
-                paginator=True,
-            ),
-            cache.cities,
-            cache.add_city,
-            cache.get_city,
-            cache.remove_city,
-        )
-        await handle_model_update(
-            "nation",
-            models.Nation,
-            pnwkit.async_nation_query(
-                {},
-                "id alliance_id alliance_position nation_name leader_name continent warpolicy dompolicy color num_cities score flag vmode beigeturns espionage_available last_active date soldiers tanks aircraft ships missiles nukes turns_since_last_city turns_since_last_project project_bits wars_won wars_lost tax_id alliance_seniority",
-                paginator=True,
-            ),
-            cache.nations,
-            cache.add_nation,
-            cache.get_nation,
-            cache.remove_nation,
-            ["estimated_resources"],
-        )
         trades = {i.id: i for i in cache.trades if not i.accepted}
-        await handle_model_update(
-            "trade",
-            models.Trade,
-            pnwkit.async_trade_query(
-                {"min_id": max(trades) + 1 if trades else 0},
-                "id type date sid rid offer_resource offer_amount buy_or_sell accepted date_accepted",
-                paginator=True,
-            ),
-            cache.trades,
-            cache.add_trade,
-            cache.get_trade,
-            cache.remove_trade,
-        )
-        await handle_model_update(
-            "treaty",
-            models.Treaty,
-            pnwkit.async_treaty_query(
-                {},
-                "id date treaty_type turns_left alliance1_id alliance2_id",
-                paginator=True,
-            ),
-            cache.treaties,
-            cache.add_treaty,
-            cache.get_treaty,
-            cache.remove_treaty,
-        )
-        await handle_model_update(
-            "war_attack",
-            models.WarAttack,
-            pnwkit.async_warattack_query(
-                {
-                    "min_id": max(i.id for i in cache.war_attacks) + 1
-                    if cache.war_attacks
-                    else 0
-                },
-                "id date attid defid type warid victor success attcas1 attcas2 defcas1 defcas2 cityid infradestroyed improvementslost moneystolen loot_info resistance_eliminated city_infra_before infra_destroyed_value att_mun_used def_mun_used att_gas_used def_gas_used aircraft_killed_by_tanks",
-                paginator=True,
-            ),
-            cache.war_attacks,
-            cache.add_war_attack,
-            cache.get_war_attack,
-            cache.remove_war_attack,
-        )
-        await handle_model_update(
-            "war",
-            models.War,
-            pnwkit.async_war_query(
-                {"days_ago": 7},
-                "id date reason war_type attid att_alliance_id defid def_alliance_id groundcontrol airsuperiority navalblockade winner turnsleft attpoints defpoints att_resistance def_resistance attpeace defpeace att_fortify def_fortify att_gas_used def_gas_used att_mun_used def_mun_used att_alum_used def_alum_used att_steel_used def_steel_used att_infra_destroyed def_infra_destroyed att_money_looted def_money_looted att_soldiers_killed def_soldiers_killed att_tanks_killed def_tanks_killed att_aircraft_killed def_aircraft_killed att_ships_killed def_ships_killed att_missiles_used def_missiles_used att_nukes_used def_nukes_used att_infra_destroyed_value def_infra_destroyed_value",
-                paginator=True,
-            ),
-            cache.wars,
-            cache.add_war,
-            cache.get_war,
-            cache.remove_war,
-            delete=False,
+        await asyncio.wait(
+            (
+                handle_model_update(
+                    "alliance",
+                    models.Alliance,
+                    pnwkit.async_alliance_query(
+                        {"first": 100},
+                        "id name acronym score color date acceptmem flag forumlink irclink",
+                        paginator=True,
+                    ),
+                    cache.alliances,
+                    cache.add_alliance,
+                    cache.get_alliance,
+                    cache.remove_alliance,
+                    ["estimated_resources"],
+                ),
+                handle_model_update(
+                    "bankrec",
+                    models.Bankrec,
+                    pnwkit.async_bankrec_query(
+                        {
+                            "min_id": max(i.id for i in cache.bankrecs) + 1
+                            if cache.bankrecs
+                            else 0
+                        },
+                        "id date sid stype rid rtype pid note money coal oil uranium iron bauxite lead gasoline munitions steel aluminum food tax_id",
+                        paginator=True,
+                    ),
+                    cache.bankrecs,
+                    cache.add_bankrec,
+                    cache.get_bankrec,
+                    cache.remove_bankrec,
+                ),
+                handle_model_update(
+                    "bounty",
+                    models.Bounty,
+                    pnwkit.async_bounty_query(
+                        {"first": 1000},
+                        "id date nation_id amount type",
+                        paginator=True,
+                    ),
+                    cache.bounties,
+                    cache.add_bounty,
+                    cache.get_bounty,
+                    cache.remove_bounty,
+                ),
+                handle_model_update(
+                    "city",
+                    models.City,
+                    pnwkit.async_city_query(
+                        {"first": 500},
+                        "id nation_id name date infrastructure land powered coalpower oilpower nuclearpower windpower coalmine leadmine bauxitemine oilwell uramine ironmine farm gasrefinery steelmill aluminumrefinery munitionsfactory policestation hospital recyclingcenter subway supermarket bank mall stadium barracks factory airforcebase drydock nukedate",
+                        paginator=True,
+                    ),
+                    cache.cities,
+                    cache.add_city,
+                    cache.get_city,
+                    cache.remove_city,
+                ),
+                handle_model_update(
+                    "nation",
+                    models.Nation,
+                    pnwkit.async_nation_query(
+                        {"first": 500},
+                        "id alliance_id alliance_position nation_name leader_name continent warpolicy dompolicy color num_cities score flag vmode beigeturns espionage_available last_active date soldiers tanks aircraft ships missiles nukes turns_since_last_city turns_since_last_project project_bits wars_won wars_lost tax_id alliance_seniority",
+                        paginator=True,
+                    ),
+                    cache.nations,
+                    cache.add_nation,
+                    cache.get_nation,
+                    cache.remove_nation,
+                    ["estimated_resources"],
+                ),
+                # handle_model_update(
+                #     "trade",
+                #     models.Trade,
+                #     pnwkit.async_trade_query(
+                #         {"min_id": max(trades) + 1 if trades else 0},
+                #         "id type date sid rid offer_resource offer_amount buy_or_sell accepted date_accepted",
+                #         paginator=True,
+                #     ),
+                #     cache.trades,
+                #     cache.add_trade,
+                #     cache.get_trade,
+                #     cache.remove_trade,
+                # ),
+                handle_model_update(
+                    "treaty",
+                    models.Treaty,
+                    pnwkit.async_treaty_query(
+                        {},
+                        "id date treaty_type turns_left alliance1_id alliance2_id",
+                        paginator=True,
+                    ),
+                    cache.treaties,
+                    cache.add_treaty,
+                    cache.get_treaty,
+                    cache.remove_treaty,
+                ),
+                # handle_model_update(
+                #     "war_attack",
+                #     models.WarAttack,
+                #     pnwkit.async_warattack_query(
+                #         {
+                #             "min_id": max(i.id for i in cache.war_attacks) + 1
+                #             if cache.war_attacks
+                #             else 0
+                #         },
+                #         "id date attid defid type warid victor success attcas1 attcas2 defcas1 defcas2 cityid infradestroyed improvementslost moneystolen loot_info resistance_eliminated city_infra_before infra_destroyed_value att_mun_used def_mun_used att_gas_used def_gas_used aircraft_killed_by_tanks",
+                #         paginator=True,
+                #     ),
+                #     cache.war_attacks,
+                #     cache.add_war_attack,
+                #     cache.get_war_attack,
+                #     cache.remove_war_attack,
+                # ),
+                handle_model_update(
+                    "war",
+                    models.War,
+                    pnwkit.async_war_query(
+                        {"days_ago": 7},
+                        "id date reason war_type attid att_alliance_id defid def_alliance_id groundcontrol airsuperiority navalblockade winner turnsleft attpoints defpoints att_resistance def_resistance attpeace defpeace att_fortify def_fortify att_gas_used def_gas_used att_mun_used def_mun_used att_alum_used def_alum_used att_steel_used def_steel_used att_infra_destroyed def_infra_destroyed att_money_looted def_money_looted att_soldiers_killed def_soldiers_killed att_tanks_killed def_tanks_killed att_aircraft_killed def_aircraft_killed att_ships_killed def_ships_killed att_missiles_used def_missiles_used att_nukes_used def_nukes_used att_infra_destroyed_value def_infra_destroyed_value",
+                        paginator=True,
+                    ),
+                    cache.wars,
+                    cache.add_war,
+                    cache.get_war,
+                    cache.remove_war,
+                    delete=False,
+                ),
+            )
         )

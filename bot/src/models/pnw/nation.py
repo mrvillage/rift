@@ -1,21 +1,20 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 import attrs
 
-from ... import cache, enums, flags, utils
+from ... import cache, enums, flags, models, utils
 
 __all__ = ("Nation",)
 
 if TYPE_CHECKING:
-    import datetime
     import decimal
     from typing import ClassVar
 
     from pnwkit.data import Nation as PnWKitNation
 
-    from ... import models
     from ...types.models.pnw.nation import Nation as NationData
 
 
@@ -23,6 +22,14 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Nation:
     TABLE: ClassVar[str] = "nations"
+    INCREMENT: ClassVar[tuple[str, ...]] = ()
+    ENUMS: ClassVar[tuple[str, ...]] = (
+        "alliance_position",
+        "continent",
+        "war_policy",
+        "domestic_policy",
+        "color",
+    )
     id: int
     alliance_id: int
     alliance_position: enums.AlliancePosition = attrs.field(
@@ -59,7 +66,7 @@ class Nation:
     alliance_seniority: int
     estimated_resources: models.Resources
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:
@@ -88,7 +95,7 @@ class Nation:
         return cls(
             id=int(data.id),
             alliance_id=int(data.alliance_id),
-            alliance_position=getattr(enums.AlliancePosition, alliance_position),
+            alliance_position=alliance_position,
             name=data.nation_name,
             leader=data.leader_name,
             # as is a python keyword so cannot be used as an attribute name

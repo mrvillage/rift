@@ -21,6 +21,8 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Treaty:
     TABLE: ClassVar[str] = "treaties"
+    INCREMENT: ClassVar[tuple[str, ...]] = ()
+    ENUMS: ClassVar[tuple[str, ...]] = ("type",)
     id: int
     date: datetime.datetime
     type: enums.TreatyType
@@ -28,7 +30,7 @@ class Treaty:
     sender_id: int
     receiver_id: int
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

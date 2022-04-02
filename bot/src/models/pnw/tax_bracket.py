@@ -21,6 +21,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class TaxBracket:
     TABLE: ClassVar[str] = "tax_brackets"
+    INCREMENT: ClassVar[tuple[str, ...]] = ()
     id: int
     alliance_id: int
     name: str
@@ -30,7 +31,7 @@ class TaxBracket:
     tax_rate: int
     resource_tax_rate: int
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

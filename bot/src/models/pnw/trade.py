@@ -21,6 +21,8 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Trade:
     TABLE: ClassVar[str] = "trades"
+    INCREMENT: ClassVar[tuple[str, ...]] = ()
+    ENUMS: ClassVar[tuple[str, ...]] = ("type", "action")
     id: int
     type: enums.TradeType = attrs.field(converter=enums.TradeType)
     date: datetime.datetime
@@ -32,7 +34,7 @@ class Trade:
     accepted: bool
     date_accepted: datetime.datetime
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

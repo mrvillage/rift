@@ -21,13 +21,15 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Bounty:
     TABLE: ClassVar[str] = "bounties"
+    INCREMENT: ClassVar[tuple[str, ...]] = ()
+    ENUMS: ClassVar[tuple[str, ...]] = ("type",)
     id: int
     date: datetime.datetime
     nation_id: int
     amount: int
     type: enums.BountyType = attrs.field(converter=enums.BountyType)
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

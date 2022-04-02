@@ -22,12 +22,13 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class NationPrivate:
     TABLE: ClassVar[str] = "nations_private"
+    INCREMENT: ClassVar[tuple[str, ...]] = ()
     id: int
     update_tz: Optional[decimal.Decimal]
     spies: Optional[int]
     resources: Optional[models.Resources]
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

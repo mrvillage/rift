@@ -8,6 +8,8 @@ import attrs
 __all__ = ("Resources",)
 
 if TYPE_CHECKING:
+    from typing import Generator
+
     from ..types.resources import Resources as ResourcesData
 
 
@@ -60,3 +62,20 @@ class Resources:
         self.aluminum = data.aluminum
         self.food = data.food
         return self
+
+    def __len__(self) -> int:
+        return 12
+
+    def __iter__(self) -> Generator[decimal.Decimal, None, None]:
+        yield self.money
+        yield self.coal
+        yield self.oil
+        yield self.uranium
+        yield self.iron
+        yield self.bauxite
+        yield self.lead
+        yield self.gasoline
+        yield self.munitions
+        yield self.steel
+        yield self.aluminum
+        yield self.food

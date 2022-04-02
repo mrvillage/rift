@@ -2,15 +2,31 @@ from __future__ import annotations
 
 import asyncio
 import datetime
-import time
+import sys
+import traceback
 from typing import TYPE_CHECKING
 
-__all__ = ("return_exception", "sleep_until", "utcnow")
+__all__ = (
+    "print_exception_with_header",
+    "print_exception",
+    "return_exception",
+    "sleep_until",
+    "utcnow",
+)
 
 if TYPE_CHECKING:
     from typing import Any, Coroutine, TypeVar
 
     T = TypeVar("T")
+
+
+def print_exception_with_header(header: str, error: Exception) -> None:
+    print(header, file=sys.stderr)
+    print_exception(error)
+
+
+def print_exception(error: Exception) -> None:
+    traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 
 async def return_exception(coro: Coroutine[Any, Any, T]) -> Exception | T:
@@ -21,7 +37,7 @@ async def return_exception(coro: Coroutine[Any, Any, T]) -> Exception | T:
 
 
 async def sleep_until(until: float) -> None:
-    until -= time.time()
+    until -= utcnow().timestamp()
     if until <= 0:
         return
     await asyncio.sleep(until)

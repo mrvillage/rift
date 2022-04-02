@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 import attrs
@@ -9,9 +10,8 @@ from ... import utils
 __all__ = ("City",)
 
 if TYPE_CHECKING:
-    import datetime
     import decimal
-    from typing import ClassVar
+    from typing import ClassVar, Optional
 
     from pnwkit.data import City as PnWKitCity
 
@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class City:
     TABLE: ClassVar[str] = "cities"
+    INCREMENT: ClassVar[tuple[str, ...]] = ()
     id: int
     nation_id: int
     name: str
@@ -56,9 +57,9 @@ class City:
     factories: int
     hangars: int
     drydocks: int
-    nuke_date: datetime.datetime
+    nuke_date: Optional[datetime.datetime]
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:
@@ -114,5 +115,7 @@ class City:
             factories=data.factory,
             hangars=data.airforcebase,
             drydocks=data.drydock,
-            nuke_date=datetime.datetime.fromisoformat(data.nukedate),
+            nuke_date=None
+            if data.nukedate.startswith("-")
+            else datetime.datetime.fromisoformat(data.nukedate),
         )

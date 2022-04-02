@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import attrs
 
-from ... import enums, utils
+from ... import enums, models, utils
 
 __all__ = ("Alliance",)
 
@@ -15,7 +15,6 @@ if TYPE_CHECKING:
 
     from pnwkit.data import Alliance as PnWKitAlliance
 
-    from ... import models
     from ...types.models.pnw.alliance import Alliance as AllianceData
 
 
@@ -23,6 +22,8 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Alliance:
     TABLE: ClassVar[str] = "alliances"
+    INCREMENT: ClassVar[tuple[str, ...]] = ()
+    ENUMS: ClassVar[tuple[str, ...]] = ("color",)
     id: int
     name: str
     acronym: str
@@ -35,7 +36,7 @@ class Alliance:
     discord: str
     estimated_resources: models.Resources
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

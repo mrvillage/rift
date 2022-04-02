@@ -21,11 +21,13 @@ if TYPE_CHECKING:
 class Color:
     TABLE: ClassVar[str] = "colors"
     PRIMARY_KEY: ClassVar[str] = "color"
+    INCREMENT: ClassVar[tuple[str, ...]] = ()
+    ENUMS: ClassVar[tuple[str, ...]] = ("color",)
     color: enums.Color = attrs.field(converter=enums.Color)
     bloc_name: str
     turn_bonus: int
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

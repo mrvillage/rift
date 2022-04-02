@@ -22,6 +22,8 @@ if TYPE_CHECKING:
 class Treasure:
     TABLE: ClassVar[str] = "treasures"
     PRIMARY_KEY: ClassVar[str] = "name"
+    INCREMENT: ClassVar[tuple[str, ...]] = ()
+    ENUMS: ClassVar[tuple[str, ...]] = ("color", "continent")
     name: str
     color: enums.Color = attrs.field(converter=enums.Color)
     continent: enums.Continent = attrs.field(converter=enums.Continent)
@@ -29,7 +31,7 @@ class Treasure:
     spawn_date: datetime.datetime
     nation_id: int
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

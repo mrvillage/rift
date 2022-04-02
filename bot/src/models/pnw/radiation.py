@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 class Radiation:
     TABLE: ClassVar[str] = "radiations"
     PRIMARY_KEY: ClassVar[str] = "date"
+    INCREMENT: ClassVar[tuple[str, ...]] = ()
     date: datetime.datetime
     north_america: decimal.Decimal
     south_america: decimal.Decimal
@@ -32,7 +33,7 @@ class Radiation:
     australia: decimal.Decimal
     antarctica: decimal.Decimal
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:
