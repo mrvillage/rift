@@ -10,3 +10,4 @@ class Menu(TypedDict):
     guild_id: int
     name: str
     description: str
+    layout: list[list[int]]

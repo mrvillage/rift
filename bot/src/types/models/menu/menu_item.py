@@ -10,7 +10,6 @@ class MenuItem(TypedDict):
     menu_id: int
     type: int
     style: int
-    row: int
     label: str
     disabled: bool
     url: str

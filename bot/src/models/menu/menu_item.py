@@ -22,7 +22,6 @@ class MenuItem:
     menu_id: int
     type: enums.MenuItemType = attrs.field(converter=enums.MenuItemType)
     style: enums.MenuItemStyle
-    row: int
     label: str
     disabled: bool
     url: str

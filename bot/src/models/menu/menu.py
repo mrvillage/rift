@@ -22,6 +22,7 @@ class Menu:
     guild_id: int
     name: str
     description: str
+    layout: list[list[int]]
 
     async def save(self) -> None:
         ...
