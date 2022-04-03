@@ -236,6 +236,7 @@ class FullCity:
             + self.coal_mines * 12
             + self.iron_mines * 12
             + self.bauxite_mines * 12
+            + self.oil_wells * 12
             + self.lead_mines * 12
             + self.uranium_mines * 20
             + self.farms * 2 * (1 - int(self.projects.green_tech) * 0.5)
