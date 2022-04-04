@@ -4,13 +4,14 @@ from typing import TYPE_CHECKING
 
 import attrs
 
-from ... import enums, utils
+from ... import cache, enums, errors, utils
 
 __all__ = ("MenuItem",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
+    from ...commands.common import CommonSlashCommand
     from ...types.models.menu.menu_item import MenuItem as MenuItemData
 
 
@@ -27,6 +28,7 @@ class MenuItem:
     url: str
     emoji: int
     action: enums.MenuItemAction
+    action_options: list[int]
 
     async def save(self) -> None:
         ...
@@ -43,3 +45,10 @@ class MenuItem:
 
     def update(self, data: MenuItem) -> MenuItem:
         ...
+
+    @classmethod
+    async def convert(cls, command: CommonSlashCommand[Any], value: int) -> MenuItem:
+        item = cache.get_menu_item(value)
+        if item is None:
+            raise errors.MenuItemNotFoundError(value)
+        return item

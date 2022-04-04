@@ -9,8 +9,9 @@ from ... import utils
 __all__ = ("Menu",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
+    from ...commands.common import CommonSlashCommand
     from ...types.models.menu.menu import Menu as MenuData
 
 
@@ -38,4 +39,8 @@ class Menu:
         ...
 
     def update(self, data: Menu) -> Menu:
+        ...
+
+    @classmethod
+    async def convert(cls, command: CommonSlashCommand[Any], value: str) -> Menu:
         ...
