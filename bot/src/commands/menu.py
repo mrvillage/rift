@@ -8,7 +8,7 @@ from .. import checks, enums, models, options
 from ..bot import bot
 from .common import CommonSlashCommand
 
-__all__ = ()
+__all__ = ("MenuCommand",)
 
 if TYPE_CHECKING:
     from typing import TypeVar
@@ -47,7 +47,6 @@ if TYPE_CHECKING:
         ...
 
 
-@bot.command
 class MenuItemCommand(
     CommonMenuSlashCommand["MenuItemCommandOptions"],
     name="item",
@@ -76,7 +75,6 @@ if TYPE_CHECKING:
         column: quarrel.Missing[int]
 
 
-@bot.command
 class MenuItemCreateCommand(
     CommonMenuSlashCommand["MenuItemCreateCommandOptions"],
     name="create",
@@ -101,7 +99,6 @@ if TYPE_CHECKING:
         item: models.MenuItem
 
 
-@bot.command
 class MenuItemDeleteCommand(
     CommonMenuSlashCommand["MenuItemDeleteCommandOptions"],
     name="delete",
@@ -129,7 +126,6 @@ if TYPE_CHECKING:
         action_options: quarrel.Missing[list[int]]
 
 
-@bot.command
 class MenuItemEditCommand(
     CommonMenuSlashCommand["MenuItemEditCommandOptions"],
     name="edit",
@@ -149,7 +145,6 @@ if TYPE_CHECKING:
         item: models.MenuItem
 
 
-@bot.command
 class MenuItemInfoCommand(
     CommonMenuSlashCommand["MenuItemInfoCommandOptions"],
     name="info",
@@ -171,7 +166,6 @@ if TYPE_CHECKING:
         column: quarrel.Missing[int]
 
 
-@bot.command
 class MenuItemMoveCommand(
     CommonMenuSlashCommand["MenuItemMoveCommandOptions"],
     name="move",
@@ -195,7 +189,6 @@ if TYPE_CHECKING:
         menu: models.Menu
 
 
-@bot.command
 class MenuInfoCommand(
     CommonMenuSlashCommand["MenuInfoCommandOptions"],
     name="info",
@@ -215,7 +208,6 @@ if TYPE_CHECKING:
         ...
 
 
-@bot.command
 class MenuCreateCommand(
     CommonMenuSlashCommand["MenuCreateCommandOptions"],
     name="create",
@@ -234,7 +226,6 @@ if TYPE_CHECKING:
         menu: models.Menu
 
 
-@bot.command
 class MenuEditCommand(
     CommonMenuSlashCommand["MenuEditCommandOptions"],
     name="edit",
@@ -255,7 +246,6 @@ if TYPE_CHECKING:
         channel: quarrel.TextChannel | quarrel.Thread
 
 
-@bot.command
 class MenuSendCommand(
     CommonMenuSlashCommand["MenuSendCommandOptions"],
     name="send",
@@ -275,7 +265,6 @@ if TYPE_CHECKING:
         menu: models.Menu
 
 
-@bot.command
 class MenuDeleteCommand(
     CommonMenuSlashCommand["MenuDeleteCommandOptions"],
     name="delete",
