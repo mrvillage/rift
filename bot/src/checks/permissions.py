@@ -38,7 +38,7 @@ async def has_discord_role_permissions(
         if TYPE_CHECKING:
             assert isinstance(command.interaction.user, quarrel.Member)
         perms = command.interaction.user.permissions
-        if all(getattr(perms, i) for i in permissions):
+        if all(getattr(perms, name) is value for name, value in permissions.items()):
             return True
         raise errors.MissingDiscordPermissionsError(permissions)
 
