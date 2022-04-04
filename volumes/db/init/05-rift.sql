@@ -266,7 +266,8 @@ CREATE TABLE "menu_items" (
   "disabled" boolean,
   "url" text,
   "emoji" bigint,
-  "action" smallint
+  "action" smallint,
+  "action_options" integer[]
 );
 
 CREATE TABLE "menu_interfaces" (

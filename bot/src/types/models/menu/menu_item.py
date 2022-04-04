@@ -15,3 +15,4 @@ class MenuItem(TypedDict):
     url: str
     emoji: int
     action: int
+    action_options: list[int]
