@@ -4,6 +4,7 @@ import {
   Container,
   Group,
   Header,
+  Image,
   MediaQuery,
   useMantineColorScheme,
   useMantineTheme,
@@ -12,6 +13,7 @@ import * as Icon from "react-feather";
 import { themePick } from "../../utils";
 import TopActionIcon from "./TopActionIcon";
 import DiscordIcon from "./DiscordIcon";
+import transparentLogo from "../../assets/transparentLogo.png";
 
 interface TopBarProps {
   opened: boolean;
@@ -33,10 +35,11 @@ const TopBar = ({ opened, setOpened }: TopBarProps) => {
             />
           </MediaQuery>
           <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
-            <Icon.Aperture
+            {/* <Icon.Aperture
               size={24}
               color={themePick(theme.colors.gray[6], theme.colors.dark[4])}
-            />
+            /> */}
+            <Image src={transparentLogo} width={50} />
           </MediaQuery>
         </Group>
         <Group>

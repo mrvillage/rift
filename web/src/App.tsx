@@ -63,9 +63,9 @@ function App() {
                   }}
                 >
                   <Shell>
-                    <Routes>
-                      {/* <Route path="/" element={<h1>Home</h1>} /> */}
-                    </Routes>
+                    {/* <Routes> */}
+                    {/* <Route path="/" element={<h1>Home</h1>} /> */}
+                    {/* </Routes> */}
                   </Shell>
                 </SpotlightProvider>
               </NotificationsProvider>
