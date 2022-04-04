@@ -8,58 +8,24 @@ from .common import CommonOption
 
 __all__ = (
     "DECIMAL_AMOUNT",
-    "DECIMAL_AMOUNT_REQUIRED",
-    "POSITIVE_DECIMAL_AMOUNT_REQUIRED",
+    "POSITIVE_DECIMAL_AMOUNT",
     "FLOAT_AMOUNT",
-    "FLOAT_AMOUNT_REQUIRED",
     "INTEGER_AMOUNT",
-    "INTEGER_AMOUNT_REQUIRED",
     "PAGE",
+    "TEXT_CHANNEL",
 )
 
 
-DECIMAL_AMOUNT = CommonOption(
-    type=quarrel.ApplicationCommandOptionType.NUMBER,
-    name="amount",
-    description="The amount to use.",
-    converter=lambda command, value: decimal.Decimal(round(value, 2)),
-    default=lambda command: quarrel.MISSING,
-)
-DECIMAL_AMOUNT_REQUIRED = CommonOption(
-    type=quarrel.ApplicationCommandOptionType.NUMBER,
-    name="amount",
-    description="The amount to use.",
-    converter=lambda command, value: decimal.Decimal(round(value, 2)),
-)
-POSITIVE_DECIMAL_AMOUNT_REQUIRED = CommonOption(
-    type=quarrel.ApplicationCommandOptionType.NUMBER,
-    name="amount",
-    description="The amount to use.",
-    converter=lambda command, value: decimal.Decimal(round(value, 2)),
-    min_value=0,
-)
-FLOAT_AMOUNT = CommonOption(
-    type=quarrel.ApplicationCommandOptionType.NUMBER,
-    name="amount",
-    description="The amount to use.",
-    default=lambda command: quarrel.MISSING,
-)
-FLOAT_AMOUNT_REQUIRED = CommonOption(
-    type=quarrel.ApplicationCommandOptionType.NUMBER,
-    name="amount",
-    description="The amount to use.",
-)
 INTEGER_AMOUNT = CommonOption(
     type=quarrel.ApplicationCommandOptionType.INTEGER,
     name="amount",
     description="The amount to use.",
-    default=lambda command: quarrel.MISSING,
 )
-INTEGER_AMOUNT_REQUIRED = CommonOption(
-    type=quarrel.ApplicationCommandOptionType.INTEGER,
-    name="amount",
-    description="The amount to use.",
+FLOAT_AMOUNT = INTEGER_AMOUNT(type=quarrel.ApplicationCommandOptionType.NUMBER)
+DECIMAL_AMOUNT = FLOAT_AMOUNT(
+    converter=lambda command, value: decimal.Decimal(round(value, 2))
 )
+POSITIVE_DECIMAL_AMOUNT = DECIMAL_AMOUNT(min_value=0)
 
 PAGE = CommonOption(
     type=quarrel.ApplicationCommandOptionType.INTEGER,
@@ -67,4 +33,17 @@ PAGE = CommonOption(
     description="The page to view.",
     default=1,
     min_value=1,
+)
+
+TEXT_CHANNEL = CommonOption(
+    type=quarrel.ApplicationCommandOptionType.CHANNEL,
+    name="channel",
+    description="The channel to use.",
+    channel_types=[
+        quarrel.ChannelType.GUILD_TEXT,
+        quarrel.ChannelType.GUILD_NEWS,
+        quarrel.ChannelType.GUILD_NEWS_THREAD,
+        quarrel.ChannelType.GUILD_PRIVATE_THREAD,
+        quarrel.ChannelType.GUILD_PUBLIC_THREAD,
+    ],
 )
