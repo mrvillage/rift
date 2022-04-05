@@ -9,8 +9,9 @@ from .. import utils
 __all__ = ("TargetRater",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
+    from ..commands.common import CommonSlashCommand
     from ..types.models.target_rater import TargetRater as TargetRaterData
 
 
@@ -55,4 +56,8 @@ class TargetRater:
         ...
 
     def update(self, data: TargetRater) -> TargetRater:
+        ...
+
+    @classmethod
+    async def convert(cls, command: CommonSlashCommand[Any], value: str) -> TargetRater:
         ...

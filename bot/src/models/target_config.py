@@ -9,8 +9,10 @@ from .. import utils
 __all__ = ("TargetConfig",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
+    from .. import flags
+    from ..commands.common import CommonSlashCommand
     from ..types.models.target_config import TargetConfig as TargetConfigData
 
 
@@ -21,7 +23,7 @@ class TargetConfig:
     id: int
     owner_id: int
     name: str
-    count: int
+    count: flags.TargetFindCounting
     rater: int
     condition: str
     use_condition: str
@@ -42,4 +44,10 @@ class TargetConfig:
         ...
 
     def update(self, data: TargetConfig) -> TargetConfig:
+        ...
+
+    @classmethod
+    async def convert(
+        cls, command: CommonSlashCommand[Any], value: str
+    ) -> TargetConfig:
         ...

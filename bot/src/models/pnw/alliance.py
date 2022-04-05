@@ -11,10 +11,11 @@ __all__ = ("Alliance",)
 
 if TYPE_CHECKING:
     import decimal
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
     from pnwkit.data import Alliance as PnWKitAlliance
 
+    from ...commands.common import CommonSlashCommand
     from ...types.models.pnw.alliance import Alliance as AllianceData
 
 
@@ -69,3 +70,9 @@ class Alliance:
             discord=data.irclink,
             estimated_resources=models.Resources(),
         )
+
+    @classmethod
+    async def convert(
+        cls, command: CommonSlashCommand[Any], value: str, default_to_self: bool = False
+    ) -> Alliance:
+        ...

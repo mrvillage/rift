@@ -9,8 +9,9 @@ from .. import utils
 __all__ = ("Condition",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
+    from ..commands.common import CommonSlashCommand
     from ..types.models.condition import Condition as ConditionData
 
 
@@ -39,4 +40,8 @@ class Condition:
         ...
 
     def update(self, data: Condition) -> Condition:
+        ...
+
+    @classmethod
+    async def convert(cls, command: CommonSlashCommand[Any], value: str) -> Condition:
         ...

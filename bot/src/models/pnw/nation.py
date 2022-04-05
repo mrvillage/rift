@@ -11,10 +11,11 @@ __all__ = ("Nation",)
 
 if TYPE_CHECKING:
     import decimal
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
     from pnwkit.data import Nation as PnWKitNation
 
+    from ...commands.common import CommonSlashCommand
     from ...types.models.pnw.nation import Nation as NationData
 
 
@@ -131,3 +132,9 @@ class Nation:
             alliance_seniority=data.alliance_seniority,
             estimated_resources=models.Resources(),
         )
+
+    @classmethod
+    async def convert(
+        cls, command: CommonSlashCommand[Any], value: str, default_to_self: bool = False
+    ) -> Nation:
+        ...
