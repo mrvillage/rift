@@ -13,6 +13,16 @@ __all__ = (
     "INTEGER_AMOUNT",
     "PAGE",
     "TEXT_CHANNEL",
+    "USER",
+    "USER_OPTIONAL",
+    "NAME",
+    "NAME_OPTIONAL",
+    "USE_CONDITION",
+    "USE_CONDITION_OPTIONAL",
+    "PUBLIC",
+    "PUBLIC_OPTIONAL",
+    "PUBLIC_DEFAULT_TRUE",
+    "PUBLIC_DEFAULT_FALSE",
 )
 
 
@@ -47,3 +57,30 @@ TEXT_CHANNEL = CommonOption(
         quarrel.ChannelType.GUILD_PUBLIC_THREAD,
     ],
 )
+USER = CommonOption(
+    type=quarrel.ApplicationCommandOptionType.USER,
+    name="user",
+    description="The user to use.",
+)
+USER_OPTIONAL = USER(default=quarrel.MISSING)
+USER_DEFAULT_SELF = USER(default=lambda command: command.interaction.user)
+NAME = CommonOption(
+    type=quarrel.ApplicationCommandOptionType.STRING,
+    name="name",
+    description="The name to use.",
+)
+NAME_OPTIONAL = NAME(default=quarrel.MISSING)
+USE_CONDITION = CommonOption(
+    type=quarrel.ApplicationCommandOptionType.STRING,
+    name="use-condition",
+    description="The condition to determine who can use this.",
+)
+USE_CONDITION_OPTIONAL = USE_CONDITION(default=quarrel.MISSING)
+PUBLIC = CommonOption(
+    type=quarrel.ApplicationCommandOptionType.BOOLEAN,
+    name="public",
+    description="Whether it should be public or not.",
+)
+PUBLIC_OPTIONAL = PUBLIC(default=quarrel.MISSING)
+PUBLIC_DEFAULT_TRUE = PUBLIC(default=True)
+PUBLIC_DEFAULT_FALSE = PUBLIC(default=False)
