@@ -64,6 +64,7 @@ class CommonOption(quarrel.Option):
 
     def __call__(
         self: OPT,
+        *,
         type: quarrel.Missing[quarrel.ApplicationCommandOptionType] = quarrel.MISSING,
         name: quarrel.Missing[str] = quarrel.MISSING,
         description: quarrel.Missing[str] = quarrel.MISSING,
