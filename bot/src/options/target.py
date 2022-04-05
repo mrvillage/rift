@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import quarrel
 
-from .. import models
+from .. import models, utils
 from .common import CommonOption
 
 __all__ = (
@@ -24,20 +24,20 @@ TARGET_CONFIG = CommonOption(
     description="The target config to use.",
     converter=models.TargetConfig.convert,
 )
-TARGET_CONFIG_OPTIONAL = TARGET_CONFIG(default=quarrel.MISSING)
+TARGET_CONFIG_OPTIONAL = TARGET_CONFIG(default=utils.default_missing)
 TARGET_RATER = CommonOption(
     type=quarrel.ApplicationCommandOptionType.STRING,
     name="rater",
     description="The target rater to use.",
     converter=models.TargetRater.convert,
 )
-TARGET_RATER_OPTIONAL = TARGET_RATER(default=quarrel.MISSING)
+TARGET_RATER_OPTIONAL = TARGET_RATER(default=utils.default_missing)
 TARGET_RATER_ATTRIBUTE = CommonOption(
     type=quarrel.ApplicationCommandOptionType.STRING,
     name="",
     description="",
     converter=models.Condition.convert,
-    default=quarrel.MISSING,
+    default=utils.default_missing,
 )
 
 TARGET_RATER_ATTRIBUTES = (
@@ -72,7 +72,7 @@ TARGET_FIND_ATTACK = CommonOption(
     description="Find targets to attack the nation instead.",
     default=False,
 )
-TARGET_FIND_ATTACK_OPTIONAL = TARGET_FIND_ATTACK(default=quarrel.MISSING)
+TARGET_FIND_ATTACK_OPTIONAL = TARGET_FIND_ATTACK(default=utils.default_missing)
 USE_TARGET_CONFIG_CONDITION = CommonOption(
     type=quarrel.ApplicationCommandOptionType.BOOLEAN,
     name="use-config-condition",
@@ -85,4 +85,4 @@ BASE_TARGET_RATER = CommonOption(
     description="The rater to use for unprovided ratings.",
     converter=models.TargetRater.convert,
 )
-BASE_TARGET_RATER_OPTIONAL = BASE_TARGET_RATER(default=quarrel.MISSING)
+BASE_TARGET_RATER_OPTIONAL = BASE_TARGET_RATER(default=utils.default_missing)

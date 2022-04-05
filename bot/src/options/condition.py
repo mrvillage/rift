@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import quarrel
 
-from .. import models
+from .. import models, utils
 from .common import CommonOption
 
 __all__ = (
@@ -16,4 +16,4 @@ CONDITION = CommonOption(
     description="The condition to use.",
     converter=models.Condition.convert,
 )
-CONDITION_OPTIONAL = CONDITION(default=quarrel.MISSING)
+CONDITION_OPTIONAL = CONDITION(default=utils.default_missing)

@@ -6,12 +6,15 @@ import sys
 import traceback
 from typing import TYPE_CHECKING
 
+import quarrel
+
 __all__ = (
     "print_exception_with_header",
     "print_exception",
     "return_exception",
     "sleep_until",
     "utcnow",
+    "default_missing",
 )
 
 if TYPE_CHECKING:
@@ -45,3 +48,7 @@ async def sleep_until(until: float) -> None:
 
 def utcnow() -> datetime.datetime:
     return datetime.datetime.now(tz=datetime.timezone.utc)
+
+
+def default_missing(*_: Any) -> Any:
+    return quarrel.MISSING

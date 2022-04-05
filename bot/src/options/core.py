@@ -4,6 +4,7 @@ import decimal
 
 import quarrel
 
+from .. import utils
 from .common import CommonOption
 
 __all__ = (
@@ -62,25 +63,25 @@ USER = CommonOption(
     name="user",
     description="The user to use.",
 )
-USER_OPTIONAL = USER(default=quarrel.MISSING)
+USER_OPTIONAL = USER(default=utils.default_missing)
 USER_DEFAULT_SELF = USER(default=lambda command: command.interaction.user)
 NAME = CommonOption(
     type=quarrel.ApplicationCommandOptionType.STRING,
     name="name",
     description="The name to use.",
 )
-NAME_OPTIONAL = NAME(default=quarrel.MISSING)
+NAME_OPTIONAL = NAME(default=utils.default_missing)
 USE_CONDITION = CommonOption(
     type=quarrel.ApplicationCommandOptionType.STRING,
     name="use-condition",
     description="The condition to determine who can use this.",
 )
-USE_CONDITION_OPTIONAL = USE_CONDITION(default=quarrel.MISSING)
+USE_CONDITION_OPTIONAL = USE_CONDITION(default=utils.default_missing)
 PUBLIC = CommonOption(
     type=quarrel.ApplicationCommandOptionType.BOOLEAN,
     name="public",
     description="Whether it should be public or not.",
 )
-PUBLIC_OPTIONAL = PUBLIC(default=quarrel.MISSING)
+PUBLIC_OPTIONAL = PUBLIC(default=utils.default_missing)
 PUBLIC_DEFAULT_TRUE = PUBLIC(default=True)
 PUBLIC_DEFAULT_FALSE = PUBLIC(default=False)
