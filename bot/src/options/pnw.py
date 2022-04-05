@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import quarrel
 
-from .. import models
+from .. import models, utils
 from .common import CommonOption
 
 __all__ = (
@@ -18,19 +18,11 @@ NATION = CommonOption(
     description="The nation to use.",
     converter=models.Nation.convert,
 )
-NATION_DEFAULT_SELF = NATION(
-    converter=lambda command, value: models.Nation.convert(
-        command, value, default_to_self=True
-    )
-)
+NATION_DEFAULT_SELF = NATION(default=utils.self_alliance)
 ALLIANCE = CommonOption(
     type=quarrel.ApplicationCommandOptionType.STRING,
     name="alliance",
     description="The alliance to use.",
     converter=models.Alliance.convert,
 )
-ALLIANCE_DEFAULT_SELF = ALLIANCE(
-    converter=lambda command, value: models.Alliance.convert(
-        command, value, default_to_self=True
-    )
-)
+ALLIANCE_DEFAULT_SELF = ALLIANCE(default=utils.self_nation)
