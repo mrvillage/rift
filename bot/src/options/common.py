@@ -41,6 +41,7 @@ class CommonOption(quarrel.Option):
         min_value: quarrel.Missing[float] = quarrel.MISSING,
         max_value: quarrel.Missing[float] = quarrel.MISSING,
         autocomplete: quarrel.Missing[bool] = quarrel.MISSING,
+        attribute: quarrel.Missing[str] = quarrel.MISSING,
     ):
         self.type: quarrel.ApplicationCommandOptionType = type
         self.name: str = name
@@ -59,6 +60,7 @@ class CommonOption(quarrel.Option):
         self.min_value: quarrel.Missing[float] = min_value
         self.max_value: quarrel.Missing[float] = max_value
         self.autocomplete: quarrel.Missing[bool] = autocomplete
+        self.attribute: str = attribute or name
 
     def __call__(
         self: OPT,
@@ -73,6 +75,7 @@ class CommonOption(quarrel.Option):
         min_value: quarrel.Missing[float] = quarrel.MISSING,
         max_value: quarrel.Missing[float] = quarrel.MISSING,
         autocomplete: quarrel.Missing[bool] = quarrel.MISSING,
+        attribute: quarrel.Missing[str] = quarrel.MISSING,
     ) -> OPT:
         return self.__class__(
             self.type if type is quarrel.MISSING else type,
@@ -86,4 +89,5 @@ class CommonOption(quarrel.Option):
             self.min_value if min_value is quarrel.MISSING else min_value,
             self.max_value if max_value is quarrel.MISSING else max_value,
             self.autocomplete if autocomplete is quarrel.MISSING else autocomplete,
+            self.attribute if attribute is quarrel.MISSING else attribute,
         )
