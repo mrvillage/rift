@@ -13,6 +13,8 @@ from .fun import *
 # from .interview import *
 # from .mention import *
 # from .menu import *
+from .militarization import *
+
 # from .reminder import *
 # from .role import *
 # from .roster import *
@@ -20,6 +22,7 @@ from .fun import *
 # from .server_settings import *
 # from .subscription import *
 # from .tag import *
-# from .target import *
+from .target import *
+
 # from .ticket import *
 # from .war_room import *
