@@ -82,7 +82,9 @@ class CommonOption(quarrel.Option):
             self.name if name is quarrel.MISSING else name,
             self.description if description is quarrel.MISSING else description,
             converter,
-            self.converters if converters is quarrel.MISSING else converters,
+            self.converters
+            if converters is quarrel.MISSING and converter is quarrel.MISSING
+            else converters,
             self.default if default is quarrel.MISSING else default,
             self.choices if choices is quarrel.MISSING else choices,
             self.channel_types if channel_types is quarrel.MISSING else channel_types,
