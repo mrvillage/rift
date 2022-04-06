@@ -15,14 +15,17 @@ import { MDXProvider } from "@mdx-js/react";
 
 function App() {
   const navigate = useNavigate();
-  const [colorScheme, setColorScheme] = useState<ColorScheme>("dark");
+  const localStorageColorScheme = localStorage.getItem("colorScheme");
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(
+    localStorageColorScheme === "light" ? "light" : "dark"
+  );
   const toggleColorScheme = (value?: ColorScheme) => {
-    console.log(colorScheme);
     if (value === undefined) {
       setColorScheme(colorScheme === "dark" ? "light" : "dark");
     } else {
       setColorScheme(value);
     }
+    localStorage.setItem("colorScheme", colorScheme);
   };
   return (
     <div className="App">
