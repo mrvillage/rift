@@ -12,6 +12,7 @@ import { AppContextProvider } from "./context/AppContext";
 import { useState } from "react";
 import { Icon } from "./utils";
 import { MDXProvider } from "@mdx-js/react";
+import { ModalsProvider } from "@mantine/modals";
 
 function App() {
   const navigate = useNavigate();
@@ -40,38 +41,40 @@ function App() {
               theme={{ colorScheme, spacing: { xxs: 5, xxxs: 2 } }}
             >
               <NotificationsProvider>
-                <SpotlightProvider
-                  shortcut={["mod + K", "mod + P", "/"]}
-                  actions={[
-                    {
-                      title: "Home",
-                      description: "Home page",
-                      onTrigger: () => navigate("/"),
-                      icon: <Icon.Home />,
-                    },
-                    {
-                      title: "Docs",
-                      description: "Documentation",
-                      onTrigger: () => console.log("/docs"),
-                      icon: <Icon.Book />,
-                    },
-                  ]}
-                  searchIcon={<Icon.Search size={18} />}
-                  searchPlaceholder="Search..."
-                  nothingFoundMessage="Nothing found..."
-                  highlightQuery
-                  transition={{
-                    in: { transform: "translateY(0)", opacity: 1 },
-                    out: { transform: "translateY(-20px)", opacity: 0 },
-                    transitionProperty: "transform, opacity",
-                  }}
-                >
-                  <Shell>
-                    {/* <Routes> */}
-                    {/* <Route path="/" element={<h1>Home</h1>} /> */}
-                    {/* </Routes> */}
-                  </Shell>
-                </SpotlightProvider>
+                <ModalsProvider>
+                  <SpotlightProvider
+                    shortcut={["mod + K", "mod + P", "/"]}
+                    actions={[
+                      {
+                        title: "Home",
+                        description: "Home page",
+                        onTrigger: () => navigate("/"),
+                        icon: <Icon.Home />,
+                      },
+                      {
+                        title: "Docs",
+                        description: "Documentation",
+                        onTrigger: () => console.log("/docs"),
+                        icon: <Icon.Book />,
+                      },
+                    ]}
+                    searchIcon={<Icon.Search size={18} />}
+                    searchPlaceholder="Search..."
+                    nothingFoundMessage="Nothing found..."
+                    highlightQuery
+                    transition={{
+                      in: { transform: "translateY(0)", opacity: 1 },
+                      out: { transform: "translateY(-20px)", opacity: 0 },
+                      transitionProperty: "transform, opacity",
+                    }}
+                  >
+                    <Shell>
+                      {/* <Routes> */}
+                      {/* <Route path="/" element={<h1>Home</h1>} /> */}
+                      {/* </Routes> */}
+                    </Shell>
+                  </SpotlightProvider>
+                </ModalsProvider>
               </NotificationsProvider>
             </MantineProvider>
           </ColorSchemeProvider>
