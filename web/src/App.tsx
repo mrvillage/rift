@@ -21,11 +21,12 @@ function App() {
   );
   const toggleColorScheme = (value?: ColorScheme) => {
     if (value === undefined) {
-      setColorScheme(colorScheme === "dark" ? "light" : "dark");
+      value = colorScheme === "dark" ? "light" : "dark";
+      setColorScheme(value);
     } else {
       setColorScheme(value);
     }
-    localStorage.setItem("colorScheme", colorScheme);
+    localStorage.setItem("colorScheme", value);
   };
   return (
     <div className="App">
