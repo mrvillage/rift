@@ -1,19 +1,11 @@
-import React from "react";
-import {
-  createStyles,
-  Title,
-  Text,
-  Button,
-  Container,
-  Group,
-} from "@mantine/core";
+import { Title, Text, Button, Container, Group } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
 const NotFound = () => {
   const navigate = useNavigate();
   return (
     <Container>
-      <Title style={{ fontSize: 220 }}>
+      <Title style={{ fontSize: 150 }}>
         <Text inherit color="red">
           404
         </Text>
@@ -29,7 +21,7 @@ const NotFound = () => {
       </Text>
       <Group position="center">
         <Button variant="subtle" size="md" onClick={() => navigate(-1)}>
-          Take me back to home page
+          Take me back
         </Button>
       </Group>
     </Container>

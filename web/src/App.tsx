@@ -74,7 +74,14 @@ const App = () => {
                 >
                   <Shell>
                     <Routes>
-                      <Route path="*" element={<NotFound />} />
+                      <Route
+                        path="*"
+                        element={
+                          <Suspense fallback={<Loader />}>
+                            <NotFound />
+                          </Suspense>
+                        }
+                      />
                     </Routes>
                   </Shell>
                 </SpotlightProvider>
