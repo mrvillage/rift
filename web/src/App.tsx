@@ -38,7 +38,11 @@ const App = () => {
           toggleColorScheme={toggleColorScheme}
         >
           <MantineProvider
-            theme={{ colorScheme, spacing: { xxs: 5, xxxs: 2 } }}
+            theme={{
+              colorScheme,
+              spacing: { xxs: 5, xxxs: 2 },
+              primaryColor: "violet",
+            }}
           >
             <NotificationsProvider>
               <ModalsProvider>
