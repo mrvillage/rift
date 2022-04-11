@@ -875,7 +875,7 @@ class PayConfirm(discord.ui.View):
             self.add_item(PayConfirmCredentialsButton(disabled=True))  # type: ignore
         else:
             self.add_item(PayConfirmCredentialsButton())  # type: ignore
-        self.add_item(DepositConfirmCancelButton())  # type: ignore
+        self.add_item(PayConfirmCancelButton())  # type: ignore
         url = f"https://politicsandwar.com/alliance/id={grant.alliance_id}&display=bank&{'&'.join(f'd_{key}={value}' for key, value in resources.to_dict().items() if value > 0)}&d_note={self.grant.code}"
         self.add_item(discord.ui.Button(label="Manual Transfer", url=url))  # type: ignore
         self.result: Optional[bool] = None
