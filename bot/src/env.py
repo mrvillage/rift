@@ -22,6 +22,7 @@ __all__ = (
     "SOCKET_IP",
     "APPLICATION_ID",
     "DEBUG_APPLICATION_ID",
+    "PNW_BOT_KEY",
 )
 
 load_dotenv()
@@ -43,6 +44,7 @@ SOCKET_IP = str(os.getenv("SOCKET_IP"))
 APPLICATION_ID = int(os.getenv("APPLICATION_ID"))  # type: ignore
 DEBUG_APPLICATION_ID = int(os.getenv("DEBUG_APPLICATION_ID"))  # type: ignore
 DEBUG = os.getenv("DEBUG") == "true"
+PNW_BOT_KEY = str(os.getenv("PNW_BOT_KEY"))
 
 set_key(PNW_API_KEY)
 

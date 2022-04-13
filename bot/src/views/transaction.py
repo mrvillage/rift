@@ -717,7 +717,6 @@ class DepositConfirmCredentialsButton(discord.ui.Button[DepositConfirm]):
         )
         result = await funcs.deposit(
             self.view.resources,
-            self.view.account.alliance,
             self.view.credentials,
             note=f"Automatic Deposit with {f'note {self.view.note}' if self.view.note else 'no note'}",
         )
@@ -913,7 +912,6 @@ class PayConfirmCredentialsButton(discord.ui.Button[PayConfirm]):
         )
         result = await funcs.deposit(
             self.view.resources,
-            self.view.grant.alliance,
             self.view.credentials,
             note=f"Automatic Grant Payoff with {f'note {self.view.note}' if self.view.note else 'no note'}",
         )
