@@ -38,7 +38,7 @@ async def withdraw(
     try:
         await kit.bank_withdraw_mutation(
             {
-                **resources.to_dict(),
+                **{key: value for key, value in resources.to_dict().items() if value},
                 "receiver": receiver.id,
                 "receiver_type": 1 if isinstance(receiver, Nation) else 2,
                 "note": note,
@@ -61,7 +61,7 @@ async def deposit(
     try:
         await kit.bank_deposit_mutation(
             {
-                **resources.to_dict(),
+                **{key: value for key, value in resources.to_dict().items() if value},
                 "note": note,
             },
             "id",
