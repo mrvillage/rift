@@ -42,7 +42,8 @@ async def withdraw(
                 "receiver": receiver.id,
                 "receiver_type": 1 if isinstance(receiver, Nation) else 2,
                 "note": note,
-            }
+            },
+            "id",
         )
         return True
     except Exception:
@@ -62,7 +63,8 @@ async def deposit(
             {
                 **resources.to_dict(),
                 "note": note,
-            }
+            },
+            "id",
         )
         return True
     except Exception:
