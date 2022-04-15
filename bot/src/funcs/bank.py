@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sys
+import traceback
 from typing import TYPE_CHECKING
 
 import pnwkit
@@ -46,7 +48,11 @@ async def withdraw(
             "id",
         )
         return True
-    except Exception:
+    except Exception as error:
+        traceback.print_exception(
+            type(error), error, error.__traceback__, file=sys.stderr
+        )
+        sys.stderr.flush()
         return False
 
 
@@ -67,7 +73,11 @@ async def deposit(
             "id",
         )
         return True
-    except Exception:
+    except Exception as error:
+        traceback.print_exception(
+            type(error), error, error.__traceback__, file=sys.stderr
+        )
+        sys.stderr.flush()
         return False
 
 
