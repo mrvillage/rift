@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import pnwkit
 from bs4 import BeautifulSoup
 
-from ..env import PNW_BOT_KEY
+from ..env import PNW_API_KEY, PNW_BOT_KEY
 
 if TYPE_CHECKING:
     from typing import Optional, Union
@@ -34,7 +34,7 @@ async def withdraw(
     from ..data.classes import Nation
 
     kit = pnwkit.Kit(credentials.api_key, async_=True)
-    kit.set_bot_key(PNW_BOT_KEY)
+    kit.set_bot_key(PNW_BOT_KEY, PNW_API_KEY)
     try:
         await kit.bank_withdraw_mutation(
             {
@@ -56,7 +56,7 @@ async def deposit(
     note: Optional[str] = None,
 ) -> bool:
     kit = pnwkit.Kit(credentials.api_key, async_=True)
-    kit.set_bot_key(PNW_BOT_KEY)
+    kit.set_bot_key(PNW_BOT_KEY, PNW_API_KEY)
     try:
         await kit.bank_deposit_mutation(
             {
