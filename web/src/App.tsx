@@ -4,11 +4,12 @@ import {
   MantineProvider,
   ColorSchemeProvider,
   ColorScheme,
+  Loader,
 } from "@mantine/core";
 import { NotificationsProvider } from "@mantine/notifications";
 import { SpotlightProvider } from "@mantine/spotlight";
 import { Shell } from "./components/Shell";
-import { lazy, useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Icon } from "./utils";
 import { MDXProvider } from "@mdx-js/react";
 import { ModalsProvider } from "@mantine/modals";
