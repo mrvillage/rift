@@ -39,6 +39,7 @@ def model(class_: T) -> T:
     increment = getattr(class_, "INCREMENT", ("id",))
     enums = getattr(class_, "ENUMS", ())
     flags = getattr(class_, "FLAGS", ())
+    no_update = getattr(class_, "NO_UPDATE", ())
     if isinstance(primary_key, str):
         primary_key = (primary_key,)
     exec(
@@ -79,7 +80,7 @@ def to_dict(self):
     exec(
         f"""
 def update(self, data):
-    {newline_with_spaces.join(f'self.{name} = data.{name}' for name in class_.__slots__)}
+    {newline_with_spaces.join(f'self.{name} = data.{name}' for name in class_.__slots__ if name not in no_update)}
     return self
     """,
         g,

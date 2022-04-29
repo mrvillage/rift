@@ -19,7 +19,7 @@ async def main() -> None:
     await db.create_pool()
     await db.create_notify_connection()
     await cache.initialize()
-    bot.running_tasks = [tasks.PnWDataTask().start()]
+    # bot.running_tasks = [tasks.PnWDataTask().start()]
     await bot.run()
 
 

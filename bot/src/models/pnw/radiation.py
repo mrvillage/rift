@@ -25,6 +25,7 @@ class Radiation:
     PRIMARY_KEY: ClassVar[str] = "date"
     INCREMENT: ClassVar[tuple[str, ...]] = ()
     date: datetime.datetime
+    global_: decimal.Decimal
     north_america: decimal.Decimal
     south_america: decimal.Decimal
     europe: decimal.Decimal
@@ -52,6 +53,7 @@ class Radiation:
     @classmethod
     def from_data(cls, data: PnWKitRadiation, date: datetime.datetime) -> Radiation:
         if TYPE_CHECKING:
+            assert isinstance(data.global_, decimal.Decimal)
             assert isinstance(data.north_america, decimal.Decimal)
             assert isinstance(data.south_america, decimal.Decimal)
             assert isinstance(data.europe, decimal.Decimal)
@@ -61,6 +63,7 @@ class Radiation:
             assert isinstance(data.antarctica, decimal.Decimal)
         return cls(
             date=date,
+            global_=data.global_,
             north_america=data.north_america,
             south_america=data.south_america,
             europe=data.europe,
@@ -69,15 +72,3 @@ class Radiation:
             australia=data.australia,
             antarctica=data.antarctica,
         )
-
-    @property
-    def global_(self) -> decimal.Decimal:
-        return (
-            self.north_america
-            + self.south_america
-            + self.europe
-            + self.africa
-            + self.asia
-            + self.australia
-            + self.antarctica
-        ) / 5

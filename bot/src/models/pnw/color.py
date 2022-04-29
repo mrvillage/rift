@@ -50,7 +50,7 @@ class Color:
     @classmethod
     def from_data(cls, data: PnWKitColor) -> Color:
         return cls(
-            color=getattr(enums.Color, data.color.upper()).value,
+            color=getattr(enums.Color, data.color.upper()),
             bloc_name=data.bloc_name,
             turn_bonus=data.turn_bonus,
         )

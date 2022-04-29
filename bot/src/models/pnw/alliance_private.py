@@ -47,7 +47,7 @@ class AlliancePrivate:
     @classmethod
     def from_data(cls, data: PnWKitAlliance) -> AlliancePrivate:
         if data.money is None:
-            return cls(id=int(data.id), resources=None)
+            return cls(id=data.id, resources=None)
         if TYPE_CHECKING:
             assert isinstance(data.money, decimal.Decimal)
             assert isinstance(data.coal, decimal.Decimal)

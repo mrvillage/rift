@@ -71,14 +71,14 @@ class Bankrec:
             assert isinstance(data.aluminum, decimal.Decimal)
             assert isinstance(data.food, decimal.Decimal)
         return cls(
-            id=int(data.id),
-            date=datetime.datetime.fromisoformat(data.date),
-            sender_id=int(data.sid),
+            id=data.id,
+            date=data.date,
+            sender_id=data.sender_id,
             # attrs will automatically convert the type
-            sender_type=data.stype,  # type: ignore
-            receiver_id=int(data.rid),
-            receiver_type=data.rtype,  # type: ignore
-            banker_id=int(data.pid),
+            sender_type=data.sender_type,  # type: ignore
+            receiver_id=data.receiver_id,
+            receiver_type=data.receiver_type,  # type: ignore
+            banker_id=data.banker_id,
             note=data.note,
             resources=models.Resources(
                 money=data.money,
@@ -94,5 +94,5 @@ class Bankrec:
                 aluminum=data.aluminum,
                 food=data.food,
             ),
-            tax_id=int(data.tax_id),
+            tax_id=data.tax_id,
         )

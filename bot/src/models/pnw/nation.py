@@ -11,7 +11,7 @@ __all__ = ("Nation",)
 
 if TYPE_CHECKING:
     import decimal
-    from typing import Any, ClassVar
+    from typing import Any, ClassVar, Optional
 
     from pnwkit.data import Nation as PnWKitNation
 
@@ -31,6 +31,7 @@ class Nation:
         "domestic_policy",
         "color",
     )
+    NO_UPDATE: ClassVar[tuple[str, ...]] = ("estimated_resources",)
     id: int
     alliance_id: int
     alliance_position: enums.AlliancePosition = attrs.field(
@@ -47,7 +48,7 @@ class Nation:
     num_cities: int
     score: decimal.Decimal
     flag: str
-    v_mode: bool
+    vacation_mode_turns: int
     beige_turns: int
     espionage_available: bool
     last_active: datetime.datetime
@@ -58,6 +59,7 @@ class Nation:
     ships: int
     missiles: int
     nukes: int
+    discord_username: str
     turns_since_last_city: int
     turns_since_last_project: int
     projects: flags.Projects = attrs.field(converter=flags.Projects)
@@ -89,13 +91,13 @@ class Nation:
             assert isinstance(data.score, decimal.Decimal)
         alliance_position = getattr(
             enums.AlliancePosition,
-            data.alliance_position
-            if data.alliance_position != "NOALLIANCE"
+            data.alliance_position.name
+            if data.alliance_position.name != "NOALLIANCE"
             else "NO_ALLIANCE",
         )
         return cls(
-            id=int(data.id),
-            alliance_id=int(data.alliance_id),
+            id=data.id,
+            alliance_id=data.alliance_id,
             alliance_position=alliance_position,
             name=data.nation_name,
             leader=data.leader_name,
@@ -103,38 +105,39 @@ class Nation:
             continent=getattr(enums.Continent, data.continent)
             if data.continent != "as"
             else enums.Continent.ASIA,
-            war_policy=getattr(enums.WarPolicy, data.warpolicy.upper()),
-            domestic_policy=getattr(
-                enums.DomesticPolicy, data.dompolicy.upper().replace(" ", "_")
-            ),
+            war_policy=getattr(enums.WarPolicy, data.war_policy.name),
+            domestic_policy=getattr(enums.DomesticPolicy, data.domestic_policy.name),
             color=getattr(enums.Color, data.color.upper()),
             num_cities=data.num_cities,
             score=data.score,
             flag=data.flag,
-            v_mode=bool(data.vmode),
+            vacation_mode_turns=data.vacation_mode_turns,
             beige_turns=data.beigeturns,
             espionage_available=data.espionage_available,
-            last_active=datetime.datetime.fromisoformat(data.last_active),
-            date=datetime.datetime.fromisoformat(data.date),
+            last_active=data.last_active,
+            date=data.date,
             soldiers=data.soldiers,
             tanks=data.tanks,
             aircraft=data.aircraft,
             ships=data.ships,
             missiles=data.missiles,
             nukes=data.nukes,
+            discord_username=data.discord,
             turns_since_last_city=data.turns_since_last_city,
             turns_since_last_project=data.turns_since_last_project,
             # attrs will convert the type
             projects=data.project_bits,  # type: ignore
             wars_won=data.wars_won,
             wars_lost=data.wars_lost,
-            tax_id=int(data.tax_id),
+            tax_id=data.tax_id,
             alliance_seniority=data.alliance_seniority,
             estimated_resources=models.Resources(),
         )
 
+    @property
+    def alliance(self) -> Optional[models.Alliance]:
+        return cache.get_alliance(self.alliance_id)
+
     @classmethod
-    async def convert(
-        cls, command: CommonSlashCommand[Any], value: str, default_to_self: bool = False
-    ) -> Nation:
+    async def convert(cls, command: CommonSlashCommand[Any], value: str) -> Nation:
         ...

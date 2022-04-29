@@ -22,8 +22,6 @@ class TargetCommand(
     CommonSlashCommand["TargetCommandOptions"],
     name="target",
     description="Manage target reminders and find targets.",
-    options=[],
-    checks=[],
 ):
     __slots__ = ()
 
@@ -55,7 +53,6 @@ class TargetFindCommand(
         options.NATION_DEFAULT_SELF,
         options.USE_TARGET_CONFIG_CONDITION,
     ],
-    checks=[],
 ):
     __slots__ = ()
 
@@ -74,8 +71,6 @@ class TargetConfigCommand(
     name="config",
     description="Manage target configs.",
     parent=TargetCommand,
-    options=[],
-    checks=[],
 ):
     __slots__ = ()
 
@@ -95,7 +90,6 @@ class TargetConfigInfoCommand(
     description="View information about a target config.",
     parent=TargetConfigCommand,
     options=[options.TARGET_CONFIG],
-    checks=[],
 ):
     __slots__ = ()
 
@@ -127,7 +121,6 @@ class TargetConfigCreateCommand(
         options.TARGET_FIND_ATTACK,
         options.PUBLIC_DEFAULT_FALSE,
     ],
-    checks=[],
 ):
     __slots__ = ()
 
@@ -147,7 +140,6 @@ class TargetConfigDeleteCommand(
     description="Delete a target config.",
     parent=TargetConfigCommand,
     options=[options.TARGET_CONFIG],
-    checks=[],
 ):
     __slots__ = ()
 
@@ -181,7 +173,6 @@ class TargetConfigEditCommand(
         options.TARGET_FIND_ATTACK_OPTIONAL,
         options.PUBLIC_OPTIONAL,
     ],
-    checks=[],
 ):
     __slots__ = ()
 
@@ -201,7 +192,6 @@ class TargetConfigListCommand(
     description="List your target configs.",
     parent=TargetConfigCommand,
     options=[options.USER_OPTIONAL],
-    checks=[],
 ):
     __slots__ = ()
 
@@ -220,8 +210,6 @@ class TargetRaterCommand(
     name="rater",
     description="Manage target raters.",
     parent=TargetCommand,
-    options=[],
-    checks=[],
 ):
     __slots__ = ()
 
@@ -241,7 +229,6 @@ class TargetRaterInfoCommand(
     description="View information about a target rater.",
     parent=TargetRaterCommand,
     options=[options.TARGET_RATER],
-    checks=[],
 ):
     __slots__ = ()
 
@@ -282,7 +269,6 @@ class TargetRaterCreateCommand(
     description="Create a target rater.",
     parent=TargetRaterCommand,
     options=[options.BASE_TARGET_RATER_OPTIONAL, *options.TARGET_RATER_ATTRIBUTES],
-    checks=[],
 ):
     __slots__ = ()
 
@@ -302,7 +288,6 @@ class TargetRaterDeleteCommand(
     description="Delete a target rater.",
     parent=TargetRaterCommand,
     options=[options.TARGET_RATER],
-    checks=[],
 ):
     __slots__ = ()
 
@@ -342,7 +327,6 @@ class TargetRaterEditCommand(
     description="Edit a target rater.",
     parent=TargetRaterCommand,
     options=[*options.TARGET_RATER_ATTRIBUTES],
-    checks=[],
 ):
     __slots__ = ()
 
@@ -362,7 +346,6 @@ class TargetRaterListCommand(
     description="List your target raters.",
     parent=TargetRaterCommand,
     options=[options.USER_OPTIONAL],
-    checks=[],
 ):
     __slots__ = ()
 

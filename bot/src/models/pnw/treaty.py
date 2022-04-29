@@ -26,6 +26,7 @@ class Treaty:
     id: int
     date: datetime.datetime
     type: enums.TreatyType
+    url: str
     turns_left: int
     sender_id: int
     receiver_id: int
@@ -49,10 +50,11 @@ class Treaty:
     @classmethod
     def from_data(cls, data: PnWKitTreaty) -> Treaty:
         return cls(
-            id=int(data.id),
-            date=datetime.datetime.fromisoformat(data.date),
+            id=data.id,
+            date=data.date,
             type=getattr(enums.TreatyType, data.treaty_type.upper()),
+            url=data.treaty_url,
             turns_left=data.turns_left,
-            sender_id=int(data.alliance1_id),
-            receiver_id=int(data.alliance2_id),
+            sender_id=data.alliance1_id,
+            receiver_id=data.alliance2_id,
         )

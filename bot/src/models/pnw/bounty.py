@@ -48,9 +48,9 @@ class Bounty:
     @classmethod
     def from_data(cls, data: PnWKitBounty) -> Bounty:
         return cls(
-            id=int(data.id),
-            date=datetime.datetime.fromisoformat(data.date),
-            nation_id=int(data.nation_id),
+            id=data.id,
+            date=data.date,
+            nation_id=data.nation_id,
             amount=data.amount,
-            type=getattr(enums.BountyType, data.type),
+            type=getattr(enums.BountyType, data.type.name),
         )

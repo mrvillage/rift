@@ -22,7 +22,7 @@ class Nation(TypedDict):
     num_cities: int
     score: decimal.Decimal
     flag: str
-    v_mode: bool
+    vacation_mode_turns: int
     beige_turns: int
     espionage_available: bool
     last_active: datetime.datetime
@@ -33,6 +33,7 @@ class Nation(TypedDict):
     ships: int
     missiles: int
     nukes: int
+    discord_username: str
     turns_since_last_city: int
     turns_since_last_project: int
     projects: int

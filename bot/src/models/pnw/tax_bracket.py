@@ -50,12 +50,12 @@ class TaxBracket:
     @classmethod
     def from_data(cls, data: PnWKitTaxBracket) -> TaxBracket:
         return cls(
-            id=int(data.id),
-            alliance_id=int(data.alliance_id),
+            id=data.id,
+            alliance_id=data.alliance_id,
             name=data.bracket_name,
-            date=datetime.datetime.fromisoformat(data.date),
-            date_modified=datetime.datetime.fromisoformat(data.date_modified),
-            last_modifier_id=int(data.last_modifier_id),
+            date=data.date,
+            date_modified=data.date_modified,
+            last_modifier_id=data.last_modifier_id,
             tax_rate=data.tax_rate,
             resource_tax_rate=data.resource_tax_rate,
         )

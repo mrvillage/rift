@@ -17,7 +17,7 @@ CREATE TABLE "nations" (
   "num_cities" integer,
   "score" numeric,
   "flag" text,
-  "v_mode" boolean,
+  "vacation_mode_turns" integer,
   "beige_turns" integer,
   "espionage_available" boolean,
   "last_active" timestamp with time zone,
@@ -28,6 +28,7 @@ CREATE TABLE "nations" (
   "ships" integer,
   "missiles" integer,
   "nukes" integer,
+  "discord_username" text,
   "turns_since_last_city" integer,
   "turns_since_last_project" integer,
   "projects" integer,
@@ -55,7 +56,8 @@ CREATE TABLE "alliances" (
   "accepts_members" boolean,
   "flag" text,
   "forum_link" text,
-  "discord" text,
+  "discord_link" text,
+  "wiki_link" text,
   "estimated_resources" resources
 );
 
@@ -111,8 +113,10 @@ CREATE TABLE "trades" (
   "resource" smallint,
   "amount" integer,
   "action" smallint,
+  "price" integer,
   "accepted" boolean,
-  "date_accepted" timestamp with time zone
+  "date_accepted" timestamp with time zone,
+  "original_trade_id" integer
 );
 
 CREATE TABLE "bankrecs" (

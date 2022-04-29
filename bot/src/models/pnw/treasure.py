@@ -51,9 +51,9 @@ class Treasure:
     def from_data(cls, data: PnWKitTreasure) -> Treasure:
         return cls(
             name=data.name,
-            color=getattr(enums.Color, data.color.upper()).value,
-            continent=getattr(enums.Continent, data.continent.upper()).value,
+            color=getattr(enums.Color, data.color.upper()),
+            continent=getattr(enums.Continent, data.continent.upper()),
             bonus=data.bonus,
-            spawn_date=datetime.datetime.fromisoformat(data.spawndate),
-            nation_id=int(data.nation.id),
+            spawn_date=data.spawn_date,
+            nation_id=data.nation_id,
         )

@@ -31,8 +31,10 @@ class Trade:
     resource: enums.Resource
     amount: int
     action: enums.TradeAction
+    price: int
     accepted: bool
     date_accepted: datetime.datetime
+    original_trade_id: int
 
     async def save(self, insert: bool = False) -> None:
         ...
@@ -53,14 +55,16 @@ class Trade:
     @classmethod
     def from_data(cls, data: PnWKitTrade) -> Trade:
         return cls(
-            id=int(data.id),
-            type=getattr(enums.TradeType, data.type),
-            date=datetime.datetime.fromisoformat(data.date),
-            sender_id=int(data.sid),
-            receiver_id=int(data.rid),
+            id=data.id,
+            type=getattr(enums.TradeType, data.type.name),
+            date=data.date,
+            sender_id=data.sender_id,
+            receiver_id=data.receiver_id,
             resource=getattr(enums.Resource, data.offer_resource.upper()),
             amount=data.offer_amount,
             action=getattr(enums.TradeAction, data.buy_or_sell.upper()),
+            price=data.price,
             accepted=data.accepted,
-            date_accepted=datetime.datetime.fromisoformat(data.date_accepted),
+            date_accepted=data.date_accepted,
+            original_trade_id=data.original_trade_id,
         )

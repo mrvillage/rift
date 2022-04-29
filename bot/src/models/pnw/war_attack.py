@@ -69,8 +69,8 @@ class WarAttack:
     @classmethod
     def from_data(cls, data: PnWKitWarAttack) -> WarAttack:
         if TYPE_CHECKING:
-            assert isinstance(data.infradestroyed, decimal.Decimal)
-            assert isinstance(data.moneystolen, decimal.Decimal)
+            assert isinstance(data.infra_destroyed, decimal.Decimal)
+            assert isinstance(data.money_stolen, decimal.Decimal)
             assert isinstance(data.city_infra_before, decimal.Decimal)
             assert isinstance(data.infra_destroyed_value, decimal.Decimal)
             assert isinstance(data.att_mun_used, decimal.Decimal)
@@ -78,22 +78,22 @@ class WarAttack:
             assert isinstance(data.att_gas_used, decimal.Decimal)
             assert isinstance(data.def_gas_used, decimal.Decimal)
         return cls(
-            id=int(data.id),
-            date=datetime.datetime.fromisoformat(data.date),
-            attacker_id=int(data.attid),
-            defender_id=int(data.defid),
+            id=data.id,
+            date=data.date,
+            attacker_id=data.att_id,
+            defender_id=data.def_id,
             type=enums.WarAttackType(data.type),
-            war_id=int(data.warid),
-            victor_id=int(data.victor),
+            war_id=data.war_id,
+            victor_id=data.victor,
             success=data.success,
             attcas1=data.attcas1,
             attcas2=data.attcas2,
             defcas1=data.defcas1,
             defcas2=data.defcas2,
-            city_id=int(data.cityid),
-            infrastructure_destroyed=data.infradestroyed,
-            improvements_lost=data.improvementslost,
-            money_stolen=data.moneystolen,
+            city_id=data.city_id,
+            infrastructure_destroyed=data.infra_destroyed,
+            improvements_lost=data.improvements_lost,
+            money_stolen=data.money_stolen,
             loot_info=data.loot_info,
             resistance_eliminated=data.resistance_eliminated,
             city_infrastructure_before=data.city_infra_before,

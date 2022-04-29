@@ -47,7 +47,7 @@ class NationPrivate:
     @classmethod
     def from_data(cls, data: PnWKitNation) -> NationPrivate:
         if data.money is None:
-            return cls(id=int(data.id), resources=None, update_tz=None, spies=None)
+            return cls(id=data.id, resources=None, update_tz=None, spies=None)
         if TYPE_CHECKING:
             assert isinstance(data.money, decimal.Decimal)
             assert isinstance(data.coal, decimal.Decimal)
@@ -63,7 +63,7 @@ class NationPrivate:
             assert isinstance(data.food, decimal.Decimal)
             assert isinstance(data.update_tz, decimal.Decimal)
         return cls(
-            id=int(data.id),
+            id=data.id,
             resources=models.Resources(
                 money=data.money,
                 coal=data.coal,

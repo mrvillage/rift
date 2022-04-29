@@ -31,6 +31,4 @@ DB_USER = os.environ["DB_USER"]
 DB_PASSWORD = os.environ["DB_PASSWORD"]
 DB_NAME = os.environ["DB_NAME"]
 
-pnwkit.set_key(PNW_API_KEY)
-pnwkit.set_bot_key(VERIFIED_BOT_KEY)
-pnwkit.async_pnwkit.parse_float = decimal.Decimal
+kit = pnwkit.QueryKit(api_key=PNW_API_KEY, bot_key=VERIFIED_BOT_KEY, bot_key_api_key=PNW_API_KEY, parse_float=decimal.Decimal)

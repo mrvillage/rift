@@ -19,5 +19,6 @@ class Alliance(TypedDict):
     accepts_members: bool
     flag: str
     forum_link: str
-    discord: str
+    discord_link: str
+    wiki_link: str
     estimated_resources: Resources
