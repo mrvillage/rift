@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import os
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # type: ignore
 
 load_dotenv(".env")
 load_dotenv(".env.dev")
@@ -19,7 +19,7 @@ async def main() -> None:
     await db.create_pool()
     await db.create_notify_connection()
     await cache.initialize()
-    # bot.running_tasks = [tasks.PnWDataTask().start()]
+    bot.running_tasks = [tasks.PnWDataTask().start()]
     await bot.run()
 
 

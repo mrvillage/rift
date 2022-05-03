@@ -97,7 +97,7 @@ class City:
             bauxite_mine=data.bauxite_mine,
             oil_well=data.oil_well,
             uranium_mine=data.uranium_mine,
-            iron_mines=data.ironmine,
+            iron_mines=data.iron_mine,
             farms=data.farm,
             oil_refineries=data.oil_refinery,
             steel_mills=data.steel_mill,

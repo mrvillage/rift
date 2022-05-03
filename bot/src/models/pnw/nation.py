@@ -112,7 +112,7 @@ class Nation:
             score=data.score,
             flag=data.flag,
             vacation_mode_turns=data.vacation_mode_turns,
-            beige_turns=data.beigeturns,
+            beige_turns=data.beige_turns,
             espionage_available=data.espionage_available,
             last_active=data.last_active,
             date=data.date,
