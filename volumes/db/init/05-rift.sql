@@ -136,6 +136,7 @@ CREATE TABLE "treaties" (
   "id" integer,
   "date" timestamp with time zone,
   "type" smallint,
+  "url" text,
   "turns_left" integer,
   "sender_id" integer,
   "receiver_id" integer
