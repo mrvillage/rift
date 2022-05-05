@@ -80,12 +80,13 @@ class PnWDataTask(CommonTask):
         next_run = utils.utcnow()
         # set next run equal to the next multiple of four minutes
         next_run = next_run.replace(
-            minute=(next_run.minute // 5) * 5, second=0, microsecond=0
-        ) + datetime.timedelta(minutes=5)
-        # await utils.sleep_until(next_run.timestamp())
+            minute=(next_run.minute // 30) * 30, second=0, microsecond=0
+        ) + datetime.timedelta(minutes=30)
+        await utils.sleep_until(next_run.timestamp())
 
     async def task(self) -> None:
-        print("RUNNING PNW TASK", flush=True)
+        print(datetime.datetime.now(datetime.timezone.utc), "RUNNING PNW TASK", flush=True)
+
         # treasures = [
         #     models.Treasure.from_data(i)
         #     for i in await pnwkit.async_treasure_query(
