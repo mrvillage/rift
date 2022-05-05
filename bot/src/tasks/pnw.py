@@ -40,6 +40,7 @@ async def handle_model_update(
     data_dict = {
         int(i.id): model.from_data(i) async for i in paginator.batch(batch_size)
     }
+    print(f"finished fetching {name}", flush=True)
     ids = set(data_dict.keys())
     current_ids = {i.id for i in current}
     deleted_ids = current_ids - ids
@@ -74,7 +75,7 @@ async def handle_model_update(
 
 class PnWDataTask(CommonTask):
     def __init__(self) -> None:
-        super().__init__(interval=1800)
+        super().__init__(interval=7200)
 
     async def before_task(self) -> None:
         next_run = utils.utcnow()
