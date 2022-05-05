@@ -272,3 +272,4 @@ class PnWDataTask(CommonTask):
                 # ),
             )
         )
+        print(datetime.datetime.now(datetime.timezone.utc), "done")
