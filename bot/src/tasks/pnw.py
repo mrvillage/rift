@@ -82,10 +82,12 @@ class PnWDataTask(CommonTask):
         next_run = next_run.replace(
             minute=(next_run.minute // 30) * 30, second=0, microsecond=0
         ) + datetime.timedelta(minutes=30)
-        await utils.sleep_until(next_run.timestamp())
+        # await utils.sleep_until(next_run.timestamp())
 
     async def task(self) -> None:
-        print(datetime.datetime.now(datetime.timezone.utc), "RUNNING PNW TASK", flush=True)
+        print(
+            datetime.datetime.now(datetime.timezone.utc), "RUNNING PNW TASK", flush=True
+        )
 
         # treasures = [
         #     models.Treasure.from_data(i)
