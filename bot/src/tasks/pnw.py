@@ -145,25 +145,26 @@ class PnWDataTask(CommonTask):
                     cache.remove_alliance,
                     ["estimated_resources"],
                 ),
-                handle_model_update(
-                    "bankrec",
-                    models.Bankrec,
-                    kit.query(
-                        "bankrecs",
-                        {
-                            "min_id": max(i.id for i in cache.bankrecs) + 1
-                            if cache.bankrecs
-                            else 0
-                        },
-                        "id date sender_id sender_type receiver_id receiver_type banker_id note money coal oil uranium iron bauxite lead gasoline munitions steel aluminum food tax_id",
-                    ).paginate(
-                        "bankrecs"
-                    ),  # type: ignore
-                    cache.bankrecs,
-                    cache.add_bankrec,
-                    cache.get_bankrec,
-                    cache.remove_bankrec,
-                ),
+                # handle_model_update(
+                #     "bankrec",
+                #     models.Bankrec,
+                #     kit.query(
+                #         "bankrecs",
+                #         {
+                #             "min_id": max(i.id for i in cache.bankrecs) + 1
+                #             if cache.bankrecs
+                #             else 0,
+                #             "first": 1000,
+                #         },
+                #         "id date sender_id sender_type receiver_id receiver_type banker_id note money coal oil uranium iron bauxite lead gasoline munitions steel aluminum food tax_id",
+                #     ).paginate(
+                #         "bankrecs"
+                #     ),  # type: ignore
+                #     cache.bankrecs,
+                #     cache.add_bankrec,
+                #     cache.get_bankrec,
+                #     cache.remove_bankrec,
+                # ),
                 handle_model_update(
                     "bounty",
                     models.Bounty,
@@ -228,7 +229,7 @@ class PnWDataTask(CommonTask):
                     models.Treaty,
                     kit.query(
                         "treaties",
-                        {},
+                        {"first": 1000},
                         "id date treaty_type treaty_url turns_left alliance1_id alliance2_id",
                     ).paginate(
                         "treaties"
