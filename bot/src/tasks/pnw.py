@@ -40,12 +40,28 @@ async def handle_model_update(
     data_dict = {
         int(i.id): model.from_data(i) async for i in paginator.batch(batch_size)
     }
-    print(f"finished fetching {name}", flush=True)
+    print(
+        f"{datetime.datetime.now(datetime.timezone.utc)} finished fetching {name}",
+        flush=True,
+    )
     ids = set(data_dict.keys())
     current_ids = {i.id for i in current}
     deleted_ids = current_ids - ids
     created_ids = ids - current_ids
     updated_ids = ids & current_ids
+    print(
+        f"{datetime.datetime.now(datetime.timezone.utc)} deleted {len(deleted_ids)} {name}",
+        flush=True,
+    )
+
+    print(
+        f"{datetime.datetime.now(datetime.timezone.utc)} created {len(created_ids)} {name}",
+        flush=True,
+    )
+    print(
+        f"{datetime.datetime.now(datetime.timezone.utc)} updated {len(updated_ids)} {name}",
+        flush=True,
+    )
     if delete:
         for i in deleted_ids:
             old = cache.get_alliance(i)
