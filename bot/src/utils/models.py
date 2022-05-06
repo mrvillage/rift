@@ -57,7 +57,7 @@ async def save(self, insert = False):
     exec(  # nosec
         f"""
 async def delete(self):
-    await db.query("DELETE FROM {class_.TABLE} WHERE {' AND '.join(f'{name} = ${index}' for index, name in enumerate(primary_key))};", {", ".join(f"self.{name}" for name in primary_key)})
+    await db.query("DELETE FROM {class_.TABLE} WHERE {' AND '.join(f'{name} = ${index + 1}' for index, name in enumerate(primary_key))};", {", ".join(f"self.{name}" for name in primary_key)})
     """,
         g,
     )
