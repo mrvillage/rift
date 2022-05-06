@@ -20,21 +20,35 @@ OPTS = TypeVar("OPTS")
 
 
 class CommonCommand:
+    name: str
     interaction: quarrel.Interaction
 
-    # for some reason this with __slots__ causes a TypeError
-    # "multiple bases have instance lay-out conflict"
-    # __slots__ = ()
-
     async def on_error(self, error: Exception) -> None:
+        # original = error
         if isinstance(error, quarrel.CheckError):
             error = error.error
+        if isinstance(error, quarrel.OptionError):
+            error = error.error
+            if isinstance(error, quarrel.ConversionError):
+                error = error.errors[0]
         if isinstance(error, errors.GuildOnlyError):
             await self.interaction.respond(
                 quarrel.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE,
                 embeds=[embeds.command_is_guild_only_error(self.interaction.user)],
                 ephemeral=True,
             )
+        elif isinstance(error, errors.NotFoundError):
+            await self.interaction.respond(
+                quarrel.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE,
+                embeds=[
+                    embeds.not_found_error(
+                        self.interaction.user, error.name, error.value, error.infer
+                    )
+                ],
+                ephemeral=True,
+            )
+        else:
+            await quarrel.SlashCommand.on_error(self, error)  # type: ignore
 
 
 class CommonSlashCommand(CommonCommand, quarrel.SlashCommand[OPTS]):

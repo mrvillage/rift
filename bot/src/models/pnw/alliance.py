@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import contextlib
 import datetime
 from typing import TYPE_CHECKING
 
 import attrs
 
-from ... import enums, models, utils
+from ... import cache, enums, errors, models, utils
 
 __all__ = ("Alliance",)
 
@@ -76,4 +77,8 @@ class Alliance:
 
     @classmethod
     async def convert(cls, command: CommonSlashCommand[Any], value: str) -> Alliance:
-        ...
+        with contextlib.suppress(ValueError):
+            alliance = cache.get_alliance(utils.convert_int(value))
+            if alliance is not None:
+                return alliance
+        raise errors.AllianceNotFoundError(command, value)

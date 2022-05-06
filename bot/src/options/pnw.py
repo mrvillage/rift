@@ -18,11 +18,11 @@ NATION = CommonOption(
     description="The nation to use.",
     converter=models.Nation.convert,
 )
-NATION_DEFAULT_SELF = NATION(default=utils.self_alliance)
+NATION_DEFAULT_SELF = NATION(default=utils.self_nation)
 ALLIANCE = CommonOption(
     type=quarrel.ApplicationCommandOptionType.STRING,
     name="alliance",
     description="The alliance to use.",
     converter=models.Alliance.convert,
 )
-ALLIANCE_DEFAULT_SELF = ALLIANCE(default=utils.self_nation)
+ALLIANCE_DEFAULT_SELF = ALLIANCE(default=utils.self_alliance)
