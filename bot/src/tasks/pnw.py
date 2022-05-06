@@ -53,8 +53,6 @@ async def handle_model_update(
         f"{datetime.datetime.now(datetime.timezone.utc)} deleted {len(deleted_ids)} {name}",
         flush=True,
     )
-    if name == "treaty":
-        print(deleted_ids)
     print(
         f"{datetime.datetime.now(datetime.timezone.utc)} created {len(created_ids)} {name}",
         flush=True,
@@ -65,7 +63,7 @@ async def handle_model_update(
     )
     if delete:
         for i in deleted_ids:
-            old = cache.get_alliance(i)
+            old = getter(i)
             if old is not None:
                 remover(old)
                 await old.delete()
