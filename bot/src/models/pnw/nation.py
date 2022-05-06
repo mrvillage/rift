@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import contextlib
 import datetime
 from typing import TYPE_CHECKING
 
 import attrs
 
-from ... import cache, enums, flags, models, utils
+from ... import cache, enums, errors, flags, models, utils
 
 __all__ = ("Nation",)
 
@@ -140,4 +141,8 @@ class Nation:
 
     @classmethod
     async def convert(cls, command: CommonSlashCommand[Any], value: str) -> Nation:
-        ...
+        with contextlib.suppress(ValueError):
+            nation = cache.get_nation(utils.convert_int(value))
+            if nation is not None:
+                return nation
+        raise errors.NationNotFoundError(command, value)
