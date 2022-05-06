@@ -22,7 +22,7 @@ async def main() -> None:
     print("Initializing cache...", flush=True)
     await cache.initialize()
     # bot.running_tasks = [tasks.PnWDataTask().start()]
-    print("Starting bot...", flush=True)
+    print("Connecting to Discord...", flush=True)
     await bot.run()
 
 

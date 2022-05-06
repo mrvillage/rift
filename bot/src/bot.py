@@ -31,3 +31,8 @@ bot = Bot(
     else env.DEV_TOKEN,
     intents,
 )
+
+
+@bot.event
+async def on_ready() -> None:
+    print("Ready!")
