@@ -40,7 +40,7 @@ class Nation:
     name: str
     leader: str
     continent: enums.Continent = attrs.field(converter=enums.Continent)
-    war_policy: enums.WarPolicy
+    war_policy: enums.WarPolicy = attrs.field(converter=enums.WarPolicy)
     domestic_policy: enums.DomesticPolicy = attrs.field(converter=enums.DomesticPolicy)
     color: models.Color = attrs.field(
         converter=lambda x: cache.get_color(enums.Color(x))
