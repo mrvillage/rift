@@ -49,7 +49,7 @@ async def save(self, insert = False):
         await db.query('UPDATE {class_.TABLE} SET {", ".join(f'"{name}" = ${i+1}' for i, name in enumerate(class_.__slots__))} WHERE {" AND ".join(f'"{name}" = ${class_.__slots__.index(name)+1}' for name in primary_key)};',
         {", ".join(f"self.{name}" if name not in enums and name not in flags else f"self.{name}.value" for name in class_.__slots__)})
     else:
-        id = await db.query('INSERT INTO {class_.TABLE} ({", ".join(f'"{i}"' for i in class_.__slots__ if i not in increment)}) VALUES ({", ".join(f"${index + 1}" for index, i in enumerate(class_.__slots__) if i not in increment)}){" RETURNING (" + ", ".join(f'"{i}"' for i in increment) + ");" if increment else ";"}', {", ".join(f"self.{name}" if name not in enums and name not in flags else f"self.{name}.value" for name in class_.__slots__ if name not in increment)})
+        id = await db.query('INSERT INTO {class_.TABLE} ({", ".join(f'"{i}"' for i in class_.__slots__ if i not in increment)}) VALUES ({", ".join(f"${index + 1}" for index in range(len([j for j in class_.__slots__ if j not in increment])))}){" RETURNING (" + ", ".join(f'"{i}"' for i in increment) + ");" if increment else ";"}', {", ".join(f"self.{name}" if name not in enums and name not in flags else f"self.{name}.value" for name in class_.__slots__ if name not in increment)})
         {'self.id = id[0]["id"]' if increment else ''}
     """,
         g,
@@ -57,7 +57,7 @@ async def save(self, insert = False):
     exec(  # nosec
         f"""
 async def delete(self):
-    await db.query("DELETE FROM {class_.TABLE} WHERE {' AND '.join(f'{name} = ${class_.__slots__.index(name)+1}' for name in primary_key)};", {", ".join(f"self.{name}" for name in primary_key)})
+    await db.query("DELETE FROM {class_.TABLE} WHERE {' AND '.join(f'{name} = ${index}' for index, name in enumerate(primary_key))};", {", ".join(f"self.{name}" for name in primary_key)})
     """,
         g,
     )
