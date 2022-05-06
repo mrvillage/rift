@@ -29,7 +29,7 @@ async def handle_model_update(
     no_compare: Optional[list[str]] = None,
     *,
     delete: bool = True,
-    batch_size: int = 10,
+    batch_size: int = 1,
 ) -> None:
     # data_dict: dict[int, Any] = {}
     # try:
@@ -90,7 +90,7 @@ async def handle_model_update(
 
 class PnWDataTask(CommonTask):
     def __init__(self) -> None:
-        super().__init__(interval=7200)
+        super().__init__(interval=60 * 60 * 12)
 
     async def before_task(self) -> None:
         next_run = utils.utcnow()
