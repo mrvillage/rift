@@ -35,7 +35,7 @@ class ModelProtocol(Protocol):
 
 def model(class_: T) -> T:
     g: dict[str, Any] = {"db": db}
-    primary_key = getattr(class_, "PRIMARY_KEY", "id")
+    primary_key = getattr(class_, "PRIMARY_KEY", ("id",))
     increment = getattr(class_, "INCREMENT", ("id",))
     enums = getattr(class_, "ENUMS", ())
     flags = getattr(class_, "FLAGS", ())
@@ -45,7 +45,7 @@ def model(class_: T) -> T:
     exec(
         f"""
 async def save(self, insert = False):
-    if self.id and not insert:
+    if {" and ".join(f"self.{i}" for i in primary_key)} and not insert:
         await db.query('UPDATE {class_.TABLE} SET {", ".join(f'"{name}" = ${i+1}' for i, name in enumerate(class_.__slots__))} WHERE {" AND ".join(f'"{name}" = ${class_.__slots__.index(name)+1}' for name in primary_key)};',
         {", ".join(f"self.{name}" if name not in enums and name not in flags else f"self.{name}.value" for name in class_.__slots__)})
     else:

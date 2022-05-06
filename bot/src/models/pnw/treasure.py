@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Treasure:
     TABLE: ClassVar[str] = "treasures"
-    PRIMARY_KEY: ClassVar[str] = "name"
+    PRIMARY_KEY: ClassVar[tuple[str]] = ("name",)
     INCREMENT: ClassVar[tuple[str, ...]] = ()
     ENUMS: ClassVar[tuple[str, ...]] = ("color", "continent")
     name: str

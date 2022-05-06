@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class User:
     TABLE: ClassVar[str] = "users"
-    PRIMARY_KEY: ClassVar[str] = "user_id"
+    PRIMARY_KEY: ClassVar[tuple[str]] = ("user_id",)
     user_id: int
     nation_id: int
     uuid: uuid.UUID

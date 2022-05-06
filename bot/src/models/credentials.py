@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Credentials:
     TABLE: ClassVar[str] = "credentials"
-    PRIMARY_KEY: ClassVar[str] = "nation_id"
+    PRIMARY_KEY: ClassVar[tuple[str]] = ("nation_id",)
     nation_id: int
     api_key: str
 

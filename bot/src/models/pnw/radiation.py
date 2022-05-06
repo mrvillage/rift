@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Radiation:
     TABLE: ClassVar[str] = "radiations"
-    PRIMARY_KEY: ClassVar[str] = "date"
+    PRIMARY_KEY: ClassVar[tuple[str]] = ("date",)
     INCREMENT: ClassVar[tuple[str, ...]] = ()
     date: datetime.datetime
     global_: decimal.Decimal

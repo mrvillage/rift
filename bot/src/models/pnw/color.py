@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Color:
     TABLE: ClassVar[str] = "colors"
-    PRIMARY_KEY: ClassVar[str] = "color"
+    PRIMARY_KEY: ClassVar[tuple[str]] = ("color",)
     INCREMENT: ClassVar[tuple[str, ...]] = ()
     ENUMS: ClassVar[tuple[str, ...]] = ("color",)
     color: enums.Color = attrs.field(converter=enums.Color)
