@@ -53,7 +53,7 @@ async def handle_model_update(
         f"{datetime.datetime.now(datetime.timezone.utc)} deleted {len(deleted_ids)} {name}",
         flush=True,
     )
-    if name == "treaties":
+    if name == "treaty":
         print(deleted_ids)
     print(
         f"{datetime.datetime.now(datetime.timezone.utc)} created {len(created_ids)} {name}",
