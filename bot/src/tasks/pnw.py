@@ -86,6 +86,7 @@ async def handle_model_update(
             old.update(new)
             await old.save()
             bot.dispatch(f"{name}_update", old, new)
+    print(f"{datetime.datetime.now(datetime.timezone.utc)} finished {name}", flush=True)
 
 
 class PnWDataTask(CommonTask):
