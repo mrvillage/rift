@@ -31,6 +31,9 @@ class CommonFlags:
     def __sub__(self, other: T) -> T:
         return self.__class__(self.flags & ~other.flags)  # type: ignore
 
+    def __int__(self) -> int:
+        return self.flags
+
 
 class flag:  # noqa: N801
     def __init__(self, func: Callable[[Any], int]):  # noqa: N801

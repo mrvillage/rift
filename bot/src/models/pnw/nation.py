@@ -43,9 +43,8 @@ class Nation:
     continent: enums.Continent = attrs.field(converter=enums.Continent)
     war_policy: enums.WarPolicy = attrs.field(converter=enums.WarPolicy)
     domestic_policy: enums.DomesticPolicy = attrs.field(converter=enums.DomesticPolicy)
-    color: models.Color = attrs.field(
-        converter=lambda x: cache.get_color(enums.Color(x))
-    )
+    # TODO: When color data is available, convert to models.Color instead
+    color: enums.Color = attrs.field(converter=enums.Color)
     num_cities: int
     score: decimal.Decimal
     flag: str
@@ -96,6 +95,13 @@ class Nation:
             if data.alliance_position.name != "NOALLIANCE"
             else "NO_ALLIANCE",
         )
+        if (
+            data.alliance_position is None
+            or data.domestic_policy is None
+            or data.domestic_policy is None
+            or data.color is None
+        ):
+            print("t")
         return cls(
             id=data.id,
             alliance_id=data.alliance_id,
