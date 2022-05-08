@@ -95,13 +95,6 @@ class Nation:
             if data.alliance_position.name != "NOALLIANCE"
             else "NO_ALLIANCE",
         )
-        if (
-            data.alliance_position is None
-            or data.domestic_policy is None
-            or data.domestic_policy is None
-            or data.color is None
-        ):
-            print("t")
         return cls(
             id=data.id,
             alliance_id=data.alliance_id,
