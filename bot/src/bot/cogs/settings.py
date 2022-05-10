@@ -1528,6 +1528,20 @@ class Settings(commands.Cog):
     ):
         if TYPE_CHECKING:
             assert isinstance(ctx.guild, discord.Guild)
+        roles = [
+            i
+            for i in cache.alliance_auto_roles
+            if i.role_id == role.id and i.alliance_id == alliance.id
+        ]
+        if roles:
+            return await ctx.reply(
+                embed=funcs.get_embed_author_member(
+                    ctx.author,
+                    description="That's already an auto role!",
+                    color=discord.Color.red(),
+                ),
+                ephemeral=True,
+            )
         await AllianceAutoRole.create(role, alliance)
         await ctx.reply(
             embed=funcs.get_embed_author_member(
