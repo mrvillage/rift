@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, TypeVar
 
 import quarrel
 
-from .. import embeds, env, utils
+from .. import env, utils
 
 __all__ = ("CommonSlashCommand",)
 
@@ -25,9 +25,6 @@ class CommonCommand:
     async def on_error(self, error: Exception) -> None:
         if utils.handle_interaction_error(self.interaction, error):
             await quarrel.SlashCommand.on_error(self, error)  # type: ignore
-            await self.interaction.respond_with_message(
-                embed=embeds.fatal_error(self.interaction.user)
-            )
 
 
 class CommonSlashCommand(CommonCommand, quarrel.SlashCommand[OPTS]):
