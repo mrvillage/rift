@@ -211,6 +211,9 @@ class Cache:
                 # too lazy to properly type this
                 model = i.from_dict(row)
                 attr[i.key if hasattr(i, "key") else model.id] = model  # type: ignore
+        for i in self.users:
+            if i.nation_id is not None:
+                self._users[i.nation_id] = i
 
     def clear(self) -> None:
         self._accounts.clear()
@@ -1000,12 +1003,16 @@ class Cache:
 
     def add_user(self, user: models.User, /) -> None:
         self._users[user.user_id] = user
+        if user.nation_id is not None:
+            self._users[user.nation_id] = user
 
     def get_user(self, id: int, /) -> Optional[models.User]:
         return self._users.get(id)
 
     def remove_user(self, user: models.User, /) -> None:
         del self._users[user.user_id]
+        if user.nation_id is not None:
+            del self._users[user.nation_id]
 
     @property
     def war_attacks(self) -> set[models.WarAttack]:

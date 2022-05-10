@@ -18,10 +18,11 @@ if TYPE_CHECKING:
     INT = TypeVar("INT", bound=quarrel.Interaction)
 
     class RespondAlias(Protocol):
-        def __call__(
+        async def __call__(
             self,
             *,
             content: Missing[str] = quarrel.MISSING,
+            embed: Missing[quarrel.Embed] = quarrel.MISSING,
             embeds: Missing[list[quarrel.Embed]] = quarrel.MISSING,
             # allowed_mentions: Missing[AllowedMentions] = MISSING,
             ephemeral: Missing[bool] = quarrel.MISSING,
@@ -67,6 +68,9 @@ class CommonCommand:
             )
         else:
             await quarrel.SlashCommand.on_error(self, error)  # type: ignore
+            await self.respond_with_message(
+                embed=embeds.fatal_error(self.interaction.user)
+            )
 
     async def respond_with_message(self, *args: Any, **kwargs: Any) -> None:  # type: ignore
         return await self.interaction.respond(

@@ -2,22 +2,24 @@ from __future__ import annotations
 
 import contextlib
 import datetime
+import decimal
 from typing import TYPE_CHECKING
 
 import attrs
+import quarrel
 
-from ... import cache, enums, errors, flags, models, utils
+from ... import cache, embeds, enums, errors, flags, models, utils
 
 __all__ = ("Nation",)
 
 if TYPE_CHECKING:
-    import decimal
     from typing import Any, ClassVar, Optional
 
     from pnwkit.data import Nation as PnWKitNation
 
     from ...commands.common import CommonSlashCommand
     from ...types.models.pnw.nation import Nation as NationData
+    from ...types.quarrel import MemberOrUser
 
 
 @utils.model
@@ -138,6 +140,28 @@ class Nation:
     def alliance(self) -> Optional[models.Alliance]:
         return cache.get_alliance(self.alliance_id)
 
+    @property
+    def average_infrastructure(self) -> decimal.Decimal:
+        return (
+            sum((i.infrastructure for i in self.cities), start=decimal.Decimal())
+            / self.num_cities
+        )
+
+    @property
+    def average_land(self) -> decimal.Decimal:
+        return (
+            sum((i.land for i in self.cities), start=decimal.Decimal())
+            / self.num_cities
+        )
+
+    @property
+    def cities(self) -> set[models.City]:
+        return {i for i in cache.cities if i.nation_id == self.id}
+
+    @property
+    def user(self) -> Optional[models.User]:
+        return cache.get_user(self.id)
+
     @classmethod
     async def convert(cls, command: CommonSlashCommand[Any], value: str) -> Nation:
         with contextlib.suppress(ValueError):
@@ -145,3 +169,6 @@ class Nation:
             if nation is not None:
                 return nation
         raise errors.NationNotFoundError(command, value)
+
+    def build_embed(self, user: MemberOrUser) -> quarrel.Embed:
+        return embeds.nation(user, self)

@@ -28,7 +28,7 @@ def convert_int(value: str) -> int:
 
 def self_nation(command: CommonSlashCommand[Any]) -> models.Nation:
     user = cache.get_user(command.interaction.user.id)
-    if user is None:
+    if user is None or user.nation_id is None:
         raise errors.NationNotFoundError(command)
     nation = cache.get_nation(user.nation_id)
     if nation is None:

@@ -10,7 +10,7 @@ __all__ = ("User",)
 
 if TYPE_CHECKING:
     import uuid
-    from typing import ClassVar
+    from typing import ClassVar, Optional
 
     from ..types.models.user import User as UserData
 
@@ -21,7 +21,7 @@ class User:
     TABLE: ClassVar[str] = "users"
     PRIMARY_KEY: ClassVar[tuple[str]] = ("user_id",)
     user_id: int
-    nation_id: int
+    nation_id: Optional[int]
     uuid: uuid.UUID
 
     async def save(self) -> None:

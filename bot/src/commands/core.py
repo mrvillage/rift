@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import quarrel
 
-from .. import embeds, models, options
+from .. import models, options
 from ..bot import bot
 from .common import CommonSlashCommand
 
@@ -29,7 +29,7 @@ class NationCommand(
     async def callback(self) -> None:
         await self.interaction.respond(
             quarrel.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE,
-            content=self.options.nation.name,
+            embed=self.options.nation.build_embed(self.interaction.user),
         )
 
 
