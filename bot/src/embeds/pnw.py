@@ -45,6 +45,7 @@ def nation(user: MemberOrUser, nation: models.Nation) -> quarrel.Embed:
         footer_text=strings.model_created("Nation"),
         timestamp=nation.date,
         description=strings.nation_linked_to(nation),
+        thumbnail_url=nation.flag,
         fields=[
             utils.embed_field(
                 name="Nation ID", value=strings.nation_link(nation, nation.id)
@@ -136,6 +137,7 @@ def alliance(user: MemberOrUser, alliance: models.Alliance) -> quarrel.Embed:
         color=consts.INFO_EMBED_COLOR,
         footer_text=strings.model_created("Alliance"),
         timestamp=alliance.date,
+        thumbnail_url=alliance.flag,
         fields=[
             utils.embed_field(
                 name="Alliance ID", value=strings.alliance_link(alliance, alliance.id)

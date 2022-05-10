@@ -32,6 +32,8 @@ def build_single_embed(
     footer_text: quarrel.Missing[str] = quarrel.MISSING,
     provider_name: quarrel.Missing[str] = quarrel.MISSING,
     fields: quarrel.Missing[list[EmbedField]] = quarrel.MISSING,
+    image_url: quarrel.Missing[str] = quarrel.MISSING,
+    thumbnail_url: quarrel.Missing[str] = quarrel.MISSING,
 ) -> quarrel.Embed:
     embed = quarrel.Embed(
         title=title, description=description, url=url, timestamp=timestamp, color=color
@@ -42,6 +44,8 @@ def build_single_embed(
     embed.footer.text = footer_text or strings.FOOTER_TEXT
     embed.provider.name = provider_name or strings.PROVIDER_NAME
     embed.fields = fields or []
+    embed.image.url = image_url
+    embed.thumbnail.url = thumbnail_url
     return embed
 
 
@@ -57,6 +61,8 @@ def build_single_embed_from_user(
     footer_text: quarrel.Missing[str] = quarrel.MISSING,
     provider_name: quarrel.Missing[str] = quarrel.MISSING,
     fields: quarrel.Missing[list[EmbedField]] = quarrel.MISSING,
+    image_url: quarrel.Missing[str] = quarrel.MISSING,
+    thumbnail_url: quarrel.Missing[str] = quarrel.MISSING,
 ) -> quarrel.Embed:
     return build_single_embed(
         title=title,
@@ -70,6 +76,8 @@ def build_single_embed_from_user(
         footer_text=footer_text,
         provider_name=provider_name,
         fields=fields,
+        image_url=image_url,
+        thumbnail_url=thumbnail_url,
     )
 
 
