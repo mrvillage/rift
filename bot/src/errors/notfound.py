@@ -4,14 +4,14 @@ from typing import TYPE_CHECKING
 
 import quarrel
 
+from .base import RiftError
+
 __all__ = (
     "NotFoundError",
     "AllianceNotFoundError",
     "MenuItemNotFoundError",
     "NationNotFoundError",
 )
-
-from .base import RiftError
 
 if TYPE_CHECKING:
     from typing import Any, ClassVar, Optional
