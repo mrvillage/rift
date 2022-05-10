@@ -18,7 +18,35 @@ class NationGrid(CommonGrid):
     def __init__(self, nation: models.Nation) -> None:
         super().__init__(timeout=None)
         self.nation: models.Nation = nation
+        self.add_component(NationRefreshButton(nation))
         self.add_component(NationAllianceInformationButton(nation))
+
+
+@bot.component
+class NationRefreshButton(CommonButton):
+    def __init__(self, nation: Missing[models.Nation] = quarrel.MISSING) -> None:
+        super().__init__(
+            custom_id=f"info-nation-{nation.id}-refresh" if nation else quarrel.MISSING,
+            label="Refresh",
+            style=quarrel.ButtonStyle.GRAY,
+            pattern="info-nation-(?P<nation_id>[0-9]+)-refresh",
+        )
+
+    async def callback(
+        self, interaction: quarrel.Interaction, groups: quarrel.Missing[dict[str, str]]
+    ) -> None:
+        if groups is quarrel.MISSING:
+            return
+        try:
+            nation_id = utils.convert_int(groups["nation_id"])
+        except ValueError:
+            return
+        nation = cache.get_nation(nation_id)
+        if nation is None:
+            raise errors.NationNotFoundError(interaction, nation_id)
+        await interaction.respond_with_edit(
+            embed=nation.build_embed(interaction.user),
+        )
 
 
 @bot.component
