@@ -32,6 +32,14 @@ async def handle_interaction_error(
                 interaction.user, error.name, error.value, error.infer
             ),
         )
+    elif isinstance(error, errors.NationNotInAllianceError):
+        await respond_with_error(
+            interaction,
+            embeds.nation_not_in_alliance_error(
+                interaction.user,
+                error.nation,
+            ),
+        )
     else:
         await respond_with_error(interaction, embeds.fatal_error(interaction.user))
         return True

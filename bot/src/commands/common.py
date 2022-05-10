@@ -23,7 +23,7 @@ class CommonCommand:
     interaction: quarrel.Interaction
 
     async def on_error(self, error: Exception) -> None:
-        if utils.handle_interaction_error(self.interaction, error):
+        if await utils.handle_interaction_error(self.interaction, error):
             await quarrel.SlashCommand.on_error(self, error)  # type: ignore
 
 

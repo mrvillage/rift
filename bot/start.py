@@ -4,6 +4,7 @@ import asyncio
 
 from src import cache
 from src import commands as commands
+from src import components as components
 from src import db, tasks
 from src.bot import bot
 

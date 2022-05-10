@@ -4,13 +4,13 @@ from typing import TYPE_CHECKING
 
 import attrs
 
-from ... import enums, utils
+from ... import cache, enums, models, utils
 
 __all__ = ("Treasure",)
 
 if TYPE_CHECKING:
     import datetime
-    from typing import ClassVar
+    from typing import ClassVar, Optional
 
     from pnwkit.data import Treasure as PnWKitTreasure
 
@@ -57,3 +57,7 @@ class Treasure:
             spawn_date=data.spawn_date,
             nation_id=data.nation_id,
         )
+
+    @property
+    def nation(self) -> Optional[models.Nation]:
+        return cache.get_nation(self.nation_id)

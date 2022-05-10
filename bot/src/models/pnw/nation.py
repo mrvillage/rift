@@ -136,6 +136,9 @@ class Nation:
             estimated_resources=models.Resources(),
         )
 
+    def __str__(self) -> str:
+        return f"{self.name} ({self.id})"
+
     @property
     def alliance(self) -> Optional[models.Alliance]:
         return cache.get_alliance(self.alliance_id)

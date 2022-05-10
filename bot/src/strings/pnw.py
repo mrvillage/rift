@@ -10,6 +10,7 @@ __all__ = (
     "alliance_link_using_name",
     "city_manager_link",
     "vacation_mode",
+    "nation_not_in_alliance",
 )
 
 if TYPE_CHECKING:
@@ -45,3 +46,7 @@ def city_manager_link(nation: models.Nation, text: Any) -> str:
 
 def vacation_mode(turns: int) -> str:
     return "False" if turns <= 0 else f"True ({turns} turns)"
+
+
+def nation_not_in_alliance(nation: models.Nation) -> str:
+    return f"{nation} is not in an alliance!"

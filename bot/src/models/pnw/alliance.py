@@ -5,8 +5,9 @@ import datetime
 from typing import TYPE_CHECKING
 
 import attrs
+import quarrel
 
-from ... import cache, enums, errors, models, utils
+from ... import cache, embeds, enums, errors, models, utils
 
 __all__ = ("Alliance",)
 
@@ -18,6 +19,7 @@ if TYPE_CHECKING:
 
     from ...commands.common import CommonSlashCommand
     from ...types.models.pnw.alliance import Alliance as AllianceData
+    from ...types.quarrel import MemberOrUser
 
 
 @utils.model
@@ -75,10 +77,53 @@ class Alliance:
             estimated_resources=models.Resources(),
         )
 
+    @property
+    def applicants(self) -> set[models.Nation]:
+        return {
+            i
+            for i in cache.nations
+            if i.alliance_id == self.id
+            and i.alliance_position is enums.AlliancePosition.APPLICANT
+        }
+
+    @property
+    def leaders(self) -> set[models.Nation]:
+        return {
+            i
+            for i in cache.nations
+            if i.alliance_id == self.id
+            and i.alliance_position is enums.AlliancePosition.LEADER
+        }
+
+    @property
+    def members(self) -> set[models.Nation]:
+        return {
+            i
+            for i in cache.nations
+            if i.alliance_id == self.id and i.alliance_position.value >= 2
+        }
+
+    @property
+    def rank(self) -> int:
+        return (
+            sorted(cache.alliances, key=lambda x: x.score, reverse=True).index(self) + 1
+        )
+
+    @property
+    def treasures(self) -> set[models.Treasure]:
+        return {
+            i
+            for i in cache.treasures
+            if (n := i.nation) is not None and n.alliance_id == self.id
+        }
+
     @classmethod
     async def convert(cls, command: CommonSlashCommand[Any], value: str) -> Alliance:
         with contextlib.suppress(ValueError):
             alliance = cache.get_alliance(utils.convert_int(value))
             if alliance is not None:
                 return alliance
-        raise errors.AllianceNotFoundError(command, value)
+        raise errors.AllianceNotFoundError(command.interaction, value)
+
+    def build_embed(self, user: MemberOrUser) -> quarrel.Embed:
+        return embeds.alliance(user, self)

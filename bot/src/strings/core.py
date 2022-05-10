@@ -10,6 +10,8 @@ __all__ = (
     "enum_name",
     "SUPPORT_SERVER",
     "FATAL_ERROR",
+    "NONE",
+    "click_here_link_or_none",
 )
 
 if TYPE_CHECKING:
@@ -38,3 +40,8 @@ SUPPORT_SERVER = "https://rift.mrvillage.dev/discord"
 FATAL_ERROR: Final[
     str
 ] = f"Uh oh! Something went wrong! Please try again later. If you need further assistance or the problem persists please join the support server [here]({SUPPORT_SERVER}) or context <@258298021266063360>."
+NONE: Final[str] = "None"
+
+
+def click_here_link_or_none(link: Optional[str]) -> str:
+    return f"[Click here]({link})" if link else "None"

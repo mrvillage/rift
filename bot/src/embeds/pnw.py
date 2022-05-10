@@ -1,19 +1,22 @@
 from __future__ import annotations
 
+import decimal
 from typing import TYPE_CHECKING
 
 import quarrel
 
-from .. import consts, enums, models, strings, utils
+from .. import cache, consts, enums, models, strings, utils
 
-__all__ = ("not_found_error", "nation")
+__all__ = ("not_found_error", "nation_not_in_alliance_error", "nation", "alliance")
 
 if TYPE_CHECKING:
     from typing import Optional
 
+    from ..types.quarrel import MemberOrUser
+
 
 def not_found_error(
-    user: quarrel.User | quarrel.Member,
+    user: MemberOrUser,
     name: str,
     value: Optional[str],
     infer: bool = False,
@@ -25,7 +28,17 @@ def not_found_error(
     )
 
 
-def nation(user: quarrel.User | quarrel.Member, nation: models.Nation) -> quarrel.Embed:
+def nation_not_in_alliance_error(
+    user: MemberOrUser, nation: models.Nation
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=user,
+        description=strings.nation_not_in_alliance(nation),
+        color=consts.ERROR_EMBED_COLOR,
+    )
+
+
+def nation(user: MemberOrUser, nation: models.Nation) -> quarrel.Embed:
     return utils.build_single_embed_from_user(
         author=user,
         color=consts.INFO_EMBED_COLOR,
@@ -72,7 +85,7 @@ def nation(user: quarrel.User | quarrel.Member, nation: models.Nation) -> quarre
             ),
             utils.embed_field(
                 name="Score",
-                value=f"{nation.score:.2f}",
+                value=f"{nation.score:,.2f}",
             ),
             utils.embed_field(
                 name="Vacation Mode",
@@ -104,11 +117,90 @@ def nation(user: quarrel.User | quarrel.Member, nation: models.Nation) -> quarre
             ),
             utils.embed_field(
                 name="Average Infrastructure",
-                value=f"{nation.average_infrastructure:.2f}",
+                value=f"{nation.average_infrastructure:,.2f}",
             ),
             utils.embed_field(
                 name="Average Land",
-                value=f"{nation.average_land:.2f}",
+                value=f"{nation.average_land:,.2f}",
+            ),
+        ],
+    )
+
+
+def alliance(user: MemberOrUser, alliance: models.Alliance) -> quarrel.Embed:
+    members = alliance.members
+    member_ids = {i.id for i in members}
+    cities = {i for i in cache.cities if i.nation_id in member_ids}
+    return utils.build_single_embed_from_user(
+        author=user,
+        color=consts.INFO_EMBED_COLOR,
+        footer_text=strings.model_created("Alliance"),
+        timestamp=alliance.date,
+        fields=[
+            utils.embed_field(
+                name="Alliance ID", value=strings.alliance_link(alliance, alliance.id)
+            ),
+            utils.embed_field(
+                name="Name", value=strings.alliance_link(alliance, alliance.name)
+            ),
+            utils.embed_field(
+                name="Acronym", value=strings.alliance_link(alliance, alliance.acronym)
+            ),
+            utils.embed_field(name="Color", value=strings.enum_name(alliance.color)),
+            utils.embed_field(name="Rank", value=f"#{alliance.rank}"),
+            utils.embed_field(
+                name="Score",
+                value=f"{alliance.score:,.2f}",
+            ),
+            utils.embed_field(
+                name="Leaders",
+                value="\n".join(
+                    strings.nation_link(i, str(i)) for i in alliance.leaders
+                ),
+            ),
+            utils.embed_field(
+                name="Members",
+                value=f"{len(members):,}",
+            ),
+            utils.embed_field(
+                name="Applicants",
+                value=f"{len(alliance.applicants):,}",
+            ),
+            utils.embed_field(
+                name="Forum Link",
+                value=strings.click_here_link_or_none(alliance.forum_link),
+            ),
+            utils.embed_field(
+                name="Discord Link",
+                value=strings.click_here_link_or_none(alliance.discord_link),
+            ),
+            utils.embed_field(
+                name="Wiki Link",
+                value=strings.click_here_link_or_none(alliance.wiki_link),
+            ),
+            utils.embed_field(
+                name="Accepts Members",
+                value=alliance.accepts_members,
+            ),
+            utils.embed_field(
+                name="Vacation Mode",
+                value=len([i for i in members if i.vacation_mode_turns]),
+            ),
+            utils.embed_field(
+                name="Treasures",
+                value=f"{len(alliance.treasures):,}",
+            ),
+            utils.embed_field(
+                name="Average Cities",
+                value=f"{sum(i.num_cities for i in members)/len(members):,.2f}",
+            ),
+            utils.embed_field(
+                name="Average Infrastructure",
+                value=f"{sum((i.infrastructure for i in cities), start=decimal.Decimal())/len(cities):,.2f}",
+            ),
+            utils.embed_field(
+                name="Average Score",
+                value=f"{sum((i.score for i in members), start=decimal.Decimal())/len(members):,.2f}",
             ),
         ],
     )

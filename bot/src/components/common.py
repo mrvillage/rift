@@ -16,8 +16,8 @@ class CommonButton(quarrel.Button):
     async def on_error(
         self, interaction: quarrel.Interaction, error: Exception
     ) -> None:
-        if utils.handle_interaction_error(interaction, error):
-            await quarrel.Button.on_error(self, error)  # type: ignore
+        if await utils.handle_interaction_error(interaction, error):
+            await quarrel.Button.on_error(self, interaction, error)
 
 
 class CommonSelectMenu(quarrel.SelectMenu):
@@ -26,8 +26,8 @@ class CommonSelectMenu(quarrel.SelectMenu):
     ) -> None:
 
         # original = error
-        if utils.handle_interaction_error(interaction, error):
-            await quarrel.Button.on_error(self, error)  # type: ignore
+        if await utils.handle_interaction_error(interaction, error):
+            await quarrel.SelectMenu.on_error(self, interaction, values, error)
 
 
 class CommonGrid(quarrel.Grid):
