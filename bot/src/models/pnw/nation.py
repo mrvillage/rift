@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 import attrs
 import quarrel
 
-from ... import cache, embeds, enums, errors, flags, models, utils
+from ... import cache, components, embeds, enums, errors, flags, models, utils
 
 __all__ = ("Nation",)
 
@@ -168,7 +168,10 @@ class Nation:
             nation = cache.get_nation(utils.convert_int(value))
             if nation is not None:
                 return nation
-        raise errors.NationNotFoundError(command, value)
+        raise errors.NationNotFoundError(command.interaction, value)
 
     def build_embed(self, user: MemberOrUser) -> quarrel.Embed:
         return embeds.nation(user, self)
+
+    def build_grid(self) -> components.NationGrid:
+        return components.NationGrid(self)

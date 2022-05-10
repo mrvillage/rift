@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import quarrel
+
 __all__ = (
     "NotFoundError",
     "AllianceNotFoundError",
@@ -12,9 +14,7 @@ __all__ = (
 from .base import RiftError
 
 if TYPE_CHECKING:
-    from typing import ClassVar, Optional
-
-    from ..commands.common import CommonCommand
+    from typing import Any, ClassVar, Optional
 
 
 class NotFoundError(RiftError):
@@ -26,9 +26,11 @@ class NotFoundError(RiftError):
         cls.name = name
         cls.infer = infer
 
-    def __init__(self, command: CommonCommand, value: Optional[str] = None) -> None:
-        self.command: CommonCommand = command
-        self.value: Optional[str] = value
+    def __init__(
+        self, interaction: quarrel.Interaction, value: Optional[Any] = None
+    ) -> None:
+        self.interaction: quarrel.Interaction = interaction
+        self.value: Optional[Any] = value
 
 
 class AllianceNotFoundError(NotFoundError, name="alliance", infer=True):
