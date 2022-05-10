@@ -27,8 +27,7 @@ class NationCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        await self.interaction.respond(
-            quarrel.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE,
+        await self.interaction.respond_with_message(
             embed=self.options.nation.build_embed(self.interaction.user),
         )
 
