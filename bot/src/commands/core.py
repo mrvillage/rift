@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import quarrel
-
 from .. import models, options
 from ..bot import bot
 from .common import CommonSlashCommand
@@ -50,7 +48,6 @@ class AllianceCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        await self.interaction.respond(
-            quarrel.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE,
+        await self.interaction.respond_with_message(
             embed=self.options.alliance.build_embed(self.interaction.user),
         )
