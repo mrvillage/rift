@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import quarrel
-
+from .. import embeds
 from .base import RiftError
 
 __all__ = (
@@ -15,6 +14,8 @@ __all__ = (
 
 if TYPE_CHECKING:
     from typing import Any, ClassVar, Optional
+
+    import quarrel
 
 
 class NotFoundError(RiftError):
@@ -31,6 +32,11 @@ class NotFoundError(RiftError):
     ) -> None:
         self.interaction: quarrel.Interaction = interaction
         self.value: Optional[Any] = value
+
+    def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
+        return embeds.not_found_error(
+            interaction.user, self.name, self.value, self.infer
+        )
 
 
 class AllianceNotFoundError(NotFoundError, name="alliance", infer=True):

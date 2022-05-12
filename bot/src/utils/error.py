@@ -21,25 +21,8 @@ async def handle_interaction_error(
         error = error.error
         if isinstance(error, quarrel.ConversionError):
             error = error.errors[0]
-    if isinstance(error, errors.GuildOnlyError):
-        await respond_with_error(
-            interaction, embeds.command_is_guild_only_error(interaction.user)
-        )
-    elif isinstance(error, errors.NotFoundError):
-        await respond_with_error(
-            interaction,
-            embeds.not_found_error(
-                interaction.user, error.name, error.value, error.infer
-            ),
-        )
-    elif isinstance(error, errors.NationNotInAllianceError):
-        await respond_with_error(
-            interaction,
-            embeds.nation_not_in_alliance_error(
-                interaction.user,
-                error.nation,
-            ),
-        )
+    if isinstance(error, errors.RiftError):
+        await respond_with_error(interaction, error.build_embed(interaction))
     else:
         await respond_with_error(interaction, embeds.fatal_error(interaction.user))
         return True
