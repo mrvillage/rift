@@ -9,4 +9,4 @@ __all__ = ("User",)
 class User(TypedDict):
     user_id: int
     nation_id: Optional[int]
-    uuid: uuid.UUID
+    uuid: Optional[uuid.UUID]

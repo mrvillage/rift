@@ -7,7 +7,16 @@ import quarrel
 
 from .. import cache, consts, enums, models, strings, utils
 
-__all__ = ("not_found_error", "nation_not_in_alliance_error", "nation", "alliance")
+__all__ = (
+    "not_found_error",
+    "nation_not_in_alliance_error",
+    "nation",
+    "alliance",
+    "user_already_linked",
+    "nation_already_linked",
+    "nation_username_mismatch",
+    "linked_to",
+)
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -205,4 +214,40 @@ def alliance(user: MemberOrUser, alliance: models.Alliance) -> quarrel.Embed:
                 value=f"{sum((i.score for i in members), start=decimal.Decimal())/len(members):,.2f}",
             ),
         ],
+    )
+
+
+def user_already_linked(user: MemberOrUser, linked_user: MemberOrUser) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=user,
+        description=strings.user_already_linked(linked_user),
+        color=quarrel.Color.RED,
+    )
+
+
+def nation_already_linked(user: MemberOrUser, nation: models.Nation) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=user,
+        description=strings.nation_already_linked(nation),
+        color=quarrel.Color.RED,
+    )
+
+
+def nation_username_mismatch(
+    user: MemberOrUser, nation: models.Nation, mismatched_user: MemberOrUser
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=user,
+        description=strings.nation_username_mismatch(nation, mismatched_user),
+        color=quarrel.Color.RED,
+    )
+
+
+def linked_to(
+    user: MemberOrUser, nation: models.Nation, linked_user: MemberOrUser
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=user,
+        description=strings.linked_to(nation, linked_user),
+        color=quarrel.Color.GREEN,
     )

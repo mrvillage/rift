@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import attrs
 
-from .. import utils
+from .. import cache, models, utils
 
 __all__ = ("User",)
 
@@ -12,7 +12,10 @@ if TYPE_CHECKING:
     import uuid
     from typing import ClassVar, Optional
 
+    from typing_extensions import Self
+
     from ..types.models.user import User as UserData
+    from ..types.quarrel import MemberOrUser
 
 
 @utils.model
@@ -20,11 +23,12 @@ if TYPE_CHECKING:
 class User:
     TABLE: ClassVar[str] = "users"
     PRIMARY_KEY: ClassVar[tuple[str]] = ("user_id",)
+    INCREMENT: ClassVar[tuple[str, ...]] = ()
     user_id: int
     nation_id: Optional[int]
-    uuid: uuid.UUID
+    uuid: Optional[uuid.UUID]
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:
@@ -43,3 +47,10 @@ class User:
     @property
     def key(self) -> int:
         return self.user_id
+
+    @classmethod
+    async def link(cls, user: MemberOrUser, nation: models.Nation) -> Self:
+        self = cls(user_id=user.id, nation_id=nation.id, uuid=None)
+        cache.add_user(self)
+        await self.save(insert=True)
+        return self

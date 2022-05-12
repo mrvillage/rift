@@ -1,8 +1,12 @@
 from __future__ import annotations
 
-import quarrel
+from typing import TYPE_CHECKING
 
 from .base import RiftError
+
+if TYPE_CHECKING:
+
+    import quarrel
 
 
 class Response(RiftError):
@@ -11,8 +15,7 @@ class Response(RiftError):
 
 class EmbedErrorResponse(Response):
     def __init__(self, embed: quarrel.Embed) -> None:
-        self._embed: quarrel.Embed = embed
+        self.embed: quarrel.Embed = embed
 
-    @property
-    def embed(self) -> quarrel.Embed:
-        return self._embed
+    def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
+        return self.embed
