@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from .. import utils
+
 __all__ = (
     "COMMAND_IS_GUILD_ONLY",
     "CREATED",
@@ -12,6 +14,7 @@ __all__ = (
     "FATAL_ERROR",
     "NONE",
     "click_here_link_or_none",
+    "missing_discord_permissions",
 )
 
 if TYPE_CHECKING:
@@ -33,7 +36,7 @@ def not_found(name: str, value: Optional[str], infer: bool = False) -> str:
 
 
 def enum_name(value: enum.Enum) -> str:
-    return " ".join(i.capitalize() for i in value.name.split("_"))
+    return utils.snake_case_to_capitals(value.name)
 
 
 SUPPORT_SERVER = "https://rift.mrvillage.dev/discord"
@@ -45,3 +48,7 @@ NONE: Final[str] = "None"
 
 def click_here_link_or_none(link: Optional[str]) -> str:
     return f"[Click here]({link})" if link else "None"
+
+
+def missing_discord_permissions(permissions: dict[str, bool]) -> str:
+    return f"You need the following permissions to do that!\n{', '.join(f'`{utils.snake_case_to_capitals(permission)}`' for permission, has_permission in permissions.items() if not has_permission)}"

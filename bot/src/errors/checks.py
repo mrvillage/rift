@@ -17,4 +17,10 @@ class GuildOnlyError(RiftError):
 
 
 class MissingDiscordPermissionsError(RiftError):
-    ...
+    def __init__(self, permissions: dict[str, bool]) -> None:
+        self.permissions: dict[str, bool] = permissions
+
+    def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
+        return embeds.missing_discord_permissions_error(
+            interaction.user, self.permissions
+        )

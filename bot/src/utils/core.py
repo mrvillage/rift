@@ -15,6 +15,7 @@ __all__ = (
     "sleep_until",
     "utcnow",
     "default_missing",
+    "snake_case_to_capitals",
 )
 
 if TYPE_CHECKING:
@@ -52,3 +53,7 @@ def utcnow() -> datetime.datetime:
 
 def default_missing(*_: Any) -> Any:
     return quarrel.MISSING
+
+
+def snake_case_to_capitals(value: str) -> str:
+    return " ".join(i.capitalize() for i in value.split("_"))

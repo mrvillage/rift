@@ -6,7 +6,11 @@ import quarrel
 
 from .. import strings, utils
 
-__all__ = ("command_is_guild_only_error", "fatal_error")
+__all__ = (
+    "command_is_guild_only_error",
+    "fatal_error",
+    "missing_discord_permissions_error",
+)
 
 if TYPE_CHECKING:
     from ..types.quarrel import MemberOrUser
@@ -24,5 +28,15 @@ def fatal_error(user: MemberOrUser) -> quarrel.Embed:
     return utils.build_single_embed_from_user(
         author=user,
         description=strings.FATAL_ERROR,
+        color=quarrel.Color.RED,
+    )
+
+
+def missing_discord_permissions_error(
+    user: MemberOrUser, permissions: dict[str, bool]
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=user,
+        description=strings.missing_discord_permissions(permissions),
         color=quarrel.Color.RED,
     )
