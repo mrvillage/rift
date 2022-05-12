@@ -210,7 +210,7 @@ class Cache:
             for row in result:
                 # too lazy to properly type this
                 model = i.from_dict(row)
-                attr[i.key if hasattr(i, "key") else model.id] = model  # type: ignore
+                attr[model.key if hasattr(i, "key") else model.id] = model  # type: ignore
         for i in self.users:
             if i.nation_id is not None:
                 self._users[i.nation_id] = i
