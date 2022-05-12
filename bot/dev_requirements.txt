@@ -1,1 +1,2 @@
 python-dotenv==0.20.*
+typing_extensions
