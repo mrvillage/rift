@@ -16,6 +16,7 @@ __all__ = (
     "TEXT_CHANNEL",
     "USER",
     "USER_OPTIONAL",
+    "USER_DEFAULT_SELF",
     "NAME",
     "NAME_OPTIONAL",
     "USE_CONDITION",
