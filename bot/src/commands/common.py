@@ -35,8 +35,7 @@ class CommonSlashCommand(CommonCommand, quarrel.SlashCommand[OPTS]):
         name: Missing[str] = quarrel.MISSING,
         description: Missing[str] = quarrel.MISSING,
         options: Missing[list[OptionType[Any]]] = quarrel.MISSING,
-        # pyright has issues unpacking Unions with Type
-        parent: type[quarrel.SlashCommand[Any]] = quarrel.MISSING,  # type: ignore
+        parent: Missing[type[quarrel.SlashCommand[Any]]] = quarrel.MISSING,
         checks: Missing[list[Any]] = quarrel.MISSING,
         guilds: Missing[list[int]] = quarrel.MISSING,
         global_: Missing[bool] = quarrel.MISSING,
@@ -45,8 +44,7 @@ class CommonSlashCommand(CommonCommand, quarrel.SlashCommand[OPTS]):
             name,
             description,
             options,
-            # pyright has issues unpacking Unions with Type
-            parent,  # type: ignore
+            parent,
             checks,
             guilds or (env.DEV_GUILD_IDS if env.ENVIRONMENT == "dev" else []),
             global_,
