@@ -50,5 +50,5 @@ class MenuItem:
     async def convert(cls, command: CommonSlashCommand[Any], value: int) -> MenuItem:
         item = cache.get_menu_item(value)
         if item is None:
-            raise errors.MenuItemNotFoundError(value)
+            raise errors.MenuItemNotFoundError(command.interaction, value)
         return item
