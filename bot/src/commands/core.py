@@ -108,7 +108,6 @@ class LinkCommand(
         )
 
 
-
 if TYPE_CHECKING:
 
     class MeCommandOptions:
@@ -120,8 +119,6 @@ class MeCommand(
     CommonSlashCommand["MeCommandOptions"],
     name="me",
     description="View your nation information.",
-    options=[],
-    checks=[],
 ):
     __slots__ = ()
 
@@ -132,4 +129,29 @@ class MeCommand(
         await self.interaction.respond_with_message(
             embed=nation.build_embed(self.interaction.user),
             grid=nation.build_grid(),
+        )
+
+
+if TYPE_CHECKING:
+
+    class WhoCommandOptions:
+        search: models.Nation | models.Alliance
+
+
+@bot.command
+class WhoCommand(
+    CommonSlashCommand["WhoCommandOptions"],
+    name="who",
+    description="View information on a nation or alliance.",
+    options=[options.NATION_OR_ALLIANCE_DEFAULT_SELF_NATION],
+):
+    __slots__ = ()
+
+    async def callback(self) -> None:
+        await self.interaction.respond_with_message(
+            embed=self.options.search.build_embed(self.interaction.user),
+            # pyright does not pick up hasattr call
+            grid=self.options.search.build_grid()  # type: ignore
+            if hasattr(self.options.search, "build_grid")
+            else quarrel.MISSING,
         )
