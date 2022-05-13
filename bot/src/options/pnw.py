@@ -10,6 +10,9 @@ __all__ = (
     "NATION_DEFAULT_SELF",
     "ALLIANCE",
     "ALLIANCE_DEFAULT_SELF",
+    "NATION_OR_ALLIANCE",
+    "NATION_OR_ALLIANCE_DEFAULT_SELF_NATION",
+    "NATION_OR_ALLIANCE_DEFAULT_SELF_ALLIANCE",
 )
 
 NATION = CommonOption(
@@ -26,3 +29,11 @@ ALLIANCE = CommonOption(
     converter=models.Alliance.convert,
 )
 ALLIANCE_DEFAULT_SELF = ALLIANCE(default=utils.self_alliance)
+NATION_OR_ALLIANCE = CommonOption(
+    type=quarrel.ApplicationCommandOptionType.STRING,
+    name="search",
+    description="The nation or alliance to search for.",
+    converters=[models.Nation.convert, models.Alliance.convert],
+)
+NATION_OR_ALLIANCE_DEFAULT_SELF_NATION = NATION_OR_ALLIANCE(default=utils.self_nation)
+NATION_OR_ALLIANCE_DEFAULT_SELF_ALLIANCE = ALLIANCE(default=utils.self_alliance)
