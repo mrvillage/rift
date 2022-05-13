@@ -106,3 +106,30 @@ class LinkCommand(
             ),
             ephemeral=True,
         )
+
+
+
+if TYPE_CHECKING:
+
+    class MeCommandOptions:
+        ...
+
+
+@bot.command
+class MeCommand(
+    CommonSlashCommand["MeCommandOptions"],
+    name="me",
+    description="View your nation information.",
+    options=[],
+    checks=[],
+):
+    __slots__ = ()
+
+    async def callback(self) -> None:
+        user = cache.get_user(self.interaction.user.id)
+        if user is None or (nation := user.nation) is None:
+            raise errors.NationNotFoundError(self.interaction)
+        await self.interaction.respond_with_message(
+            embed=nation.build_embed(self.interaction.user),
+            grid=nation.build_grid(),
+        )
