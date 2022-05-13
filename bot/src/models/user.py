@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import attrs
 
 from .. import cache, models, utils
+from ..bot import bot
 
 __all__ = ("User",)
 
@@ -12,6 +13,7 @@ if TYPE_CHECKING:
     import uuid
     from typing import ClassVar, Optional
 
+    import quarrel
     from typing_extensions import Self
 
     from ..types.models.user import User as UserData
@@ -47,6 +49,14 @@ class User:
     @property
     def key(self) -> int:
         return self.user_id
+
+    @property
+    def nation(self) -> Optional[models.Nation]:
+        return cache.get_nation(self.nation_id) if self.nation_id else None
+
+    @property
+    def user(self) -> Optional[quarrel.User]:
+        return bot.get_user(self.user_id)
 
     @classmethod
     async def link(cls, user: MemberOrUser, nation: models.Nation) -> Self:
