@@ -79,9 +79,7 @@ class Bank(commands.Cog):
         credentials = funcs.credentials.find_highest_alliance_credentials(
             alliance, "send_alliance_bank"
         )
-        if credentials is None or (
-            credentials.username is None and credentials.password is None
-        ):
+        if credentials is None:
             raise NoCredentialsError()
         view = Confirm(defer=True)
         await ctx.reply(
