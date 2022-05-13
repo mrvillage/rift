@@ -10,6 +10,7 @@ __all__ = (
     "AllianceNotFoundError",
     "MenuItemNotFoundError",
     "NationNotFoundError",
+    "NationOrAllianceNotFoundError",
 )
 
 if TYPE_CHECKING:
@@ -48,4 +49,8 @@ class MenuItemNotFoundError(NotFoundError, name="menu item"):
 
 
 class NationNotFoundError(NotFoundError, name="nation", infer=True):
+    ...
+
+
+class NationOrAllianceNotFoundError(NotFoundError, name="nation or alliance"):
     ...

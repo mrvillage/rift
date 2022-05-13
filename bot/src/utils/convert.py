@@ -1,20 +1,21 @@
 from __future__ import annotations
 
+import contextlib
 from typing import TYPE_CHECKING
 
-from .. import cache, errors
+from .. import cache, errors, models
 
 __all__ = (
     "convert_comma_separated_ints",
     "convert_int",
     "self_nation",
     "self_alliance",
+    "nation_or_alliance",
 )
 
 if TYPE_CHECKING:
     from typing import Any
 
-    from .. import models
     from ..commands.common import CommonSlashCommand
 
 
@@ -45,3 +46,13 @@ def self_alliance(command: CommonSlashCommand[Any]) -> models.Alliance:
     if alliance is None:
         raise errors.AllianceNotFoundError(command.interaction)
     return alliance
+
+
+async def nation_or_alliance(
+    command: CommonSlashCommand[Any], value: str
+) -> models.Nation | models.Alliance:
+    with contextlib.suppress(errors.NationNotFoundError):
+        return await models.Nation.convert(command, value)
+    with contextlib.suppress(errors.AllianceNotFoundError):
+        return await models.Alliance.convert(command, value)
+    raise errors.NationOrAllianceNotFoundError(command.interaction, value)
