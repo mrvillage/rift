@@ -23,7 +23,9 @@ class Account:
     name: str
     owner_id: int
     alliance_id: int
-    resources: models.Resources
+    resources: models.Resources = attrs.field(
+        converter=lambda x: models.Resources.from_dict(x)
+    )
     war_chest: bool
     primary: bool
     deposit_code: str

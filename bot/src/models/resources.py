@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from ..types.resources import Resources as ResourcesData
 
 
-@attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
+@attrs.define(weakref_slot=False, auto_attribs=True, eq=False)
 class Resources:
     money: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
     coal: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
@@ -30,7 +30,7 @@ class Resources:
 
     @classmethod
     def from_dict(cls, data: ResourcesData) -> Resources:
-        return cls(**data)
+        return data if isinstance(data, cls) else cls(**data)
 
     def to_dict(self) -> ResourcesData:
         return {

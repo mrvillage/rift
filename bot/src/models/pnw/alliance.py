@@ -40,7 +40,9 @@ class Alliance:
     forum_link: str
     discord_link: str
     wiki_link: str
-    estimated_resources: models.Resources
+    estimated_resources: models.Resources = attrs.field(
+        converter=lambda x: models.Resources.from_dict(x)
+    )
 
     async def save(self, insert: bool = False) -> None:
         ...

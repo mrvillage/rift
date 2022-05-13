@@ -24,13 +24,17 @@ class Grant:
     date: datetime.datetime
     status: enums.GrantStatus = attrs.field(converter=enums.GrantStatus)
     recipient: int
-    resources: models.Resources
+    resources: models.Resources = attrs.field(
+        converter=lambda x: models.Resources.from_dict(x)
+    )
     alliance_id: int
     note: str
     payoff_type: enums.GrantPayoffType = attrs.field(converter=enums.GrantPayoffType)
     deadline: datetime.datetime
     expiry: datetime.datetime
-    paid: models.Resources
+    paid: models.Resources = attrs.field(
+        converter=lambda x: models.Resources.from_dict(x)
+    )
     payoff_code: str
     tax_bracket: int
 

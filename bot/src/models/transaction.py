@@ -29,7 +29,9 @@ class Transaction:
     to_type: enums.AccountType = attrs.field(converter=enums.AccountType)
     from_id: int
     from_type: enums.AccountType = attrs.field(converter=enums.AccountType)
-    resources: models.Resources
+    resources: models.Resources = attrs.field(
+        converter=lambda x: models.Resources.from_dict(x)
+    )
     note: str
 
     async def save(self) -> None:

@@ -36,7 +36,9 @@ class Bankrec:
     )
     banker_id: int
     note: str
-    resources: models.Resources
+    resources: models.Resources = attrs.field(
+        converter=lambda x: models.Resources.from_dict(x)
+    )
     tax_id: int
 
     async def save(self, insert: bool = False) -> None:
