@@ -24,7 +24,7 @@ async def handle_interaction_error(
     if isinstance(error, errors.RiftError):
         await respond_with_error(interaction, error.build_embed(interaction))
     else:
-        await respond_with_error(interaction, embeds.fatal_error(interaction.user))
+        await respond_with_error(interaction, embeds.fatal_error(interaction))
         return True
 
 

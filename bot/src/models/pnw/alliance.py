@@ -13,13 +13,11 @@ __all__ = ("Alliance",)
 
 if TYPE_CHECKING:
     import decimal
-    from typing import Any, Any, ClassVar
+    from typing import Any, ClassVar
 
     from pnwkit.data import Alliance as PnWKitAlliance
 
     from ...commands.common import CommonSlashCommand
-
-    from ...types.quarrel import MemberOrUser
 
 
 @utils.model
@@ -127,5 +125,5 @@ class Alliance:
                 return alliance
         raise errors.AllianceNotFoundError(command.interaction, value)
 
-    def build_embed(self, user: MemberOrUser) -> quarrel.Embed:
-        return embeds.alliance(user, self)
+    def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
+        return embeds.alliance(interaction, self)

@@ -17,6 +17,6 @@ class NationNotInAllianceError(RiftError):
 
     def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
         return embeds.nation_not_in_alliance_error(
-            interaction.user,
+            interaction,
             self.nation,
         )

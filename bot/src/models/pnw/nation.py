@@ -13,13 +13,11 @@ from ... import cache, components, embeds, enums, errors, flags, models, utils
 __all__ = ("Nation",)
 
 if TYPE_CHECKING:
-    from typing import Any, Any, ClassVar, Optional
+    from typing import Any, ClassVar, Optional
 
     from pnwkit.data import Nation as PnWKitNation
 
     from ...commands.common import CommonSlashCommand
-
-    from ...types.quarrel import MemberOrUser
 
 
 @utils.model
@@ -175,8 +173,8 @@ class Nation:
                 return nation
         raise errors.NationNotFoundError(command.interaction, value)
 
-    def build_embed(self, user: MemberOrUser) -> quarrel.Embed:
-        return embeds.nation(user, self)
+    def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
+        return embeds.nation(interaction, self)
 
     def build_grid(self) -> components.NationGrid:
         return components.NationGrid(self)

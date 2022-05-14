@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 class RiftError(Exception):
     def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
-        return embeds.fatal_error(interaction.user)
+        return embeds.fatal_error(interaction)
 
     def build_grid(self, interaction: quarrel.Interaction) -> Missing[quarrel.Grid]:
         return quarrel.MISSING

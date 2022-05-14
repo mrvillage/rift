@@ -25,31 +25,31 @@ if TYPE_CHECKING:
 
 
 def not_found_error(
-    user: MemberOrUser,
+    interaction: quarrel.Interaction,
     name: str,
     value: Optional[str],
     infer: bool = False,
 ) -> quarrel.Embed:
     return utils.build_single_embed_from_user(
-        author=user,
+        author=interaction.user,
         description=strings.not_found(name, value, infer),
         color=consts.ERROR_EMBED_COLOR,
     )
 
 
 def nation_not_in_alliance_error(
-    user: MemberOrUser, nation: models.Nation
+    interaction: quarrel.Interaction, nation: models.Nation
 ) -> quarrel.Embed:
     return utils.build_single_embed_from_user(
-        author=user,
+        author=interaction.user,
         description=strings.nation_not_in_alliance(nation),
         color=consts.ERROR_EMBED_COLOR,
     )
 
 
-def nation(user: MemberOrUser, nation: models.Nation) -> quarrel.Embed:
+def nation(interaction: quarrel.Interaction, nation: models.Nation) -> quarrel.Embed:
     return utils.build_single_embed_from_user(
-        author=user,
+        author=interaction.user,
         color=consts.INFO_EMBED_COLOR,
         footer_text=strings.model_created("Nation"),
         timestamp=nation.date,
@@ -137,12 +137,14 @@ def nation(user: MemberOrUser, nation: models.Nation) -> quarrel.Embed:
     )
 
 
-def alliance(user: MemberOrUser, alliance: models.Alliance) -> quarrel.Embed:
+def alliance(
+    interaction: quarrel.Interaction, alliance: models.Alliance
+) -> quarrel.Embed:
     members = alliance.members
     member_ids = {i.id for i in members}
     cities = {i for i in cache.cities if i.nation_id in member_ids}
     return utils.build_single_embed_from_user(
-        author=user,
+        author=interaction.user,
         color=consts.INFO_EMBED_COLOR,
         footer_text=strings.model_created("Alliance"),
         timestamp=alliance.date,
@@ -217,37 +219,43 @@ def alliance(user: MemberOrUser, alliance: models.Alliance) -> quarrel.Embed:
     )
 
 
-def user_already_linked(user: MemberOrUser, linked_user: MemberOrUser) -> quarrel.Embed:
+def user_already_linked(
+    interaction: quarrel.Interaction, user: MemberOrUser
+) -> quarrel.Embed:
     return utils.build_single_embed_from_user(
-        author=user,
-        description=strings.user_already_linked(linked_user),
+        author=interaction.user,
+        description=strings.user_already_linked(user),
         color=quarrel.Color.RED,
     )
 
 
-def nation_already_linked(user: MemberOrUser, nation: models.Nation) -> quarrel.Embed:
+def nation_already_linked(
+    interaction: quarrel.Interaction, nation: models.Nation
+) -> quarrel.Embed:
     return utils.build_single_embed_from_user(
-        author=user,
+        author=interaction.user,
         description=strings.nation_already_linked(nation),
         color=quarrel.Color.RED,
     )
 
 
 def nation_username_mismatch(
-    user: MemberOrUser, nation: models.Nation, mismatched_user: MemberOrUser
+    interaction: quarrel.Interaction,
+    nation: models.Nation,
+    user: MemberOrUser,
 ) -> quarrel.Embed:
     return utils.build_single_embed_from_user(
-        author=user,
-        description=strings.nation_username_mismatch(nation, mismatched_user),
+        author=interaction.user,
+        description=strings.nation_username_mismatch(nation, user),
         color=quarrel.Color.RED,
     )
 
 
 def linked_to(
-    user: MemberOrUser, nation: models.Nation, linked_user: MemberOrUser
+    interaction: quarrel.Interaction, nation: models.Nation, user: MemberOrUser
 ) -> quarrel.Embed:
     return utils.build_single_embed_from_user(
-        author=user,
-        description=strings.linked_to(nation, linked_user),
+        author=interaction.user,
+        description=strings.linked_to(nation, user),
         color=quarrel.Color.GREEN,
     )

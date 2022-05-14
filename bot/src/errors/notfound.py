@@ -35,9 +35,7 @@ class NotFoundError(RiftError):
         self.value: Optional[Any] = value
 
     def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
-        return embeds.not_found_error(
-            interaction.user, self.name, self.value, self.infer
-        )
+        return embeds.not_found_error(interaction, self.name, self.value, self.infer)
 
 
 class AllianceNotFoundError(NotFoundError, name="alliance", infer=True):

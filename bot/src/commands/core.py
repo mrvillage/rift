@@ -28,7 +28,7 @@ class NationCommand(
 
     async def callback(self) -> None:
         await self.interaction.respond_with_message(
-            embed=self.options.nation.build_embed(self.interaction.user),
+            embed=self.options.nation.build_embed(self.interaction),
             grid=self.options.nation.build_grid(),
         )
 
@@ -51,7 +51,7 @@ class AllianceCommand(
 
     async def callback(self) -> None:
         await self.interaction.respond_with_message(
-            embed=self.options.alliance.build_embed(self.interaction.user),
+            embed=self.options.alliance.build_embed(self.interaction),
         )
 
 
@@ -76,14 +76,12 @@ class LinkCommand(
         user_from_nation = cache.get_user(self.options.nation.id)
         if user_from_user is not None and user_from_user.nation_id is not None:
             raise errors.EmbedErrorResponse(
-                embed=embeds.user_already_linked(
-                    self.interaction.user, self.options.user
-                ),
+                embed=embeds.user_already_linked(self.interaction, self.options.user),
             )
         if user_from_nation is not None:
             raise errors.EmbedErrorResponse(
                 embed=embeds.nation_already_linked(
-                    self.interaction.user, self.options.nation
+                    self.interaction, self.options.nation
                 ),
             )
         if (
@@ -92,7 +90,7 @@ class LinkCommand(
         ):
             raise errors.EmbedErrorResponse(
                 embed=embeds.nation_username_mismatch(
-                    self.interaction.user, self.options.nation, self.options.user
+                    self.interaction, self.options.nation, self.options.user
                 ),
             )
         if user_from_user is not None:
@@ -102,7 +100,7 @@ class LinkCommand(
             await models.User.link(self.options.user, self.options.nation)
         await self.interaction.respond_with_message(
             embed=embeds.linked_to(
-                self.interaction.user, self.options.nation, self.options.user
+                self.interaction, self.options.nation, self.options.user
             ),
             ephemeral=True,
         )
@@ -127,7 +125,7 @@ class MeCommand(
         if user is None or (nation := user.nation) is None:
             raise errors.NationNotFoundError(self.interaction)
         await self.interaction.respond_with_message(
-            embed=nation.build_embed(self.interaction.user),
+            embed=nation.build_embed(self.interaction),
             grid=nation.build_grid(),
         )
 
@@ -149,7 +147,7 @@ class WhoCommand(
 
     async def callback(self) -> None:
         await self.interaction.respond_with_message(
-            embed=self.options.search.build_embed(self.interaction.user),
+            embed=self.options.search.build_embed(self.interaction),
             # pyright does not pick up hasattr call
             grid=self.options.search.build_grid()  # type: ignore
             if hasattr(self.options.search, "build_grid")

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 class GuildOnlyError(RiftError):
     def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
-        return embeds.command_is_guild_only_error(interaction.user)
+        return embeds.command_is_guild_only_error(interaction)
 
 
 class MissingDiscordPermissionsError(RiftError):
@@ -22,5 +22,5 @@ class MissingDiscordPermissionsError(RiftError):
 
     def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
         return embeds.missing_discord_permissions_error(
-            interaction.user, self.permissions
+            interaction, self.permissions
         )

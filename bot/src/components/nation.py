@@ -45,7 +45,7 @@ class NationRefreshButton(CommonButton):
         if nation is None:
             raise errors.NationNotFoundError(interaction, nation_id)
         await interaction.respond_with_edit(
-            embed=nation.build_embed(interaction.user),
+            embed=nation.build_embed(interaction),
         )
 
 
@@ -77,6 +77,6 @@ class NationAllianceInformationButton(CommonButton):
         if alliance is None:
             raise errors.NationNotInAllianceError(nation)
         await interaction.respond_with_message(
-            embed=alliance.build_embed(interaction.user),
+            embed=alliance.build_embed(interaction),
             ephemeral=True,
         )
