@@ -11,11 +11,9 @@ __all__ = ("City",)
 
 if TYPE_CHECKING:
     import decimal
-    from typing import ClassVar, Optional
+    from typing import Any, ClassVar, Optional
 
     from pnwkit.data import City as PnWKitCity
-
-    from ...types.models.pnw.city import City as CityData
 
 
 @utils.model
@@ -66,10 +64,10 @@ class City:
         ...
 
     @classmethod
-    def from_dict(cls, data: CityData) -> City:
+    def from_dict(cls, data: dict[str, Any]) -> City:
         ...
 
-    def to_dict(self) -> CityData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: City) -> City:

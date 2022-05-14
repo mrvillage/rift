@@ -9,9 +9,7 @@ from .. import enums, utils
 __all__ = ("AuditLogConfig",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.audit_log_config import AuditLogConfig as AuditLogConfigData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -32,10 +30,10 @@ class AuditLogConfig:
         ...
 
     @classmethod
-    def from_dict(cls, data: AuditLogConfigData) -> AuditLogConfig:
+    def from_dict(cls, data: dict[str, Any]) -> AuditLogConfig:
         ...
 
-    def to_dict(self) -> AuditLogConfigData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: AuditLogConfig) -> AuditLogConfig:

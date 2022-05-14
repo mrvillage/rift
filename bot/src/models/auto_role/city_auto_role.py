@@ -9,9 +9,9 @@ from ... import utils
 __all__ = ("CityAutoRole",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
-    from ...types.models.auto_role.city_auto_role import (
+    
         CityAutoRole as CityAutoRoleData,
     )
 
@@ -35,10 +35,10 @@ class CityAutoRole:
         ...
 
     @classmethod
-    def from_dict(cls, data: CityAutoRoleData) -> CityAutoRole:
+    def from_dict(cls, data: dict[str, Any]) -> CityAutoRole:
         ...
 
-    def to_dict(self) -> CityAutoRoleData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: CityAutoRole) -> CityAutoRole:

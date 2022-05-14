@@ -9,9 +9,7 @@ from .. import utils
 __all__ = ("WarRoom",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.war_room import WarRoom as WarRoomData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -34,10 +32,10 @@ class WarRoom:
         ...
 
     @classmethod
-    def from_dict(cls, data: WarRoomData) -> WarRoom:
+    def from_dict(cls, data: dict[str, Any]) -> WarRoom:
         ...
 
-    def to_dict(self) -> WarRoomData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: WarRoom) -> WarRoom:

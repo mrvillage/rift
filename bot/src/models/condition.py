@@ -9,10 +9,9 @@ from .. import utils
 __all__ = ("Condition",)
 
 if TYPE_CHECKING:
-    from typing import Any, ClassVar
+    from typing import Any, Any, ClassVar
 
     from ..commands.common import CommonSlashCommand
-    from ..types.models.condition import Condition as ConditionData
 
 
 @utils.model
@@ -33,10 +32,10 @@ class Condition:
         ...
 
     @classmethod
-    def from_dict(cls, data: ConditionData) -> Condition:
+    def from_dict(cls, data: dict[str, Any]) -> Condition:
         ...
 
-    def to_dict(self) -> ConditionData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Condition) -> Condition:

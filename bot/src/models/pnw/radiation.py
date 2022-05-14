@@ -11,11 +11,9 @@ __all__ = ("Radiation",)
 if TYPE_CHECKING:
     import datetime
     import decimal
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
     from pnwkit.data import Radiation as PnWKitRadiation
-
-    from ...types.models.pnw.radiation import Radiation as RadiationData
 
 
 @utils.model
@@ -41,10 +39,10 @@ class Radiation:
         ...
 
     @classmethod
-    def from_dict(cls, data: RadiationData) -> Radiation:
+    def from_dict(cls, data: dict[str, Any]) -> Radiation:
         ...
 
-    def to_dict(self) -> RadiationData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Radiation) -> Radiation:

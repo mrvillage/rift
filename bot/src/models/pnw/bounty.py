@@ -10,11 +10,9 @@ from ... import enums, utils
 __all__ = ("Bounty",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
     from pnwkit.data import Bounty as PnWKitBounty
-
-    from ...types.models.pnw.bounty import Bounty as BountyData
 
 
 @utils.model
@@ -36,10 +34,10 @@ class Bounty:
         ...
 
     @classmethod
-    def from_dict(cls, data: BountyData) -> Bounty:
+    def from_dict(cls, data: dict[str, Any]) -> Bounty:
         ...
 
-    def to_dict(self) -> BountyData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Bounty) -> Bounty:

@@ -11,12 +11,11 @@ __all__ = ("User",)
 
 if TYPE_CHECKING:
     import uuid
-    from typing import ClassVar, Optional
+    from typing import Any, ClassVar, Optional
 
     import quarrel
     from typing_extensions import Self
 
-    from ..types.models.user import User as UserData
     from ..types.quarrel import MemberOrUser
 
 
@@ -37,10 +36,10 @@ class User:
         ...
 
     @classmethod
-    def from_dict(cls, data: UserData) -> User:
+    def from_dict(cls, data: dict[str, Any]) -> User:
         ...
 
-    def to_dict(self) -> UserData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: User) -> User:

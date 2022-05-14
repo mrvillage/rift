@@ -9,11 +9,7 @@ from ... import utils
 __all__ = ("InterviewAnswer",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ...types.models.interview.interview_answer import (
-        InterviewAnswer as InterviewAnswerData,
-    )
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -32,10 +28,10 @@ class InterviewAnswer:
         ...
 
     @classmethod
-    def from_dict(cls, data: InterviewAnswerData) -> InterviewAnswer:
+    def from_dict(cls, data: dict[str, Any]) -> InterviewAnswer:
         ...
 
-    def to_dict(self) -> InterviewAnswerData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: InterviewAnswer) -> InterviewAnswer:

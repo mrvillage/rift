@@ -9,11 +9,10 @@ from .. import utils
 __all__ = ("TargetConfig",)
 
 if TYPE_CHECKING:
-    from typing import Any, ClassVar
+    from typing import Any, Any, ClassVar
 
     from .. import flags
     from ..commands.common import CommonSlashCommand
-    from ..types.models.target_config import TargetConfig as TargetConfigData
 
 
 @utils.model
@@ -37,10 +36,10 @@ class TargetConfig:
         ...
 
     @classmethod
-    def from_dict(cls, data: TargetConfigData) -> TargetConfig:
+    def from_dict(cls, data: dict[str, Any]) -> TargetConfig:
         ...
 
-    def to_dict(self) -> TargetConfigData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: TargetConfig) -> TargetConfig:

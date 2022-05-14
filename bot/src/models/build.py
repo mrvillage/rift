@@ -10,9 +10,7 @@ __all__ = ("Build",)
 
 if TYPE_CHECKING:
     import decimal
-    from typing import ClassVar
-
-    from ..types.models.build import Build as BuildData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -60,10 +58,10 @@ class Build:
         ...
 
     @classmethod
-    def from_dict(cls, data: BuildData) -> Build:
+    def from_dict(cls, data: dict[str, Any]) -> Build:
         ...
 
-    def to_dict(self) -> BuildData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Build) -> Build:

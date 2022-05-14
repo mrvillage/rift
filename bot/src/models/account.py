@@ -9,10 +9,9 @@ from .. import utils
 __all__ = ("Account",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
     from .. import models
-    from ..types.models.account import Account as AccountData
 
 
 @utils.model
@@ -37,10 +36,10 @@ class Account:
         ...
 
     @classmethod
-    def from_dict(cls, data: AccountData) -> Account:
+    def from_dict(cls, data: dict[str, Any]) -> Account:
         ...
 
-    def to_dict(self) -> AccountData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Account) -> Account:

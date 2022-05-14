@@ -9,9 +9,7 @@ from ... import utils
 __all__ = ("MenuInterface",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ...types.models.menu.menu_interface import MenuInterface as MenuInterfaceData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -30,10 +28,10 @@ class MenuInterface:
         ...
 
     @classmethod
-    def from_dict(cls, data: MenuInterfaceData) -> MenuInterface:
+    def from_dict(cls, data: dict[str, Any]) -> MenuInterface:
         ...
 
-    def to_dict(self) -> MenuInterfaceData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: MenuInterface) -> MenuInterface:

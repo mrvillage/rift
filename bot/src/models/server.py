@@ -9,9 +9,7 @@ from .. import utils
 __all__ = ("Server",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.server import Server as ServerData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -32,10 +30,10 @@ class Server:
         ...
 
     @classmethod
-    def from_dict(cls, data: ServerData) -> Server:
+    def from_dict(cls, data: dict[str, Any]) -> Server:
         ...
 
-    def to_dict(self) -> ServerData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Server) -> Server:

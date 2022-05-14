@@ -10,11 +10,9 @@ __all__ = ("Treaty",)
 
 if TYPE_CHECKING:
     import datetime
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
     from pnwkit.data import Treaty as PnWKitTreaty
-
-    from ...types.models.pnw.treaty import Treaty as TreatyData
 
 
 @utils.model
@@ -38,10 +36,10 @@ class Treaty:
         ...
 
     @classmethod
-    def from_dict(cls, data: TreatyData) -> Treaty:
+    def from_dict(cls, data: dict[str, Any]) -> Treaty:
         ...
 
-    def to_dict(self) -> TreatyData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Treaty) -> Treaty:

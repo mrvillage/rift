@@ -13,12 +13,12 @@ from ... import cache, components, embeds, enums, errors, flags, models, utils
 __all__ = ("Nation",)
 
 if TYPE_CHECKING:
-    from typing import Any, ClassVar, Optional
+    from typing import Any, Any, ClassVar, Optional
 
     from pnwkit.data import Nation as PnWKitNation
 
     from ...commands.common import CommonSlashCommand
-    from ...types.models.pnw.nation import Nation as NationData
+
     from ...types.quarrel import MemberOrUser
 
 
@@ -80,10 +80,10 @@ class Nation:
         ...
 
     @classmethod
-    def from_dict(cls, data: NationData) -> Nation:
+    def from_dict(cls, data: dict[str, Any]) -> Nation:
         ...
 
-    def to_dict(self) -> NationData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Nation) -> Nation:

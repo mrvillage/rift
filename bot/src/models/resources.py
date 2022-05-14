@@ -8,7 +8,7 @@ import attrs
 __all__ = ("Resources",)
 
 if TYPE_CHECKING:
-    from typing import Generator
+    from typing import Any, Generator
 
     from ..types.resources import Resources as ResourcesData
 
@@ -29,10 +29,10 @@ class Resources:
     food: decimal.Decimal = attrs.field(default=decimal.Decimal(0))
 
     @classmethod
-    def from_dict(cls, data: ResourcesData) -> Resources:
+    def from_dict(cls, data: dict[str, Any]) -> Resources:
         return data if isinstance(data, cls) else cls(**data)
 
-    def to_dict(self) -> ResourcesData:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "money": self.money,
             "coal": self.coal,

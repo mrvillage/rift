@@ -9,9 +9,7 @@ from .. import enums, utils
 __all__ = ("GuildSettings",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.guild_settings import GuildSettings as GuildSettingsData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -40,10 +38,10 @@ class GuildSettings:
         ...
 
     @classmethod
-    def from_dict(cls, data: GuildSettingsData) -> GuildSettings:
+    def from_dict(cls, data: dict[str, Any]) -> GuildSettings:
         ...
 
-    def to_dict(self) -> GuildSettingsData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: GuildSettings) -> GuildSettings:

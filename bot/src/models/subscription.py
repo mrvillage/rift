@@ -9,9 +9,7 @@ from .. import utils
 __all__ = ("Subscription",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.subscription import Subscription as SubscriptionData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -34,10 +32,10 @@ class Subscription:
         ...
 
     @classmethod
-    def from_dict(cls, data: SubscriptionData) -> Subscription:
+    def from_dict(cls, data: dict[str, Any]) -> Subscription:
         ...
 
-    def to_dict(self) -> SubscriptionData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Subscription) -> Subscription:

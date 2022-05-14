@@ -9,9 +9,7 @@ from .. import utils
 __all__ = ("Credentials",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.credentials import Credentials as CredentialsData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -29,10 +27,10 @@ class Credentials:
         ...
 
     @classmethod
-    def from_dict(cls, data: CredentialsData) -> Credentials:
+    def from_dict(cls, data: dict[str, Any]) -> Credentials:
         ...
 
-    def to_dict(self) -> CredentialsData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Credentials) -> Credentials:

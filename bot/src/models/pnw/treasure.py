@@ -10,11 +10,9 @@ __all__ = ("Treasure",)
 
 if TYPE_CHECKING:
     import datetime
-    from typing import ClassVar, Optional
+    from typing import Any, ClassVar, Optional
 
     from pnwkit.data import Treasure as PnWKitTreasure
-
-    from ...types.models.pnw.treasure import Treasure as TreasureData
 
 
 @utils.model
@@ -38,10 +36,10 @@ class Treasure:
         ...
 
     @classmethod
-    def from_dict(cls, data: TreasureData) -> Treasure:
+    def from_dict(cls, data: dict[str, Any]) -> Treasure:
         ...
 
-    def to_dict(self) -> TreasureData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Treasure) -> Treasure:

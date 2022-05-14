@@ -9,11 +9,9 @@ from ... import enums, utils
 __all__ = ("Color",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
     from pnwkit.data import Color as PnWKitColor
-
-    from ...types.models.pnw.color import Color as ColorData
 
 
 @utils.model
@@ -34,10 +32,10 @@ class Color:
         ...
 
     @classmethod
-    def from_dict(cls, data: ColorData) -> Color:
+    def from_dict(cls, data: dict[str, Any]) -> Color:
         ...
 
-    def to_dict(self) -> ColorData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Color) -> Color:

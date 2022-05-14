@@ -9,9 +9,7 @@ from .. import utils
 __all__ = ("BlitzTarget",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.blitz_target import BlitzTarget as BlitzTargetData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -31,10 +29,10 @@ class BlitzTarget:
         ...
 
     @classmethod
-    def from_dict(cls, data: BlitzTargetData) -> BlitzTarget:
+    def from_dict(cls, data: dict[str, Any]) -> BlitzTarget:
         ...
 
-    def to_dict(self) -> BlitzTargetData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: BlitzTarget) -> BlitzTarget:

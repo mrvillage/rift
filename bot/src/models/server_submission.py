@@ -9,9 +9,9 @@ from .. import utils
 __all__ = ("ServerSubmission",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
-    from ..types.models.server_submission import (
+    
         ServerSubmission as ServerSubmissionData,
     )
 
@@ -33,10 +33,10 @@ class ServerSubmission:
         ...
 
     @classmethod
-    def from_dict(cls, data: ServerSubmissionData) -> ServerSubmission:
+    def from_dict(cls, data: dict[str, Any]) -> ServerSubmission:
         ...
 
-    def to_dict(self) -> ServerSubmissionData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: ServerSubmission) -> ServerSubmission:

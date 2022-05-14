@@ -10,9 +10,7 @@ __all__ = ("Blitz",)
 
 if TYPE_CHECKING:
     import datetime
-    from typing import ClassVar
-
-    from ..types.models.blitz import Blitz as BlitzData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -36,10 +34,10 @@ class Blitz:
         ...
 
     @classmethod
-    def from_dict(cls, data: BlitzData) -> Blitz:
+    def from_dict(cls, data: dict[str, Any]) -> Blitz:
         ...
 
-    def to_dict(self) -> BlitzData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Blitz) -> Blitz:

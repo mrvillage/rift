@@ -9,10 +9,9 @@ from ... import cache, enums, errors, utils
 __all__ = ("MenuItem",)
 
 if TYPE_CHECKING:
-    from typing import Any, ClassVar
+    from typing import Any, Any, ClassVar
 
     from ...commands.common import CommonSlashCommand
-    from ...types.models.menu.menu_item import MenuItem as MenuItemData
 
 
 @utils.model
@@ -22,12 +21,12 @@ class MenuItem:
     id: int
     menu_id: int
     type: enums.MenuItemType = attrs.field(converter=enums.MenuItemType)
-    style: enums.MenuItemStyle
+    style: enums.MenuItemStyle = attrs.field(converter=enums.MenuItemStyle)
     label: str
     disabled: bool
     url: str
     emoji: int
-    action: enums.MenuItemAction
+    action: enums.MenuItemAction = attrs.field(converter=enums.MenuItemAction)
     action_options: list[int]
 
     async def save(self) -> None:
@@ -37,10 +36,10 @@ class MenuItem:
         ...
 
     @classmethod
-    def from_dict(cls, data: MenuItemData) -> MenuItem:
+    def from_dict(cls, data: dict[str, Any]) -> MenuItem:
         ...
 
-    def to_dict(self) -> MenuItemData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: MenuItem) -> MenuItem:

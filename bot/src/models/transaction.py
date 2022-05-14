@@ -10,10 +10,9 @@ __all__ = ("Transaction",)
 
 if TYPE_CHECKING:
     import datetime
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
     from .. import models
-    from ..types.models.transaction import Transaction as TransactionData
 
 
 @utils.model
@@ -41,10 +40,10 @@ class Transaction:
         ...
 
     @classmethod
-    def from_dict(cls, data: TransactionData) -> Transaction:
+    def from_dict(cls, data: dict[str, Any]) -> Transaction:
         ...
 
-    def to_dict(self) -> TransactionData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Transaction) -> Transaction:

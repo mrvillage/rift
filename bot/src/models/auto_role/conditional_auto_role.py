@@ -9,9 +9,9 @@ from ... import utils
 __all__ = ("ConditionalAutoRole",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
-    from ...types.models.auto_role.conditional_auto_role import (
+    
         ConditionalAutoRole as ConditionalAutoRoleData,
     )
 
@@ -32,10 +32,10 @@ class ConditionalAutoRole:
         ...
 
     @classmethod
-    def from_dict(cls, data: ConditionalAutoRoleData) -> ConditionalAutoRole:
+    def from_dict(cls, data: dict[str, Any]) -> ConditionalAutoRole:
         ...
 
-    def to_dict(self) -> ConditionalAutoRoleData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: ConditionalAutoRole) -> ConditionalAutoRole:

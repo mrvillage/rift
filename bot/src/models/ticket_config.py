@@ -9,9 +9,7 @@ from .. import utils
 __all__ = ("TicketConfig",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.ticket_config import TicketConfig as TicketConfigData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -36,10 +34,10 @@ class TicketConfig:
         ...
 
     @classmethod
-    def from_dict(cls, data: TicketConfigData) -> TicketConfig:
+    def from_dict(cls, data: dict[str, Any]) -> TicketConfig:
         ...
 
-    def to_dict(self) -> TicketConfigData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: TicketConfig) -> TicketConfig:

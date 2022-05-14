@@ -9,9 +9,9 @@ from ... import enums, utils
 __all__ = ("InterviewQuestion",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
-    from ...types.models.interview.interview_question import (
+    
         InterviewQuestion as InterviewQuestionData,
     )
 
@@ -39,10 +39,10 @@ class InterviewQuestion:
         ...
 
     @classmethod
-    def from_dict(cls, data: InterviewQuestionData) -> InterviewQuestion:
+    def from_dict(cls, data: dict[str, Any]) -> InterviewQuestion:
         ...
 
-    def to_dict(self) -> InterviewQuestionData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: InterviewQuestion) -> InterviewQuestion:

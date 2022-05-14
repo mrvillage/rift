@@ -11,9 +11,7 @@ __all__ = ("Roster",)
 if TYPE_CHECKING:
     import datetime
     import decimal
-    from typing import ClassVar
-
-    from ..types.models.roster import Roster as RosterData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -33,10 +31,10 @@ class Roster:
         ...
 
     @classmethod
-    def from_dict(cls, data: RosterData) -> Roster:
+    def from_dict(cls, data: dict[str, Any]) -> Roster:
         ...
 
-    def to_dict(self) -> RosterData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Roster) -> Roster:

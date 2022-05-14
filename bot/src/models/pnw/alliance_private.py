@@ -10,12 +10,12 @@ __all__ = ("AlliancePrivate",)
 
 if TYPE_CHECKING:
     import decimal
-    from typing import ClassVar, Optional
+    from typing import Any, ClassVar, Optional
 
     from pnwkit.data import Alliance as PnWKitAlliance
 
     from ... import models
-    from ...types.models.pnw.alliance_private import (
+    
         AlliancePrivate as AlliancePrivateData,
     )
 
@@ -35,10 +35,10 @@ class AlliancePrivate:
         ...
 
     @classmethod
-    def from_dict(cls, data: AlliancePrivateData) -> AlliancePrivate:
+    def from_dict(cls, data: dict[str, Any]) -> AlliancePrivate:
         ...
 
-    def to_dict(self) -> AlliancePrivateData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: AlliancePrivate) -> AlliancePrivate:

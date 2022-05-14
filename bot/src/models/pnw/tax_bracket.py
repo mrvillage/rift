@@ -10,11 +10,9 @@ __all__ = ("TaxBracket",)
 
 if TYPE_CHECKING:
     import datetime
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
     from pnwkit.data import TaxBracket as PnWKitTaxBracket
-
-    from ...types.models.pnw.tax_bracket import TaxBracket as TaxBracketData
 
 
 @utils.model
@@ -38,10 +36,10 @@ class TaxBracket:
         ...
 
     @classmethod
-    def from_dict(cls, data: TaxBracketData) -> TaxBracket:
+    def from_dict(cls, data: dict[str, Any]) -> TaxBracket:
         ...
 
-    def to_dict(self) -> TaxBracketData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: TaxBracket) -> TaxBracket:

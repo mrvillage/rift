@@ -13,12 +13,12 @@ __all__ = ("Alliance",)
 
 if TYPE_CHECKING:
     import decimal
-    from typing import Any, ClassVar
+    from typing import Any, Any, ClassVar
 
     from pnwkit.data import Alliance as PnWKitAlliance
 
     from ...commands.common import CommonSlashCommand
-    from ...types.models.pnw.alliance import Alliance as AllianceData
+
     from ...types.quarrel import MemberOrUser
 
 
@@ -51,10 +51,10 @@ class Alliance:
         ...
 
     @classmethod
-    def from_dict(cls, data: AllianceData) -> Alliance:
+    def from_dict(cls, data: dict[str, Any]) -> Alliance:
         ...
 
-    def to_dict(self) -> AllianceData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Alliance) -> Alliance:

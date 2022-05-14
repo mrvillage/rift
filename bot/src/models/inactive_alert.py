@@ -10,9 +10,7 @@ __all__ = ("InactiveAlert",)
 
 if TYPE_CHECKING:
     import datetime
-    from typing import ClassVar
-
-    from ..types.models.inactive_alert import InactiveAlert as InactiveAlertData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -30,10 +28,10 @@ class InactiveAlert:
         ...
 
     @classmethod
-    def from_dict(cls, data: InactiveAlertData) -> InactiveAlert:
+    def from_dict(cls, data: dict[str, Any]) -> InactiveAlert:
         ...
 
-    def to_dict(self) -> InactiveAlertData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: InactiveAlert) -> InactiveAlert:

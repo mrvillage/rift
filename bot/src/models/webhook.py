@@ -9,9 +9,7 @@ from .. import utils
 __all__ = ("Webhook",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.webhook import Webhook as WebhookData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -30,10 +28,10 @@ class Webhook:
         ...
 
     @classmethod
-    def from_dict(cls, data: WebhookData) -> Webhook:
+    def from_dict(cls, data: dict[str, Any]) -> Webhook:
         ...
 
-    def to_dict(self) -> WebhookData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Webhook) -> Webhook:

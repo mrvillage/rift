@@ -9,9 +9,7 @@ from ... import utils
 __all__ = ("AuditConfig",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ...types.models.audit.audit_config import AuditConfig as AuditConfigData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -31,10 +29,10 @@ class AuditConfig:
         ...
 
     @classmethod
-    def from_dict(cls, data: AuditConfigData) -> AuditConfig:
+    def from_dict(cls, data: dict[str, Any]) -> AuditConfig:
         ...
 
-    def to_dict(self) -> AuditConfigData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: AuditConfig) -> AuditConfig:

@@ -9,9 +9,7 @@ from .. import utils
 __all__ = ("Embassy",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.embassy import Embassy as EmbassyData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -32,10 +30,10 @@ class Embassy:
         ...
 
     @classmethod
-    def from_dict(cls, data: EmbassyData) -> Embassy:
+    def from_dict(cls, data: dict[str, Any]) -> Embassy:
         ...
 
-    def to_dict(self) -> EmbassyData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Embassy) -> Embassy:

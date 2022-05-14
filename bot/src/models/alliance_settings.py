@@ -9,9 +9,9 @@ from .. import utils
 __all__ = ("AllianceSettings",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
-    from ..types.models.alliance_settings import (
+    
         AllianceSettings as AllianceSettingsData,
     )
 
@@ -40,10 +40,10 @@ class AllianceSettings:
         ...
 
     @classmethod
-    def from_dict(cls, data: AllianceSettingsData) -> AllianceSettings:
+    def from_dict(cls, data: dict[str, Any]) -> AllianceSettings:
         ...
 
-    def to_dict(self) -> AllianceSettingsData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: AllianceSettings) -> AllianceSettings:

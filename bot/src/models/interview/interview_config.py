@@ -9,9 +9,9 @@ from ... import utils
 __all__ = ("InterviewConfig",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
-    from ...types.models.interview.interview_config import (
+    
         InterviewConfig as InterviewConfigData,
     )
 
@@ -31,10 +31,10 @@ class InterviewConfig:
         ...
 
     @classmethod
-    def from_dict(cls, data: InterviewConfigData) -> InterviewConfig:
+    def from_dict(cls, data: dict[str, Any]) -> InterviewConfig:
         ...
 
-    def to_dict(self) -> InterviewConfigData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: InterviewConfig) -> InterviewConfig:

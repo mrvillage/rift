@@ -10,11 +10,9 @@ __all__ = ("Trade",)
 
 if TYPE_CHECKING:
     import datetime
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
     from pnwkit.data import Trade as PnWKitTrade
-
-    from ...types.models.pnw.trade import Trade as TradeData
 
 
 @utils.model
@@ -43,10 +41,10 @@ class Trade:
         ...
 
     @classmethod
-    def from_dict(cls, data: TradeData) -> Trade:
+    def from_dict(cls, data: dict[str, Any]) -> Trade:
         ...
 
-    def to_dict(self) -> TradeData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Trade) -> Trade:

@@ -10,10 +10,9 @@ __all__ = ("Grant",)
 
 if TYPE_CHECKING:
     import datetime
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
     from .. import models
-    from ..types.models.grant import Grant as GrantData
 
 
 @utils.model
@@ -45,10 +44,10 @@ class Grant:
         ...
 
     @classmethod
-    def from_dict(cls, data: GrantData) -> Grant:
+    def from_dict(cls, data: dict[str, Any]) -> Grant:
         ...
 
-    def to_dict(self) -> GrantData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Grant) -> Grant:

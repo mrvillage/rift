@@ -9,9 +9,7 @@ from .. import enums, utils
 __all__ = ("Mention",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.mention import Mention as MentionData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -32,10 +30,10 @@ class Mention:
         ...
 
     @classmethod
-    def from_dict(cls, data: MentionData) -> Mention:
+    def from_dict(cls, data: dict[str, Any]) -> Mention:
         ...
 
-    def to_dict(self) -> MentionData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Mention) -> Mention:

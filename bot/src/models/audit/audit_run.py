@@ -9,10 +9,7 @@ from ... import utils
 __all__ = ("AuditRun",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ...types.models.audit.audit_run import AuditRun as AuditRunData
-    from ...types.models.audit.audit_run import AuditRunCheck
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -31,10 +28,10 @@ class AuditRun:
         ...
 
     @classmethod
-    def from_dict(cls, data: AuditRunData) -> AuditRun:
+    def from_dict(cls, data: dict[str, Any]) -> AuditRun:
         ...
 
-    def to_dict(self) -> AuditRunData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: AuditRun) -> AuditRun:

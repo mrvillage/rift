@@ -9,9 +9,9 @@ from ... import enums, utils
 __all__ = ("AllianceAutoRole",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
-    from ...types.models.auto_role.alliance_auto_role import (
+    
         AllianceAutoRole as AllianceAutoRoleData,
     )
 
@@ -34,10 +34,10 @@ class AllianceAutoRole:
         ...
 
     @classmethod
-    def from_dict(cls, data: AllianceAutoRoleData) -> AllianceAutoRole:
+    def from_dict(cls, data: dict[str, Any]) -> AllianceAutoRole:
         ...
 
-    def to_dict(self) -> AllianceAutoRoleData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: AllianceAutoRole) -> AllianceAutoRole:

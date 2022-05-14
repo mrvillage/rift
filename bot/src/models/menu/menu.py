@@ -12,7 +12,6 @@ if TYPE_CHECKING:
     from typing import Any, ClassVar
 
     from ...commands.common import CommonSlashCommand
-    from ...types.models.menu.menu import Menu as MenuData
 
 
 @utils.model
@@ -32,10 +31,10 @@ class Menu:
         ...
 
     @classmethod
-    def from_dict(cls, data: MenuData) -> Menu:
+    def from_dict(cls, data: dict[str, Any]) -> Menu:
         ...
 
-    def to_dict(self) -> MenuData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Menu) -> Menu:

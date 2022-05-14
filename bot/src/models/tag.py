@@ -9,9 +9,7 @@ from .. import utils
 __all__ = ("Tag",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.tag import Tag as TagData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -31,10 +29,10 @@ class Tag:
         ...
 
     @classmethod
-    def from_dict(cls, data: TagData) -> Tag:
+    def from_dict(cls, data: dict[str, Any]) -> Tag:
         ...
 
-    def to_dict(self) -> TagData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Tag) -> Tag:

@@ -9,9 +9,7 @@ from .. import utils
 __all__ = ("TargetReminder",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.target_reminder import TargetReminder as TargetReminderData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -32,10 +30,10 @@ class TargetReminder:
         ...
 
     @classmethod
-    def from_dict(cls, data: TargetReminderData) -> TargetReminder:
+    def from_dict(cls, data: dict[str, Any]) -> TargetReminder:
         ...
 
-    def to_dict(self) -> TargetReminderData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: TargetReminder) -> TargetReminder:

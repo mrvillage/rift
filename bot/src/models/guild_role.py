@@ -9,9 +9,7 @@ from .. import flags, utils
 __all__ = ("GuildRole",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.guild_role import GuildRole as GuildRoleData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -31,10 +29,10 @@ class GuildRole:
         ...
 
     @classmethod
-    def from_dict(cls, data: GuildRoleData) -> GuildRole:
+    def from_dict(cls, data: dict[str, Any]) -> GuildRole:
         ...
 
-    def to_dict(self) -> GuildRoleData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: GuildRole) -> GuildRole:

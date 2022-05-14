@@ -11,11 +11,9 @@ __all__ = ("War",)
 if TYPE_CHECKING:
     import datetime
     import decimal
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
     from pnwkit.data import War as PnWKitWar
-
-    from ...types.models.pnw.war import War as WarData
 
 
 @utils.model
@@ -79,10 +77,10 @@ class War:
         ...
 
     @classmethod
-    def from_dict(cls, data: WarData) -> War:
+    def from_dict(cls, data: dict[str, Any]) -> War:
         ...
 
-    def to_dict(self) -> WarData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: War) -> War:

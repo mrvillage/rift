@@ -9,9 +9,7 @@ from .. import enums, utils
 __all__ = ("EmbassyConfig",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.embassy_config import EmbassyConfig as EmbassyConfigData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -36,10 +34,10 @@ class EmbassyConfig:
         ...
 
     @classmethod
-    def from_dict(cls, data: EmbassyConfigData) -> EmbassyConfig:
+    def from_dict(cls, data: dict[str, Any]) -> EmbassyConfig:
         ...
 
-    def to_dict(self) -> EmbassyConfigData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: EmbassyConfig) -> EmbassyConfig:

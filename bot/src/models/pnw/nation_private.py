@@ -10,12 +10,11 @@ __all__ = ("NationPrivate",)
 
 if TYPE_CHECKING:
     import decimal
-    from typing import ClassVar, Optional
+    from typing import Any, ClassVar, Optional
 
     from pnwkit.data import Nation as PnWKitNation
 
     from ... import models
-    from ...types.models.pnw.nation_private import NationPrivate as NationPrivateData
 
 
 @utils.model
@@ -35,10 +34,10 @@ class NationPrivate:
         ...
 
     @classmethod
-    def from_dict(cls, data: NationPrivateData) -> NationPrivate:
+    def from_dict(cls, data: dict[str, Any]) -> NationPrivate:
         ...
 
-    def to_dict(self) -> NationPrivateData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: NationPrivate) -> NationPrivate:

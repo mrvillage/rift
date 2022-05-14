@@ -9,9 +9,7 @@ from .. import enums, flags, utils
 __all__ = ("Role",)
 
 if TYPE_CHECKING:
-    from typing import ClassVar
-
-    from ..types.models.role import Role as RoleData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -37,10 +35,10 @@ class Role:
         ...
 
     @classmethod
-    def from_dict(cls, data: RoleData) -> Role:
+    def from_dict(cls, data: dict[str, Any]) -> Role:
         ...
 
-    def to_dict(self) -> RoleData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Role) -> Role:

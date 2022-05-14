@@ -10,9 +10,7 @@ __all__ = ("Reminder",)
 
 if TYPE_CHECKING:
     import datetime
-    from typing import ClassVar
-
-    from ..types.models.reminder import Reminder as ReminderData
+    from typing import Any, ClassVar
 
 
 @utils.model
@@ -35,10 +33,10 @@ class Reminder:
         ...
 
     @classmethod
-    def from_dict(cls, data: ReminderData) -> Reminder:
+    def from_dict(cls, data: dict[str, Any]) -> Reminder:
         ...
 
-    def to_dict(self) -> ReminderData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Reminder) -> Reminder:

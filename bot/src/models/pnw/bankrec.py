@@ -11,11 +11,9 @@ __all__ = ("Bankrec",)
 
 if TYPE_CHECKING:
     import decimal
-    from typing import ClassVar
+    from typing import Any, ClassVar
 
     from pnwkit.data import Bankrec as PnWKitBankrec
-
-    from ...types.models.pnw.bankrec import Bankrec as BankrecData
 
 
 @utils.model
@@ -48,10 +46,10 @@ class Bankrec:
         ...
 
     @classmethod
-    def from_dict(cls, data: BankrecData) -> Bankrec:
+    def from_dict(cls, data: dict[str, Any]) -> Bankrec:
         ...
 
-    def to_dict(self) -> BankrecData:
+    def to_dict(self) -> dict[str, Any]:
         ...
 
     def update(self, data: Bankrec) -> Bankrec:
