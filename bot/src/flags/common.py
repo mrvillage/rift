@@ -34,6 +34,9 @@ class CommonFlags:
     def __int__(self) -> int:
         return self.flags
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.flags!r})"
+
 
 class flag:  # noqa: N801
     def __init__(self, func: Callable[[Any], int]):  # noqa: N801
