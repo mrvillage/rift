@@ -3,8 +3,6 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
-from .models import init_cache
-
 __all__ = ("init_test_environment",)
 
 if TYPE_CHECKING:
@@ -34,5 +32,7 @@ def init_test_environment() -> None:
     from src import components as components  # noqa: E402
     from src import db as db  # noqa: E402
     from src.bot import bot as bot  # noqa: E402
+
+    from .models import init_cache
 
     init_cache()
