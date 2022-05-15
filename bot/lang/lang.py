@@ -3,7 +3,7 @@ from __future__ import annotations
 import decimal
 import re
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 import lark
 
@@ -71,49 +71,51 @@ class Operator(Enum):
     not_ = "not"
     neg = "-"
 
-    def evaluate(self, left: Any, right: Any = None) -> Any:  # noqa: C901
+    def evaluate(
+        self, left: Callable[[], Any], right: Callable[[], Any]
+    ) -> Any:  # noqa: C901
         if self is Operator.or_:
-            return left or right
+            return left() or right()
         elif self is Operator.and_:
-            return left and right
+            return left() and right()
         elif self is Operator.lt:
-            return left < right
+            return left() < right()
         elif self is Operator.le:
-            return left <= right
+            return left() <= right()
         elif self is Operator.ge:
-            return left >= right
+            return left() >= right()
         elif self is Operator.gt:
-            return left > right
+            return left() > right()
         elif self is Operator.eq:
-            return left == right
+            return left() == right()
         elif self is Operator.ne:
-            return left != right
+            return left() != right()
         elif self is Operator.in_:
-            return left in right
+            return left() in right()
         elif self is Operator.not_in:
-            return left not in right
+            return left() not in right()
         elif self is Operator.is_:
-            return left is right
+            return left() is right()
         elif self is Operator.is_not:
-            return left is not right
+            return left() is not right()
         elif self is Operator.add:
-            return left + right
+            return left() + right()
         elif self is Operator.sub:
-            return left - right
+            return left() - right()
         elif self is Operator.mul:
-            return left * right
+            return left() * right()
         elif self is Operator.div:
-            return left / right
+            return left() / right()
         elif self is Operator.mod:
-            return left % right
+            return left() % right()
         elif self is Operator.floor:
-            return left // right
+            return left() // right()
         elif self is Operator.pow:
-            return left**right
+            return left() ** right()
         elif self is Operator.not_:
-            return not left
+            return not left()
         elif self is Operator.neg:
-            return -left
+            return -left()
 
 
 class Member:
@@ -195,9 +197,10 @@ class Expression:
         return cls(left, operator, right)
 
     def evaluate(self, scope: Scope) -> Any:
-        left = evaluate_if_abstract(self.left, scope)
-        right = evaluate_if_abstract(self.right, scope)
-        return self.operator.evaluate(left, right)
+        return self.operator.evaluate(
+            lambda: evaluate_if_abstract(self.left, scope),
+            lambda: evaluate_if_abstract(self.right, scope),
+        )
 
     def __str__(self) -> str:
         if self.expr:
@@ -217,11 +220,11 @@ class UnaryExpression:
         return (
             cls(operator, value)
             if getattr(value, "__lang_abstract__", False)
-            else operator.evaluate(value)
+            else operator.evaluate(lambda: value, lambda: None)
         )
 
     def evaluate(self, scope: Scope) -> Any:
-        return self.operator.evaluate(self.value.evaluate(scope))
+        return self.operator.evaluate(lambda: self.value.evaluate(scope), lambda: None)
 
     def __str__(self) -> str:
         if self.operator is Operator.neg:
