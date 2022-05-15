@@ -21,6 +21,4 @@ class MissingDiscordPermissionsError(RiftError):
         self.permissions: dict[str, bool] = permissions
 
     def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
-        return embeds.missing_discord_permissions_error(
-            interaction, self.permissions
-        )
+        return embeds.missing_discord_permissions_error(interaction, self.permissions)

@@ -11,6 +11,8 @@ __all__ = ("AuditRun",)
 if TYPE_CHECKING:
     from typing import Any, ClassVar
 
+    from ...types.audit_run_check import AuditRunCheck
+
 
 @utils.model
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
