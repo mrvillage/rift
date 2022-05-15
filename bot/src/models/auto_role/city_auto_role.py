@@ -11,10 +11,6 @@ __all__ = ("CityAutoRole",)
 if TYPE_CHECKING:
     from typing import Any, ClassVar
 
-    
-        CityAutoRole as CityAutoRoleData,
-    )
-
 
 @utils.model
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)

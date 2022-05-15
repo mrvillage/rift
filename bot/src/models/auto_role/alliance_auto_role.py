@@ -11,10 +11,6 @@ __all__ = ("AllianceAutoRole",)
 if TYPE_CHECKING:
     from typing import Any, ClassVar
 
-    
-        AllianceAutoRole as AllianceAutoRoleData,
-    )
-
 
 @utils.model
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)

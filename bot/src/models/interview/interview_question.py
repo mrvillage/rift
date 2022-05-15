@@ -11,10 +11,6 @@ __all__ = ("InterviewQuestion",)
 if TYPE_CHECKING:
     from typing import Any, ClassVar
 
-    
-        InterviewQuestion as InterviewQuestionData,
-    )
-
 
 @utils.model
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)

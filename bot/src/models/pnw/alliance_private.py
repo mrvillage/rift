@@ -15,9 +15,6 @@ if TYPE_CHECKING:
     from pnwkit.data import Alliance as PnWKitAlliance
 
     from ... import models
-    
-        AlliancePrivate as AlliancePrivateData,
-    )
 
 
 @utils.model

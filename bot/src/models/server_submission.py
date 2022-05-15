@@ -11,10 +11,6 @@ __all__ = ("ServerSubmission",)
 if TYPE_CHECKING:
     from typing import Any, ClassVar
 
-    
-        ServerSubmission as ServerSubmissionData,
-    )
-
 
 @utils.model
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)

@@ -11,10 +11,6 @@ __all__ = ("AllianceSettings",)
 if TYPE_CHECKING:
     from typing import Any, ClassVar
 
-    
-        AllianceSettings as AllianceSettingsData,
-    )
-
 
 @utils.model
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
