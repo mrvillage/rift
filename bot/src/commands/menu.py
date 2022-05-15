@@ -61,6 +61,27 @@ class MenuItemCommand(
 
 if TYPE_CHECKING:
 
+    class MenuItemInfoCommandOptions:
+        item: models.MenuItem
+
+
+class MenuItemInfoCommand(
+    CommonMenuSlashCommand["MenuItemInfoCommandOptions"],
+    name="info",
+    description="View information about a menu item.",
+    parent=MenuItemCommand,
+    options=[options.MENU_ITEM],
+):
+    __slots__ = ()
+
+    async def callback(self) -> None:
+        await self.interaction.respond_with_message(
+            embed=self.options.item.build_embed(self.interaction),
+        )
+
+
+if TYPE_CHECKING:
+
     class MenuItemCreateCommandOptions:
         menu: models.Menu
         type: enums.MenuItemType
@@ -167,27 +188,6 @@ class MenuItemEditCommand(
         await self.interaction.respond_with_message(
             embed=embeds.menu_item_edited(self.interaction, self.options.item),
             ephemeral=True,
-        )
-
-
-if TYPE_CHECKING:
-
-    class MenuItemInfoCommandOptions:
-        item: models.MenuItem
-
-
-class MenuItemInfoCommand(
-    CommonMenuSlashCommand["MenuItemInfoCommandOptions"],
-    name="info",
-    description="View information about a menu item.",
-    parent=MenuItemCommand,
-    options=[options.MENU_ITEM],
-):
-    __slots__ = ()
-
-    async def callback(self) -> None:
-        await self.interaction.respond_with_message(
-            embed=self.options.item.build_embed(self.interaction),
         )
 
 
