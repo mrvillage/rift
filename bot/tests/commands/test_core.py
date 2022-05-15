@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from src.bot import bot
-from tests.suite import build_application_command_mock
+from tests.suite.interactions import build_application_command_mock
 
 
 async def test_me() -> None:
