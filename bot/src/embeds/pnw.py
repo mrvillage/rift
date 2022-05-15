@@ -51,7 +51,7 @@ def nation(interaction: quarrel.Interaction, nation: models.Nation) -> quarrel.E
     return utils.build_single_embed_from_user(
         author=interaction.user,
         color=consts.INFO_EMBED_COLOR,
-        footer_text=strings.model_created("Nation"),
+        footer_text=strings.model_created_at("Nation"),
         timestamp=nation.date,
         description=strings.nation_linked_to(nation),
         thumbnail_url=nation.flag,
@@ -146,7 +146,7 @@ def alliance(
     return utils.build_single_embed_from_user(
         author=interaction.user,
         color=consts.INFO_EMBED_COLOR,
-        footer_text=strings.model_created("Alliance"),
+        footer_text=strings.model_created_at("Alliance"),
         timestamp=alliance.date,
         thumbnail_url=alliance.flag,
         fields=[

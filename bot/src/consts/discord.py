@@ -1,0 +1,13 @@
+from __future__ import annotations
+
+__all__ = (
+    "BUTTON_WIDTH",
+    "SELECT_MENU_WIDTH",
+    "DEFAULT_COMPONENT_WIDTH",
+    "MAX_ACTION_ROW_WIDTH",
+)
+
+BUTTON_WIDTH = 1
+SELECT_MENU_WIDTH = 5
+DEFAULT_COMPONENT_WIDTH = 1
+MAX_ACTION_ROW_WIDTH = 5

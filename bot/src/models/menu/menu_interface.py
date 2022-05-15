@@ -36,3 +36,7 @@ class MenuInterface:
 
     def update(self, data: MenuInterface) -> MenuInterface:
         ...
+
+    # TODO: Add edit message support and update interface support
+    async def update_interface(self) -> None:
+        ...

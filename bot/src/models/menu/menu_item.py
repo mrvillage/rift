@@ -3,13 +3,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import attrs
+import quarrel
 
-from ... import cache, enums, errors, utils
+from ... import cache, consts, embeds, enums, errors, models, utils
 
 __all__ = ("MenuItem",)
 
 if TYPE_CHECKING:
-    from typing import Any, Any, ClassVar
+    from typing import Any, ClassVar, Optional
+
+    from quarrel import Missing
+    from typing_extensions import Self
 
     from ...commands.common import CommonSlashCommand
 
@@ -22,11 +26,13 @@ class MenuItem:
     menu_id: int
     type: enums.MenuItemType = attrs.field(converter=enums.MenuItemType)
     style: enums.MenuItemStyle = attrs.field(converter=enums.MenuItemStyle)
-    label: str
-    disabled: bool
-    url: str
-    emoji: int
-    action: enums.MenuItemAction = attrs.field(converter=enums.MenuItemAction)
+    label: Optional[str]
+    disabled: Optional[bool]
+    url: Optional[str]
+    emoji: Optional[int]
+    action: Optional[enums.MenuItemAction] = attrs.field(
+        converter=lambda x: x if x is None else enums.MenuItemAction(x)
+    )
     action_options: list[int]
 
     async def save(self) -> None:
@@ -45,9 +51,85 @@ class MenuItem:
     def update(self, data: MenuItem) -> MenuItem:
         ...
 
+    @property
+    def menu(self) -> Optional[models.Menu]:
+        return cache.get_menu(self.menu_id)
+
+    @property
+    def width(self) -> int:
+        if self.type is enums.MenuItemType.BUTTON:
+            return consts.BUTTON_WIDTH
+        elif self.type is enums.MenuItemType.SELECT_MENU:
+            return consts.SELECT_MENU_WIDTH
+        return consts.DEFAULT_COMPONENT_WIDTH
+
     @classmethod
     async def convert(cls, command: CommonSlashCommand[Any], value: int) -> MenuItem:
         item = cache.get_menu_item(value)
         if item is None:
             raise errors.MenuItemNotFoundError(command.interaction, value)
         return item
+
+    @classmethod
+    async def create(
+        cls,
+        menu: models.Menu,
+        type: enums.MenuItemType,
+        style: Missing[enums.MenuItemStyle],
+        label: Missing[str],
+        disabled: Missing[bool],
+        url: Missing[str],
+        emoji: Missing[int],
+        action: Missing[enums.MenuItemAction],
+        action_options: Missing[list[int]],
+        row: Missing[int],
+        column: Missing[int],
+    ) -> Self:
+        self = cls(
+            id=0,
+            menu_id=menu.id,
+            type=type,
+            style=style or enums.MenuItemStyle.BLURPLE,
+            label=label or None,
+            disabled=disabled if disabled is not quarrel.MISSING else False,
+            url=url or None,
+            emoji=emoji or None,
+            action=action or None,
+            action_options=action_options or [],
+        )
+        if not menu.has_space(self.width, row, column):
+            raise errors.MenuHasNoSpaceError(menu, self, row, column)
+        await self.save()
+        return self
+
+    def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
+        return embeds.menu_item(interaction, self)
+
+    async def edit(
+        self,
+        style: Missing[enums.MenuItemStyle],
+        label: Missing[str],
+        disabled: Missing[bool],
+        url: Missing[str],
+        emoji: Missing[int],
+        action: Missing[enums.MenuItemAction],
+        action_options: Missing[list[int]],
+    ) -> None:
+        if style is not quarrel.MISSING:
+            self.style = style
+        if label is not quarrel.MISSING:
+            self.label = label
+        if disabled is not quarrel.MISSING:
+            self.disabled = disabled
+        if url is not quarrel.MISSING:
+            self.url = url
+        if emoji is not quarrel.MISSING:
+            self.emoji = emoji
+        if action is not quarrel.MISSING:
+            self.action = action
+        if action_options is not quarrel.MISSING:
+            self.action_options = action_options
+        await self.save()
+        menu = self.menu
+        if menu is not None:
+            await menu.update_interfaces()

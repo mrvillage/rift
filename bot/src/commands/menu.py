@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import quarrel
 
-from .. import checks, enums, models, options
+from .. import checks, embeds, enums, errors, models, options
 from ..bot import bot
 from .common import CommonSlashCommand
 
@@ -90,7 +90,23 @@ class MenuItemCreateCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        ...
+        item = await models.MenuItem.create(
+            menu=self.options.menu,
+            type=self.options.type,
+            style=self.options.style,
+            label=self.options.label,
+            disabled=self.options.disabled,
+            url=self.options.url,
+            emoji=self.options.emoji,
+            action=self.options.action,
+            action_options=self.options.action_options,
+            row=self.options.row,
+            column=self.options.column,
+        )
+        await self.interaction.respond_with_message(
+            embed=embeds.menu_item_created(self.interaction, item),
+            ephemeral=True,
+        )
 
 
 if TYPE_CHECKING:
@@ -109,14 +125,17 @@ class MenuItemDeleteCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        ...
+        await self.options.item.delete()
+        await self.interaction.respond_with_message(
+            embed=embeds.menu_item_deleted(self.interaction, self.options.item),
+            ephemeral=True,
+        )
 
 
 if TYPE_CHECKING:
 
     class MenuItemEditCommandOptions:
         item: models.MenuItem
-        type: quarrel.Missing[enums.MenuItemType]
         style: quarrel.Missing[enums.MenuItemStyle]
         label: quarrel.Missing[str]
         disabled: quarrel.Missing[bool]
@@ -131,12 +150,24 @@ class MenuItemEditCommand(
     name="edit",
     description="Edit a menu item.",
     parent=MenuItemCommand,
-    options=[options.MENU_ITEM, *options.MENU_ITEM_ATTRIBUTES_OPTIONAL],
+    options=[options.MENU_ITEM, *options.MENU_ITEM_ATTRIBUTES_OPTIONAL_WITHOUT_TYPE],
 ):
     __slots__ = ()
 
     async def callback(self) -> None:
-        ...
+        await self.options.item.edit(
+            style=self.options.style,
+            label=self.options.label,
+            disabled=self.options.disabled,
+            url=self.options.url,
+            emoji=self.options.emoji,
+            action=self.options.action,
+            action_options=self.options.action_options,
+        )
+        await self.interaction.respond_with_message(
+            embed=embeds.menu_item_edited(self.interaction, self.options.item),
+            ephemeral=True,
+        )
 
 
 if TYPE_CHECKING:
@@ -155,14 +186,16 @@ class MenuItemInfoCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        ...
+        await self.interaction.respond_with_message(
+            embed=self.options.item.build_embed(self.interaction),
+        )
 
 
 if TYPE_CHECKING:
 
     class MenuItemMoveCommandOptions:
         item: models.MenuItem
-        row: quarrel.Missing[int]
+        row: int
         column: quarrel.Missing[int]
 
 
@@ -173,14 +206,21 @@ class MenuItemMoveCommand(
     parent=MenuItemCommand,
     options=[
         options.MENU_ITEM,
-        options.MENU_ITEM_ROW_OPTIONAL,
+        options.MENU_ITEM_ROW,
         options.MENU_ITEM_COLUMN_OPTIONAL,
     ],
 ):
     __slots__ = ()
 
     async def callback(self) -> None:
-        ...
+        menu = self.options.item.menu
+        if menu is None:
+            raise errors.MenuItemHasNoMenuError(self.options.item)
+        await menu.move(self.options.item, self.options.row, self.options.column)
+        await self.interaction.respond_with_message(
+            embed=embeds.menu_item_moved(self.interaction, self.options.item),
+            ephemeral=True,
+        )
 
 
 if TYPE_CHECKING:
