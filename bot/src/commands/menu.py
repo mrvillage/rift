@@ -239,7 +239,9 @@ class MenuInfoCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        ...
+        await self.interaction.respond_with_message(
+            embed=self.options.menu.build_embed(self.interaction),
+        )
 
 
 if TYPE_CHECKING:
@@ -257,7 +259,8 @@ class MenuCreateCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        ...  # show a modal to input the menu name and description
+        # TODO: Implement modals then implement menu creation
+        ...
 
 
 if TYPE_CHECKING:
@@ -276,7 +279,8 @@ class MenuEditCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        ...  # show a modal to input the menu name and description
+        # TODO: Implement modals then implement menu editing
+        ...
 
 
 if TYPE_CHECKING:
@@ -296,7 +300,13 @@ class MenuSendCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        ...
+        await self.options.menu.send(self.options.channel)
+        await self.interaction.respond_with_message(
+            embed=embeds.menu_sent(
+                self.interaction, self.options.menu, self.options.channel
+            ),
+            ephemeral=True,
+        )
 
 
 if TYPE_CHECKING:
@@ -315,4 +325,8 @@ class MenuDeleteCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        ...
+        await self.options.menu.delete()
+        await self.interaction.respond_with_message(
+            embed=embeds.menu_deleted(self.interaction, self.options.menu),
+            ephemeral=True,
+        )

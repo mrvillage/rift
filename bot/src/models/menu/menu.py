@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 import attrs
 import quarrel
 
-from ... import cache, consts, errors, models, utils
+from ... import cache, consts, embeds, errors, models, utils
 
 __all__ = ("Menu",)
 
@@ -50,6 +50,13 @@ class Menu:
 
     @classmethod
     async def convert(cls, command: CommonSlashCommand[Any], value: str) -> Menu:
+        ...
+
+    def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
+        return embeds.menu(interaction, self)
+
+    # TODO: Implement menu sending
+    async def send(self, channel: quarrel.TextChannel | quarrel.Thread) -> None:
         ...
 
     def set_item(

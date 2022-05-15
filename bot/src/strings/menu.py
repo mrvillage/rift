@@ -14,6 +14,8 @@ __all__ = (
     "menu_item_edited",
     "menu_item_has_no_menu",
     "menu_item_moved",
+    "menu_deleted",
+    "menu_sent",
 )
 
 if TYPE_CHECKING:
@@ -52,3 +54,11 @@ def menu_item_has_no_menu(item: models.MenuItem) -> str:
 
 def menu_item_moved(item: models.MenuItem) -> str:
     return f"Menu item with ID {item.id} has been moved!"
+
+
+def menu_deleted(menu: models.Menu) -> str:
+    return strings.model_deleted("Menu", menu.id)
+
+
+def menu_sent(menu: models.Menu, channel: quarrel.TextChannel | quarrel.Thread) -> str:
+    return f"Menu {menu} sent to <@#{channel.id}>!"

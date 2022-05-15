@@ -12,6 +12,9 @@ __all__ = (
     "menu_item",
     "menu_item_has_no_menu_error",
     "menu_item_moved",
+    "menu",
+    "menu_deleted",
+    "menu_sent",
 )
 
 if TYPE_CHECKING:
@@ -69,21 +72,21 @@ def menu_item(interaction: quarrel.Interaction, item: models.MenuItem) -> quarre
     return utils.build_single_embed_from_user(
         author=interaction.user,
         fields=[
-            quarrel.EmbedField(name="ID", value=item.id),
-            quarrel.EmbedField(name="Menu ID", value=item.menu_id),
-            quarrel.EmbedField(name="Type", value=strings.enum_name(item.type)),
-            quarrel.EmbedField(name="Style", value=strings.enum_name(item.style)),
-            quarrel.EmbedField(name="Label", value=item.label),
-            quarrel.EmbedField(name="Disabled", value=item.disabled),
-            quarrel.EmbedField(name="URL", value=item.url),
-            quarrel.EmbedField(name="Emoji", value=item.emoji),
-            quarrel.EmbedField(
-                name="Action",
-                value=strings.enum_name(item.action) if item.action else None,
+            utils.embed_field("ID", item.id),
+            utils.embed_field("Menu ID", item.menu_id),
+            utils.embed_field("Type", strings.enum_name(item.type)),
+            utils.embed_field("Style", strings.enum_name(item.style)),
+            utils.embed_field("Label", item.label),
+            utils.embed_field("Disabled", item.disabled),
+            utils.embed_field("URL", item.url),
+            utils.embed_field("Emoji", item.emoji),
+            utils.embed_field(
+                "Action",
+                strings.enum_name(item.action) if item.action else None,
             ),
-            quarrel.EmbedField(
-                name="Action Options",
-                value=", ".join([str(i) for i in item.action_options]),
+            utils.embed_field(
+                "Action Options",
+                ", ".join([str(i) for i in item.action_options]),
             ),
         ],
         color=consts.SUCCESS_EMBED_COLOR,
@@ -107,5 +110,43 @@ def menu_item_moved(
     return utils.build_single_embed_from_user(
         author=interaction.user,
         description=strings.menu_item_moved(item),
+        color=consts.SUCCESS_EMBED_COLOR,
+    )
+
+
+def menu(
+    interaction: quarrel.Interaction,
+    menu: models.Menu,
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=interaction.user,
+        fields=[
+            utils.embed_field("ID", menu.id),
+            utils.embed_field("Name", menu.name),
+            utils.embed_field("Description", menu.description, inline=False),
+        ],
+        color=consts.SUCCESS_EMBED_COLOR,
+    )
+
+
+def menu_deleted(
+    interaction: quarrel.Interaction,
+    menu: models.Menu,
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=interaction.user,
+        description=strings.menu_deleted(menu),
+        color=consts.SUCCESS_EMBED_COLOR,
+    )
+
+
+def menu_sent(
+    interaction: quarrel.Interaction,
+    menu: models.Menu,
+    channel: quarrel.TextChannel | quarrel.Thread,
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=interaction.user,
+        description=strings.menu_sent(menu, channel),
         color=consts.SUCCESS_EMBED_COLOR,
     )
