@@ -68,8 +68,9 @@ def build_application_command_mock(
     user: Missing[User] = quarrel.MISSING,
     message: Missing[Message] = quarrel.MISSING,
 ) -> MockInteraction:
-    return build_mock(  # type: ignore
+    return build_mock(
         quarrel.InteractionType.APPLICATION_COMMAND,
+        data={},  # type: ignore
         guild_id=guild_id,
         channel_id=channel_id,
         member=member,
