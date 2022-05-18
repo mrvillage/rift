@@ -578,7 +578,7 @@ class HouseStark(commands.Cog):
 
     @tasks.loop(hours=24)
     async def bank_send_task(self):
-        channel = self.bot.get_channel(239099900174925824)
+        channel = self.bot.get_channel(871841090041446451)
         if not channel:
             return
         try:
