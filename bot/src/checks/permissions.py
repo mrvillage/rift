@@ -10,6 +10,7 @@ __all__ = (
     "has_alliance_role_permissions",
     "has_discord_role_permissions",
     "has_guild_role_permissions",
+    "modal_has_guild_role_permissions",
 )
 
 if TYPE_CHECKING:
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
     from ..commands.common import CommonSlashCommand
 
 
-async def has_alliance_role_permissions(
+def has_alliance_role_permissions(
     **permissions: bool,
 ) -> Callable[[CommonSlashCommand[Any]], Coroutine[Any, Any, bool]]:
     @quarrel.check(after_options=True, requires=["alliance"])
@@ -28,7 +29,7 @@ async def has_alliance_role_permissions(
     return check
 
 
-async def has_discord_role_permissions(
+def has_discord_role_permissions(
     **permissions: bool,
 ) -> Callable[[CommonSlashCommand[Any]], Coroutine[Any, Any, bool]]:
     @quarrel.check(after_options=False)
@@ -45,11 +46,28 @@ async def has_discord_role_permissions(
     return check
 
 
-async def has_guild_role_permissions(
+def has_guild_role_permissions(
     **permissions: bool,
 ) -> Callable[[CommonSlashCommand[Any]], Coroutine[Any, Any, bool]]:
     @quarrel.check(after_options=False)
     async def check(command: CommonSlashCommand[Any]) -> bool:
+        return True
+
+    return check
+
+
+def modal_has_guild_role_permissions(
+    **permissions: bool,
+) -> Callable[
+    [quarrel.Modal[Any], quarrel.Interaction, dict[str, str], Any],
+    Coroutine[Any, Any, bool],
+]:
+    async def check(
+        modal: quarrel.Modal[Any],
+        interaction: quarrel.Interaction,
+        groups: dict[str, str],
+        values: Any,
+    ) -> bool:
         return True
 
     return check
