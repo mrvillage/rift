@@ -21,7 +21,7 @@ class ConditionalAutoRole:
     guild_id: int
     condition: str
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

@@ -9,6 +9,7 @@ __all__ = (
     "NotFoundError",
     "AllianceNotFoundError",
     "MenuItemNotFoundError",
+    "MenuNotFoundError",
     "NationNotFoundError",
     "NationOrAllianceNotFoundError",
 )
@@ -43,6 +44,10 @@ class AllianceNotFoundError(NotFoundError, name="alliance", infer=True):
 
 
 class MenuItemNotFoundError(NotFoundError, name="menu item"):
+    ...
+
+
+class MenuNotFoundError(NotFoundError, name="menu"):
     ...
 
 

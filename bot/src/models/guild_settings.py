@@ -31,7 +31,7 @@ class GuildSettings:
     enforce_verified_nickname: bool
     welcome_mentions: list[int]
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

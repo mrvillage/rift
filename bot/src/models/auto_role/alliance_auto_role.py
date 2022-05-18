@@ -23,7 +23,7 @@ class AllianceAutoRole:
     access_level: enums.AccessLevel = attrs.field(converter=enums.AccessLevel)
     condition: str
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

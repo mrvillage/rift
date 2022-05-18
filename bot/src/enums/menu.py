@@ -10,13 +10,14 @@ __all__ = (
 
 
 class MenuItemAction(enum.Enum):
-    ADD_ROLES = 0
-    REMOVE_ROLES = 1
-    TOGGLE_ROLES = 2
-    CREATE_TICKETS = 3
-    CLOSE_TICKETS = 4
-    CREATE_EMBASSIES = 5
-    CLOSE_EMBASSIES = 6
+    NONE = 0
+    ADD_ROLES = 1
+    REMOVE_ROLES = 2
+    TOGGLE_ROLES = 3
+    CREATE_TICKETS = 4
+    CLOSE_TICKETS = 5
+    CREATE_EMBASSIES = 6
+    CLOSE_EMBASSIES = 7
 
 
 class MenuItemStyle(enum.Enum):

@@ -37,7 +37,7 @@ class Grant:
     payoff_code: str
     tax_bracket: int
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

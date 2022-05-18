@@ -16,6 +16,10 @@ __all__ = (
     "menu_item_moved",
     "menu_deleted",
     "menu_sent",
+    "menu_layout",
+    "menu_created",
+    "menu_edited",
+    "menu_list",
 )
 
 if TYPE_CHECKING:
@@ -37,15 +41,15 @@ def menu_has_no_space(
 
 
 def menu_item_created(item: models.MenuItem) -> str:
-    return strings.model_created("Menu item", item.id)
+    return strings.model_created_id("Menu item", item.id)
 
 
 def menu_item_deleted(item: models.MenuItem) -> str:
-    return strings.model_deleted("Menu item", item.id)
+    return strings.model_deleted_id("Menu item", item.id)
 
 
 def menu_item_edited(item: models.MenuItem) -> str:
-    return strings.model_edited("Menu item", item.id)
+    return strings.model_edited_id("Menu item", item.id)
 
 
 def menu_item_has_no_menu(item: models.MenuItem) -> str:
@@ -57,8 +61,24 @@ def menu_item_moved(item: models.MenuItem) -> str:
 
 
 def menu_deleted(menu: models.Menu) -> str:
-    return strings.model_deleted("Menu", menu.id)
+    return strings.model_deleted("Menu", menu)
 
 
 def menu_sent(menu: models.Menu, channel: quarrel.TextChannel | quarrel.Thread) -> str:
     return f"Menu {menu} sent to <@#{channel.id}>!"
+
+
+def menu_layout(menu: models.Menu) -> str:
+    return f"Showing layout for menu {menu}."
+
+
+def menu_created(menu: models.Menu) -> str:
+    return strings.model_created("Menu", menu)
+
+
+def menu_edited(menu: models.Menu) -> str:
+    return strings.model_edited("Menu", menu)
+
+
+def menu_list(menu: list[models.Menu]) -> str:
+    return strings.model_list("Menu", menu)

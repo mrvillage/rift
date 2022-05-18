@@ -25,7 +25,7 @@ class Subscription:
     condition: str
     mentions: list[int]
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

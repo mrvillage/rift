@@ -29,7 +29,7 @@ class Account:
     primary: bool
     deposit_code: str
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

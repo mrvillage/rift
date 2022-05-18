@@ -37,7 +37,7 @@ class CommonSlashCommand(CommonCommand, quarrel.SlashCommand[OPTS]):
         options: Missing[list[OptionType[Any]]] = quarrel.MISSING,
         parent: Missing[type[quarrel.SlashCommand[Any]]] = quarrel.MISSING,
         checks: Missing[list[Any]] = quarrel.MISSING,
-        guilds: Missing[list[int]] = quarrel.MISSING,
+        guilds: Missing[set[int]] = quarrel.MISSING,
         global_: Missing[bool] = quarrel.MISSING,
     ) -> None:
         return super().__init_subclass__(
@@ -46,7 +46,7 @@ class CommonSlashCommand(CommonCommand, quarrel.SlashCommand[OPTS]):
             options,
             parent,
             checks,
-            guilds or (env.DEV_GUILD_IDS if env.ENVIRONMENT == "dev" else []),
+            guilds or (env.DEV_GUILD_IDS if env.ENVIRONMENT == "dev" else set()),
             global_,
         )
 

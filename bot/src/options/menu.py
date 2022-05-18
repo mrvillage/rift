@@ -18,7 +18,7 @@ __all__ = (
 )
 
 MENU_ITEM = CommonOption(
-    type=quarrel.ApplicationCommandOptionType.NUMBER,
+    type=quarrel.ApplicationCommandOptionType.STRING,
     name="item",
     description="The menu item to use.",
     converter=models.MenuItem.convert,
@@ -31,13 +31,13 @@ MENU = CommonOption(
     converter=models.Menu.convert,
 )
 MENU_ITEM_TYPE = CommonOption(
-    type=quarrel.ApplicationCommandOptionType.STRING,
+    type=quarrel.ApplicationCommandOptionType.NUMBER,
     name="type",
     description="The type of menu item to use.",
     choices=enums.MenuItemType,
 )
 MENU_ITEM_STYLE = CommonOption(
-    type=quarrel.ApplicationCommandOptionType.STRING,
+    type=quarrel.ApplicationCommandOptionType.NUMBER,
     name="style",
     description="The style of menu item to use.",
     default=utils.default_missing,
@@ -68,10 +68,10 @@ MENU_ITEM_EMOJI = CommonOption(
     default=utils.default_missing,
 )
 MENU_ITEM_ACTION = CommonOption(
-    type=quarrel.ApplicationCommandOptionType.STRING,
+    type=quarrel.ApplicationCommandOptionType.NUMBER,
     name="action",
     description="The action to run when the item is clicked.",
-    default=utils.default_missing,
+    default=enums.MenuItemAction.NONE,
     choices=enums.MenuItemAction,
 )
 MENU_ITEM_ACTION_OPTIONS = CommonOption(
@@ -80,6 +80,7 @@ MENU_ITEM_ACTION_OPTIONS = CommonOption(
     description="The options to pass to the action.",
     default=utils.default_missing,
     converter=lambda command, value: utils.convert_comma_separated_ints(value),
+    attribute="action_options",
 )
 
 MENU_ITEM_ATTRIBUTES = (

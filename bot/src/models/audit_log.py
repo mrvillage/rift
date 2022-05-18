@@ -25,7 +25,7 @@ class AuditLog:
     action: enums.AuditLogAction = attrs.field(converter=enums.AuditLogAction)
     data: dict[str, Any]
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

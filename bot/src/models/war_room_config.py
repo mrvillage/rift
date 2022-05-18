@@ -29,7 +29,7 @@ class WarRoomConfig:
     track_wars: bool
     advise: bool
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

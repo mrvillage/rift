@@ -28,7 +28,7 @@ class InterviewQuestion:
     min_choices: int
     max_choices: int
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

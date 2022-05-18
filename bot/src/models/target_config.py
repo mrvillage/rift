@@ -29,7 +29,7 @@ class TargetConfig:
     attack: bool
     public: bool
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

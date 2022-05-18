@@ -22,7 +22,7 @@ class AuditConfig:
     fail_message_format: str
     success_message_format: str
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

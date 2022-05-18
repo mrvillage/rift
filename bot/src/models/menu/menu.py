@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 from typing import TYPE_CHECKING
 
 import attrs
@@ -28,7 +29,7 @@ class Menu:
     description: str
     layout: list[list[int]]
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:
@@ -44,16 +45,44 @@ class Menu:
     def update(self, data: Menu) -> Menu:
         ...
 
+    def __str__(self) -> str:
+        return f"{self.name} ({self.id})"
+
     @property
     def interfaces(self) -> set[models.MenuInterface]:
         return {i for i in cache.menu_interfaces if i.menu_id == self.id}
 
     @classmethod
     async def convert(cls, command: CommonSlashCommand[Any], value: str) -> Menu:
-        ...
+        with contextlib.suppress(ValueError):
+            menu = cache.get_menu(utils.convert_int(value))
+            if menu is not None:
+                return menu
+        raise errors.MenuNotFoundError(command.interaction, value)
+
+    @classmethod
+    async def create(cls, guild_id: int, name: str, description: str) -> Menu:
+        self = cls(
+            id=0,
+            guild_id=guild_id,
+            name=name,
+            description=description,
+            layout=[
+                [0 for _ in range(consts.MAX_ACTION_ROW_WIDTH)]
+                for _ in range(consts.MAX_ACTION_ROWS)
+            ],
+        )
+        await self.save(insert=True)
+        cache.add_menu(self)
+        return self
 
     def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
         return embeds.menu(interaction, self)
+
+    async def edit(self, name: str, description: str) -> None:
+        self.name = name
+        self.description = description
+        await self.save()
 
     # TODO: Implement menu sending
     async def send(self, channel: quarrel.TextChannel | quarrel.Thread) -> None:
@@ -80,12 +109,14 @@ class Menu:
             )
         else:
             for i in self.layout:
-                offset = i.index(0)
-                i[offset : offset + width] = [item.id] * (
-                    width
-                    if width + offset <= consts.MAX_ACTION_ROW_WIDTH
-                    else width + offset - consts.MAX_ACTION_ROW_WIDTH
-                )
+                with contextlib.suppress(ValueError):
+                    offset = i.index(0)
+                    i[offset : offset + width] = [item.id] * (
+                        width
+                        if width + offset <= consts.MAX_ACTION_ROW_WIDTH
+                        else width + offset - consts.MAX_ACTION_ROW_WIDTH
+                    )
+                    break
 
     def has_space(self, width: int, row: Missing[int], column: Missing[int]) -> bool:
         if width == 1 and row is not quarrel.MISSING and column is not quarrel.MISSING:
@@ -106,9 +137,10 @@ class Menu:
     async def move(self, item: models.MenuItem, row: int, column: Missing[int]) -> None:
         if not self.has_space(item.width, row, column):
             raise errors.MenuHasNoSpaceError(self, item, row, column)
-        self.set_item(item, row, column)
         for i in self.layout:
             i[:] = [j if j != item.id else 0 for j in i]
+        self.set_item(item, row, column)
+        await self.save()
         await self.update_interfaces()
 
     async def update_interfaces(self) -> None:

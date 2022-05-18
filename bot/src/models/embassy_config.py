@@ -27,7 +27,7 @@ class EmbassyConfig:
     name_format: str
     access_level: enums.AccessLevel
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

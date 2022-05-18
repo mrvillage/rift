@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import quarrel
 
-from .. import checks, embeds, enums, errors, models, options
+from .. import cache, checks, components, embeds, enums, errors, models, options
 from ..bot import bot
 from .common import CommonSlashCommand
 
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 class CommonMenuSlashCommand(
-    CommonSlashCommand[T],
+    CommonSlashCommand["T"],
     checks=[checks.guild_only, checks.has_guild_role_permissions(manage_menus=True)],
 ):
     ...
@@ -259,8 +259,7 @@ class MenuCreateCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        # TODO: Implement modals then implement menu creation
-        ...
+        await self.interaction.respond_with_modal(modal=components.MenuCreateModal())
 
 
 if TYPE_CHECKING:
@@ -279,8 +278,36 @@ class MenuEditCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        # TODO: Implement modals then implement menu editing
+        await self.interaction.respond_with_modal(
+            modal=components.MenuEditModal(self.options.menu)
+        )
+
+
+if TYPE_CHECKING:
+
+    class MenuListCommandOptions:
         ...
+
+
+class MenuListCommand(
+    CommonMenuSlashCommand["MenuListCommandOptions"],
+    name="list",
+    description="List all the menus in a server.",
+    parent=MenuCommand,
+    options=[],
+):
+    __slots__ = ()
+
+    async def callback(self) -> None:
+        await self.interaction.respond_with_message(
+            embed=embeds.menu_list(
+                self.interaction,
+                sorted(
+                    (i for i in cache.menus if i.guild_id == self.interaction.guild_id),
+                    key=lambda i: i.id,
+                ),
+            )
+        )
 
 
 if TYPE_CHECKING:
@@ -329,4 +356,26 @@ class MenuDeleteCommand(
         await self.interaction.respond_with_message(
             embed=embeds.menu_deleted(self.interaction, self.options.menu),
             ephemeral=True,
+        )
+
+
+if TYPE_CHECKING:
+
+    class MenuLayoutCommandOptions:
+        menu: models.Menu
+
+
+class MenuLayoutCommand(
+    CommonMenuSlashCommand["MenuLayoutCommandOptions"],
+    name="layout",
+    description="View a menu's layout.",
+    parent=MenuCommand,
+    options=[options.MENU],
+):
+    __slots__ = ()
+
+    async def callback(self) -> None:
+        await self.interaction.respond_with_message(
+            embed=embeds.menu_layout(self.interaction, self.options.menu),
+            grid=components.MenuLayoutGrid(self.options.menu),
         )

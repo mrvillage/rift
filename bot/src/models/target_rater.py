@@ -41,7 +41,7 @@ class TargetRater:
     aluminum: str
     food: str
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

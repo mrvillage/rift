@@ -22,7 +22,7 @@ class Interview:
     ticket_id: int
     require_link: bool
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

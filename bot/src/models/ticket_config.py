@@ -27,7 +27,7 @@ class TicketConfig:
     name_format: str
     interview_config_id: int
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

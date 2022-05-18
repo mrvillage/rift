@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 from typing import TYPE_CHECKING
 
 import attrs
@@ -22,6 +23,7 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class MenuItem:
     TABLE: ClassVar[str] = "menu_items"
+    ENUMS: ClassVar[tuple[str, ...]] = ("type", "style", "action")
     id: int
     menu_id: int
     type: enums.MenuItemType = attrs.field(converter=enums.MenuItemType)
@@ -30,12 +32,10 @@ class MenuItem:
     disabled: Optional[bool]
     url: Optional[str]
     emoji: Optional[int]
-    action: Optional[enums.MenuItemAction] = attrs.field(
-        converter=lambda x: x if x is None else enums.MenuItemAction(x)
-    )
+    action: enums.MenuItemAction = attrs.field(converter=enums.MenuItemAction)
     action_options: list[int]
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:
@@ -64,11 +64,12 @@ class MenuItem:
         return consts.DEFAULT_COMPONENT_WIDTH
 
     @classmethod
-    async def convert(cls, command: CommonSlashCommand[Any], value: int) -> MenuItem:
-        item = cache.get_menu_item(value)
-        if item is None:
-            raise errors.MenuItemNotFoundError(command.interaction, value)
-        return item
+    async def convert(cls, command: CommonSlashCommand[Any], value: str) -> MenuItem:
+        with contextlib.suppress(ValueError):
+            item = cache.get_menu_item(utils.convert_int(value))
+            if item is not None:
+                return item
+        raise errors.MenuItemNotFoundError(command.interaction, value)
 
     @classmethod
     async def create(
@@ -94,12 +95,15 @@ class MenuItem:
             disabled=disabled if disabled is not quarrel.MISSING else False,
             url=url or None,
             emoji=emoji or None,
-            action=action or None,
+            action=action or enums.MenuItemAction.NONE,
             action_options=action_options or [],
         )
         if not menu.has_space(self.width, row, column):
             raise errors.MenuHasNoSpaceError(menu, self, row, column)
-        await self.save()
+        await self.save(insert=True)
+        cache.add_menu_item(self)
+        menu.set_item(self, row, column)
+        await menu.save()
         return self
 
     def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:

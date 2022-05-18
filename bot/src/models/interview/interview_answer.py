@@ -21,7 +21,7 @@ class InterviewAnswer:
     interview_id: int
     answer: str
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

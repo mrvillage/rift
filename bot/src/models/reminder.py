@@ -26,7 +26,7 @@ class Reminder:
     date: datetime.datetime
     interval: datetime.timedelta
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

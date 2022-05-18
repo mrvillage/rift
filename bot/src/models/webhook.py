@@ -21,7 +21,7 @@ class Webhook:
     guild_id: int
     token: str
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

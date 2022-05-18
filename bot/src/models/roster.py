@@ -24,7 +24,7 @@ class Roster:
     join_date: datetime.datetime
     time_zone: decimal.Decimal
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

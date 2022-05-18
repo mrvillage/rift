@@ -28,7 +28,7 @@ class Role:
     privacy_level: int
     access_level: enums.AccessLevel = attrs.field(converter=enums.AccessLevel)
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

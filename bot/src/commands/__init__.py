@@ -13,7 +13,7 @@ from .fun import *
 # from .grant import *
 # from .interview import *
 # from .mention import *
-# from .menu import *
+from .menu import *
 from .militarization import *
 
 # from .reminder import *

@@ -15,6 +15,10 @@ __all__ = (
     "menu",
     "menu_deleted",
     "menu_sent",
+    "menu_layout",
+    "menu_created",
+    "menu_edited",
+    "menu_list",
 )
 
 if TYPE_CHECKING:
@@ -82,11 +86,11 @@ def menu_item(interaction: quarrel.Interaction, item: models.MenuItem) -> quarre
             utils.embed_field("Emoji", item.emoji),
             utils.embed_field(
                 "Action",
-                strings.enum_name(item.action) if item.action else None,
+                strings.enum_name(item.action),
             ),
             utils.embed_field(
                 "Action Options",
-                ", ".join([str(i) for i in item.action_options]),
+                ", ".join([str(i) for i in item.action_options]) or "None",
             ),
         ],
         color=consts.SUCCESS_EMBED_COLOR,
@@ -148,5 +152,46 @@ def menu_sent(
     return utils.build_single_embed_from_user(
         author=interaction.user,
         description=strings.menu_sent(menu, channel),
+        color=consts.SUCCESS_EMBED_COLOR,
+    )
+
+
+def menu_layout(interaction: quarrel.Interaction, menu: models.Menu) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=interaction.user,
+        description=strings.menu_layout(menu),
+        color=consts.INFO_EMBED_COLOR,
+    )
+
+
+def menu_created(
+    interaction: quarrel.Interaction,
+    menu: models.Menu,
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=interaction.user,
+        description=strings.menu_created(menu),
+        color=consts.SUCCESS_EMBED_COLOR,
+    )
+
+
+def menu_edited(
+    interaction: quarrel.Interaction,
+    menu: models.Menu,
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=interaction.user,
+        description=strings.menu_edited(menu),
+        color=consts.SUCCESS_EMBED_COLOR,
+    )
+
+
+def menu_list(
+    interaction: quarrel.Interaction,
+    menus: list[models.Menu],
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=interaction.user,
+        description=strings.menu_list(menus),
         color=consts.SUCCESS_EMBED_COLOR,
     )

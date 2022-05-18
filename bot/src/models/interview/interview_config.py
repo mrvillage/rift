@@ -20,7 +20,7 @@ class InterviewConfig:
     name: str
     guild_id: int
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:

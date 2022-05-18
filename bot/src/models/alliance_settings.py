@@ -29,7 +29,7 @@ class AllianceSettings:
     offshore_id: int
     withdraw_from_offshore: bool
 
-    async def save(self) -> None:
+    async def save(self, insert: bool = False) -> None:
         ...
 
     async def delete(self) -> None:
