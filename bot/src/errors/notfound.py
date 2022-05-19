@@ -8,6 +8,7 @@ from .base import RiftError
 __all__ = (
     "NotFoundError",
     "AllianceNotFoundError",
+    "ConditionNotFoundError",
     "MenuItemNotFoundError",
     "MenuNotFoundError",
     "NationNotFoundError",
@@ -40,6 +41,9 @@ class NotFoundError(RiftError):
 
 
 class AllianceNotFoundError(NotFoundError, name="alliance", infer=True):
+    ...
+
+class ConditionNotFoundError(NotFoundError, name="condition", infer=True):
     ...
 
 

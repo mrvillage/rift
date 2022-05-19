@@ -22,6 +22,7 @@ __all__ = (
     "model_deleted",
     "model_edited",
     "model_list",
+    "user_mention_id",
 )
 
 if TYPE_CHECKING:
@@ -39,7 +40,7 @@ def model_created_at(model: str) -> str:
 def not_found(name: str, value: Optional[str], infer: bool = False) -> str:
     if value is None and infer:
         return f"Your Discord account is not linked to a nation so I couldn't infer your {name}!"
-    return f"No {name} found with argument `{value}`."
+    return f"No {name} found."
 
 
 def enum_name(value: enum.Enum) -> str:
@@ -96,3 +97,7 @@ def model_list(
     if length == 1:
         return f"{length:,} {singular} found!\n\n{joined}"
     return f"{length:,} {plural} found!\n\n{joined}"
+
+
+def user_mention_id(id: int) -> str:
+    return f"<@{id}>"
