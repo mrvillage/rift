@@ -9,7 +9,10 @@ import lark
 
 from . import errors
 
-__all__ = ("parse_expression",)
+__all__ = (
+    "Expression",
+    "parse_expression",
+)
 
 if TYPE_CHECKING:
     from typing import Any, Dict, Final, Optional
