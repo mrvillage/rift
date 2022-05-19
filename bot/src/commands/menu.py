@@ -146,6 +146,7 @@ class MenuItemDeleteCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
+        cache.remove_menu_item(self.options.item)
         await self.options.item.delete()
         await self.interaction.respond_with_message(
             embed=embeds.menu_item_deleted(self.interaction, self.options.item),
@@ -352,6 +353,7 @@ class MenuDeleteCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
+        cache.remove_menu(self.options.menu)
         await self.options.menu.delete()
         await self.interaction.respond_with_message(
             embed=embeds.menu_deleted(self.interaction, self.options.menu),
