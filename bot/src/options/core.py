@@ -19,8 +19,6 @@ __all__ = (
     "USER_DEFAULT_SELF",
     "NAME",
     "NAME_OPTIONAL",
-    "USE_CONDITION",
-    "USE_CONDITION_OPTIONAL",
     "PUBLIC",
     "PUBLIC_OPTIONAL",
     "PUBLIC_DEFAULT_TRUE",
@@ -72,12 +70,6 @@ NAME = CommonOption(
     description="The name to use.",
 )
 NAME_OPTIONAL = NAME(default=utils.default_missing)
-USE_CONDITION = CommonOption(
-    type=quarrel.ApplicationCommandOptionType.STRING,
-    name="use-condition",
-    description="The condition to determine who can use this.",
-)
-USE_CONDITION_OPTIONAL = USE_CONDITION(default=utils.default_missing)
 PUBLIC = CommonOption(
     type=quarrel.ApplicationCommandOptionType.BOOLEAN,
     name="public",

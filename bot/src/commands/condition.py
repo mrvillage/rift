@@ -9,6 +9,8 @@ __all__ = ()
 
 
 if TYPE_CHECKING:
+    from quarrel import Missing
+
     from ..types.quarrel import MemberOrUser
 
     class ConditionCommandOptions:
@@ -51,7 +53,10 @@ class ConditionInfoCommand(
 if TYPE_CHECKING:
 
     class ConditionCreateCommandOptions:
-        ...
+        name: str
+        expression: models.Condition
+        public: bool
+        use_condition: models.Condition
 
 
 class ConditionCreateCommand(
@@ -59,12 +64,28 @@ class ConditionCreateCommand(
     name="create",
     description="Create a condition.",
     parent=ConditionCommand,
-    options=[],
+    options=[
+        options.NAME,
+        options.EXPRESSION,
+        options.PUBLIC_DEFAULT_FALSE,
+        options.USE_CONDITION_OPTIONAL,
+    ],
 ):
     __slots__ = ()
 
     async def callback(self) -> None:
-        ...
+        await self.options.expression.edit(
+            self.options.name,
+            self.options.expression.get_expression(),
+            self.options.public,
+            self.options.use_condition.get_expression(),
+            self.interaction.user.id,
+        )
+        cache.add_condition(self.options.expression)
+        await self.interaction.respond_with_message(
+            embed=embeds.condition_created(self.interaction, self.options.expression),
+            ephemeral=True,
+        )
 
 
 if TYPE_CHECKING:
@@ -95,7 +116,11 @@ class ConditionDeleteCommand(
 if TYPE_CHECKING:
 
     class ConditionEditCommandOptions:
-        ...
+        condition: models.Condition
+        name: Missing[str]
+        expression: Missing[models.Condition]
+        public: Missing[bool]
+        use_condition: Missing[models.Condition]
 
 
 class ConditionEditCommand(
@@ -103,13 +128,28 @@ class ConditionEditCommand(
     name="edit",
     description="Edit a condition.",
     parent=ConditionCommand,
-    options=[],
+    options=[
+        options.CONDITION,
+        options.NAME_OPTIONAL,
+        options.EXPRESSION_OPTIONAL,
+        options.PUBLIC_OPTIONAL,
+        options.USE_CONDITION_OPTIONAL,
+    ],
     checks=[checks.own_condition],
 ):
     __slots__ = ()
 
     async def callback(self) -> None:
-        ...
+        await self.options.condition.edit(
+            self.options.name,
+            self.options.expression and self.options.expression.get_expression(),
+            self.options.public,
+            self.options.use_condition and self.options.use_condition.get_expression(),
+        )
+        await self.interaction.respond_with_message(
+            embed=embeds.condition_edited(self.interaction, self.options.condition),
+            ephemeral=True,
+        )
 
 
 if TYPE_CHECKING:
