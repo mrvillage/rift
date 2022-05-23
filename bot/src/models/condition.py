@@ -75,7 +75,7 @@ class Condition:
             command.interaction.user.id,
             lang.parse_expression(value),
             False,
-            lang.parse_expression("true"),
+            lang.parse_expression("false"),
         )
 
     @classmethod
