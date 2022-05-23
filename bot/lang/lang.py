@@ -346,6 +346,15 @@ class LangTransformer:
     def condition(self, tree: list[Any]) -> Any:
         return tree[0] if len(tree) == 1 else Expression(tree[0], tree[1], tree[2])
 
+    def conditional(self, tree: list[Any]) -> Any:
+        return tree[0]
+
+    def conditional_and(self, tree: list[Any]) -> Any:
+        return Operator.and_
+
+    def conditional_or(self, tree: list[Any]) -> Any:
+        return Operator.or_
+
     def operator(self, tree: list[Operator]) -> Any:
         return tree[0]
 
