@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Callable
 import lark
 
 from . import errors
+from .builtins import get_builtin_attrs
 
 __all__ = (
     "Expression",
@@ -15,9 +16,9 @@ __all__ = (
 )
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, Final, Optional
+    from typing import Any, Final, Optional
 
-    Scope = Dict[str, Any]
+    Scope = dict[str, Any]
 
 
 def get_attribute(obj: Any, name: str, default: Optional[Any] = None) -> Any:
@@ -32,6 +33,10 @@ def get_attribute(obj: Any, name: str, default: Optional[Any] = None) -> Any:
             raise errors.InvalidAttributeError(
                 f"{type(obj).__name__} has no attribute {name}"
             ) from e
+
+
+def get_lang_attrs(obj: Any) -> set[str]:
+    return get_attribute(obj, "__lang_attrs__", set()) or get_builtin_attrs(obj)
 
 
 def evaluate_if_abstract(value: Any, scope: Scope) -> Any:
@@ -134,7 +139,7 @@ class Member:
         obj = scope[self.path[0]]
         for name in self.path[1:]:
             if isinstance(name, str):
-                if name not in get_attribute(obj, "__lang_attrs__", set()):
+                if name not in get_lang_attrs(obj):
                     raise errors.InvalidAttributeError(
                         f"{type(obj).__name__} has no attribute {name}"
                     )
