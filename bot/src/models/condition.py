@@ -106,7 +106,7 @@ class Condition:
         return (
             self.public
             or user.id == self.owner_id
-            or self.get_use_condition().evaluate({"user": user})
+            or utils.evaluate_in_default_scope(self.get_use_condition(), user=user)
         )
 
     async def edit(
