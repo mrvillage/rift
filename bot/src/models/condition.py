@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 import attrs
 import lang
+import quarrel
 
 from .. import cache, embeds, errors, utils
 
@@ -13,7 +14,6 @@ __all__ = ("Condition",)
 if TYPE_CHECKING:
     from typing import Any, ClassVar, Optional
 
-    import quarrel
     from quarrel import Missing
 
     from ..commands.common import CommonSlashCommand
