@@ -16,24 +16,24 @@ if TYPE_CHECKING:
     import datetime
     from typing import Any
 
-    from quarrel import EmbedField
+    from quarrel import EmbedField, Missing
 
 
 def build_single_embed(
     *,
-    title: quarrel.Missing[str] = quarrel.MISSING,
-    description: quarrel.Missing[str] = quarrel.MISSING,
-    url: quarrel.Missing[str] = quarrel.MISSING,
-    timestamp: quarrel.Missing[datetime.datetime] = quarrel.MISSING,
-    color: quarrel.Missing[int | quarrel.Color] = quarrel.MISSING,
-    author_name: quarrel.Missing[str] = quarrel.MISSING,
-    author_url: quarrel.Missing[str] = quarrel.MISSING,
-    author_icon_url: quarrel.Missing[str] = quarrel.MISSING,
-    footer_text: quarrel.Missing[str] = quarrel.MISSING,
-    provider_name: quarrel.Missing[str] = quarrel.MISSING,
-    fields: quarrel.Missing[list[EmbedField]] = quarrel.MISSING,
-    image_url: quarrel.Missing[str] = quarrel.MISSING,
-    thumbnail_url: quarrel.Missing[str] = quarrel.MISSING,
+    title: Missing[str] = quarrel.MISSING,
+    description: Missing[str] = quarrel.MISSING,
+    url: Missing[str] = quarrel.MISSING,
+    timestamp: Missing[datetime.datetime] = quarrel.MISSING,
+    color: Missing[int | quarrel.Color] = quarrel.MISSING,
+    author_name: Missing[str] = quarrel.MISSING,
+    author_url: Missing[str] = quarrel.MISSING,
+    author_icon_url: Missing[str] = quarrel.MISSING,
+    footer_text: Missing[str] = quarrel.MISSING,
+    provider_name: Missing[str] = quarrel.MISSING,
+    fields: Missing[list[EmbedField]] = quarrel.MISSING,
+    image_url: Missing[str] = quarrel.MISSING,
+    thumbnail_url: Missing[str] = quarrel.MISSING,
 ) -> quarrel.Embed:
     embed = quarrel.Embed(
         title=title, description=description, url=url, timestamp=timestamp, color=color
@@ -51,18 +51,18 @@ def build_single_embed(
 
 def build_single_embed_from_user(
     *,
-    title: quarrel.Missing[str] = quarrel.MISSING,
-    description: quarrel.Missing[str] = quarrel.MISSING,
-    url: quarrel.Missing[str] = quarrel.MISSING,
-    timestamp: quarrel.Missing[datetime.datetime] = quarrel.MISSING,
-    color: quarrel.Missing[int | quarrel.Color] = quarrel.MISSING,
+    title: Missing[str] = quarrel.MISSING,
+    description: Missing[str] = quarrel.MISSING,
+    url: Missing[str] = quarrel.MISSING,
+    timestamp: Missing[datetime.datetime] = quarrel.MISSING,
+    color: Missing[int | quarrel.Color] = quarrel.MISSING,
     author: quarrel.Member | quarrel.User,
-    author_url: quarrel.Missing[str] = quarrel.MISSING,
-    footer_text: quarrel.Missing[str] = quarrel.MISSING,
-    provider_name: quarrel.Missing[str] = quarrel.MISSING,
-    fields: quarrel.Missing[list[EmbedField]] = quarrel.MISSING,
-    image_url: quarrel.Missing[str] = quarrel.MISSING,
-    thumbnail_url: quarrel.Missing[str] = quarrel.MISSING,
+    author_url: Missing[str] = quarrel.MISSING,
+    footer_text: Missing[str] = quarrel.MISSING,
+    provider_name: Missing[str] = quarrel.MISSING,
+    fields: Missing[list[EmbedField]] = quarrel.MISSING,
+    image_url: Missing[str] = quarrel.MISSING,
+    thumbnail_url: Missing[str] = quarrel.MISSING,
 ) -> quarrel.Embed:
     return build_single_embed(
         title=title,
@@ -81,5 +81,7 @@ def build_single_embed_from_user(
     )
 
 
-def embed_field(name: Any, value: Any, inline: bool = True) -> quarrel.EmbedField:
+def embed_field(
+    name: Any, value: Any, inline: Missing[bool] = True
+) -> quarrel.EmbedField:
     return quarrel.EmbedField(name=name, value=value, inline=inline)
