@@ -34,6 +34,7 @@ USE_CONDITION = CommonOption(
     name="use-condition",
     description="The condition to determine who can use this.",
     converter=models.Condition.convert,
+    attribute="use_condition",
 )
 USE_CONDITION_OPTIONAL = USE_CONDITION(default=utils.default_missing)
 USE_CONDITION_EXPRESSION = USE_CONDITION(
