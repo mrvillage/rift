@@ -40,7 +40,7 @@ def condition_list(
     return utils.build_single_embed_from_user(
         author=interaction.user,
         description=strings.condition_list(conditions),
-        color=consts.SUCCESS_EMBED_COLOR,
+        color=consts.INFO_EMBED_COLOR,
     )
 
 
