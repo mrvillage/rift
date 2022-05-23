@@ -58,7 +58,7 @@ if TYPE_CHECKING:
         name: str
         expression: models.Condition
         public: bool
-        use_condition: models.Condition
+        use_condition: Missing[models.Condition]
 
 
 class ConditionCreateCommand(
@@ -80,7 +80,7 @@ class ConditionCreateCommand(
             self.options.name,
             self.options.expression.get_expression(),
             self.options.public,
-            self.options.use_condition.get_expression(),
+            self.options.use_condition and self.options.use_condition.get_expression(),
             self.interaction.user.id,
         )
         cache.add_condition(self.options.expression)
