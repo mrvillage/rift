@@ -201,7 +201,7 @@ class Expression:
         if not getattr(left, "__lang_abstract__", False) and not getattr(
             right, "__lang_abstract__", False
         ):
-            return operator.evaluate(left, right)
+            return operator.evaluate(lambda: left, lambda: right)
         return cls(left, operator, right)
 
     def evaluate(self, scope: Scope) -> Any:
