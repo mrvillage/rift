@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import quarrel
+
 from .. import consts, strings, utils
 
 __all__ = (
@@ -13,7 +15,6 @@ __all__ = (
 )
 
 if TYPE_CHECKING:
-    import quarrel
 
     from .. import models
 
@@ -28,9 +29,14 @@ def condition(
             utils.embed_field("Name", condition.name),
             utils.embed_field("Owner", strings.user_mention_id(condition.owner_id)),
             utils.embed_field("Public", condition.public),
-            utils.embed_field("Use condition", condition.use_condition),
-            utils.embed_field("Condition", condition.value),
+            utils.embed_field(
+                "Use condition", f"```ts\n{condition.use_condition}```", inline=False
+            ),
+            utils.embed_field(
+                "Condition", f"```ts\n{condition.value}```", inline=False
+            ),
         ],
+        color=consts.INFO_EMBED_COLOR,
     )
 
 
