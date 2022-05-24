@@ -135,7 +135,7 @@ class ConditionEditCommand(
         options.NAME_OPTIONAL,
         options.EXPRESSION_OPTIONAL,
         options.PUBLIC_OPTIONAL,
-        options.USE_CONDITION_OPTIONAL,
+        options.USE_CONDITION_EXPRESSION_OPTIONAL,
     ],
     checks=[checks.own_condition],
 ):

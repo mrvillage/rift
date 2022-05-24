@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import lark
 import quarrel
 
 from .. import embeds, errors
@@ -23,6 +24,10 @@ async def handle_interaction_error(
             error = error.errors[0]
     if isinstance(error, errors.RiftError):
         await respond_with_error(interaction, error.build_embed(interaction))
+    if isinstance(error, lark.UnexpectedToken):
+        await respond_with_error(
+            interaction, embeds.lark_unexpected_token_error(interaction, error)
+        )
     else:
         await respond_with_error(interaction, embeds.fatal_error(interaction))
         return True

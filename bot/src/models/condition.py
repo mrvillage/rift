@@ -61,22 +61,30 @@ class Condition:
         return f"{self.name} ({self.id})"
 
     @classmethod
-    async def convert(
-        cls, command: CommonSlashCommand[Any], value: str, parse: bool = False
+    def assemble(
+        cls,
+        name: str,
+        owner_id: int,
+        condition: lang.Expression,
+        public: bool,
+        use_condition: lang.Expression,
     ) -> Condition:
+        return cls(
+            id=0,
+            name=name,
+            owner_id=owner_id,
+            value=str(condition),
+            public=public,
+            use_condition=str(use_condition),
+        )
+
+    @classmethod
+    async def convert(cls, command: CommonSlashCommand[Any], value: str) -> Condition:
         with contextlib.suppress(ValueError):
             condition = cache.get_condition(utils.convert_int(value))
             if condition is not None:
                 return condition
-        if not parse:
-            raise errors.ConditionNotFoundError(command.interaction, value)
-        return await Condition.create(
-            "",
-            command.interaction.user.id,
-            lang.parse_expression(value),
-            False,
-            lang.parse_expression("false"),
-        )
+        raise errors.ConditionNotFoundError(command.interaction, value)
 
     @classmethod
     async def create(
@@ -87,17 +95,20 @@ class Condition:
         public: bool,
         use_condition: lang.Expression,
     ) -> Condition:
-        self = cls(
-            id=0,
-            name=name,
-            owner_id=owner_id,
-            value=str(condition),
-            public=public,
-            use_condition=str(use_condition),
-        )
+        self = cls.assemble(name, owner_id, condition, public, use_condition)
         await self.save()
         cache.add_condition(self)
         return self
+
+    @classmethod
+    def parse(cls, command: CommonSlashCommand[Any], value: str) -> Condition:
+        return Condition.assemble(
+            "",
+            command.interaction.user.id,
+            lang.parse_expression(value),
+            False,
+            lang.parse_expression("false"),
+        )
 
     def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
         return embeds.condition(interaction, self)
