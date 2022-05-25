@@ -11,7 +11,7 @@ from discord.utils import MISSING
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
+from googleapiclient.discovery import build  # type: ignore
 
 from ... import funcs
 from ...cache import cache
@@ -231,7 +231,13 @@ class HouseStark(commands.Cog):
     async def stockpile(self, ctx: RiftContext, *, nation: Nation = MISSING):
         nation = nation or await Nation.convert(ctx, nation)
         user = nation.user
-        data = await pnwkit.async_nation_query(
+        credentials = cache.get_credentials(68915)
+        if credentials is None:
+            return await ctx.send(
+                embed=funcs.get_embed_author_member(ctx.author, "No credentials found")
+            )
+        kit = pnwkit.Kit(credentials.api_key, async_=True)
+        data = await kit.nation_query(
             {"id": nation.id, "first": 1},
             "money",
             "food",
@@ -360,9 +366,15 @@ class HouseStark(commands.Cog):
         if offshore is not None:
             nations += offshore.members
         amounts: List[str] = []
+        credentials = cache.get_credentials(68915)
+        if credentials is None:
+            return await ctx.send(
+                embed=funcs.get_embed_author_member(ctx.author, "No credentials found")
+            )
+        kit = pnwkit.Kit(credentials.api_key, async_=True)
         for nation in sorted(nations, key=lambda x: x.id):
             user = nation.user
-            data = await pnwkit.async_nation_query(
+            data = await kit.nation_query(
                 {"id": nation.id, "first": 1},
                 "money",
                 "food",
