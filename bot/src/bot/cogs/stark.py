@@ -676,7 +676,7 @@ class HouseStark(commands.Cog):
         deposits: List[List[Any]] = []
         for user in users:
             nation = links.get(user)
-            accounts_ = [i for i in accounts if i.owner_id == user]
+            accounts_ = [i for i in accounts if i.owner_id == user and i.alliance_id == 3683]
             resources = sum((i.resources for i in accounts_), Resources())
             deposits.append(
                 [
