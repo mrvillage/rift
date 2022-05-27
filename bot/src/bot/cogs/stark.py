@@ -73,7 +73,12 @@ class Confirm(discord.ui.View):
         resources = await main.fetch_bank()
         if TYPE_CHECKING:
             assert isinstance(interaction.user, discord.Member)
-        credentials = cache.get_credentials(68915)
+        alliance = cache.get_alliance(3683)
+        if alliance is None:
+            return
+        credentials = funcs.credentials.find_highest_alliance_credentials(
+            alliance, "view_alliance_bank"
+        )
         if credentials is None:
             return await interaction.followup.send(
                 embed=funcs.get_embed_author_member(
@@ -231,7 +236,12 @@ class HouseStark(commands.Cog):
     async def stockpile(self, ctx: RiftContext, *, nation: Nation = MISSING):
         nation = nation or await Nation.convert(ctx, nation)
         user = nation.user
-        credentials = cache.get_credentials(68915)
+        alliance = cache.get_alliance(3683)
+        if alliance is None:
+            return
+        credentials = funcs.credentials.find_highest_alliance_credentials(
+            alliance, "view_alliance_bank"
+        )
         if credentials is None:
             return await ctx.send(
                 embed=funcs.get_embed_author_member(ctx.author, "No credentials found")
@@ -366,7 +376,12 @@ class HouseStark(commands.Cog):
         if offshore is not None:
             nations += offshore.members
         amounts: List[str] = []
-        credentials = cache.get_credentials(68915)
+        alliance = cache.get_alliance(3683)
+        if alliance is None:
+            return
+        credentials = funcs.credentials.find_highest_alliance_credentials(
+            alliance, "view_alliance_bank"
+        )
         if credentials is None:
             return await ctx.send(
                 embed=funcs.get_embed_author_member(ctx.author, "No credentials found")
@@ -676,7 +691,9 @@ class HouseStark(commands.Cog):
         deposits: List[List[Any]] = []
         for user in users:
             nation = links.get(user)
-            accounts_ = [i for i in accounts if i.owner_id == user and i.alliance_id == 3683]
+            accounts_ = [
+                i for i in accounts if i.owner_id == user and i.alliance_id == 3683
+            ]
             resources = sum((i.resources for i in accounts_), Resources())
             deposits.append(
                 [
