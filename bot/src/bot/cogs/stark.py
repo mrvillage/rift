@@ -77,7 +77,7 @@ class Confirm(discord.ui.View):
         if alliance is None:
             return
         credentials = funcs.credentials.find_highest_alliance_credentials(
-            alliance, "view_alliance_bank"
+            alliance, "send_alliance_bank"
         )
         if credentials is None:
             return await interaction.followup.send(
