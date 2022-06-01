@@ -14,7 +14,7 @@ __all__ = ("City", "FullCity")
 
 if TYPE_CHECKING:
     from _typings import CityData
-    from pnwkit.data import Nation as PnWKitNation
+    from pnwkit.legacy.data import Nation as PnWKitNation
 
     from .nation import Nation
 

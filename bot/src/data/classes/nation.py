@@ -23,7 +23,7 @@ __all__ = ("Nation",)
 
 if TYPE_CHECKING:
     from _typings import Field, NationData, RevenueDict
-    from pnwkit.data import Nation as PnWKitNation
+    from pnwkit.legacy.data import Nation as PnWKitNation
 
     from ...views import Info
     from .alliance import Alliance

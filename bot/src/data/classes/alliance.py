@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Union
 import cachetools
 import discord
 import pnwkit
-from pnwkit.async_ import AsyncKit
+from pnwkit.legacy.async_ import AsyncKit
 
 from ... import funcs
 from ...cache import cache
@@ -20,9 +20,8 @@ from .resources import Resources
 __all__ = ("Alliance",)
 
 if TYPE_CHECKING:
-    from pnwkit.data import Alliance as PnWKitAlliance
-
     from _typings import AllianceData, Field, RevenueDict
+    from pnwkit.legacy.data import Alliance as PnWKitAlliance
 
     from .nation import Nation
     from .trade import TradePrices

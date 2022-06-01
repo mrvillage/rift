@@ -12,7 +12,7 @@ from discord.ext.commands import (
     converter,
 )
 from discord.ext.commands.converter import CONVERTER_MAPPING
-from pnwkit import async_, data, sync
+from pnwkit.legacy import async_, data, sync
 
 
 async def _actual_conversion(

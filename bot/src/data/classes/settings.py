@@ -53,7 +53,7 @@ class AllianceAutoRole:
     async def delete(self) -> None:
         cache.remove_alliance_auto_role(self)
         await execute_query(
-            "DELETE FROM alliance_auto_roles WHERE role_id = $1 AND guild_id = $2 AND alliance_id = $3;",
+            "DELETE FROM alliance_auto_roles WHERE role = $1 AND guild = $2 AND alliance = $3;",
             self.role_id,
             self.guild_id,
             self.alliance_id,
