@@ -423,8 +423,8 @@ class Nation(Makeable):
         color = await Color.fetch(self.color.lower())
         bonus = color.bonus * 12
         if self.cities <= 10:
-            revenue["new_player_bonus"] = revenue["gross_income"].money * 1.1 - (
-                0.1 * self.cities
+            revenue["new_player_bonus"] = revenue["gross_income"].money * (
+                1.1 - (0.1 * self.cities)
             )
             revenue["gross_income"].money *= 2.1 - (0.1 * self.cities)
             revenue["net_income"].money = sum(

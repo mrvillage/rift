@@ -326,50 +326,66 @@ class FullCity:
         )
 
     def calculate_food_income(self) -> float:
-        if not self.farms:
-            return 0
         return (
-            (self.land / (500 - (int(self.projects.massirr) * 100)))
-            * self.farms
-            * (1 + ((0.5 * (self.farms - 1)) / (10 - 1)))
-            * 12
+            (
+                (self.land / (500 - (int(self.projects.massirr) * 100)))
+                * self.farms
+                * (1 + ((0.5 * (self.farms - 1)) / (20 - 1)))
+                * 12
+            )
+            if self.farms
+            else 0
         )
 
     def calculate_coal_income(self) -> float:
-        if not self.coal_mines:
-            return 0
-        return 3 * self.coal_mines * (1 + ((0.5 * (self.coal_mines - 1)) / (10 - 1)))
+        return (
+            3 * self.coal_mines * (1 + ((0.5 * (self.coal_mines - 1)) / (10 - 1)))
+            if self.coal_mines
+            else 0
+        )
 
     def calculate_oil_income(self) -> float:
-        if not self.oil_wells:
-            return 0
-        return 3 * self.oil_wells * (1 + ((0.5 * (self.oil_wells - 1)) / (10 - 1)))
+        return (
+            3 * self.oil_wells * (1 + ((0.5 * (self.oil_wells - 1)) / (10 - 1)))
+            if self.oil_wells
+            else 0
+        )
 
     def calculate_uranium_income(self) -> float:
-        if not self.uranium_mines:
-            return 0
         return (
-            3
-            * self.uranium_mines
-            * (1 + ((0.5 * (self.uranium_mines - 1)) / (5 - 1)))
-            * (1 + int(self.projects.uap))
+            (
+                3
+                * self.uranium_mines
+                * (1 + ((0.5 * (self.uranium_mines - 1)) / (5 - 1)))
+                * (1 + int(self.projects.uap))
+            )
+            if self.uranium_mines
+            else 0
         )
 
     def calculate_lead_income(self) -> float:
-        if not self.lead_mines:
-            return 0
-        return 3 * self.lead_mines * (1 + ((0.5 * (self.lead_mines - 1)) / (10 - 1)))
+        return (
+            3 * self.lead_mines * (1 + ((0.5 * (self.lead_mines - 1)) / (10 - 1)))
+            if self.lead_mines
+            else 0
+        )
 
     def calculate_iron_income(self) -> float:
-        if not self.iron_mines:
-            return 0
-        return 3 * self.iron_mines * (1 + ((0.5 * (self.iron_mines - 1)) / (10 - 1)))
+        return (
+            3 * self.iron_mines * (1 + ((0.5 * (self.iron_mines - 1)) / (10 - 1)))
+            if self.iron_mines
+            else 0
+        )
 
     def calculate_bauxite_income(self) -> float:
-        if not self.bauxite_mines:
-            return 0
         return (
-            3 * self.bauxite_mines * (1 + ((0.5 * (self.bauxite_mines - 1)) / (10 - 1)))
+            (
+                3
+                * self.bauxite_mines
+                * (1 + ((0.5 * (self.bauxite_mines - 1)) / (10 - 1)))
+            )
+            if self.bauxite_mines
+            else 0
         )
 
     def calculate_gasoline_income(self) -> float:
