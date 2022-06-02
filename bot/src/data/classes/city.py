@@ -190,10 +190,7 @@ class FullCity:
     @cachetools.cached(cache=cachetools.TTLCache(1024, 30))  # type: ignore
     def population(self) -> float:
         return (
-            (
-                (self.infrastructure * 100)
-                - ((self.disease * 100 * self.infrastructure) / 10)
-            )
+            ((self.infrastructure * 100) - (self.disease * self.infrastructure))
             - max((self.crime / 10) * (100 * self.infrastructure) - 25, 0)
         ) * (1 + (math.log(self.age) if self.age else 0) / 15)
 
