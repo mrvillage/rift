@@ -461,7 +461,7 @@ class FullCity:
         )
 
     def calculate_food_upkeep(self):
-        return self.population / 1000
+        return self.population / 12000
 
     def calculate_coal_upkeep(self):
         return (self.coal_power * 1.2) + (
