@@ -4,6 +4,7 @@ import asyncio
 import datetime
 import sys
 import traceback
+from functools import reduce
 from typing import TYPE_CHECKING
 
 import quarrel
@@ -16,10 +17,11 @@ __all__ = (
     "utcnow",
     "default_missing",
     "snake_case_to_capitals",
+    "unique",
 )
 
 if TYPE_CHECKING:
-    from typing import Any, Coroutine, TypeVar
+    from typing import Any, Coroutine, Iterable, TypeVar
 
     T = TypeVar("T")
 
@@ -57,3 +59,7 @@ def default_missing(*_: Any) -> Any:
 
 def snake_case_to_capitals(value: str) -> str:
     return " ".join(i.capitalize() for i in value.split("_"))
+
+
+def unique(iterable: Iterable[T]) -> list[T]:
+    return reduce(lambda a, b: a if b in a else a + [b], iterable, [])  # type: ignore
