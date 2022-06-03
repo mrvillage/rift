@@ -1,3 +1,4 @@
+from .component import *
 from .convert import *
 from .core import *
 from .embed import *
