@@ -9,6 +9,7 @@ from .. import strings
 __all__ = (
     "build_single_embed",
     "build_single_embed_from_user",
+    "build_single_embed_from_guild",
     "embed_field",
 )
 
@@ -72,6 +73,38 @@ def build_single_embed_from_user(
         color=color,
         author_name=author.username,
         author_icon_url=author.display_avatar.url,
+        author_url=author_url,
+        footer_text=footer_text,
+        provider_name=provider_name,
+        fields=fields,
+        image_url=image_url,
+        thumbnail_url=thumbnail_url,
+    )
+
+
+def build_single_embed_from_guild(
+    *,
+    title: Missing[str] = quarrel.MISSING,
+    description: Missing[str] = quarrel.MISSING,
+    url: Missing[str] = quarrel.MISSING,
+    timestamp: Missing[datetime.datetime] = quarrel.MISSING,
+    color: Missing[int | quarrel.Color] = quarrel.MISSING,
+    guild: quarrel.Guild,
+    author_url: Missing[str] = quarrel.MISSING,
+    footer_text: Missing[str] = quarrel.MISSING,
+    provider_name: Missing[str] = quarrel.MISSING,
+    fields: Missing[list[EmbedField]] = quarrel.MISSING,
+    image_url: Missing[str] = quarrel.MISSING,
+    thumbnail_url: Missing[str] = quarrel.MISSING,
+) -> quarrel.Embed:
+    return build_single_embed(
+        title=title,
+        description=description,
+        url=url,
+        timestamp=timestamp,
+        color=color,
+        author_name=guild.name,
+        author_icon_url=guild.icon.url if guild.icon else quarrel.MISSING,
         author_url=author_url,
         footer_text=footer_text,
         provider_name=provider_name,
