@@ -8,6 +8,7 @@ __all__ = (
     "PENDING_EMBED_COLOR",
     "SUCCESS_EMBED_COLOR",
     "FAIL_EMBED_COLOR",
+    "SPECIAL_EMBED_COLOR",
 )
 
 INFO_EMBED_COLOR = quarrel.Color.BLUE
@@ -15,3 +16,4 @@ ERROR_EMBED_COLOR = quarrel.Color.RED
 PENDING_EMBED_COLOR = quarrel.Color.ORANGE
 SUCCESS_EMBED_COLOR = quarrel.Color.GREEN
 FAIL_EMBED_COLOR = quarrel.Color.RED
+SPECIAL_EMBED_COLOR = quarrel.Color.PURPLE
