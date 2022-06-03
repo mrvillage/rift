@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import attrs
 import quarrel
 
-from ... import cache, consts, embeds, errors, models, utils
+from ... import cache, components, consts, embeds, errors, models, utils
 
 __all__ = ("Menu",)
 
@@ -79,14 +79,23 @@ class Menu:
     def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
         return embeds.menu(interaction, self)
 
+    def build_interface_embed(self, guild: quarrel.Guild) -> quarrel.Embed:
+        return embeds.menu_interface(guild, self)
+
+    def build_interface_grid(self) -> quarrel.Grid:
+        return components.MenuInterfaceGrid(self)
+
     async def edit(self, name: str, description: str) -> None:
         self.name = name
         self.description = description
         await self.save()
 
-    # TODO: Implement menu sending
-    async def send(self, channel: quarrel.TextChannel | quarrel.Thread) -> None:
-        ...
+    async def send(self, channel: quarrel.GuildChannel) -> None:
+        message = await channel.create_message(
+            embed=self.build_interface_embed(channel.guild),
+            grid=self.build_interface_grid(),
+        )
+        await models.MenuInterface.create(self, message)
 
     def set_item(
         self,

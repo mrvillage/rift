@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 import attrs
 import quarrel
 
-from ... import cache, consts, embeds, enums, errors, models, utils
+from ... import cache, components, consts, embeds, enums, errors, models, utils
 
 __all__ = ("MenuItem",)
 
@@ -106,6 +106,13 @@ class MenuItem:
         await menu.save()
         return self
 
+    def build_component(self) -> quarrel.Component:
+        if self.type is enums.MenuItemType.BUTTON:
+            return components.MenuInterfaceButton(self)
+        elif self.type is enums.MenuItemType.SELECT_MENU:
+            return components.MenuInterfaceSelectMenu(self)
+        raise RuntimeError("Unsupported menu item type")
+
     def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
         return embeds.menu_item(interaction, self)
 
@@ -137,3 +144,16 @@ class MenuItem:
         menu = self.menu
         if menu is not None:
             await menu.update_interfaces()
+
+    @property
+    def quarrel_style(self) -> quarrel.ButtonStyle:
+        if self.style is enums.MenuItemStyle.BLURPLE:
+            return quarrel.ButtonStyle.BLURPLE
+        elif self.style is enums.MenuItemStyle.GRAY:
+            return quarrel.ButtonStyle.GRAY
+        elif self.style is enums.MenuItemStyle.GREEN:
+            return quarrel.ButtonStyle.GREEN
+        elif self.style is enums.MenuItemStyle.RED:
+            return quarrel.ButtonStyle.RED
+        else:
+            return quarrel.ButtonStyle.GRAY

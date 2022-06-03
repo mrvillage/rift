@@ -20,6 +20,9 @@ __all__ = (
     "menu_created",
     "menu_edited",
     "menu_list",
+    "menu_item_action_added_roles",
+    "menu_item_action_removed_roles",
+    "menu_item_action_toggled_roles",
 )
 
 if TYPE_CHECKING:
@@ -82,3 +85,29 @@ def menu_edited(menu: models.Menu) -> str:
 
 def menu_list(menu: list[models.Menu]) -> str:
     return strings.model_list("Menu", menu)
+
+
+def menu_item_action_added_roles(
+    roles: list[quarrel.Role],
+) -> str:
+    return (
+        f"Added roles {', '.join(role.mention for role in roles)}!"
+        if roles
+        else "No roles added!"
+    )
+
+
+def menu_item_action_removed_roles(
+    roles: list[quarrel.Role],
+) -> str:
+    return (
+        f"Removed roles {', '.join(role.mention for role in roles)}!"
+        if roles
+        else "No roles removed!"
+    )
+
+
+def menu_item_action_toggled_roles(
+    added: list[quarrel.Role], removed: list[quarrel.Role]
+) -> str:
+    return f"{menu_item_action_added_roles(added)}\n{menu_item_action_removed_roles(removed)}"

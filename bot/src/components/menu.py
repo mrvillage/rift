@@ -4,11 +4,18 @@ from typing import TYPE_CHECKING
 
 import quarrel
 
-from .. import cache, checks, embeds, errors, models, utils
+from .. import cache, checks, embeds, enums, errors, models, utils
 from ..bot import bot
-from .common import CommonButton, CommonGrid
+from .common import CommonButton, CommonGrid, CommonSelectMenu
 
-__all__ = ("MenuLayoutGrid", "MenuCreateModal", "MenuEditModal")
+__all__ = (
+    "MenuLayoutGrid",
+    "MenuCreateModal",
+    "MenuEditModal",
+    "MenuInterfaceGrid",
+    "MenuInterfaceButton",
+    "MenuInterfaceSelectMenu",
+)
 
 if TYPE_CHECKING:
     from quarrel import Missing
@@ -37,27 +44,24 @@ class MenuLayoutButton(CommonButton):
         column: Missing[int] = quarrel.MISSING,
     ) -> None:
         super().__init__(
-            custom_id=f"info-menu-item-{item.id}-{row or 0}-{column or 0}"
+            custom_id=f"button-menu-item-{item.id}-{row or 0}-{column or 0}-info"
             if item
             else quarrel.MISSING,
             label=item.id if item else quarrel.MISSING,
             style=quarrel.ButtonStyle.GRAY,
-            pattern="info-menu-item-(?P<item_id>[0-9]+)-(?P<row>[0-9]+)-(?P<column>[0-9]+)",
+            pattern="button-menu-item-(?P<id>[0-9]+)-(?P<row>[0-9]+)-(?P<column>[0-9]+)-info",
             row=row,
         )
 
     async def callback(
         self, interaction: quarrel.Interaction, groups: quarrel.Missing[dict[str, str]]
     ) -> None:
-        if groups is quarrel.MISSING:
+        if (
+            item := utils.regex_groups_to_model(
+                interaction, groups, cache.get_menu_item, errors.MenuItemNotFoundError
+            )
+        ) is None:
             return
-        try:
-            item_id = utils.convert_int(groups["item_id"])
-        except ValueError:
-            return
-        item = cache.get_menu_item(item_id)
-        if item is None:
-            raise errors.MenuItemNotFoundError(interaction, item_id)
         await interaction.respond_with_message(
             embed=item.build_embed(interaction),
             ephemeral=True,
@@ -140,7 +144,7 @@ class MenuEditModal(
         super().__init__(
             title="Create Menu",
             custom_id=f"modal-menu-{menu.id}-edit" if menu else quarrel.MISSING,
-            pattern="modal-menu-(?P<menu_id>[0-9]+)-edit",
+            pattern="modal-menu-(?P<id>[0-9]+)-edit",
         )
         self.add_component(
             quarrel.TextInput(
@@ -171,17 +175,113 @@ class MenuEditModal(
     ) -> None:
         if TYPE_CHECKING:
             assert interaction.guild_id is not quarrel.MISSING
-        if groups is quarrel.MISSING:
+        if (
+            menu := utils.regex_groups_to_model(
+                interaction, groups, cache.get_menu, errors.MenuNotFoundError
+            )
+        ) is None:
             return
-        try:
-            menu_id = utils.convert_int(groups["menu_id"])
-        except ValueError:
-            return
-        menu = cache.get_menu(menu_id)
-        if menu is None:
-            raise errors.MenuNotFoundError(interaction, menu_id)
         await menu.edit(values.name.value, values.description.value)
         await interaction.respond_with_message(
             embed=embeds.menu_edited(interaction, menu),
             ephemeral=True,
+        )
+
+
+class MenuInterfaceGrid(CommonGrid):
+    def __init__(self, menu: models.Menu) -> None:
+        super().__init__(timeout=None)
+        for row in menu.layout:
+            for id in row:
+                item = cache.get_menu_item(id)
+                if item is None:
+                    continue
+                self.add_component(item.build_component())
+
+
+@bot.component
+class MenuInterfaceButton(CommonButton, checks=[checks.button_guild_only]):
+    def __init__(self, item: Missing[models.MenuItem] = quarrel.MISSING) -> None:
+        super().__init__(
+            custom_id=f"button-menu-item-{item.id}-run" if item else quarrel.MISSING,
+            label=item.label if item else quarrel.MISSING,
+            style=item.quarrel_style if item else quarrel.MISSING,
+            disabled=item.disabled or quarrel.MISSING if item else quarrel.MISSING,
+            url=item.url or quarrel.MISSING if item else quarrel.MISSING,
+            pattern="button-menu-item-(?P<id>[0-9]+)-run",
+        )
+
+    async def callback(
+        self, interaction: quarrel.Interaction, groups: Missing[dict[str, str]]
+    ) -> None:
+        if TYPE_CHECKING:
+            assert interaction.guild is not None
+            assert isinstance(interaction.user, quarrel.Member)
+        if (
+            item := utils.regex_groups_to_model(
+                interaction, groups, cache.get_menu_item, errors.MenuItemNotFoundError
+            )
+        ) is None:
+            return
+        if item.action is enums.MenuItemAction.NONE:
+            return
+        if item.action is enums.MenuItemAction.ADD_ROLES:
+            current_roles = interaction.user.roles
+            roles = [
+                role
+                for id in item.action_options
+                if (role := interaction.guild.get_role(id)) is not None
+                and role not in current_roles
+            ]
+            await interaction.user.edit(roles=utils.unique(roles + current_roles))
+            await interaction.respond_with_message(
+                embed=embeds.menu_item_action_added_roles(interaction, roles),
+                ephemeral=True,
+            )
+        elif item.action is enums.MenuItemAction.REMOVE_ROLES:
+            current_roles = interaction.user.roles
+            roles = [
+                role
+                for id in item.action_options
+                if (role := interaction.guild.get_role(id)) is not None
+                and role in current_roles
+            ]
+            await interaction.user.edit(
+                roles=utils.unique([i for i in current_roles if i not in roles])
+            )
+            await interaction.respond_with_message(
+                embed=embeds.menu_item_action_removed_roles(interaction, roles),
+                ephemeral=True,
+            )
+        elif item.action is enums.MenuItemAction.TOGGLE_ROLES:
+            current_roles = interaction.user.roles
+            added = [
+                role
+                for id in item.action_options
+                if (role := interaction.guild.get_role(id)) is not None
+                and role not in current_roles
+            ]
+            removed = [
+                role
+                for id in item.action_options
+                if (role := interaction.guild.get_role(id)) is not None
+                and role in current_roles
+            ]
+            await interaction.user.edit(
+                roles=utils.unique(
+                    added + [i for i in current_roles if i not in removed]
+                )
+            )
+            await interaction.respond_with_message(
+                embed=embeds.menu_item_action_toggled_roles(interaction, added, removed),
+                ephemeral=True,
+            )
+
+
+@bot.component
+class MenuInterfaceSelectMenu(CommonSelectMenu):
+    def __init__(self, item: Missing[models.MenuItem] = quarrel.MISSING) -> None:
+        super().__init__(
+            custom_id=f"select-menu-item-{item.id}-run" if item else quarrel.MISSING,
+            pattern="select-menu-item-(?P<id>[0-9]+)-run",
         )

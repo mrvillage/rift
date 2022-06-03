@@ -19,6 +19,10 @@ __all__ = (
     "menu_created",
     "menu_edited",
     "menu_list",
+    "menu_interface",
+    "menu_item_action_added_roles",
+    "menu_item_action_removed_roles",
+    "menu_item_action_toggled_roles",
 )
 
 if TYPE_CHECKING:
@@ -193,5 +197,48 @@ def menu_list(
     return utils.build_single_embed_from_user(
         author=interaction.user,
         description=strings.menu_list(menus),
+        color=consts.SUCCESS_EMBED_COLOR,
+    )
+
+
+def menu_interface(
+    guild: quarrel.Guild,
+    menu: models.Menu,
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_guild(
+        guild=guild,
+        description=menu.description,
+        color=consts.SPECIAL_EMBED_COLOR,
+    )
+
+
+def menu_item_action_added_roles(
+    interaction: quarrel.Interaction, roles: list[quarrel.Role]
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=interaction.user,
+        description=strings.menu_item_action_added_roles(roles),
+        color=consts.SUCCESS_EMBED_COLOR,
+    )
+
+
+def menu_item_action_removed_roles(
+    interaction: quarrel.Interaction, roles: list[quarrel.Role]
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=interaction.user,
+        description=strings.menu_item_action_removed_roles(roles),
+        color=consts.SUCCESS_EMBED_COLOR,
+    )
+
+
+def menu_item_action_toggled_roles(
+    interaction: quarrel.Interaction,
+    added: list[quarrel.Role],
+    removed: list[quarrel.Role],
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=interaction.user,
+        description=strings.menu_item_action_toggled_roles(added, removed),
         color=consts.SUCCESS_EMBED_COLOR,
     )
