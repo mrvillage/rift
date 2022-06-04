@@ -273,7 +273,9 @@ class MenuInterfaceButton(CommonButton, checks=[checks.button_guild_only]):
                 )
             )
             await interaction.respond_with_message(
-                embed=embeds.menu_item_action_toggled_roles(interaction, added, removed),
+                embed=embeds.menu_item_action_toggled_roles(
+                    interaction, added, removed
+                ),
                 ephemeral=True,
             )
 
