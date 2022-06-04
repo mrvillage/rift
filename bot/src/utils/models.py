@@ -13,7 +13,7 @@ T = TypeVar("T", bound="Type[ModelProtocol]")
 
 
 class ModelProtocol(Protocol):
-    __slots__ = ("id",)
+    __slots__: ClassVar[tuple[str, ...]] = ()
     TABLE: ClassVar[str]
 
     async def save(self, insert: bool = False) -> None:
