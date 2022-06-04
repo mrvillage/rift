@@ -226,29 +226,28 @@ class MenuInterfaceButton(CommonButton, checks=[checks.button_guild_only]):
         if item.action is enums.MenuItemAction.NONE:
             return
         if item.action is enums.MenuItemAction.ADD_ROLES:
-            current_roles = interaction.user.roles
             roles = [
                 role
                 for id in item.action_options
                 if (role := interaction.guild.get_role(id)) is not None
-                and role not in current_roles
             ]
-            await interaction.user.edit(roles=utils.unique(roles + current_roles))
+            for i in roles:
+                await interaction.user.add_role(i)
             await interaction.respond_with_message(
                 embed=embeds.menu_item_action_added_roles(interaction, roles),
                 ephemeral=True,
             )
         elif item.action is enums.MenuItemAction.REMOVE_ROLES:
             current_roles = interaction.user.roles
-            roles = [
-                role
-                for id in item.action_options
-                if (role := interaction.guild.get_role(id)) is not None
-                and role in current_roles
-            ]
-            await interaction.user.edit(
-                roles=utils.unique([i for i in current_roles if i not in roles])
+            roles = utils.unique(
+                (
+                    role
+                    for id in item.action_options
+                    if (role := interaction.guild.get_role(id)) is not None
+                )
             )
+            for i in roles:
+                await interaction.user.remove_role(i)
             await interaction.respond_with_message(
                 embed=embeds.menu_item_action_removed_roles(interaction, roles),
                 ephemeral=True,
@@ -267,11 +266,10 @@ class MenuInterfaceButton(CommonButton, checks=[checks.button_guild_only]):
                 if (role := interaction.guild.get_role(id)) is not None
                 and role in current_roles
             ]
-            await interaction.user.edit(
-                roles=utils.unique(
-                    added + [i for i in current_roles if i not in removed]
-                )
-            )
+            for i in added:
+                await interaction.user.add_role(i)
+            for i in removed:
+                await interaction.user.remove_role(i)
             await interaction.respond_with_message(
                 embed=embeds.menu_item_action_toggled_roles(
                     interaction, added, removed
