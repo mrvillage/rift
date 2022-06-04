@@ -43,6 +43,7 @@ class NotFoundError(RiftError):
 class AllianceNotFoundError(NotFoundError, name="alliance", infer=True):
     ...
 
+
 class ConditionNotFoundError(NotFoundError, name="condition", infer=True):
     ...
 
