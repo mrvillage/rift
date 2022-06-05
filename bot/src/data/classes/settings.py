@@ -49,6 +49,7 @@ class AllianceAutoRole:
             self.guild_id,
             self.alliance_id,
         )
+        cache.add_alliance_auto_role(self)
 
     async def delete(self) -> None:
         cache.remove_alliance_auto_role(self)
@@ -203,6 +204,7 @@ class GuildWelcomeSettings(Makeable):
             self.alliance_auto_roles_enabled,
             self.alliance_auto_role_creation_enabled,
         )
+        cache.add_guild_welcome_settings(self)
 
 
 class GuildSettings(Makeable):
@@ -252,6 +254,7 @@ class GuildSettings(Makeable):
             self.purpose_argument,
             self.manager_role_ids,
         )
+        cache.add_guild_settings(self)
 
 
 class AllianceSettings:
@@ -327,6 +330,7 @@ class AllianceSettings:
             self.offshore_id,
             self.withdraw_from_offshore,
         )
+        cache.add_alliance_settings(self)
 
     @property
     def withdraw_channels_(self) -> List[discord.TextChannel]:
