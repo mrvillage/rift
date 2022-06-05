@@ -142,7 +142,7 @@ class MenuEditModal(
 ):
     def __init__(self, menu: Missing[models.Menu] = quarrel.MISSING) -> None:
         super().__init__(
-            title="Create Menu",
+            title="Edit Menu",
             custom_id=f"modal-menu-{menu.id}-edit" if menu else quarrel.MISSING,
             pattern="modal-menu-(?P<id>[0-9]+)-edit",
         )
