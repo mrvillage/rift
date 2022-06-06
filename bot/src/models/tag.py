@@ -23,6 +23,12 @@ if TYPE_CHECKING:
 @attrs.define(weakref_slot=False, auto_attribs=True, kw_only=True, eq=False)
 class Tag:
     TABLE: ClassVar[str] = "tags"
+    IGNORE: ClassVar[tuple[str, ...]] = (
+        "expression",
+        "expression_value",
+        "use_condition_expression",
+        "use_condition_expression_value",
+    )
     id: int
     name: str
     owner_id: int
