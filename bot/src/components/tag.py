@@ -136,7 +136,7 @@ class TagEditModal(
                 style=quarrel.TextInputStyle.PARAGRAPH,
                 label="Use Condition",
                 required=True,
-                value=tag.text if tag else quarrel.MISSING,
+                value=tag.use_condition if tag else quarrel.MISSING,
                 max_length=1000,
                 attribute="use_condition",
                 custom_id="text-input-tag-edit-use-condition",
