@@ -24,7 +24,7 @@ async def handle_interaction_error(
             error = error.errors[0]
     if isinstance(error, errors.RiftError):
         await respond_with_error(interaction, error.build_embed(interaction))
-    if isinstance(error, lark.UnexpectedToken):
+    elif isinstance(error, lark.UnexpectedToken):
         await respond_with_error(
             interaction, embeds.lark_unexpected_token_error(interaction, error)
         )
