@@ -37,7 +37,7 @@ CREATED: Final[str] = "Created"
 
 
 def model_created_at(model: str) -> str:
-    return f"{model} created!"
+    return f"{model} created"
 
 
 def not_found(name: str, value: Optional[str], infer: bool = False) -> str:
