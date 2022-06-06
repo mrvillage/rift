@@ -57,7 +57,6 @@ if TYPE_CHECKING:
     class ConditionCreateCommandOptions:
         name: str
         expression: models.Condition
-        public: bool
         use_condition: Missing[models.Condition]
 
 
@@ -69,7 +68,6 @@ class ConditionCreateCommand(
     options=[
         options.NAME,
         options.EXPRESSION,
-        options.PUBLIC_DEFAULT_FALSE,
         options.USE_CONDITION_OPTIONAL,
     ],
 ):
@@ -79,7 +77,6 @@ class ConditionCreateCommand(
         await self.options.expression.edit(
             self.options.name,
             self.options.expression.get_expression(),
-            self.options.public,
             self.options.use_condition and self.options.use_condition.get_expression(),
             self.interaction.user.id,
         )
@@ -121,7 +118,6 @@ if TYPE_CHECKING:
         condition: models.Condition
         name: Missing[str]
         expression: Missing[models.Condition]
-        public: Missing[bool]
         use_condition: Missing[models.Condition]
 
 
@@ -134,7 +130,6 @@ class ConditionEditCommand(
         options.CONDITION,
         options.NAME_OPTIONAL,
         options.EXPRESSION_OPTIONAL,
-        options.PUBLIC_OPTIONAL,
         options.USE_CONDITION_EXPRESSION_OPTIONAL,
     ],
     checks=[checks.own_condition],
@@ -145,7 +140,6 @@ class ConditionEditCommand(
         await self.options.condition.edit(
             self.options.name,
             self.options.expression and self.options.expression.get_expression(),
-            self.options.public,
             self.options.use_condition and self.options.use_condition.get_expression(),
         )
         await self.interaction.respond_with_message(

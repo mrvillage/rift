@@ -9,7 +9,7 @@ from .. import utils
 __all__ = ("TargetConfig",)
 
 if TYPE_CHECKING:
-    from typing import Any, Any, ClassVar
+    from typing import Any, ClassVar
 
     from .. import flags
     from ..commands.common import CommonSlashCommand
@@ -27,7 +27,6 @@ class TargetConfig:
     condition: str
     use_condition: str
     attack: bool
-    public: bool
 
     async def save(self, insert: bool = False) -> None:
         ...

@@ -28,7 +28,6 @@ def condition(
             utils.embed_field("ID", condition.id),
             utils.embed_field("Name", condition.name),
             utils.embed_field("Owner", strings.user_mention_id(condition.owner_id)),
-            utils.embed_field("Public", condition.public),
             utils.embed_field(
                 "Use condition", f"```ts\n{condition.use_condition}```", inline=False
             ),

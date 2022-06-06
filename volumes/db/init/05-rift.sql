@@ -291,8 +291,7 @@ CREATE TABLE "target_configs" (
   "rater" integer,
   "condition" text,
   "use_condition" text,
-  "attack" boolean,
-  "public" boolean
+  "attack" boolean
 );
 
 CREATE TABLE "target_raters" (
@@ -483,7 +482,6 @@ CREATE TABLE "conditions" (
   "name" text,
   "owner_id" bigint,
   "value" text,
-  "public" boolean,
   "use_condition" text
 );
 

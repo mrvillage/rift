@@ -36,7 +36,6 @@ class Condition:
     value: str
     expression: Optional[lang.Expression] = attrs.field(default=None)
     expression_value: str = attrs.field(default="")
-    public: bool
     use_condition: str
     use_condition_expression: Optional[lang.Expression] = attrs.field(default=None)
     use_condition_expression_value: str = attrs.field(default="")
@@ -66,7 +65,6 @@ class Condition:
         name: str,
         owner_id: int,
         condition: lang.Expression,
-        public: bool,
         use_condition: lang.Expression,
     ) -> Condition:
         return cls(
@@ -74,7 +72,6 @@ class Condition:
             name=name,
             owner_id=owner_id,
             value=str(condition),
-            public=public,
             use_condition=str(use_condition),
         )
 
@@ -92,21 +89,25 @@ class Condition:
         name: str,
         owner_id: int,
         condition: lang.Expression,
-        public: bool,
         use_condition: lang.Expression,
     ) -> Condition:
-        self = cls.assemble(name, owner_id, condition, public, use_condition)
+        self = cls.assemble(name, owner_id, condition, use_condition)
         await self.save()
         cache.add_condition(self)
         return self
 
     @classmethod
     def parse(cls, command: CommonSlashCommand[Any], value: str) -> Condition:
+        return cls.parse_from_interaction(command.interaction, value)
+
+    @classmethod
+    def parse_from_interaction(
+        cls, interaction: quarrel.Interaction, value: str
+    ) -> Condition:
         return Condition.assemble(
             "",
-            command.interaction.user.id,
+            interaction.user.id,
             lang.parse_expression(value),
-            False,
             lang.parse_expression("false"),
         )
 
@@ -114,17 +115,14 @@ class Condition:
         return embeds.condition(interaction, self)
 
     def can_use(self, user: MemberOrUser) -> bool:
-        return (
-            self.public
-            or user.id == self.owner_id
-            or utils.evaluate_in_default_scope(self.get_use_condition(), user=user)
+        return user.id == self.owner_id or utils.evaluate_in_default_scope(
+            self.get_use_condition(), user=user
         )
 
     async def edit(
         self,
         name: Missing[str],
         condition: Missing[lang.Expression],
-        public: Missing[bool],
         use_condition: Missing[lang.Expression],
         owner_id: Missing[int] = quarrel.MISSING,
     ) -> None:
@@ -132,8 +130,6 @@ class Condition:
             self.name = name
         if condition is not quarrel.MISSING:
             self.value = str(condition)
-        if public is not quarrel.MISSING:
-            self.public = public
         if use_condition is not quarrel.MISSING:
             self.use_condition = str(use_condition)
         if owner_id is not quarrel.MISSING:
