@@ -34,7 +34,7 @@ def nation_linked_to(nation: models.Nation) -> str:
 
 
 def color_and_beige_turns(beige_turns: int) -> str:
-    return f"Beige ({beige_turns} turns)."
+    return f"Beige ({beige_turns} turns)"
 
 
 def alliance_link(alliance: models.Alliance, text: Any) -> str:
