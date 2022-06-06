@@ -110,4 +110,4 @@ def model_strs_compare(
     lower_value: str,
     values_to_compare: set[str],
 ) -> bool:
-    return any(getattr(model, i, "") == lower_value for i in values_to_compare)
+    return any(getattr(model, i, "").lower() == lower_value for i in values_to_compare)
