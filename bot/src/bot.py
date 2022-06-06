@@ -35,4 +35,4 @@ bot = Bot(
 
 @bot.event
 async def on_ready() -> None:
-    print("Ready!")
+    print("Ready!", flush=True)
