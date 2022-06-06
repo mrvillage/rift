@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from .. import cache, checks, components, embeds, models, options
+from ..bot import bot
 from .common import CommonSlashCommand
 
 __all__ = ()
@@ -14,6 +15,7 @@ if TYPE_CHECKING:
         ...
 
 
+@bot.command
 class TagCommand(
     CommonSlashCommand["TagCommandOptions"],
     name="tag",
