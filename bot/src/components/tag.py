@@ -40,6 +40,7 @@ class TagCreateModal(
                 label="Name",
                 required=True,
                 max_length=50,
+                custom_id="text-input-tag-create-name",
             ),
         )
         self.add_component(
@@ -49,6 +50,7 @@ class TagCreateModal(
                 label="Text",
                 required=True,
                 max_length=4000,
+                custom_id="text-input-tag-create-text",
             )
         )
         self.add_component(
@@ -60,6 +62,7 @@ class TagCreateModal(
                 max_length=1000,
                 attribute="use_condition",
                 value="false",
+                custom_id="text-input-tag-create-use-condition",
             )
         )
 
@@ -113,6 +116,7 @@ class TagEditModal(
                 required=True,
                 value=tag.name if tag else quarrel.MISSING,
                 max_length=50,
+                custom_id="text-input-tag-edit-name",
             ),
         )
         self.add_component(
@@ -123,6 +127,7 @@ class TagEditModal(
                 required=True,
                 value=tag.text if tag else quarrel.MISSING,
                 max_length=4000,
+                custom_id="text-input-tag-edit-text",
             )
         )
         self.add_component(
@@ -134,6 +139,7 @@ class TagEditModal(
                 value=tag.text if tag else quarrel.MISSING,
                 max_length=1000,
                 attribute="use_condition",
+                custom_id="text-input-tag-edit-use-condition",
             )
         )
 

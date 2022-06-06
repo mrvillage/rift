@@ -96,6 +96,7 @@ class MenuCreateModal(
                 label="Name",
                 required=True,
                 max_length=50,
+                custom_id="text-input-menu-create-name",
             ),
         )
         self.add_component(
@@ -105,6 +106,7 @@ class MenuCreateModal(
                 label="Description",
                 required=True,
                 max_length=1000,
+                custom_id="text-input-menu-create-description",
             )
         )
 
@@ -154,6 +156,7 @@ class MenuEditModal(
                 required=True,
                 value=menu.name if menu else quarrel.MISSING,
                 max_length=50,
+                custom_id="text-input-menu-edit-name",
             ),
         )
         self.add_component(
@@ -164,6 +167,7 @@ class MenuEditModal(
                 required=True,
                 value=menu.description if menu else quarrel.MISSING,
                 max_length=1000,
+                custom_id="text-input-menu-edit-description",
             )
         )
 
