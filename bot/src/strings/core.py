@@ -22,7 +22,10 @@ __all__ = (
     "model_deleted",
     "model_edited",
     "model_list",
+    "channel_mention_id",
+    "role_mention_id",
     "user_mention_id",
+    "USER_PROVIDED_CONTENT_DISCLAIMER",
 )
 
 if TYPE_CHECKING:
@@ -99,5 +102,18 @@ def model_list(
     return f"{length:,} {plural} found!\n\n{joined}"
 
 
+def channel_mention_id(id: int) -> str:
+    return f"<#{id}>"
+
+
+def role_mention_id(id: int) -> str:
+    return f"<@&{id}>"
+
+
 def user_mention_id(id: int) -> str:
     return f"<@{id}>"
+
+
+USER_PROVIDED_CONTENT_DISCLAIMER: Final[
+    str
+] = "This content is provided by a user. Rift takes no responsibility for the content or anything caused by it."
