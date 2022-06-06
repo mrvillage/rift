@@ -106,7 +106,9 @@ class TagEditCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        await self.interaction.respond_with_modal(modal=components.TagEditModal(self.options.tag))
+        await self.interaction.respond_with_modal(
+            modal=components.TagEditModal(self.options.tag)
+        )
 
 
 if TYPE_CHECKING:
