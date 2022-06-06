@@ -59,6 +59,7 @@ class TagCreateModal(
                 required=True,
                 max_length=1000,
                 attribute="use_condition",
+                value="false",
             )
         )
 
