@@ -1086,7 +1086,7 @@ class Settings(commands.Cog):
         type=commands.CommandType.chat_input,
         descriptions={
             "roles": "The new verified roles, given by space separated role mentions.",
-            "clear": "Set to True to clear the join roles.",
+            "clear": "Set to True to clear the verified roles.",
         },
     )
     @has_manage_permissions()
@@ -1144,7 +1144,7 @@ class Settings(commands.Cog):
         type=commands.CommandType.chat_input,
         descriptions={
             "roles": "The new alliance member roles, given by space separated role mentions.",
-            "clear": "Set to True to clear the join roles.",
+            "clear": "Set to True to clear the member roles.",
         },
     )
     @has_manage_permissions()
@@ -1332,7 +1332,7 @@ class Settings(commands.Cog):
                 return await ctx.reply(
                     embed=funcs.get_embed_author_member(
                         ctx.author,
-                        description=f"The join roles are:\n\n{''.join(f'<@&{i}>' for i in settings.manager_role_ids)}",
+                        description=f"The manager roles are:\n\n{''.join(f'<@&{i}>' for i in settings.manager_role_ids)}",
                         color=discord.Color.green(),
                     ),
                     ephemeral=True,
