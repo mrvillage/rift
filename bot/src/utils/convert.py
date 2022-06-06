@@ -3,7 +3,9 @@ from __future__ import annotations
 import contextlib
 from typing import TYPE_CHECKING
 
-from .. import cache, errors, models
+import quarrel
+
+from .. import cache, enums, errors, models
 
 __all__ = (
     "convert_comma_separated_ints",
@@ -11,12 +13,15 @@ __all__ = (
     "self_nation",
     "self_alliance",
     "nation_or_alliance",
+    "convert_model",
 )
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Any, Callable, Iterable, Optional, TypeVar
 
     from ..commands.common import CommonSlashCommand
+
+    T = TypeVar("T")
 
 
 def convert_comma_separated_ints(value: str) -> list[int]:
@@ -56,3 +61,53 @@ async def nation_or_alliance(
     with contextlib.suppress(errors.AllianceNotFoundError):
         return await models.Alliance.convert(command, value)
     raise errors.NationOrAllianceNotFoundError(command.interaction, value)
+
+
+def convert_model(
+    type: enums.ConvertType,
+    interaction: quarrel.Interaction,
+    value: str,
+    getter: Callable[[int], Optional[T]],
+    values: Iterable[T],
+    values_to_compare: str | set[str],
+    error: type[Exception],
+    *,
+    can_use: bool = False,
+) -> T:  # sourcery skip: move-assign
+    if isinstance(values_to_compare, str):
+        values_to_compare = {values_to_compare}
+    value = value.strip()
+    with contextlib.suppress(ValueError):
+        got = getter(convert_int(value))
+        if got is not None and (not can_use or got.can_use(interaction.user)):  # type: ignore
+            return got
+    lower_value = value.lower()
+    if type.value >= 2 and values is not None:
+        if (
+            len(
+                l := [
+                    i
+                    for i in values
+                    if model_strs_compare(i, lower_value, values_to_compare)
+                    and (not can_use or i.can_use(interaction.user))  # type: ignore
+                ]
+            )
+            == 1
+        ):
+            return l[0]
+        # add conversions for startswith and endswith, no "the", and partial using in operator
+    if type.value >= 3:
+        ...  # fuzzy matching here
+    raise error(interaction, value)
+
+
+def str_remove_the(value: str) -> str:
+    return value[3:].strip() if value.startswith("the") else value
+
+
+def model_strs_compare(
+    model: Any,
+    lower_value: str,
+    values_to_compare: set[str],
+) -> bool:
+    return any(getattr(model, i, "") == lower_value for i in values_to_compare)

@@ -1,4 +1,5 @@
 from .audit_log import *
+from .convert import *
 from .grant import *
 from .guild_settings import *
 from .interview import *
