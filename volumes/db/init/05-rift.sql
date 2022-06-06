@@ -387,7 +387,7 @@ CREATE TABLE "tickets" (
   "guild_id" bigint,
   "channel_id" bigint,
   "owner_id" bigint,
-  "archived" boolean
+  "closed" boolean
 );
 
 CREATE TABLE "embassy_configs" (

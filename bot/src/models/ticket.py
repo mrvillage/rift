@@ -22,7 +22,7 @@ class Ticket:
     guild_id: int
     channel_id: int
     owner_id: int
-    archived: bool
+    closed: bool
 
     async def save(self, insert: bool = False) -> None:
         ...
