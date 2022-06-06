@@ -46,7 +46,7 @@ def alliance_link_using_name(alliance: Optional[models.Alliance]) -> str:
 
 
 def city_manager_link(nation: models.Nation, text: Any) -> str:
-    return f"[{text}](https://politicsandwar.com/?id=62&n={'+'.join(nation.name.split(' '))})"
+    return f"[{text}](https://politicsandwar.com/index.php?id=62&n={'+'.join(nation.name.split(' '))})"
 
 
 def vacation_mode(turns: int) -> str:
