@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 from typing import TYPE_CHECKING
 
 import attrs
@@ -65,11 +64,15 @@ class MenuItem:
 
     @classmethod
     async def convert(cls, command: CommonSlashCommand[Any], value: str) -> MenuItem:
-        with contextlib.suppress(ValueError):
-            item = cache.get_menu_item(utils.convert_int(value))
-            if item is not None:
-                return item
-        raise errors.MenuItemNotFoundError(command.interaction, value)
+        return utils.convert_model(
+            enums.ConvertType.ID,
+            command.interaction,
+            value,
+            cache.get_menu_item,
+            set(),
+            set(),
+            errors.MenuItemNotFoundError,
+        )
 
     @classmethod
     async def create(

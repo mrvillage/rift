@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import datetime
 from typing import TYPE_CHECKING
 
@@ -119,11 +118,15 @@ class Alliance:
 
     @classmethod
     async def convert(cls, command: CommonSlashCommand[Any], value: str) -> Alliance:
-        with contextlib.suppress(ValueError):
-            alliance = cache.get_alliance(utils.convert_int(value))
-            if alliance is not None:
-                return alliance
-        raise errors.AllianceNotFoundError(command.interaction, value)
+        return utils.convert_model(
+            enums.ConvertType.FUZZY,
+            command.interaction,
+            value,
+            cache.get_alliance,
+            cache.alliances,
+            {"name", "acronym"},
+            errors.AllianceNotFoundError,
+        )
 
     def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
         return embeds.alliance(interaction, self)

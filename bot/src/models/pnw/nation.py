@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import datetime
 import decimal
 from typing import TYPE_CHECKING
@@ -167,11 +166,15 @@ class Nation:
 
     @classmethod
     async def convert(cls, command: CommonSlashCommand[Any], value: str) -> Nation:
-        with contextlib.suppress(ValueError):
-            nation = cache.get_nation(utils.convert_int(value))
-            if nation is not None:
-                return nation
-        raise errors.NationNotFoundError(command.interaction, value)
+        return utils.convert_model(
+            enums.ConvertType.FUZZY,
+            command.interaction,
+            value,
+            cache.get_nation,
+            cache.nations,
+            {"name", "leader"},
+            errors.NationNotFoundError,
+        )
 
     def build_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
         return embeds.nation(interaction, self)

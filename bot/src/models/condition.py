@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-import contextlib
 from typing import TYPE_CHECKING
 
 import attrs
 import lang
 import quarrel
 
-from .. import cache, embeds, errors, utils
+from .. import cache, embeds, enums, errors, utils
 
 __all__ = ("Condition",)
 
@@ -77,11 +76,16 @@ class Condition:
 
     @classmethod
     async def convert(cls, command: CommonSlashCommand[Any], value: str) -> Condition:
-        with contextlib.suppress(ValueError):
-            condition = cache.get_condition(utils.convert_int(value))
-            if condition is not None:
-                return condition
-        raise errors.ConditionNotFoundError(command.interaction, value)
+        return utils.convert_model(
+            enums.ConvertType.STR_EQ,
+            command.interaction,
+            value,
+            cache.get_condition,
+            cache.conditions,
+            "name",
+            errors.ConditionNotFoundError,
+            can_use=True,
+        )
 
     @classmethod
     async def create(

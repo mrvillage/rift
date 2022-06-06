@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import attrs
 import quarrel
 
-from ... import cache, components, consts, embeds, errors, models, utils
+from ... import cache, components, consts, embeds, enums, errors, models, utils
 
 __all__ = ("Menu",)
 
@@ -54,11 +54,15 @@ class Menu:
 
     @classmethod
     async def convert(cls, command: CommonSlashCommand[Any], value: str) -> Menu:
-        with contextlib.suppress(ValueError):
-            menu = cache.get_menu(utils.convert_int(value))
-            if menu is not None:
-                return menu
-        raise errors.MenuNotFoundError(command.interaction, value)
+        return utils.convert_model(
+            enums.ConvertType.STR_EQ,
+            command.interaction,
+            value,
+            cache.get_menu,
+            {i for i in cache.menus if i.guild_id == command.interaction.guild_id},
+            "name",
+            errors.MenuNotFoundError,
+        )
 
     @classmethod
     async def create(cls, guild_id: int, name: str, description: str) -> Menu:
