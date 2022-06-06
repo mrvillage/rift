@@ -105,7 +105,6 @@ if TYPE_CHECKING:
         condition: quarrel.Missing[models.Condition]
         use_condition: quarrel.Missing[models.Condition]
         attack: bool
-        public: bool
 
 
 class TargetConfigCreateCommand(
@@ -119,7 +118,6 @@ class TargetConfigCreateCommand(
         options.CONDITION_OPTIONAL,
         options.USE_CONDITION_OPTIONAL,
         options.TARGET_FIND_ATTACK,
-        options.PUBLIC_DEFAULT_FALSE,
     ],
 ):
     __slots__ = ()
@@ -156,7 +154,6 @@ if TYPE_CHECKING:
         condition: quarrel.Missing[models.Condition]
         use_condition: quarrel.Missing[models.Condition]
         attack: quarrel.Missing[bool]
-        public: quarrel.Missing[bool]
 
 
 class TargetConfigEditCommand(
@@ -171,7 +168,6 @@ class TargetConfigEditCommand(
         options.CONDITION_OPTIONAL,
         options.USE_CONDITION_OPTIONAL,
         options.TARGET_FIND_ATTACK_OPTIONAL,
-        options.PUBLIC_OPTIONAL,
     ],
 ):
     __slots__ = ()
