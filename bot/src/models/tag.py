@@ -53,6 +53,9 @@ class Tag:
     def update(self, data: Tag) -> Tag:
         ...
 
+    def __str__(self) -> str:
+        return f"{self.name} ({self.id})"
+
     def build_display_embed(self, interaction: quarrel.Interaction) -> quarrel.Embed:
         return embeds.tag_display(interaction, self)
 
