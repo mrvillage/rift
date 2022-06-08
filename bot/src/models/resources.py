@@ -79,3 +79,33 @@ class Resources:
         yield self.steel
         yield self.aluminum
         yield self.food
+
+    def __str__(self) -> str:
+        resources = [
+            i
+            for i in (
+                ("Money", self.money),
+                ("Food", self.food),
+                ("Coal", self.coal),
+                ("Oil", self.oil),
+                ("Uranium", self.uranium),
+                ("Lead", self.lead),
+                ("Iron", self.iron),
+                ("Bauxite", self.bauxite),
+                ("Gasoline", self.gasoline),
+                ("Munitions", self.munitions),
+                ("Steel", self.steel),
+                ("Aluminum", self.aluminum),
+            )
+            if i[1] != 0
+        ]
+        if not resources:
+            return "None"
+        return ", ".join(
+            f"{value:,.2f} {name}"
+            if name != "Money"
+            else f"${value:,.2f}"
+            if value >= 0
+            else f"-${-value:,.2f}"
+            for name, value in resources
+        )
