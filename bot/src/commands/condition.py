@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .. import cache, checks, embeds, models, options
+from .. import cache, checks, embeds, models, options, utils
 from ..bot import bot
 from .common import CommonSlashCommand
 
@@ -164,15 +164,7 @@ class ConditionListCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        conditions = sorted(
-            {
-                i
-                for i in cache.conditions
-                if i.owner_id == self.options.user.id
-                and i.can_use(self.interaction.user)
-            },
-            key=lambda i: i.id,
-        )
         await self.interaction.respond_with_message(
-            embed=embeds.condition_list(self.interaction, conditions),
+            embed=embeds.condition_list(self.interaction, utils.sort_models_by_id(cache.conditions, lambda x: x.owner_id == self.options.user.id
+                and x.can_use(self.interaction.user))),
         )

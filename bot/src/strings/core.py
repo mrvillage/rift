@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import quarrel
+
 from .. import utils
+from ..bot import bot
 
 __all__ = (
     "COMMAND_IS_GUILD_ONLY",
@@ -13,6 +16,7 @@ __all__ = (
     "SUPPORT_SERVER",
     "FATAL_ERROR",
     "NONE",
+    "UNKNOWN",
     "click_here_link_or_none",
     "missing_discord_permissions",
     "model_created_id",
@@ -26,6 +30,8 @@ __all__ = (
     "role_mention_id",
     "user_mention_id",
     "USER_PROVIDED_CONTENT_DISCLAIMER",
+    "display_bool",
+    "category_name_id",
 )
 
 if TYPE_CHECKING:
@@ -55,6 +61,7 @@ FATAL_ERROR: Final[
     str
 ] = f"Uh oh! Something went wrong! Please try again later. If you need further assistance or the problem persists please join the support server [here]({SUPPORT_SERVER}) or context <@258298021266063360>."
 NONE: Final[str] = "None"
+UNKNOWN: Final[str] = "Unknown"
 
 
 def click_here_link_or_none(link: Optional[str]) -> str:
@@ -117,3 +124,19 @@ def user_mention_id(id: int) -> str:
 USER_PROVIDED_CONTENT_DISCLAIMER: Final[
     str
 ] = "This content is provided by a user. Rift takes no responsibility for the content or anything caused by it."
+
+
+def display_bool(value: bool) -> str:
+    return "Yes" if value else "No"
+
+
+def category_name_id(guild_id: int, id: int) -> str:
+    guild = bot.get_guild(guild_id)
+    if guild is None:
+        return UNKNOWN
+    category = guild.get_channel(id)
+    return (
+        category.name
+        if category and category.type is quarrel.ChannelType.GUILD_CATEGORY
+        else UNKNOWN
+    )

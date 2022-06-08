@@ -377,7 +377,9 @@ CREATE TABLE "ticket_configs" (
   "mention_ids" integer[],
   "default" boolean,
   "name_format" text,
-  "interview_config_id" integer
+  "interview_config_id" integer,
+  "close_action" smallint,
+  "transcript_channel_id" bigint
 );
 
 CREATE TABLE "tickets" (

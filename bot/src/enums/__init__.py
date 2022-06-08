@@ -7,4 +7,5 @@ from .mention import *
 from .menu import *
 from .pnw import *
 from .role import *
+from .ticket import *
 from .transaction import *

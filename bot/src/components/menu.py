@@ -80,7 +80,7 @@ class MenuCreateModal(
     quarrel.Modal["MenuCreateModalComponents"],
     checks=[
         checks.modal_guild_only,
-        checks.modal_has_guild_role_permissions(manage_menus=True),
+        checks.modal_has_discord_role_permissions(manage_guild=True),
     ],
 ):
     def __init__(self) -> None:
@@ -139,7 +139,7 @@ class MenuEditModal(
     quarrel.Modal["MenuEditModalComponents"],
     checks=[
         checks.modal_guild_only,
-        checks.modal_has_guild_role_permissions(manage_menus=True),
+        checks.modal_has_discord_role_permissions(manage_guild=True),
     ],
 ):
     def __init__(self, menu: Missing[models.Menu] = quarrel.MISSING) -> None:
@@ -229,6 +229,14 @@ class MenuInterfaceButton(CommonButton, checks=[checks.button_guild_only]):
             return
         if item.action is enums.MenuItemAction.NONE:
             return
+        if not any(
+            i.guild_id == i.guild_id
+            and i.channel_id == i.channel_id
+            and i.message_id == (interaction.message and interaction.message.id)
+            and i.menu_id == item.menu_id
+            for i in cache.menu_interfaces
+        ):
+            return
         if item.action is enums.MenuItemAction.ADD_ROLES:
             roles = [
                 role
@@ -278,6 +286,17 @@ class MenuInterfaceButton(CommonButton, checks=[checks.button_guild_only]):
                 embed=embeds.menu_item_action_toggled_roles(
                     interaction, added, removed
                 ),
+                ephemeral=True,
+            )
+        elif item.action is enums.MenuItemAction.CREATE_TICKETS:
+            configs = {
+                c
+                for i in item.action_options
+                if (c := cache.get_ticket_config(i)) is not None
+            }
+            tickets = [await i.open_ticket(interaction.user) for i in configs]
+            await interaction.respond_with_message(
+                embed=embeds.menu_item_action_created_tickets(interaction, tickets),
                 ephemeral=True,
             )
 

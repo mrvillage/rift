@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .. import cache, checks, components, embeds, models, options
+from .. import cache, checks, components, embeds, models, options, utils
 from ..bot import bot
 from .common import CommonSlashCommand
 
@@ -127,9 +127,11 @@ class TagListCommand(
 
     async def callback(self) -> None:
         user = self.interaction.user
-        tags = [i for i in cache.tags if i.can_use(user)]
         await self.interaction.respond_with_message(
-            embed=embeds.tag_list(self.interaction, tags),
+            embed=embeds.tag_list(
+                self.interaction,
+                utils.sort_models_by_id(cache.tags, lambda x: x.can_use(user)),
+            ),
         )
 
 

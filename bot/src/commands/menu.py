@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import quarrel
 
-from .. import cache, checks, components, embeds, enums, errors, models, options
+from .. import cache, checks, components, embeds, enums, errors, models, options, utils
 from ..bot import bot
 from .common import CommonSlashCommand
 
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 class CommonMenuSlashCommand(
     CommonSlashCommand["T"],
-    checks=[checks.guild_only, checks.has_guild_role_permissions(manage_menus=True)],
+    checks=[checks.guild_only, checks.has_discord_role_permissions(manage_guild=True)],
 ):
     ...
 
@@ -295,7 +295,6 @@ class MenuListCommand(
     name="list",
     description="List all the menus in a server.",
     parent=MenuCommand,
-    options=[],
 ):
     __slots__ = ()
 
@@ -303,9 +302,8 @@ class MenuListCommand(
         await self.interaction.respond_with_message(
             embed=embeds.menu_list(
                 self.interaction,
-                sorted(
-                    (i for i in cache.menus if i.guild_id == self.interaction.guild_id),
-                    key=lambda i: i.id,
+                utils.sort_models_by_id(
+                    cache.menus, lambda x: x.guild_id == self.interaction.guild_id
                 ),
             )
         )

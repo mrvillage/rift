@@ -23,6 +23,10 @@ __all__ = (
     "PUBLIC_OPTIONAL",
     "PUBLIC_DEFAULT_TRUE",
     "PUBLIC_DEFAULT_FALSE",
+    "CATEGORY",
+    "CATEGORY_OPTIONAL",
+    "DEFAULT_BOOL",
+    "DEFAULT_BOOL_OPTIONAL",
 )
 
 
@@ -78,3 +82,16 @@ PUBLIC = CommonOption(
 PUBLIC_OPTIONAL = PUBLIC(default=utils.default_missing)
 PUBLIC_DEFAULT_TRUE = PUBLIC(default=True)
 PUBLIC_DEFAULT_FALSE = PUBLIC(default=False)
+CATEGORY = CommonOption(
+    type=quarrel.ApplicationCommandOptionType.CHANNEL,
+    name="category",
+    description="The category to use.",
+    channel_types=[quarrel.ChannelType.GUILD_CATEGORY],
+)
+CATEGORY_OPTIONAL = CATEGORY(default=utils.default_missing)
+DEFAULT_BOOL = CommonOption(
+    type=quarrel.ApplicationCommandOptionType.BOOLEAN,
+    name="default",
+    description="Whether this should be the default or not.",
+)
+DEFAULT_BOOL_OPTIONAL = DEFAULT_BOOL(default=utils.default_missing)

@@ -23,6 +23,7 @@ __all__ = (
     "menu_item_action_added_roles",
     "menu_item_action_removed_roles",
     "menu_item_action_toggled_roles",
+    "menu_item_action_created_tickets",
 )
 
 if TYPE_CHECKING:
@@ -240,5 +241,16 @@ def menu_item_action_toggled_roles(
     return utils.build_single_embed_from_user(
         author=interaction.user,
         description=strings.menu_item_action_toggled_roles(added, removed),
+        color=consts.SUCCESS_EMBED_COLOR,
+    )
+
+
+def menu_item_action_created_tickets(
+    interaction: quarrel.Interaction,
+    tickets: list[models.Ticket],
+) -> quarrel.Embed:
+    return utils.build_single_embed_from_user(
+        author=interaction.user,
+        description=strings.menu_item_action_created_tickets(tickets),
         color=consts.SUCCESS_EMBED_COLOR,
     )

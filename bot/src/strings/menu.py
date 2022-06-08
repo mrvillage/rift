@@ -23,6 +23,7 @@ __all__ = (
     "menu_item_action_added_roles",
     "menu_item_action_removed_roles",
     "menu_item_action_toggled_roles",
+    "menu_item_action_created_tickets",
 )
 
 if TYPE_CHECKING:
@@ -111,3 +112,13 @@ def menu_item_action_toggled_roles(
     added: list[quarrel.Role], removed: list[quarrel.Role]
 ) -> str:
     return f"{menu_item_action_added_roles(added)}\n{menu_item_action_removed_roles(removed)}"
+
+
+def menu_item_action_created_tickets(
+    tickets: list[models.Ticket],
+) -> str:
+    return (
+        f"Created tickets {', '.join(ticket.mention for ticket in tickets)}!"
+        if tickets
+        else "No tickets created!"
+    )

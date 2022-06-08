@@ -14,6 +14,8 @@ __all__ = (
     "NationNotFoundError",
     "NationOrAllianceNotFoundError",
     "TagNotFoundError",
+    "TicketConfigNotFoundError",
+    "TicketNotFoundError",
 )
 
 if TYPE_CHECKING:
@@ -66,4 +68,12 @@ class NationOrAllianceNotFoundError(NotFoundError, name="nation or alliance"):
 
 
 class TagNotFoundError(NotFoundError, name="tag"):
+    ...
+
+
+class TicketConfigNotFoundError(NotFoundError, name="ticket config"):
+    ...
+
+
+class TicketNotFoundError(NotFoundError, name="ticket"):
     ...

@@ -16,14 +16,23 @@ __all__ = (
     "sleep_until",
     "utcnow",
     "default_missing",
+    "default_none",
+    "default_true",
+    "default_false",
     "snake_case_to_capitals",
     "unique",
+    "sort_models_by_id",
 )
 
 if TYPE_CHECKING:
-    from typing import Any, Coroutine, Iterable, TypeVar
+    from typing import Any, Callable, Coroutine, Iterable, Optional, Protocol, TypeVar
 
     T = TypeVar("T")
+
+    class IDProtocol(Protocol):
+        id: int
+
+    M = TypeVar("M", bound=IDProtocol)
 
 
 def print_exception_with_header(header: str, error: Exception) -> None:
@@ -57,9 +66,28 @@ def default_missing(*_: Any) -> Any:
     return quarrel.MISSING
 
 
+def default_none(*_: Any) -> Any:
+    return None
+
+
+def default_true(*_: Any) -> bool:
+    return True
+
+
+def default_false(*_: Any) -> bool:
+    return False
+
+
 def snake_case_to_capitals(value: str) -> str:
     return " ".join(i.capitalize() for i in value.split("_"))
 
 
 def unique(iterable: Iterable[T]) -> list[T]:
     return reduce(lambda a, b: a if b in a else a + [b], iterable, [])  # type: ignore
+
+
+def sort_models_by_id(
+    iterable: Iterable[M], predicate: Optional[Callable[[M], bool]] = None
+) -> list[M]:
+    predicate = predicate or (lambda _: True)
+    return sorted((i for i in iterable if predicate(i)), key=lambda i: i.id)
