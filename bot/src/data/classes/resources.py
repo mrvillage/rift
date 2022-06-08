@@ -77,6 +77,8 @@ class Resources:
             )
             if i[1] != 0
         ]
+        if not resources:
+            return "None"
         return ", ".join(
             f"{value:,.2f} {name}" if name != "Money" else f"${value:,.2f}"
             for name, value in resources
