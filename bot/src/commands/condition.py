@@ -165,6 +165,12 @@ class ConditionListCommand(
 
     async def callback(self) -> None:
         await self.interaction.respond_with_message(
-            embed=embeds.condition_list(self.interaction, utils.sort_models_by_id(cache.conditions, lambda x: x.owner_id == self.options.user.id
-                and x.can_use(self.interaction.user))),
+            embed=embeds.condition_list(
+                self.interaction,
+                utils.sort_models_by_id(
+                    cache.conditions,
+                    lambda x: x.owner_id == self.options.user.id
+                    and x.can_use(self.interaction.user),
+                ),
+            ),
         )
