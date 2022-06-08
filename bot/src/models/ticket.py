@@ -132,6 +132,11 @@ class Ticket:
             # type not narrowed to CategoryChannel
             parent=owner.guild.get_channel(config.category_id) or quarrel.MISSING,  # type: ignore
         )
+        await channel.edit_permission_overwrite(
+            quarrel.PermissionOverwrite.from_member(
+                owner, allow=quarrel.Permissions(send_messages=True, view_channel=True)
+            )
+        )
         return await cls.create(
             ticket_number=ticket_number,
             config=config,
