@@ -9,9 +9,7 @@ from .. import utils
 __all__ = ("CommonButton", "CommonSelectMenu", "CommonGrid")
 
 if TYPE_CHECKING:
-    from typing import TypeVar
-
-    C = TypeVar("C")
+    ...
 
 
 class CommonButton(quarrel.Button):
@@ -33,8 +31,4 @@ class CommonSelectMenu(quarrel.SelectMenu):
 
 
 class CommonGrid(quarrel.Grid):
-    ...
-
-
-class CommonModal(quarrel.Modal[C]):
     ...
