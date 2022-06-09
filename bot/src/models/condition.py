@@ -108,7 +108,7 @@ class Condition:
     def parse_from_interaction(
         cls, interaction: quarrel.Interaction, value: str
     ) -> Condition:
-        return Condition.assemble(
+        return cls.assemble(
             "",
             interaction.user.id,
             lang.parse_expression(value),

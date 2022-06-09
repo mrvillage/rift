@@ -92,7 +92,7 @@ class Tag:
             name=name,
             owner_id=owner_id,
             text=text,
-            use_condition=str(use_condition),
+            use_condition=use_condition.value,
         )
         await self.save(insert=True)
         cache.add_tag(self)
