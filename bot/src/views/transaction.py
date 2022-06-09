@@ -272,7 +272,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                         await owner.send(
                             embed=funcs.get_embed_author_member(
                                 interaction.user,
-                                f"Your {'grant ' if transaction.type is TransactionType.GRANT_WITHDRAW else ''}withdrawl request has failed. Transaction #{transaction.id}.",
+                                f"Your {'grant ' if transaction.type is TransactionType.GRANT_WITHDRAW else ''}withdrawal request has failed. Transaction #{transaction.id}.",
                                 color=discord.Color.red(),
                             )
                         )
@@ -352,7 +352,7 @@ class TransactionRequestAcceptButton(discord.ui.Button[TransactionRequestView]):
                     await owner.send(
                         embed=funcs.get_embed_author_member(
                             interaction.user,
-                            f"Your {'grant ' if transaction.type is TransactionType.GRANT_WITHDRAW else ''}withdrawl request has been approved and the resources sent! Transaction #{transaction.id}.",
+                            f"Your {'grant ' if transaction.type is TransactionType.GRANT_WITHDRAW else ''}withdrawal request has been approved and the resources sent! Transaction #{transaction.id}.",
                             color=discord.Color.green(),
                         )
                     )
@@ -501,7 +501,7 @@ class TransactionRequestManualAcceptButton(discord.ui.Button[TransactionRequestV
                     await owner.send(
                         embed=funcs.get_embed_author_member(
                             interaction.user,
-                            f"Your withdrawl request has failed. Transaction #{transaction.id}.",
+                            f"Your withdrawal request has failed. Transaction #{transaction.id}.",
                             color=discord.Color.red(),
                         )
                     )
@@ -564,7 +564,7 @@ class TransactionRequestManualAcceptButton(discord.ui.Button[TransactionRequestV
                 await owner.send(
                     embed=funcs.get_embed_author_member(
                         interaction.user,
-                        f"Your {'grant ' if transaction.type is TransactionType.GRANT_WITHDRAW else ''}withdrawl request has been approved! Please wait for the resources to be sent. Transaction #{transaction.id}.",
+                        f"Your {'grant ' if transaction.type is TransactionType.GRANT_WITHDRAW else ''}withdrawal request has been approved! Please wait for the resources to be sent. Transaction #{transaction.id}.",
                         color=discord.Color.green(),
                     )
                 )
@@ -630,7 +630,7 @@ class TransactionRequestRejectButton(discord.ui.Button[TransactionRequestView]):
                 await owner.send(
                     embed=funcs.get_embed_author_member(
                         interaction.user,
-                        f"Your {'grant ' if self.transaction.type is TransactionType.GRANT_WITHDRAW else ''}withdrawl request has been rejected! Please wait for the resources to be sent. Transaction #{self.transaction.id}.",
+                        f"Your {'grant ' if self.transaction.type is TransactionType.GRANT_WITHDRAW else ''}withdrawal request has been rejected! Please wait for the resources to be sent. Transaction #{self.transaction.id}.",
                         color=discord.Color.red(),
                     )
                 )
