@@ -3,13 +3,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Union
 
 from ...cache import cache
+from ...ref import bot
 from ..db import execute_query
 
 __all__ = ("User",)
 
 if TYPE_CHECKING:
     import discord
-
     from _typings import UserData
 
     from ..classes import Nation
@@ -29,6 +29,7 @@ class User:
         user_ = cls({"user_": user.id, "nation": nation.id})
         await user_.save()
         cache.add_user(user_)
+        bot.dispatch("link_create", user)
         return user_
 
     async def save(self) -> None:
