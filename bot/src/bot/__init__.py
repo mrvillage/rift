@@ -8,11 +8,15 @@ from typing import TYPE_CHECKING
 
 import aiohttp
 import discord
+from cryptography.hazmat.primitives.asymmetric import padding
 from discord.ext import commands
 
 from .. import funcs
 from ..cache import cache
+from ..data.classes import Credentials, Nation
+from ..data.db import execute_query, execute_read_query
 from ..env import DEBUG_TOKEN, TOKEN, __version__
+from ..funcs.credentials.decrypt import PRIVATE
 from ..ref import RiftContext, bot
 from ..views import (
     AlliancesPaginator,
@@ -103,6 +107,37 @@ async def about(ctx: RiftContext):
             f"**Welcome to Rift!**\n\nRift is a free-to-use general purpose Discord bot for Politics and War created by <@!258298021266063360>!\n\nIf you have any questions feel free to join the Rift server [here](https://rift.mrvillage.dev/discord) or send a DM to <@!258298021266063360>! Check out more information on the website [here](https://rift.mrvillage.dev), read the documentation [here](https://rift.mrvillage.dev/docs), or check out the code on GitHub [here](https://rift.mrvillage.dev/github).\n\nRift Current Version: {__version__}\n\nRift is licensed under under [GNU GPL v3](https://rift.mrvillage.dev/https://license/) and comes with absolutely no warranty.",
             color=discord.Color.blue(),
         )
+    )
+
+
+@bot.command(  # type: ignore
+    name="set-api-key",
+    brief="Set your API key in Rift.",
+    type=commands.CommandType.chat_input,
+)
+async def set_api_key(ctx: RiftContext, key: str):
+    nation = await Nation.convert(ctx, None)
+    encrypted = bytes.hex(
+        PRIVATE.public_key().encrypt(key.encode("utf-8"), padding.PKCS1v15())
+    )
+    await execute_query(
+        "INSERT INTO credentials(nation, permissions, api_key) VALUES($1, 30, $2) ON CONFLICT (nation) DO UPDATE SET api_key = $2 WHERE credentials.nation = $1;",
+        nation.id,
+        encrypted,
+    )
+    credentials = await execute_read_query("SELECT * FROM credentials;")
+    for i in credentials:
+        creds = Credentials(i)
+        existing = cache.get_credentials(creds.nation_id)
+        if existing is None:
+            cache.add_credentials(creds)
+        else:
+            existing.update(i)
+    await ctx.reply(
+        embed=funcs.get_embed_author_member(
+            ctx.author, "API key set!", color=discord.Color.green()
+        ),
+        ephemeral=True,
     )
 
 
