@@ -1,5 +1,5 @@
 git+https://github.com/mrvillage/discord.py2.git
-asyncpg
+git+https://github.com/MagicStack/asyncpg.git@fb3b6bf7d6557b87370eff28141e02aea6256954
 beautifulsoup4
 git+https://github.com/mrvillage/pnwkit-py.git
 git+https://github.com/Rapptz/discord-ext-menus
