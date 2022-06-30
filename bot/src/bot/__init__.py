@@ -13,7 +13,7 @@ from discord.ext import commands
 
 from .. import funcs
 from ..cache import cache
-from ..data.classes import Credentials, Nation
+from ..data.classes import Credentials, Nation, Resources
 from ..data.db import execute_query, execute_read_query
 from ..env import DEBUG_TOKEN, TOKEN, __version__
 from ..funcs.credentials.decrypt import PRIVATE
@@ -139,6 +139,34 @@ async def set_api_key(ctx: RiftContext, key: str):
         ),
         ephemeral=True,
     )
+
+
+@bot.group(  # type: ignore
+    name="star",
+    brief="Commands for Star.",
+    case_insensitive=True,
+    invoke_without_command=True,
+    type=commands.CommandType.default,
+)
+async def star(ctx: RiftContext):
+    if ctx.author.id not in {258298021266063360, 369895759761506314}:
+        return
+    await ctx.send("Bruh. You forgot a command.")
+
+
+@star.command(  # type: ignore
+    name="bal",
+    brief="Get bank balance.",
+    type=commands.CommandType.default,
+)
+async def star_bal(ctx: RiftContext):
+    if ctx.author.id not in {258298021266063360, 369895759761506314}:
+        return
+    resources = (
+        await cache.get_alliance(10029).fetch_bank()  # type: ignore
+        + await cache.get_alliance(9952).fetch_bank()  # type: ignore
+    ) - sum((i.resources for i in cache.accounts if i.alliance_id == 9952), Resources())
+    await ctx.send(str(resources))
 
 
 async def main() -> None:
