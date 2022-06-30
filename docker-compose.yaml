@@ -3,7 +3,7 @@ services:
   rift:
     build: ./bot
     volumes:
-      - /home/host/rift/.env:/.env
-      - /home/host/rift/private.pem:/private.pem
-      - /home/host/rift/credentials.json:/credentials.json
-      - /home/host/rift/token.json:/token.json
+      - /home/rift-master/.env:/.env
+      - /home/rift-master/private.pem:/private.pem
+      - /home/rift-master/credentials.json:/credentials.json
+      - /home/rift-master/token.json:/token.json
