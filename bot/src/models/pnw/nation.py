@@ -30,6 +30,7 @@ class Nation:
         "war_policy",
         "domestic_policy",
         "color",
+        "projects",
     )
     NO_UPDATE: ClassVar[tuple[str, ...]] = ("estimated_resources",)
     id: int
