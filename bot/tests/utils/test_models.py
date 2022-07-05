@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 # expecting error since save and from_dict are not yet defined for testing
-@utils.model  # type: ignore
+@utils.model
 @attrs.define
 class Model:
     TABLE: ClassVar[str] = "test"

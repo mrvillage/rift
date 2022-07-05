@@ -15,7 +15,10 @@ async def main() -> None:
     await db.create_notify_connection()
     print("Initializing cache...", flush=True)
     await cache.initialize()
-    bot.running_tasks = [tasks.PnWDataTask().start()]
+    bot.running_tasks = [
+        tasks.PnWDataTask().start(),
+        tasks.PnWSubscriptionsTask().start(),
+    ]
     print("Connecting to Discord...", flush=True)
     await bot.run()
 

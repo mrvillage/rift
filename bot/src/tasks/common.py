@@ -47,4 +47,6 @@ class CommonTask:
             error = await utils.return_exception(self.task())
             if isinstance(error, Exception):
                 await utils.return_exception(self.on_error(error))
+            if self.interval <= 0:
+                return
             await utils.sleep_until(self.last_run + self.interval)

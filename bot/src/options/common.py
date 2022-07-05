@@ -62,7 +62,7 @@ class CommonOption(quarrel.Option):
         self.autocomplete: quarrel.Missing[bool] = autocomplete
         self.attribute: str = attribute or name
 
-    def __call__(
+    def __call__(  # type: ignore
         self: OPT,
         *,
         type: quarrel.Missing[quarrel.ApplicationCommandOptionType] = quarrel.MISSING,
