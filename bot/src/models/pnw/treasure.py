@@ -50,7 +50,7 @@ class Treasure:
         return cls(
             name=data.name,
             color=getattr(enums.Color, data.color.upper()),
-            continent=getattr(enums.Continent, data.continent.upper()),
+            continent=getattr(enums.Continent, data.continent),
             bonus=data.bonus,
             spawn_date=data.spawn_date,
             nation_id=data.nation_id,
