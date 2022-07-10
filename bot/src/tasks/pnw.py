@@ -53,7 +53,7 @@ async def subscription(
                 bot.dispatch(f"{name}_delete", old)
 
 
-def model_subscriptions(
+async def model_subscriptions(
     name: str,
     model: SubscriptionModelLiteral,
     cls: Any,
@@ -61,12 +61,15 @@ def model_subscriptions(
     getter: Callable[[int], Any],
     remover: Callable[[Any], Any],
 ) -> None:
+    await asyncio.sleep(1)
     asyncio.create_task(
         subscription("create", name, model, cls, adder, getter, remover)
     )
+    await asyncio.sleep(1)
     asyncio.create_task(
         subscription("update", name, model, cls, adder, getter, remover)
     )
+    await asyncio.sleep(1)
     asyncio.create_task(
         subscription("delete", name, model, cls, adder, getter, remover)
     )
@@ -132,7 +135,7 @@ class PnWSubscriptionsTask(CommonTask):
         super().__init__(interval=-1)
 
     async def task(self) -> None:
-        model_subscriptions(
+        await model_subscriptions(
             "alliance",
             "alliance",
             models.Alliance,
@@ -140,7 +143,8 @@ class PnWSubscriptionsTask(CommonTask):
             cache.get_alliance,
             cache.remove_alliance,
         )
-        model_subscriptions(
+        await asyncio.sleep(1)
+        await model_subscriptions(
             "bankrec",
             "bankrec",
             models.Bankrec,
@@ -148,7 +152,8 @@ class PnWSubscriptionsTask(CommonTask):
             cache.get_bankrec,
             cache.remove_bankrec,
         )
-        model_subscriptions(
+        await asyncio.sleep(1)
+        await model_subscriptions(
             "bounty",
             "bounty",
             models.Bounty,
@@ -156,7 +161,8 @@ class PnWSubscriptionsTask(CommonTask):
             cache.get_bounty,
             cache.remove_bounty,
         )
-        model_subscriptions(
+        await asyncio.sleep(1)
+        await model_subscriptions(
             "city",
             "city",
             models.City,
@@ -164,7 +170,8 @@ class PnWSubscriptionsTask(CommonTask):
             cache.get_city,
             cache.remove_city,
         )
-        model_subscriptions(
+        await asyncio.sleep(1)
+        await model_subscriptions(
             "nation",
             "nation",
             models.Nation,
@@ -172,7 +179,8 @@ class PnWSubscriptionsTask(CommonTask):
             cache.get_nation,
             cache.remove_nation,
         )
-        model_subscriptions(
+        await asyncio.sleep(1)
+        await model_subscriptions(
             "trade",
             "trade",
             models.Trade,
@@ -180,7 +188,8 @@ class PnWSubscriptionsTask(CommonTask):
             cache.get_trade,
             cache.remove_trade,
         )
-        model_subscriptions(
+        await asyncio.sleep(1)
+        await model_subscriptions(
             "treaty",
             "treaty",
             models.Treaty,
@@ -188,7 +197,8 @@ class PnWSubscriptionsTask(CommonTask):
             cache.get_treaty,
             cache.remove_treaty,
         )
-        model_subscriptions(
+        await asyncio.sleep(1)
+        await model_subscriptions(
             "war_attack",
             "warattack",
             models.WarAttack,
@@ -196,7 +206,8 @@ class PnWSubscriptionsTask(CommonTask):
             cache.get_war_attack,
             cache.remove_war_attack,
         )
-        model_subscriptions(
+        await asyncio.sleep(1)
+        await model_subscriptions(
             "war",
             "war",
             models.War,
