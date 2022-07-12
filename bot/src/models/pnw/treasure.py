@@ -23,8 +23,12 @@ class Treasure:
     INCREMENT: ClassVar[tuple[str, ...]] = ()
     ENUMS: ClassVar[tuple[str, ...]] = ("color", "continent")
     name: str
-    color: enums.Color = attrs.field(converter=enums.Color)
-    continent: enums.Continent = attrs.field(converter=enums.Continent)
+    color: Optional[enums.Color] = attrs.field(
+        converter=lambda x: None if x is None else enums.Color(x)
+    )
+    continent: Optional[enums.Continent] = attrs.field(
+        converter=lambda x: None if x is None else enums.Continent(x)
+    )
     bonus: int
     spawn_date: datetime.datetime
     nation_id: int
@@ -49,8 +53,14 @@ class Treasure:
     def from_data(cls, data: PnWKitTreasure) -> Treasure:
         return cls(
             name=data.name,
-            color=getattr(enums.Color, data.color.upper()),
-            continent=getattr(enums.Continent, data.continent),
+            color=getattr(enums.Color, data.color.upper())
+            if data.color != "any"
+            else None,
+            continent=None
+            if data.continent == "n"
+            else getattr(enums.Continent, data.continent)
+            if data.continent != "as"
+            else enums.Continent.ASIA,
             bonus=data.bonus,
             spawn_date=data.spawn_date,
             nation_id=data.nation_id,
