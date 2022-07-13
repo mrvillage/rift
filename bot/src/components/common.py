@@ -13,6 +13,8 @@ if TYPE_CHECKING:
 
 
 class CommonButton(quarrel.Button):
+    __slots__ = ()
+
     async def on_error(
         self, interaction: quarrel.Interaction, error: Exception
     ) -> None:
@@ -21,6 +23,8 @@ class CommonButton(quarrel.Button):
 
 
 class CommonSelectMenu(quarrel.SelectMenu):
+    __slots__ = ()
+
     async def on_error(
         self, interaction: quarrel.Interaction, values: tuple[str], error: Exception
     ) -> None:
@@ -31,4 +35,4 @@ class CommonSelectMenu(quarrel.SelectMenu):
 
 
 class CommonGrid(quarrel.Grid):
-    ...
+    __slots__ = ()

@@ -26,7 +26,9 @@ CONDITION_OPTIONAL = CONDITION(default=utils.default_missing)
 EXPRESSION = CONDITION(
     name="expression",
     description="The expression to use.",
-    converter=models.Condition.parse,
+    converter=lambda command, value: models.Condition.parse(
+        command, value
+    ).get_expression(),
     attribute="expression",
 )
 EXPRESSION_OPTIONAL = EXPRESSION(default=utils.default_missing)

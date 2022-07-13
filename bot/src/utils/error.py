@@ -36,7 +36,12 @@ async def handle_interaction_error(
 async def respond_with_error(
     interaction: quarrel.Interaction, embed: quarrel.Embed
 ) -> None:
-    await interaction.respond_with_message(
-        embed=embed,
-        ephemeral=True,
-    )
+    if interaction.responded:
+        await interaction.respond_with_message(
+            embed=embed,
+            ephemeral=True,
+        )
+    else:
+        await interaction.edit_original_response(
+            embed=embed,
+        )

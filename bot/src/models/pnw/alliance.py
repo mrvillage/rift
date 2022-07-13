@@ -68,7 +68,7 @@ class Alliance:
             score=data.score,
             color=getattr(enums.Color, data.color.upper()),
             date=data.date,
-            accepts_members=data.accept_members,
+            accepts_members=bool(data.accept_members),
             flag=data.flag,
             forum_link=data.forum_link,
             discord_link=data.discord_link,

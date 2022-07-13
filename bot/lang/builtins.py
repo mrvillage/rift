@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 __all__ = ("get_builtin_attrs",)
@@ -96,5 +97,17 @@ def get_builtin_attrs(obj: Any) -> set[str]:
         }
     elif isinstance(obj, tuple):
         return {"count", "index"}
+    elif isinstance(obj, datetime.datetime):
+        return {"year", "month", "day", "hour", "minute", "second", "microsecond"}
+    elif isinstance(obj, datetime.timedelta):
+        return {
+            "days",
+            "seconds",
+            "microseconds",
+            "milliseconds",
+            "minutes",
+            "hours",
+            "weeks",
+        }
     else:
         return set()

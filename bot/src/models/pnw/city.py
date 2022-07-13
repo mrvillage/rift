@@ -21,6 +21,7 @@ if TYPE_CHECKING:
 class City:
     TABLE: ClassVar[str] = "cities"
     INCREMENT: ClassVar[tuple[str, ...]] = ()
+    NO_UPDATE: ClassVar[tuple[str, ...]] = ("powered",)
     id: int
     nation_id: int
     name: str
@@ -85,7 +86,7 @@ class City:
             date=data.date,
             infrastructure=data.infrastructure,
             land=data.land,
-            powered=data.powered,
+            powered=getattr(data, "powered", False),
             coal_power=data.coal_power,
             oil_power=data.oil_power,
             nuclear_power=data.nuclear_power,

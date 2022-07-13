@@ -129,14 +129,18 @@ class Operator(Enum):
 class Member:
     __lang_abstract__: Final = True
 
-    def __init__(self, path: str) -> None:
-        self.path: list[Any] = [path]
+    def __init__(self, *path: Any) -> None:
+        self.path: list[Any] = list(path)
 
     def get(self) -> Any:
         ...
 
     def evaluate(self, scope: Scope) -> Any:  # noqa: C901
-        obj = scope[self.path[0]]
+        path_root = self.path[0]
+        if getattr(path_root, "__lang_abstract__", False):
+            obj = path_root.evaluate(scope)
+        else:
+            obj = scope[path_root]
         for name in self.path[1:]:
             if isinstance(name, str):
                 if name not in get_lang_attrs(obj):
@@ -178,10 +182,10 @@ class Member:
         for name in self.path:
             if isinstance(name, str):
                 string += f".{name}"
-            elif isinstance(name, CSV):
-                string += f"({name})"
             elif isinstance(name, Index):
                 string += f"[{name}]"
+            else:
+                string += f"({name})"
         return string.strip(".")
 
 
@@ -197,12 +201,12 @@ class Expression:
         self.expr: bool = expr
 
     @classmethod
-    def new(cls, left: Any, operator: Operator, right: Any) -> Any:
+    def new(cls, left: Any, operator: Operator, right: Any, expr: bool = False) -> Any:
         if not getattr(left, "__lang_abstract__", False) and not getattr(
             right, "__lang_abstract__", False
         ):
             return operator.evaluate(lambda: left, lambda: right)
-        return cls(left, operator, right)
+        return cls(left, operator, right, expr)
 
     def evaluate(self, scope: Scope) -> Any:
         return self.operator.evaluate(
@@ -329,22 +333,38 @@ class Set:
         return f"{{{self.csv}}}"
 
 
+class NotAbstractExpression:
+    __lang_abstract__: Final = True
+
+    def __init__(self, expr: Any) -> None:
+        self.expr: Any = expr
+
+    def evaluate(self, scope: Scope) -> Any:
+        return self.expr
+
+
 class LangTransformer:
     def expr(self, tree: list[Any]) -> Any:
+        expr = (
+            tree[0]
+            if len(tree) == 1
+            else Expression.new(tree[0], tree[1], tree[2], expr=True)
+        )
+        if getattr(expr, "__lang_abstract__", False):
+            return expr
+        return NotAbstractExpression(expr)
+
+    def nested_expr(self, tree: list[Any]) -> Any:
         return (
             tree[0]
             if len(tree) == 1
-            else Expression(tree[0], tree[1], tree[2], expr=True)
+            else Expression.new(tree[0][0], tree[0][1], tree[0][2], expr=True)
         )
-
-    def nested_expr(self, tree: list[Any]) -> Any:
-        tree[0].expr = True
-        return tree[0]
 
     # handle operators
 
     def condition(self, tree: list[Any]) -> Any:
-        return tree[0] if len(tree) == 1 else Expression(tree[0], tree[1], tree[2])
+        return tree[0] if len(tree) == 1 else Expression.new(tree[0], tree[1], tree[2])
 
     def conditional(self, tree: list[Any]) -> Any:
         return tree[0]
@@ -405,7 +425,7 @@ class LangTransformer:
     # handle multiplication
 
     def multiplication_expression(self, tree: list[Any]) -> Any:
-        return tree[0] if len(tree) == 1 else tree
+        return tree[0] if len(tree) == 1 else Expression.new(tree[0], tree[1], tree[2])
 
     def multiplication(self, tree: list[Any]) -> Any:
         return tree[0]
@@ -428,7 +448,7 @@ class LangTransformer:
     # handle unary
 
     def unary_expression(self, tree: list[Any]) -> Any:
-        return tree[0] if len(tree) == 1 else UnaryExpression(tree[0], tree[1])
+        return tree[0] if len(tree) == 1 else UnaryExpression.new(tree[0], tree[1])
 
     def unary(self, tree: list[Any]) -> Any:
         return tree[0]
@@ -458,7 +478,7 @@ class LangTransformer:
     def LITERAL_DECIMAL(self, token: lark.Token) -> decimal.Decimal:  # noqa: N802
         return decimal.Decimal(token.value[1:])
 
-    def LITERAL_BOOl(self, token: lark.Token) -> bool:  # noqa: N802
+    def LITERAL_BOOL(self, token: lark.Token) -> bool:  # noqa: N802
         return token.value.lower() == "true"
 
     def LITERAL_NULL(self, tree: lark.Token) -> None:  # noqa: N802
@@ -495,7 +515,12 @@ class LangTransformer:
         return tree[0]
 
     def member_name(self, tree: list[Any]) -> Any:
-        return Member(tree[0]) if len(tree) == 1 else tree[0].chain(tree[1])
+        if len(tree) == 1:
+            return Member(tree[0])
+        elif isinstance(tree[0], Member):
+            return tree[0].chain(*tree[1:])
+        else:
+            return Member(*tree)
 
     def member_call(self, tree: list[Any]) -> Any:
         if isinstance(tree[0], Member):

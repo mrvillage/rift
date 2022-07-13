@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import quarrel
 
-from .. import utils
+from .. import enums, utils
 from ..bot import bot
 
 __all__ = (
@@ -32,9 +32,11 @@ __all__ = (
     "USER_PROVIDED_CONTENT_DISCLAIMER",
     "display_bool",
     "category_name_id",
+    "datetime_mention",
 )
 
 if TYPE_CHECKING:
+    import datetime
     import enum
     from typing import Any, Final, Optional
 
@@ -140,3 +142,7 @@ def category_name_id(guild_id: int, id: int) -> str:
         if category and category.type is quarrel.ChannelType.GUILD_CATEGORY
         else UNKNOWN
     )
+
+
+def datetime_mention(datetime: datetime.datetime, style: enums.TimestampStyle) -> str:
+    return f"<t:{int(datetime.timestamp())}:{style.value}>"

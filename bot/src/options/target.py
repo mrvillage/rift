@@ -78,11 +78,13 @@ USE_TARGET_CONFIG_CONDITION = CommonOption(
     name="use-config-condition",
     description="Whether or not to use the target config condition.",
     default=True,
+    attribute="use_config_condition",
 )
 BASE_TARGET_RATER = CommonOption(
     type=quarrel.ApplicationCommandOptionType.STRING,
     name="base-rater",
     description="The rater to use for unprovided ratings.",
     converter=models.TargetRater.convert,
+    attribute="base_rater",
 )
 BASE_TARGET_RATER_OPTIONAL = BASE_TARGET_RATER(default=utils.default_missing)

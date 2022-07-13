@@ -30,9 +30,9 @@ class Nation:
         "war_policy",
         "domestic_policy",
         "color",
-        "projects",
     )
-    NO_UPDATE: ClassVar[tuple[str, ...]] = ("estimated_resources",)
+    FLAGS: ClassVar[tuple[str, ...]] = ("projects",)
+    NO_UPDATE: ClassVar[tuple[str, ...]] = ("estimated_resources", "last_active")
     id: int
     alliance_id: int
     alliance_position: enums.AlliancePosition = attrs.field(
@@ -69,6 +69,41 @@ class Nation:
     alliance_seniority: int
     estimated_resources: models.Resources = attrs.field(
         converter=lambda x: models.Resources.from_dict(x)
+    )
+
+    __lang_attrs__ = (
+        "id",
+        "alliance_id",
+        "alliance_position",
+        "name",
+        "leader",
+        "continent",
+        "war_policy",
+        "domestic_policy",
+        "color",
+        "num_cities",
+        "score",
+        "flag",
+        "vacation_mode_turns",
+        "beige_turns",
+        "espionage_available",
+        "last_active",
+        "date",
+        "soldiers",
+        "tanks",
+        "aircraft",
+        "ships",
+        "missiles",
+        "nukes",
+        "discord_username",
+        "turns_since_last_city",
+        "turns_since_last_project",
+        "projects",
+        "wars_won",
+        "wars_lost",
+        "alliance_seniority",
+        "estimated_resources",
+        "average_infrastructure",
     )
 
     async def save(self, insert: bool = False) -> None:
@@ -116,7 +151,7 @@ class Nation:
             vacation_mode_turns=data.vacation_mode_turns,
             beige_turns=data.beige_turns,
             espionage_available=data.espionage_available,
-            last_active=data.last_active,
+            last_active=getattr(data, "last_active", None),
             date=data.date,
             soldiers=data.soldiers,
             tanks=data.tanks,
@@ -182,3 +217,10 @@ class Nation:
 
     def build_grid(self) -> components.NationGrid:
         return components.NationGrid(self)
+
+    def can_declare_war_on(self, other: Nation) -> bool:
+        return (
+            self.id != other.id
+            and self.alliance_id != other.alliance_id
+            and float(self.score) * 1.75 > other.score > float(self.score) * 0.75
+        )

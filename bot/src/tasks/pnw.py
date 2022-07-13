@@ -30,27 +30,30 @@ async def subscription(
     getter: Callable[[int], Any],
     remover: Callable[[Any], Any],
 ) -> None:
-    if event == "create":
-        async for i in await kit.subscribe(model, "create"):
-            new = cls.from_data(i)
-            adder(new)
-            await new.save(insert=True)
-            bot.dispatch(f"{name}_create", new)
-    elif event == "update":
-        async for i in await kit.subscribe(model, "update"):
-            new = getter(i.id)
-            if new is not None:
-                old = attrs.evolve(new)
-                new.update(i)
+    try:
+        if event == "create":
+            async for i in await kit.subscribe(model, "create"):
+                new = cls.from_data(i)
+                adder(new)
                 await new.save(insert=True)
-                bot.dispatch(f"{name}_update", old, new)
-    else:
-        async for i in await kit.subscribe(model, "delete"):
-            old = cls.from_data(i)
-            if old is not None:
-                remover(old)
-                await old.delete()
-                bot.dispatch(f"{name}_delete", old)
+                bot.dispatch(f"{name}_create", new)
+        elif event == "update":
+            async for i in await kit.subscribe(model, "update"):
+                new = getter(i.id)
+                if new is not None:
+                    old = attrs.evolve(new)
+                    new.update(cls.from_data(i))
+                    await new.save()
+                    bot.dispatch(f"{name}_update", old, new)
+        else:
+            async for i in await kit.subscribe(model, "delete"):
+                old = cls.from_data(i)
+                if old is not None:
+                    remover(old)
+                    await old.delete()
+                    bot.dispatch(f"{name}_delete", old)
+    except Exception as e:
+        raise e
 
 
 async def model_subscriptions(
@@ -63,15 +66,18 @@ async def model_subscriptions(
 ) -> None:
     await asyncio.sleep(1)
     asyncio.create_task(
-        subscription("create", name, model, cls, adder, getter, remover)
+        subscription("create", name, model, cls, adder, getter, remover),
+        name=f"subscribe_{model}_create",
     )
     await asyncio.sleep(1)
     asyncio.create_task(
-        subscription("update", name, model, cls, adder, getter, remover)
+        subscription("update", name, model, cls, adder, getter, remover),
+        name=f"subscribe_{model}_update",
     )
     await asyncio.sleep(1)
     asyncio.create_task(
-        subscription("delete", name, model, cls, adder, getter, remover)
+        subscription("delete", name, model, cls, adder, getter, remover),
+        name=f"subscribe_{model}_delete",
     )
 
 

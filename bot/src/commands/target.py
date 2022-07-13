@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import lang
 import quarrel
 
-from .. import models, options
+from .. import cache, components, embeds, models, options, utils
 from ..bot import bot
 from .common import CommonSlashCommand
 
@@ -35,7 +36,7 @@ if TYPE_CHECKING:
         config: quarrel.Missing[models.TargetConfig]
         rater: quarrel.Missing[models.TargetRater]
         attack: bool
-        condition: quarrel.Missing[models.Condition]
+        expression: quarrel.Missing[lang.Expression]
         nation: models.Nation
         use_config_condition: bool
 
@@ -48,8 +49,8 @@ class TargetFindCommand(
     options=[
         options.TARGET_CONFIG_OPTIONAL,
         options.TARGET_RATER_OPTIONAL,
-        options.TARGET_FIND_ATTACK,
-        options.CONDITION_OPTIONAL,
+        options.TARGET_FIND_ATTACK_OPTIONAL,
+        options.EXPRESSION_OPTIONAL,
         options.NATION_DEFAULT_SELF,
         options.USE_TARGET_CONFIG_CONDITION,
     ],
@@ -57,7 +58,46 @@ class TargetFindCommand(
     __slots__ = ()
 
     async def callback(self) -> None:
-        ...  # if a config isn't provided for the counting, have a follow up with a select menu to determine the "counting"
+        config = self.options.config
+        rater = (
+            self.options.rater
+            or (config and cache.get_target_rater(config.rater))
+            or models.TargetRater.default_rater()
+        )
+        if config:
+            await self.interaction.respond(
+                quarrel.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+            )
+            targets = config.find_targets(
+                config.count,
+                rater,
+                config.attack
+                if self.options.attack is quarrel.MISSING
+                else self.options.attack,
+                lang.parse_expression(config.condition)
+                if self.options.expression is quarrel.MISSING
+                else utils.merge_expressions(
+                    self.options.expression, config.condition, sep="&&"
+                )
+                if self.options.use_config_condition
+                else self.options.expression,
+                self.options.nation,
+            )
+            await self.interaction.edit_original_response(
+                embed=embeds.targets(self.interaction, targets, 1, self.options.nation),
+                grid=components.TargetsGrid(self.interaction.user.id, targets, 1),
+            )
+        else:
+            await self.interaction.respond_with_message(
+                embed=embeds.target_find_wizard(self.interaction),
+                grid=components.TargetFindGrid(
+                    self.interaction.user.id,
+                    rater,
+                    self.options.attack,
+                    self.options.expression,
+                    self.options.nation,
+                ),
+            )
 
 
 if TYPE_CHECKING:

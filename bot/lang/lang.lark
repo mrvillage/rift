@@ -4,7 +4,7 @@ expr : [expr conditional] condition
 conditional : conditional_or | conditional_and
 conditional_or : "or" | "||"
 conditional_and : "and" | "&&"
- 
+
 condition : [condition operator] addition_expression
 
 operator : operator_lt | operator_le | operator_ge | operator_gt | operator_eq | operator_ne | operator_in | operator_not_in | operator_is | operator_is_not
@@ -40,21 +40,21 @@ unary : unary_not | unary_neg
 unary_not : "not" | "!"
 unary_neg : "-"
 
-primary_expression : member | literal | nested_expr
+primary_expression : literal | member | nested_expr
 nested_expr : "(" expr ")"
 
 member : member_name | member_call | member_index
-member_name : [member "."] NAME
-member_call : member "(" [csv] ")"
-member_index : member "[" index "]"
+member_name : [primary_expression "."] NAME
+member_call : primary_expression "(" [csv] ")"
+member_index : primary_expression "[" index "]"
 
-literal : LITERAL_STRING | LITERAL_INT | LITERAL_FLOAT | LITERAL_DECIMAL | LITERAL_BOOL | LITERAL_NULL | literal_array | literal_object | literal_set
+literal.2 : LITERAL_STRING | LITERAL_INT | LITERAL_FLOAT | LITERAL_DECIMAL | LITERAL_BOOL | LITERAL_NULL | literal_array | literal_object | literal_set
 LITERAL_STRING : STRING | LONG_STRING
 LITERAL_INT : ["+" | "-"] ("0".."9")+
 LITERAL_FLOAT :  ["+" | "-"] ("0".."9")* "." ("0".."9")*
 LITERAL_DECIMAL :  "d" ["+" | "-"] ("0".."9")* "." ("0".."9")*
-LITERAL_BOOL : /"true"/i | /"false"/i
-LITERAL_NULL : /"null"/i | /"none"/i
+LITERAL_BOOL.2 : /true/i | /false/i
+LITERAL_NULL.2 : /null/i | /none/i
 literal_array : "[" [csv] "]"
 literal_object : "{" [map] "}"
 literal_set : "{" csv "}"

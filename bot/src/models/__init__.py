@@ -27,6 +27,7 @@ from .server import *
 from .server_submission import *
 from .subscription import *
 from .tag import *
+from .target import *
 from .target_config import *
 from .target_rater import *
 from .target_reminder import *

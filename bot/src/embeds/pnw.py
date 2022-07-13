@@ -95,19 +95,19 @@ def nation(interaction: quarrel.Interaction, nation: models.Nation) -> quarrel.E
             ),
             utils.embed_field(
                 "Soldiers",
-                f"{nation.soldiers:,}/{nation.num_cities * consts.MAX_SOLDIERS_PER_CITY}",
+                f"{nation.soldiers:,}/{nation.num_cities * consts.MAX_SOLDIERS_PER_CITY:,}",
             ),
             utils.embed_field(
                 "Tanks",
-                f"{nation.tanks:,}/{nation.num_cities * consts.MAX_TANKS_PER_CITY}",
+                f"{nation.tanks:,}/{nation.num_cities * consts.MAX_TANKS_PER_CITY:,}",
             ),
             utils.embed_field(
                 "Aircraft",
-                f"{nation.aircraft:,}/{nation.num_cities * consts.MAX_AIRCRAFT_PER_CITY}",
+                f"{nation.aircraft:,}/{nation.num_cities * consts.MAX_AIRCRAFT_PER_CITY:,}",
             ),
             utils.embed_field(
                 "Ships",
-                f"{nation.ships:,}/{nation.num_cities * consts.MAX_SHIPS_PER_CITY}",
+                f"{nation.ships:,}/{nation.num_cities * consts.MAX_SHIPS_PER_CITY:,}",
             ),
             utils.embed_field(
                 "Missiles",

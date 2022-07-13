@@ -49,9 +49,9 @@ def model(class_: T) -> T:
 async def save(self, insert = False):
     if {" and ".join(f"self.{i}" for i in primary_key)} and not insert:
         await db.query('UPDATE {class_.TABLE} SET {", ".join(f'"{name}" = ${i+1}' for i, name in enumerate(slots))} WHERE {" AND ".join(f'"{name}" = ${slots.index(name)+1}' for name in primary_key)};',
-        {", ".join(f"self.{name}" if name not in enums and name not in flags else f"self.{name}.value" for name in slots)})
+        {", ".join(f"self.{name}" if name not in enums and name not in flags else f"self.{name}.value" if name not in flags else f"self.{name}.flags" for name in slots)})
     else:
-        id = await db.query('INSERT INTO {class_.TABLE} ({", ".join(f'"{i}"' for i in slots if i not in increment)}) VALUES ({", ".join(f"${index + 1}" for index in range(len([j for j in slots if j not in increment])))}){" RETURNING (" + ", ".join(f'"{i}"' for i in increment) + ");" if increment else ";"}', {", ".join(f"self.{name}" if name not in enums and name not in flags else f"self.{name}.value" for name in slots if name not in increment)})
+        id = await db.query('INSERT INTO {class_.TABLE} ({", ".join(f'"{i}"' for i in slots if i not in increment)}) VALUES ({", ".join(f"${index + 1}" for index in range(len([j for j in slots if j not in increment])))}){" RETURNING (" + ", ".join(f'"{i}"' for i in increment) + ");" if increment else ";"}', {", ".join(f"self.{name}" if name not in enums and name not in flags else f"self.{name}.value" if name not in flags else f"self.{name}.flags" for name in slots if name not in increment)})
         {'self.id = id[0]["id"]' if increment else ''}
     """,
         g,
