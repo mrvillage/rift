@@ -29,5 +29,4 @@ DEFAULT_SCOPE: dict[str, Any] = {
     "all": all,
     "any": any,
     "now": lambda: datetime.datetime.now(tz=datetime.timezone.utc),
-
 }
