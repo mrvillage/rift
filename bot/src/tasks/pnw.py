@@ -95,11 +95,11 @@ class PnWDataTask(CommonTask):
     # ol
     async def before_task(self) -> None:
         next_run = utils.utcnow()
-        # set next run equal to the next multiple of four minutes
+        # set next run equal to the next multiple of fifteen minutes
         next_run = next_run.replace(
             minute=(next_run.minute // 15) * 15, second=0, microsecond=0
         ) + datetime.timedelta(minutes=15)
-        # await utils.sleep_until(next_run.timestamp())
+        await utils.sleep_until(next_run.timestamp())
 
     async def task(self) -> None:
         print(
