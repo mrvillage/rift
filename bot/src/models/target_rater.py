@@ -3,13 +3,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import attrs
+import lang
 
 from .. import consts, utils
 
 __all__ = ("TargetRater",)
 
 if TYPE_CHECKING:
-    from typing import Any, ClassVar
+    from typing import Any, ClassVar, Optional
 
     from ..commands.common import CommonSlashCommand
 
@@ -20,26 +21,68 @@ class TargetRater:
     TABLE: ClassVar[str] = "target_raters"
     id: int
     cities: str
+    cities_expression: Optional[lang.Expression] = attrs.field(default=None)
+    cities_expression_value: str = attrs.field(default="")
     infrastructure: str
+    infrastructure_expression: Optional[lang.Expression] = attrs.field(default=None)
+    infrastructure_expression_value: str = attrs.field(default="")
     activity: str
+    activity_expression: Optional[lang.Expression] = attrs.field(default=None)
+    activity_expression_value: str = attrs.field(default="")
     soldiers: str
+    soldiers_expression: Optional[lang.Expression] = attrs.field(default=None)
+    soldiers_expression_value: str = attrs.field(default="")
     tanks: str
+    tanks_expression: Optional[lang.Expression] = attrs.field(default=None)
+    tanks_expression_value: str = attrs.field(default="")
     aircraft: str
+    aircraft_expression: Optional[lang.Expression] = attrs.field(default=None)
+    aircraft_expression_value: str = attrs.field(default="")
     ships: str
+    ships_expression: Optional[lang.Expression] = attrs.field(default=None)
+    ships_expression_value: str = attrs.field(default="")
     missiles: str
+    missiles_expression: Optional[lang.Expression] = attrs.field(default=None)
+    missiles_expression_value: str = attrs.field(default="")
     nukes: str
+    nukes_expression: Optional[lang.Expression] = attrs.field(default=None)
+    nukes_expression_value: str = attrs.field(default="")
     money: str
+    money_expression: Optional[lang.Expression] = attrs.field(default=None)
+    money_expression_value: str = attrs.field(default="")
     coal: str
+    coal_expression: Optional[lang.Expression] = attrs.field(default=None)
+    coal_expression_value: str = attrs.field(default="")
     oil: str
+    oil_expression: Optional[lang.Expression] = attrs.field(default=None)
+    oil_expression_value: str = attrs.field(default="")
     uranium: str
+    uranium_expression: Optional[lang.Expression] = attrs.field(default=None)
+    uranium_expression_value: str = attrs.field(default="")
     iron: str
+    iron_expression: Optional[lang.Expression] = attrs.field(default=None)
+    iron_expression_value: str = attrs.field(default="")
     bauxite: str
+    bauxite_expression: Optional[lang.Expression] = attrs.field(default=None)
+    bauxite_expression_value: str = attrs.field(default="")
     lead: str
+    lead_expression: Optional[lang.Expression] = attrs.field(default=None)
+    lead_expression_value: str = attrs.field(default="")
     gasoline: str
+    gasoline_expression: Optional[lang.Expression] = attrs.field(default=None)
+    gasoline_expression_value: str = attrs.field(default="")
     munitions: str
+    munitions_expression: Optional[lang.Expression] = attrs.field(default=None)
+    munitions_expression_value: str = attrs.field(default="")
     steel: str
+    steel_expression: Optional[lang.Expression] = attrs.field(default=None)
+    steel_expression_value: str = attrs.field(default="")
     aluminum: str
+    aluminum_expression: Optional[lang.Expression] = attrs.field(default=None)
+    aluminum_expression_value: str = attrs.field(default="")
     food: str
+    food_expression: Optional[lang.Expression] = attrs.field(default=None)
+    food_expression_value: str = attrs.field(default="")
 
     async def save(self, insert: bool = False) -> None:
         ...
@@ -87,3 +130,12 @@ class TargetRater:
             aluminum="target.estimated_resources.aluminum / 500",
             food="target.estimated_resources.food / 10000",
         )
+
+    def get_rater(self, attr: str) -> lang.Expression:
+        value = getattr(self, attr)
+        expression: lang.Expression = getattr(self, f"{attr}_expression")
+        if expression is None or value != getattr(self, f"{attr}_expression_value"):
+            expression = lang.parse_expression(value)
+            setattr(self, f"{attr}_expression", expression)
+            setattr(self, f"{attr}_expression_value", value)
+        return expression

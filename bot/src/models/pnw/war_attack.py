@@ -80,7 +80,7 @@ class WarAttack:
             date=data.date,
             attacker_id=data.att_id,
             defender_id=data.def_id,
-            type=enums.WarAttackType(data.type),
+            type=enums.WarAttackType(data.type.value),
             war_id=data.war_id,
             victor_id=data.victor,
             success=data.success,

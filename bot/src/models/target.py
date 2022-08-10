@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import attrs
-import lang
 import quarrel
 
 from .. import consts, enums, strings, utils
@@ -37,7 +36,7 @@ class Target:
         attributes: list[TargetAttribute] = []
         for attr in attrs.fields(type(rater)):
             if getattr(count, attr.name, None):
-                attr_rater: str = getattr(rater, attr.name)
+                attr_rater = rater.get_rater(attr.name)
                 if attr_rater:
                     attributes.append(
                         TargetAttribute(
@@ -45,7 +44,7 @@ class Target:
                             value=TargetAttribute.get_value(attr.name, defender),
                             rating=float(
                                 utils.evaluate_in_default_scope(
-                                    lang.parse_expression(attr_rater),
+                                    attr_rater,
                                     nation=attacker,
                                     target=defender,
                                 )

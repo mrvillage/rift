@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 class Trade:
     TABLE: ClassVar[str] = "trades"
     INCREMENT: ClassVar[tuple[str, ...]] = ()
-    ENUMS: ClassVar[tuple[str, ...]] = ("type", "action")
+    ENUMS: ClassVar[tuple[str, ...]] = ("type", "resource", "action")
     id: int
     type: enums.TradeType = attrs.field(converter=enums.TradeType)
     date: datetime.datetime
@@ -62,7 +62,7 @@ class Trade:
             amount=data.offer_amount,
             action=getattr(enums.TradeAction, data.buy_or_sell.upper()),
             price=data.price,
-            accepted=data.accepted,
+            accepted=bool(data.accepted),
             date_accepted=data.date_accepted,
             original_trade_id=data.original_trade_id,
         )
