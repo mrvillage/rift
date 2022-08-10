@@ -42,7 +42,7 @@ async def can_manage_alliance_roles(
 def has_alliance_manage_permissions():
     async def predicate(ctx: RiftContext):
         nation = await Nation.convert(ctx, None)
-        if nation.alliance_position >= 3:
+        if nation.alliance and nation.alliance.permissions_for(ctx.author).leadership:
             return True
         raise commands.MissingPermissions(["alliance_manage"])
 

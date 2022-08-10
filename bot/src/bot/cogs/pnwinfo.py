@@ -481,7 +481,7 @@ class PnWInfo(commands.Cog):
         fields: List[Field] = [
             {
                 "name": f"#{index+1}",
-                "value": f"[{repr(i[0])}](https://politicsandwar.com/alliance/id={i[0].id})\nGross: ${sum(i[1]['gross_total'].to_dict().values())+i[1]['gross_income'].money:,.2f}\nUpkeep: ${sum(i[1]['upkeep_total'].to_dict().values())+i[1]['upkeep'].money:,.2f}\nNet: ${sum(i[1]['net_total'].to_dict().values())+i[1]['net_income'].money:,.2f}",
+                "value": f"[{repr(i[0])}](https://politicsandwar.com/nation/id={i[0].id})\nGross: ${sum(i[1]['gross_total'].to_dict().values())+i[1]['gross_income'].money:,.2f}\nUpkeep: ${sum(i[1]['upkeep_total'].to_dict().values())+i[1]['upkeep'].money:,.2f}\nNet: ${sum(i[1]['net_total'].to_dict().values())+i[1]['net_income'].money:,.2f}",
             }
             for index, i in enumerate(top_alliances)
         ]
