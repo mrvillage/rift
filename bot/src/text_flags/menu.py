@@ -17,6 +17,7 @@ class ButtonFlags(BaseFlagConverter, case_insensitive=True):
     options: Optional[Tuple[str, ...]]
     row: Optional[int]
     id: Optional[int]
+    patch: Optional[str]
 
 
 class SelectFlags(BaseFlagConverter, case_insensitive=True):
