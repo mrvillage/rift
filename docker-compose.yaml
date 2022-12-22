@@ -8,9 +8,47 @@ x-large-logging:
 
 services:
   rift:
+    container_name: rift-master-bot
     build: ./bot
+    depends_on:
+      - db
+    restart: unless-stopped
+    environment:
+      TOKEN: ${TOKEN}
+      DEBUG_TOKEN: ${DEBUG_TOKEN}
+      FOOTER: ${FOOTER}
+      COLOR: ${COLOR}
+      PNW_API_KEY: ${PNW_API_KEY}
+      PNW_EMAIL: ${PNW_EMAIL}
+      PNW_PASSWORD: ${PNW_PASSWORD}
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${DB_NAME:-postgres}
+      SOCKET_PORT: ${SOCKET_PORT}
+      SOCKET_IP: ${SOCKET_IP}
+      APPLICATION_ID: ${APPLICATION_ID}
+      DEBUG_APPLICATION_ID: ${DEBUG_APPLICATION_ID}
+      DEBUG: ${DEBUG}
+      PNW_BOT_KEY: ${PNW_BOT_KEY}
+      HS_YES_CUSTOM_ID: ${HS_YES_CUSTOM_ID}
+      HS_NO_CUSTOM_ID: ${HS_NO_CUSTOM_ID}
+      HS_OFFSHORE_ID: ${HS_OFFSHORE_ID}
+      HS_SOLDIER_MMR: ${HS_SOLDIER_MMR}
+      HS_TANK_MMR: ${HS_TANK_MMR}
+      HS_AIRCRAFT_MMR: ${HS_AIRCRAFT_MMR}
+      HS_SHIP_MMR: ${HS_SHIP_MMR}
+      HS_MONEY_REQ: ${HS_MONEY_REQ}
+      HS_FOOD_REQ_START: ${HS_FOOD_REQ_START}
+      HS_FOOD_REQ: ${HS_FOOD_REQ}
+      HS_URANIUM_REQ: ${HS_URANIUM_REQ}
+      HS_STEEL_REQ: ${HS_STEEL_REQ}
+      HS_ALUMINUM_REQ: ${HS_ALUMINUM_REQ}
+      HS_GASOLINE_REQ: ${HS_GASOLINE_REQ}
+      HS_MUNITIONS_REQ: ${HS_MUNITIONS_REQ}
+      HS_SPREADSHEET_ID: ${HS_SPREADSHEET_ID}
     volumes:
-      - /home/rift-master/bot/.env:/.env
       - /home/rift-master/bot/private.pem:/private.pem
       - /home/rift-master/bot/credentials.json:/credentials.json
       - /home/rift-master/bot/token.json:/token.json

@@ -2,7 +2,7 @@ __version__ = "Beta 0.11.1"
 
 import os
 
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from pnwkit import set_key
 
 __all__ = (
@@ -25,7 +25,7 @@ __all__ = (
     "PNW_BOT_KEY",
 )
 
-load_dotenv()
+# load_dotenv()
 
 TOKEN = str(os.getenv("TOKEN"))
 DEBUG_TOKEN = str(os.getenv("DEBUG_TOKEN"))
