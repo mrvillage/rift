@@ -53,6 +53,8 @@ services:
       - /home/rift-master/bot/private.pem:/private.pem
       - /home/rift-master/bot/credentials.json:/credentials.json
       - /home/rift-master/bot/token.json:/token.json
+    networks:
+      hostnet: {}
 
   db:
     container_name: rift-master-db
@@ -70,6 +72,6 @@ services:
     logging: *large-logging
 
 networks:
-  default:
+  hostnet:
     external: true
     name: host
