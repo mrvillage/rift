@@ -41,8 +41,11 @@ class Events(commands.Cog):
             except (
                 ConnectionRefusedError,
                 aiohttp.ClientConnectorError,
-            ):
-                print("rift-data socket refused", flush=True)
+            ) as error:
+                print("rift-data socket refused", file=sys.stderr, flush=True)
+                traceback.print_exception(
+                    type(error), error, error.__traceback__, file=sys.stderr
+                )
                 delay = backoff.delay()
                 await sleep(delay)
             except Exception as error:
