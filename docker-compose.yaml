@@ -61,7 +61,6 @@ services:
     restart: unless-stopped
     ports:
       - ${DB_PORT:-5432}:5432
-      - "9093:9093"
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
@@ -69,5 +68,8 @@ services:
       - ./db-init:/docker-entrypoint-initdb.d
       - ./postgresql.conf:/etc/postgresql/postgresql.conf
     logging: *large-logging
-    extra_hosts:
-      - "socket:127.0.0.1"
+
+networks:
+  default:
+    external: true
+    name: host
