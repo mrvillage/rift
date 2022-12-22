@@ -9,10 +9,10 @@ COPY requirements.txt requirements.txt
 RUN apt-get clean && \
     apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y git gcc net-tools
+    apt-get install -y git gcc
 
 RUN pip3 install -r requirements.txt
 
 COPY . .
 
-CMD export DOCKER_HOST_IP=$(route -n | awk '/UG[ \t]/{print $2}') && python3 -OO start.py
+CMD python3 -OO start.py

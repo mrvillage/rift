@@ -9,7 +9,9 @@ x-large-logging:
 services:
   rift:
     container_name: rift-master-bot
-    build: ./bot
+    build:
+      context: ./bot
+      network: host
     depends_on:
       - db
     restart: unless-stopped

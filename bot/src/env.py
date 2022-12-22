@@ -40,7 +40,7 @@ DB_USER = str(os.getenv("DB_USER"))
 DB_PASSWORD = str(os.getenv("DB_PASSWORD"))
 DB_NAME = str(os.getenv("DB_NAME"))
 SOCKET_PORT = str(os.getenv("SOCKET_PORT"))
-SOCKET_IP = str(os.getenv("DOCKER_HOST_IP"))
+SOCKET_IP = str(os.getenv("SOCKET_IP"))
 APPLICATION_ID = int(os.getenv("APPLICATION_ID"))  # type: ignore
 DEBUG_APPLICATION_ID = int(os.getenv("DEBUG_APPLICATION_ID"))  # type: ignore
 DEBUG = os.getenv("DEBUG") == "true"
