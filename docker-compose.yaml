@@ -26,6 +26,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./db-data:/var/lib/postgresql/data
-      # - ./db/init:/docker-entrypoint-initdb.d
+      - ./db-init:/docker-entrypoint-initdb.d
       - ./postgresql.conf:/etc/postgresql/postgresql.conf
     logging: *large-logging
