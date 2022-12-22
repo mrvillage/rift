@@ -55,6 +55,7 @@ services:
       - /home/rift-master/bot/private.pem:/private.pem
       - /home/rift-master/bot/credentials.json:/credentials.json
       - /home/rift-master/bot/token.json:/token.json
+    network_mode: host
 
   db:
     container_name: rift-master-db
