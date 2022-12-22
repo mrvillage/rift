@@ -69,4 +69,4 @@ services:
       - ./postgresql.conf:/etc/postgresql/postgresql.conf
     logging: *large-logging
     extra_hosts:
-      - "socket:localhost"
+      - "socket:127.0.0.1"
