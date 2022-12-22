@@ -1,4 +1,11 @@
 version: "2"
+
+x-large-logging:
+  &large-logging
+  options:
+    max-size: "100MB"
+    max-file: "10"
+
 services:
   rift:
     build: ./bot
@@ -7,3 +14,18 @@ services:
       - /home/rift-master/bot/private.pem:/private.pem
       - /home/rift-master/bot/credentials.json:/credentials.json
       - /home/rift-master/bot/token.json:/token.json
+
+  db:
+    container_name: rift-master-db
+    image: mrvillage/postgres:latest
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    restart: unless-stopped
+    ports:
+      - ${DB_PORT:-5432}:5432
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+      # - ./db/init:/docker-entrypoint-initdb.d
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf
+    logging: *large-logging
