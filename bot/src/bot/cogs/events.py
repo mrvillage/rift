@@ -29,7 +29,7 @@ class Events(commands.Cog):
         backoff = ExponentialBackoff()
         while True:
             try:
-                async with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession(trust_env=True) as session:
                     async with session.ws_connect(
                         f"ws://{SOCKET_IP}:{SOCKET_PORT}", max_msg_size=0, timeout=300
                     ) as ws:
