@@ -53,8 +53,6 @@ services:
       - /home/rift-master/bot/private.pem:/private.pem
       - /home/rift-master/bot/credentials.json:/credentials.json
       - /home/rift-master/bot/token.json:/token.json
-    extra_hosts:
-      - "socket:127.0.0.1"
 
   db:
     container_name: rift-master-db
