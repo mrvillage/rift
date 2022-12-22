@@ -48,6 +48,7 @@ services:
       HS_GASOLINE_REQ: ${HS_GASOLINE_REQ}
       HS_MUNITIONS_REQ: ${HS_MUNITIONS_REQ}
       HS_SPREADSHEET_ID: ${HS_SPREADSHEET_ID}
+      JISHAKU_NO_UNDERSCORE: ${JISHAKU_NO_UNDERSCORE}
     volumes:
       - /home/rift-master/bot/private.pem:/private.pem
       - /home/rift-master/bot/credentials.json:/credentials.json
