@@ -61,6 +61,7 @@ services:
     restart: unless-stopped
     ports:
       - ${DB_PORT:-5432}:5432
+      - "9093:9093"
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
