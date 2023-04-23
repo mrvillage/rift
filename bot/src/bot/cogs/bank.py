@@ -910,10 +910,15 @@ class Bank(commands.Cog):
             "alliance": "The alliance to view information about.",
         },
     )
-    async def bank_account_summary(self, ctx: RiftContext, alliance: Alliance = MISSING):
+    async def bank_account_summary(
+        self, ctx: RiftContext, alliance: Alliance = MISSING
+    ):
         alliance = alliance or await Alliance.convert(ctx, alliance)
         permissions = alliance.permissions_for(ctx.author)
-        if not ((permissions.view_alliance_bank and permissions.view_bank_accounts) or permissions.leadership):
+        if not (
+            (permissions.view_alliance_bank and permissions.view_bank_accounts)
+            or permissions.leadership
+        ):
             raise NoRolesError(alliance, "View Alliance Bank", "View Bank Accounts")
         accounts = [i for i in cache.accounts if i.alliance_id == alliance.id]
         if not accounts:
@@ -927,7 +932,7 @@ class Bank(commands.Cog):
                 ctx.author,
                 f"Alliance: {repr(account.alliance)}\n"
                 f"Accounts: {resources}\n"
-                f"Accounts Value: ${resources.calculate_value(cache.prices):,.2f}\n"
+                f"Accounts Value: ${resources.calculate_value(cache.prices):,.2f}\n",
                 color=discord.Color.blue(),
             )
         )
