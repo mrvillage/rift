@@ -902,6 +902,45 @@ class Bank(commands.Cog):
         if await view.wait():
             await ctx.interaction.edit_original_message(view=None)
 
+                @bank_account.command(  # type: ignore
+        name="info",
+        brief="Get information about a bank account.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "account": "The bank account to get information about.",
+        },
+    )
+
+    @bank_account.command(  # type: ignore
+        name="summary",
+        brief="Get a summary of all bank accounts in an alliance.",
+        type=commands.CommandType.chat_input,
+        descriptions={
+            "alliance": "The alliance to view information about.",
+        },
+    )
+    async def bank_account_summary(self, ctx: RiftContext, alliance: Alliance = MISSING):
+        alliance = alliance or await Alliance.convert(ctx, alliance)
+        permissions = alliance.permissions_for(ctx.author)
+        if not ((permissions.view_alliance_bank and permissions.view_bank_accounts) or permissions.leadership):
+            raise NoRolesError(alliance, "View Alliance Bank", "View Bank Accounts")
+        accounts = [i for i in cache.accounts if i.alliance_id == alliance.id]
+        if not accounts:
+            raise EmbedErrorMessage(
+                ctx.author,
+                "This alliance has no bank accounts!",
+            )
+        resources = sum((i.resources for i in accounts), Resources())
+        await ctx.reply(
+            embed=funcs.get_embed_author_member(
+                ctx.author,
+                f"Alliance: {repr(account.alliance)}\n"
+                f"Accounts: {resources}\n"
+                f"Accounts Value: ${resources.calculate_value(cache.prices):,.2f}\n"
+                color=discord.Color.blue(),
+            )
+        )
+
     @bank.group(  # type: ignore
         name="transaction",
         brief="Manage transactions.",
