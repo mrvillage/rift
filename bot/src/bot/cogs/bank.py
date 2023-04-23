@@ -902,15 +902,6 @@ class Bank(commands.Cog):
         if await view.wait():
             await ctx.interaction.edit_original_message(view=None)
 
-                @bank_account.command(  # type: ignore
-        name="info",
-        brief="Get information about a bank account.",
-        type=commands.CommandType.chat_input,
-        descriptions={
-            "account": "The bank account to get information about.",
-        },
-    )
-
     @bank_account.command(  # type: ignore
         name="summary",
         brief="Get a summary of all bank accounts in an alliance.",
