@@ -265,13 +265,13 @@ class Alliance(Makeable):
             },
             {
                 "name": "Forum Link",
-                "value": f'[Click Here]({self.forum_url} "{self.forum_url}")'
+                "value": f'[Click Here]({self.forum_url})'
                 if self.forum_url is not None
                 else "None",
             },
             {
                 "name": "Discord Link",
-                "value": f'[Click Here]({self.ircchan} "{self.ircchan}")'
+                "value": f'[Click Here]({self.ircchan})'
                 if self.ircchan is not None
                 else "None",
             },

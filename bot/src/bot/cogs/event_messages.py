@@ -78,7 +78,7 @@ class EventMessages(commands.Cog):
             await sub.send(
                 funcs.get_embed_author_member(
                     bot.user,
-                    f'**Forum Post Created!**\nForum: {post.forum.name}\n[{title}]({post.link} "{post.link}")',
+                    f'**Forum Post Created!**\nForum: {post.forum.name}\n[{title}]({post.link})',
                     color=discord.Color.blue(),
                 ),
             )
