@@ -930,7 +930,7 @@ class Bank(commands.Cog):
         await ctx.reply(
             embed=funcs.get_embed_author_member(
                 ctx.author,
-                f"Alliance: {repr(account.alliance)}\n"
+                f"Alliance: {repr(alliance)}\n"
                 f"Accounts: {resources}\n"
                 f"Accounts Value: ${resources.calculate_value(cache.prices):,.2f}\n",
                 color=discord.Color.blue(),
